@@ -66,6 +66,9 @@ Category colours (budget, map pins): Stay `#5B5BD6`, Travel `#14B8A6`, Food `#FF
 | **ExpenseRow** | Category icon, title, paid by, my share (+/−) |
 | **BalanceChip** | "Arjun owes you ₹1,240" + Settle (UPI) |
 | **BookingTicket** | Ticket-shaped card with notch, PNR, times, offline badge |
+| **OfferCard** | Find & book result: thumbnail, name, rating, price (tabular), partner chip, **Add to poll** (ghost) + **Book ↗** (accent) |
+| **PartnerLabel** | Small caption "Partner · we may earn a commission" under every offer list; never hidden or shrunk below 12 px |
+| **NudgeCard** | Dashed-border card in the itinerary for a gap ("No stay for Night 2") with one action into Find & book |
 | **NowCard** (Trip) | Large: current item, countdown, Navigate / Check in |
 | **BottomSheet** | Create trip, add expense, item detail |
 | **CollageCanvas** | Template frames, drag-swap, stickers |

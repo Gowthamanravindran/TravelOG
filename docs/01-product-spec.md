@@ -95,7 +95,20 @@ Top bar: back to Home · trip name & dates · member avatars · **Invite** · �
 - **Per-person spending limit** (personal, private) — used for warnings in Trip mode.
 - Currency: trip base currency + per-item currency (auto-converted, daily rates).
 
-### 4.3 Bookings & Tickets (tab 3)
+### 4.3 Bookings (tab 3) — Find & book + My bookings
+A segmented control at the top switches between searching and the ticket wallet.
+
+**Find & book** (affiliate revenue lives here)
+- Search tabs: **Stays · Flights · Trains · Buses · Activities**.
+- Query is pre-filled from the trip: destination of the selected night/leg, dates, number of members ("Kaza · 16–18 Nov · 5 guests"). Editable.
+- Result card (OfferCard): photo/emoji, name, rating, price per night/seat, partner chip ("on Agoda"), "Partner · we may earn a commission" label.
+- Two actions per result:
+  - **Add to poll** — shortlist into a Stay/Transport poll. The option keeps price + partner link, so the group votes on real, bookable options.
+  - **Book on {partner} ↗** — opens the partner app/site through a tracked affiliate link.
+- On return to the app: **"Did you book it?"** sheet → Yes saves it to My bookings (PNR, dates, cost; cost is also added as an expense split across the members it covers) → No dismisses.
+- v1: click-out to partner search via deep links (no API contracts needed). v2: live prices from partner/aggregator APIs. In-app checkout is out of scope (payments, refunds, support).
+
+**My bookings**
 - Types: Flight, Train, Bus, Hotel/Stay, Event, Rental, Other.
 - Fields: provider, PNR/confirmation #, times, who it covers, cost (auto-adds to budget/expenses), attachments (PDF, image).
 - Attachments cached offline automatically when the trip becomes Upcoming.
@@ -125,6 +138,35 @@ Top bar: back to Home · trip name & dates · member avatars · **Invite** · �
 | Viewer | view, vote, comment, add expenses |
 
 Invite via link/QR (expires, revocable). Link preview works on web without an account; joining requires sign-up.
+
+### 4.6 Affiliate entry points
+Find & book is the one place booking happens. Other screens only point to it, pre-filtered.
+
+| Where | Trigger | What the user sees |
+|---|---|---|
+| Itinerary (Plan) | a night with no Stay item | NudgeCard: "No stay for Night 2 in Kaza → Find stays from ₹900" |
+| Itinerary (Plan) | city change between consecutive days | NudgeCard: "Manali → Kaza: buses from ₹1,100 · 9 h" |
+| Polls | Stay / Transport poll options | price + partner chip on each option; after **Lock in**: "Book now on {partner} ↗" |
+| Trip mode · Nearby | bookable activities and events | "Book tickets ↗" |
+| Explore | forking a template | "Book this trip" checklist (stays + transport per day) |
+
+**Trust rules**
+- Every partner result carries "Partner · we may earn a commission".
+- Sort by price, rating or distance; never by commission.
+- No affiliate cards on Trip mode **Today** or in **Memories**.
+- A link the user pasted themselves is never replaced with an affiliate link.
+
+**Partners to start with (India)** — confirm rates on signup:
+
+| Category | Partners | Notes |
+|---|---|---|
+| Stays | Booking.com, Agoda, MakeMyTrip / Goibibo | % of booking value or fixed payout |
+| Flights | MakeMyTrip, Cleartrip, ixigo | fixed payout per booking |
+| Trains | ixigo, ConfirmTkt | IRCTC has no affiliate program; partners are authorised IRCTC agents |
+| Buses | redBus, Goibibo | small fixed payout |
+| Activities | Klook, Thrillophilia | % of booking |
+
+Joined through affiliate networks (e.g. vCommission, EarnKaro, INRDeals, Involve Asia, Travelpayouts) where a partner has no direct program.
 
 ---
 
@@ -198,7 +240,8 @@ Free tier: watermark + standard resolution; Plus/Pass: HD, no watermark, premium
 | Auth, trips, invites, roles | Ranked polls, availability grid | Email-forward booking parsing |
 | Itinerary + plan variants | Offline map packs | Live events feed |
 | Polls (single/multi), lock-in | Location timeline (time spent) | AI auto-plan / suggestions |
-| Budget + expenses + UPI settle | Feed + Explore templates | Affiliate booking |
-| Bookings with attachments | Memories templates pack 2 | Web planner |
+| Budget + expenses + UPI settle | Feed + Explore templates | "Book this trip" checklist |
+| My bookings with attachments | Memories templates pack 2 | Web planner |
 | Trip mode Today/Plan/Map/Budget | Nearby (Places) | Public creator profiles |
-| Memories collage + IG share | Subscriptions (RevenueCat) | |
+| Memories collage + IG share | Subscriptions (RevenueCat) | Find & book with live partner prices |
+| | Find & book (click-out deep links) + nudges | |

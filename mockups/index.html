@@ -209,6 +209,11 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:14px;overflow:hidden}
 .grid3 .ph{aspect-ratio:1}
+.offer{padding:12px}
+.offer .thumb{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;flex:none}
+.partner{font-weight:700;color:var(--accent)}
+.nudge{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:18px;border:1.5px dashed var(--accent);background:var(--accent-soft)}
+.nudge .nico{width:38px;height:38px;border-radius:12px;background:var(--surface);display:grid;place-items:center;font-size:18px;flex:none}
 .tplchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 
 @media (max-width:460px){
@@ -227,7 +232,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
     </div>
     <div class="modes" id="modes">
       <button class="mode-btn" data-act="go-mode" data-mode="home"><span class="dot" style="background:var(--coral)"></span><b>Home mode</b><small>Trips · Feed · Explore · Profile</small></button>
-      <button class="mode-btn" data-act="go-mode" data-mode="plan"><span class="dot" style="background:var(--indigo)"></span><b>Plan mode · Spiti Road Trip</b><small>Itinerary · Budget · Bookings · Polls</small></button>
+      <button class="mode-btn" data-act="go-mode" data-mode="plan"><span class="dot" style="background:var(--indigo)"></span><b>Plan mode · Spiti Road Trip</b><small>Itinerary · Budget · Find &amp; book · Polls</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="trip"><span class="dot" style="background:var(--teal)"></span><b>Trip mode · Goa (live)</b><small>Today · Plan + Map · Nearby · Budget</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="memories"><span class="dot" style="background:var(--mango)"></span><b>Memories · Kerala (past)</b><small>Collage editor → Instagram</small></button>
     </div>
@@ -297,10 +302,11 @@ const S = {
   planTab:'itin', day:1, variant:'A', compare:false,
   tripTab:'today', tripView:'list', tripDay:2, near:'Food',
   memTpl:'grid', sheet:null, toast:null,
+  bookSeg:'find', findCat:'Stays', pending:null, myBookings:[],
   polls:[
     {id:'p1',q:'Which route into Spiti?',type:'Plan variant',dl:'Closes in 2 days',style:'single',opts:[['Plan A · via Rohtang (Manali)',3],['Plan B · via Kinnaur (Shimla)',1]],mine:null,locked:false,voters:['riya','arjun','kabir','meera']},
     {id:'p2',q:'When can everyone go?',type:'Dates',dl:'Closes Fri',style:'single',opts:[['8 – 15 Nov',2],['15 – 22 Nov',3],['22 – 29 Nov',0]],mine:null,locked:false,voters:['riya','arjun','kabir','meera']},
-    {id:'p3',q:'Stay in Kaza',type:'Stay',dl:'Closes in 5 days',style:'multi',opts:[['Zostel Kaza · ₹900/night',2],['Sakya Abode · ₹2,400/night',2],['Homestay in Langza · ₹1,500',1]],mine:null,locked:false,voters:['riya','kabir','arjun']}
+    {id:'p3',q:'Stay in Kaza',type:'Stay',dl:'Closes in 5 days',style:'multi',opts:[['Zostel Kaza · ₹900/night',2,'Booking.com'],['Sakya Abode · ₹2,400/night',2,'Agoda'],['Homestay in Langza · ₹1,500',1,'MakeMyTrip']],mine:null,locked:false,voters:['riya','kabir','arjun']}
   ],
   expenses:[
     {t:'Beach shack lunch',cat:'🍤',by:'arjun',amt:2840,split:['you','riya','arjun','meera'],when:'Today 1:40 pm'},
@@ -347,6 +353,28 @@ const nearby = {
   Sights:[['⛪','Church of St. Anthony','Heritage','2.6 km','Open till 6 pm','4.3'],['🏖️','Vagator Beach','Beach','1.4 km','Open now','4.5'],['🌊','Ozran cliffs','Viewpoint','1.8 km','Best at sunset','4.6']],
   Events:[['🎶','Saturday Night Market','Arpora · live music','5.1 km','Today 6 pm – 1 am','4.4'],['🎨','Goa Open Arts walk','Panjim','18 km','Sat 10 am','4.2'],['🎧','Sunset sessions','Hilltop, Vagator','1.6 km','Today 5 pm','4.1']],
   Essentials:[['🏧','HDFC ATM','Cash','0.6 km','24 h',''],['💊','Apollo Pharmacy','Pharmacy','1.1 km','Open till 10 pm',''],['⛽','HP petrol pump','Fuel','2.2 km','24 h','']]
+};
+
+const offers = {
+  Stays:{q:'Kaza · 16 – 18 Nov · 2 nights · 5 guests',unit:'/night',items:[
+    ['🛖','Zostel Kaza','Hostel · dorms + private rooms','4.5',900,'Booking.com','#BDE0FE'],
+    ['🏨','Sakya Abode','Hotel · heated rooms, parking','4.3',2400,'Agoda','#CDB4DB'],
+    ['🏔️','Hotel Deyzor','Hotel · Key monastery views','4.4',3100,'MakeMyTrip','#FFD6A5']]},
+  Flights:{q:'Kullu (KUU) → Delhi (DEL) · Wed 26 Nov · 2 adults',unit:'/person',items:[
+    ['✈️','IndiGo 6E 2134','13:05 → 14:35 · non-stop','',5840,'MakeMyTrip','#E7E7FB'],
+    ['✈️','Alliance Air 9I 832','11:10 → 12:40 · non-stop','',6210,'Cleartrip','#E7E7FB'],
+    ['✈️','Air India via CHD','09:40 → 15:20 · 1 stop','',6450,'ixigo','#E7E7FB']]},
+  Trains:{q:'New Delhi → Kalka · Fri 14 Nov · 5 passengers',unit:'/person',items:[
+    ['🚆','Kalka Shatabdi 12011','07:40 → 11:45 · CC · 42 available','',1045,'ixigo','#B7E4C7'],
+    ['🚄','Vande Bharat 22447','05:50 → 09:55 · CC · RAC 4','',1280,'ConfirmTkt','#B7E4C7']]},
+  Buses:{q:'Delhi → Manali · Fri 14 Nov · 5 seats',unit:'/seat',items:[
+    ['🚌','HRTC Volvo','18:30 → 07:15 · AC sleeper','4.2',1450,'redBus','#FFE6E2'],
+    ['🚌','Zingbus','19:15 → 08:00 · AC seater','4.4',1199,'Goibibo','#FFE6E2'],
+    ['🚐','Manali → Kaza HRTC','05:30 → 15:00 · Sun 16 Nov','4.0',480,'redBus','#FFE6E2']]},
+  Activities:{q:'Around Kaza · 16 – 19 Nov · 5 people',unit:'/person',items:[
+    ['🛕','Key Monastery guided walk','2 h · local guide','4.7',600,'Thrillophilia','#FFF1D6'],
+    ['🥾','Langza fossil hike','4 h · with lunch','4.6',900,'Thrillophilia','#FFF1D6'],
+    ['🌌','Chandratal stargazing camp','overnight · telescope','4.8',1800,'Klook','#FFF1D6']]}
 };
 
 /* ---------- helpers ---------- */
@@ -484,6 +512,9 @@ function planItin(){
   }
   html += `<div class="card" style="background:var(--accent-soft);border:0;box-shadow:none;margin:6px 0 4px;padding:10px 12px"><div class="between small"><span><b>${v.km} km</b> · ${v.drive} driving · <b>${inr(v.cost)}</b> pp</span><span class="tiny muted">by ${people[v.by].n}</span></div></div>`;
   html += tl(v.items.map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],'',r[6]]));
+  html += `<div class="stack" style="gap:8px;margin:4px 0 10px">
+    <button class="nudge" data-act="find" data-k="Stays"><span class="nico">🛏️</span><span style="flex:1;min-width:0"><b>No stay for Night 3 in Kaza</b><span class="tiny muted" style="display:block">Find stays from ₹900 · 16 – 18 Nov · 5 guests</span></span><span class="link">Find →</span></button>
+    <button class="nudge" data-act="find" data-k="Buses"><span class="nico">🚌</span><span style="flex:1;min-width:0"><b>Delhi → Manali on Day 1</b><span class="tiny muted" style="display:block">Buses from ₹1,199 · trains to Kalka from ₹1,045</span></span><span class="link">Find →</span></button></div>`;
   html += `<div class="row" style="margin-top:6px"><button class="btn ghost" style="flex:1" data-act="toast" data-msg="Add place, activity, food, stay or transport">${ic('plus',16)} Add item</button><button class="btn primary" style="flex:1" data-act="to-poll">${ic('vote',16)} Vote A vs B</button></div>`;
   return html;
 }
@@ -501,15 +532,40 @@ function planBudget(){
   <div class="card between"><div><b class="num" style="font-size:18px">₹2,500 / day</b><div class="small muted">We'll nudge you at 80% during the trip</div></div><span class="chip accent">On</span></div>`;
 }
 function planBook(){
+  const seg=`<div class="seg" role="group" aria-label="Bookings view" style="margin-bottom:12px">
+    <button data-act="bseg" data-v="find" aria-pressed="${S.bookSeg==='find'}">Find &amp; book</button>
+    <button data-act="bseg" data-v="mine" aria-pressed="${S.bookSeg==='mine'}">My bookings · ${3+S.myBookings.length}</button></div>`;
+  return seg + (S.bookSeg==='find'?findBook():myBook());
+}
+function findBook(){
+  const o=offers[S.findCat];
+  const pollable = S.findCat==='Stays';
+  return `<div class="hscroll" style="margin-bottom:10px">${Object.keys(offers).map(k=>`<button class="chip ${S.findCat===k?'accent':''}" data-act="fcat" data-k="${k}">${k}</button>`).join('')}</div>
+  <div class="input between" style="background:var(--surface);margin-bottom:12px"><span class="row small" style="min-width:0;gap:8px">${ic('search',16)}<span style="min-width:0">${o.q}</span></span><span class="link">Edit</span></div>
+  <div class="between tiny muted" style="margin-bottom:8px"><span>Sorted by price · from trip dates</span><span>${o.items.length} results</span></div>
+  <div class="stack">${o.items.map((it,i)=>`<div class="card offer">
+    <div class="row" style="align-items:flex-start;gap:12px">
+      <div class="thumb" style="background:${it[6]}">${it[0]}</div>
+      <div style="flex:1;min-width:0"><b class="item-title">${it[1]}</b><div class="tiny muted">${it[2]}</div>
+        <div class="row tiny" style="margin-top:4px;gap:6px">${it[3]?`<span>★ ${it[3]}</span>·`:''}<span class="partner">on ${it[5]}</span></div></div>
+      <div style="text-align:right;flex:none"><b class="num" style="font-family:var(--display);font-size:17px">${inr(it[4])}</b><div class="tiny muted">${o.unit}</div></div>
+    </div>
+    <div class="row" style="margin-top:10px">${pollable?`<button class="btn ghost" style="flex:1;padding:10px" data-act="add-poll" data-i="${i}">${ic('vote',16)} Add to poll</button>`:''}
+      <button class="btn primary" style="flex:1;padding:10px" data-act="book" data-i="${i}">Book on ${it[5]} ↗</button></div>
+  </div>`).join('')}</div>
+  <p class="tiny muted" style="margin:10px 2px 0">Partner results · we may earn a commission when you book. It never changes the order.</p>`;
+}
+function myBook(){
   const tk=(type,from,to,sub,ref,who,cost,off)=>`<div class="ticket"><div class="l"><div class="between"><span class="eyebrow">${type}</span>${off?'<span class="chip accent">Offline ✓</span>':''}</div>
     <div class="route">${from}<span class="line"></span>${to}</div><div class="small muted">${sub}</div><div class="row tiny">${av(who)}<span class="muted">${who.length} travellers · ${inr(cost)}</span></div></div>
     <div class="r"><span class="tiny muted">PNR</span><b class="num" style="font-family:var(--display)">${ref}</b><span class="tiny muted">PDF</span></div></div>`;
-  return `<div class="hscroll" style="margin-bottom:12px">${['All','Transport','Stays','Events'].map((f,i)=>`<span class="chip ${i===0?'accent':''}">${f}</span>`).join('')}</div>
-  <div class="stack">
-    ${tk('Bus · HRTC Volvo','DEL','MNL','Fri 14 Nov · 18:30 → 07:15 · Seat 21–25','8K2QXP',['you','riya','arjun','kabir','meera'],7250,true)}
-    ${tk('Camp','Chandratal','2N','Sun 16 → Tue 18 Nov · 2 Swiss tents','CT-4471',['you','riya','arjun','kabir','meera'],9000,true)}
+  const all=['you','riya','arjun','kabir','meera'];
+  return `<div class="stack">
+    ${S.myBookings.map(b=>tk(b.type,b.from,b.to,b.sub,b.ref,all,b.cost,false)).join('')}
+    ${tk('Bus · HRTC Volvo','DEL','MNL','Fri 14 Nov · 18:30 → 07:15 · Seat 21–25','8K2QXP',all,7250,true)}
+    ${tk('Camp','Chandratal','2N','Sun 16 → Tue 18 Nov · 2 Swiss tents','CT-4471',all,9000,true)}
     ${tk('Flight · IndiGo 6E 2134','KUU','DEL','Wed 26 Nov · 13:05 → 14:35','R7TZ2M',['you','kabir'],11840,false)}
-    <button class="card" style="border-style:dashed;box-shadow:none;text-align:left" data-act="toast" data-msg="Upload a PDF/screenshot or forward the email to spiti@in.travelog.app (v2)"><div class="row"><span class="icon-btn" style="background:var(--accent-soft);color:var(--accent);border:0">${ic('plus')}</span><div><b>Add booking</b><div class="small muted">PDF, screenshot or forward the email</div></div></div></button>
+    <button class="card" style="border-style:dashed;box-shadow:none;text-align:left" data-act="toast" data-msg="Upload a PDF/screenshot or forward the email to spiti@in.travelog.app (v2)"><div class="row"><span class="icon-btn" style="background:var(--accent-soft);color:var(--accent);border:0">${ic('plus')}</span><div><b>Add a booking you made elsewhere</b><div class="small muted">PDF, screenshot or forward the email</div></div></div></button>
   </div>`;
 }
 function pollCard(p){
@@ -519,9 +575,10 @@ function pollCard(p){
     <div class="between"><span class="chip">${p.type}</span><span class="tiny muted">${p.locked?'🔒 Locked in':p.dl}</span></div>
     <h3 style="font-size:17px">${p.q}</h3>
     ${p.opts.map((o,i)=>{const pct=Math.round(o[1]/total*100);return `<button class="opt ${p.mine===i?'mine':''}" data-act="vote" data-p="${p.id}" data-o="${i}" ${p.locked?'disabled':''}>
-      <span class="bar" style="width:${pct}%"></span><span>${p.locked&&o[1]===max?'🏆 ':''}${o[0]}${p.mine===i?' · <span class="tiny">your vote</span>':''}</span><span class="pct">${pct}%</span></button>`}).join('')}
+      <span class="bar" style="width:${pct}%"></span><span>${p.locked&&o[1]===max?'🏆 ':''}${o[0]}${o[2]?` <span class="tiny muted">· on ${o[2]}</span>`:''}${p.mine===i?' · <span class="tiny">your vote</span>':''}</span><span class="pct">${pct}%</span></button>`}).join('')}
     <div class="between"><div class="row tiny muted">${av(p.voters)} ${total} votes · ${p.style==='multi'?'pick any':'pick one'}</div>
-    ${p.locked?'':`<button class="link" data-act="lock" data-p="${p.id}">Lock in</button>`}</div></div>`;
+    ${p.locked?'':`<button class="link" data-act="lock" data-p="${p.id}">Lock in</button>`}</div>
+    ${p.locked&&p.opts.find(o=>o[1]===max)[2]?(()=>{const w=p.opts.find(o=>o[1]===max);return `<button class="btn primary block" data-act="book-poll" data-p="${p.id}">Book now on ${w[2]} ↗</button>`})():''}</div>`;
 }
 function planPolls(){
   return `<div class="between" style="margin-bottom:12px"><span class="small muted">Tap an option to vote · results are live</span><button class="btn primary" style="padding:8px 12px" data-act="toast" data-msg="Poll types: destination, dates, stay, activity, plan variant">${ic('plus',16)} Poll</button></div>
@@ -602,7 +659,7 @@ function tripNear(){
   <div class="stack">${nearby[S.near].map(p=>`<div class="card" style="display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:12px">
     <div style="width:48px;height:48px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;font-size:24px">${p[0]}</div>
     <div style="min-width:0"><b>${p[1]}</b><div class="tiny muted">${p[2]} · ${p[3]}</div><div class="tiny" style="color:var(--accent)">${p[4]}${p[5]?' · ★ '+p[5]:''}</div></div>
-    <button class="btn ghost" style="padding:8px 10px;font-size:12px" data-act="toast" data-msg="Added ${p[1].replace(/'/g,'')} to today at the best free slot">＋ Today</button></div>`).join('')}</div>
+    <button class="btn ghost" style="padding:8px 10px;font-size:12px" data-act="toast" data-msg="${S.near==='Events'?'Opens tickets on the partner site via a tracked link':'Added '+p[1].replace(/'/g,'')+' to today at the best free slot'}">${S.near==='Events'?'Tickets ↗':'＋ Today'}</button></div>`).join('')}</div>
   <p class="tiny muted" style="margin-top:10px">Places data is cached for your area to keep this fast offline.</p>`;
 }
 function ringSvg(spent,budget){
@@ -689,6 +746,15 @@ function sheet(){
     <div class="upi">upi://pay?pa=you@okaxis&amp;pn=You&amp;am=${amt}&amp;cu=INR&amp;tn=TravelOG%20Goa</div></div>
     <div class="row" style="margin-top:12px"><button class="btn ghost" style="flex:1" data-act="toast-close" data-msg="Marked as settled in cash">Cash</button><button class="btn primary" style="flex:1" data-act="toast-close" data-msg="Request sent to ${people[k[0]].n} on WhatsApp + push">Send request</button></div>`;
   }
+  if(S.sheet==='booked'){
+    const b=S.pending;
+    body=`<div style="text-align:center;font-size:34px">🧳</div><h3 style="font-size:20px;text-align:center">Did you book ${b.name}?</h3>
+    <p class="small muted" style="margin:4px 0 14px;text-align:center">You just came back from ${b.partner}. Save it so the whole group has the ticket offline.</p>
+    <div class="stack"><div class="field"><label for="pnr">Confirmation / PNR</label><input id="pnr" class="input" value="${b.ref}"></div>
+    <div class="field"><label for="bc">Total paid</label><input id="bc" class="input" inputmode="numeric" value="${b.total}"></div>
+    <label class="row small" style="gap:8px"><input type="checkbox" id="splitchk" checked> Add as an expense split 5 ways</label>
+    <div class="row"><button class="btn ghost" style="flex:1" data-act="close">Not yet</button><button class="btn primary" style="flex:1" data-act="save-booking">Yes, save it</button></div></div>`;
+  }
   if(S.sheet==='ig') body=`<h3 style="font-size:20px">Share to Instagram</h3><p class="small muted" style="margin:4px 0 14px">Exports in HD without watermark on Plus or Trip Pass.</p>
     <div class="stack">${[['Feed post','1080 × 1350 · 4:5'],['Story','1080 × 1920 · 9:16'],['Carousel','up to 10 slides']].map(o=>`<button class="card between" style="box-shadow:none" data-act="toast-close" data-msg="Opening Instagram ${o[0].toLowerCase()} with your collage"><div style="text-align:left"><b>${o[0]}</b><div class="tiny muted">${o[1]}</div></div><span class="muted">›</span></button>`).join('')}</div>`;
   return `<div class="scrim" data-act="close-scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
@@ -753,6 +819,26 @@ document.addEventListener('click',e=>{
     case 'tday': S.tripDay=+d.day; break;
     case 'near': S.near=d.k; break;
     case 'tpl': S.memTpl=d.k; break;
+    case 'bseg': S.bookSeg=d.v; break;
+    case 'fcat': S.findCat=d.k; break;
+    case 'find': S.planTab='book'; S.bookSeg='find'; S.findCat=d.k; keep=false; break;
+    case 'add-poll':{ const it=offers[S.findCat].items[+d.i]; const poll=S.polls.find(x=>x.id==='p3');
+      const label=`${it[1]} · ${inr(it[4])}/night`;
+      if(!poll.opts.some(o=>o[0]===label)) poll.opts.push([label,0,it[5]]);
+      toast(`Added ${it[1]} to “${poll.q}” — the group can vote now`); break; }
+    case 'book':{ const c=offers[S.findCat]; const it=c.items[+d.i];
+      const nights=S.findCat==='Stays'?2:1, qty=S.findCat==='Flights'?2:S.findCat==='Stays'?(it[4]<1000?5:2):5;
+      S.pending={name:it[1],partner:it[5],cat:S.findCat,total:it[4]*nights*qty,ref:'TOG'+(1000+Math.floor(Math.random()*9000)),q:c.q};
+      S.sheet='booked'; break; }
+    case 'book-poll':{ const p=S.polls.find(x=>x.id===d.p); const max=Math.max(...p.opts.map(o=>o[1])); const w=p.opts.find(o=>o[1]===max);
+      S.pending={name:w[0].split(' · ')[0],partner:w[2],cat:'Stays',total:(parseInt(w[0].replace(/[^0-9]/g,''),10)||900)*2*2,ref:'TOG'+(1000+Math.floor(Math.random()*9000)),q:'Kaza · 16 – 18 Nov'};
+      S.sheet='booked'; break; }
+    case 'save-booking':{ const b=S.pending; const total=parseInt(($('bc')||{}).value,10)||b.total; const ref=(($('pnr')||{}).value||b.ref).trim();
+      const map={Stays:['Stay','Kaza','2N'],Flights:['Flight','KUU','DEL'],Trains:['Train','NDLS','KLK'],Buses:['Bus','DEL','MNL'],Activities:['Activity','Kaza','🎟']};
+      const m=map[b.cat]||map.Stays;
+      S.myBookings.unshift({type:`${m[0]} · ${b.name} · ${b.partner}`,from:m[1],to:m[2],sub:b.q,ref,cost:total});
+      S.sheet=null; S.bookSeg='mine'; S.planTab='book'; S.mode='plan'; keep=false;
+      toast(`Saved to My bookings${($('splitchk')||{}).checked!==false?' · '+inr(total)+' added to Budget':''}`); break; }
     case 'sheet': S.sheet=d.sheet; break;
     case 'close': S.sheet=null; break;
     case 'create': S.sheet=null; S.mode='plan'; S.planTab='itin'; toast('“Coorg monsoon weekend” created — invite link ready'); keep=false; break;

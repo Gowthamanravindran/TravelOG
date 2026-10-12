@@ -37,6 +37,7 @@ The data is **relational** (trips → days → items, polls → votes, expenses 
 | Object storage | Cloudflare R2 + custom domain CDN | photos, attachments; zero egress fees |
 | Places | Google Places API (New), cached server-side 7 days | Nearby, place search |
 | Payments | RevenueCat over App Store / Play Billing | subscriptions + Trip Pass (consumable/non-consumable) |
+| Affiliate booking | `partner-search` Edge Function, `/go` click redirect (Cloudflare Worker), network postbacks | Find & book in the Bookings tab |
 | Push | Expo Push → FCM/APNs | poll, expense, reminder notifications |
 | Email | Resend | invites, receipts |
 | Analytics / errors | PostHog, Sentry | product analytics, crash reporting |
@@ -65,6 +66,10 @@ flowchart LR
   EF --> PUSH[Expo Push → FCM/APNs]
   UI --> RC[RevenueCat] -->|webhook| EF
   WEB[Next.js share pages] --> SB
+  UI -->|Find & book query| PS[partner-search fn]
+  PS -->|v2 live prices| PAPI[Partner / aggregator APIs]
+  UI -->|Book ↗| GO["/go/:clickId redirect"] -->|302 + affiliate tag| PARTNER[Partner site / app]
+  NET[Affiliate networks] -->|postback / CSV| EF
 ```
 
 ## 4. Data model (core)
@@ -90,6 +95,9 @@ erDiagram
   trips ||--o{ memories : has
   memories ||--o| feed_posts : published_as
   trips ||--o{ location_visits : records
+  trips ||--o{ affiliate_clicks : generates
+  affiliate_clicks ||--o| affiliate_conversions : converts_to
+  affiliate_clicks ||--o| bookings : saved_as
 ```
 
 | Table | Key columns |
@@ -112,6 +120,8 @@ erDiagram
 | `memories` | id, trip_id, author_id, template, layout_json, export_key |
 | `feed_posts`, `reactions`, `comments`, `follows`, `reports` | social graph + moderation |
 | `location_visits` | trip_id, user_id, item_id?, lat, lng, arrived_at, left_at |
+| `affiliate_clicks` | id (= sub-id sent to partner), trip_id, user_id, partner, category, query jsonb, offer_ref, price_shown, created_at |
+| `affiliate_conversions` | click_id, network, partner_order_ref (hashed), status (pending/confirmed/cancelled), commission, currency, reported_at |
 
 **RLS rule of thumb:** every trip-scoped table has `using (is_trip_member(trip_id))`; writes additionally check role. Balances are computed by a SQL view; "simplify debts" runs in an Edge Function.
 
@@ -126,6 +136,14 @@ erDiagram
 **Location timeline** — background task only while a trip is Live and user opted in; on-device clustering → `location_visits` upload of visits only (no raw GPS trail).
 
 **Instagram share** — Skia renders to a PNG at export size → `react-native-share`: `Share.shareSingle({ social: INSTAGRAM_STORIES, backgroundImage })` for Stories (needs a Facebook App ID), share sheet for Feed posts.
+
+**Find & book (affiliate)** —
+1. App sends the pre-filled query (category, place, dates, guests) to the `partner-search` Edge Function.
+2. v1: the function returns partner **deep links** (each partner's own search URL with our affiliate tag) plus cached sample prices. v2: it calls partner/aggregator APIs, normalises results into one OfferCard shape and caches them for 24 h per (place, dates, guests).
+3. **Book ↗** hits `/go/:clickId` (Edge Function or Cloudflare Worker): it inserts an `affiliate_clicks` row and 302-redirects with the click id as the network **sub-id**, so a conversion can be traced back to the trip without sending personal data to the partner.
+4. Networks report conversions by postback URL or daily CSV → `affiliate_conversions` (pending → confirmed after the stay/travel date, usually 30–60 days).
+5. When the user returns, the "Did you book it?" sheet creates a `bookings` row linked to the click. That gives the user their ticket wallet entry even before the network confirms.
+Bookings happen on the partner's site, so no in-app purchase rules or payment handling apply.
 
 **Settle up** — `upi://pay?pa=<payee upi>&pn=<name>&am=<amount>&cu=INR&tn=TravelOG <trip>`; user confirms "paid" afterwards (we never touch funds).
 

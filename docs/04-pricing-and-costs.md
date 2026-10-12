@@ -40,10 +40,37 @@ Core collaboration stays free — a group app dies if one friend hits a paywall 
 - Pros: casual groups buy a pass; frequent travellers/creators subscribe; Plus is an easy upsell after the 2nd pass ("You've spent ₹398 — Plus is ₹1,199 for unlimited").
 - Cons: two SKUs to explain (keep the paywall to one screen).
 
-### Extra revenue (any model, v2)
-- **Affiliate bookings** — hotel/flight/bus links in itinerary & bookings (typically a few % commission per booking).
+### Extra revenue (any model)
+- **Affiliate bookings** (v1.5) — Find & book in the Bookings tab; see §2a.
 - **Sponsored Explore templates** — tourism boards, homestays (clearly labelled).
 - **Creator itineraries** — paid templates with revenue share (later).
+
+---
+
+## 2a. Affiliate booking revenue
+
+**Where it happens:** Plan mode › Bookings › **Find & book** (stays, flights, trains, buses, activities), fed by itinerary nudges, Stay/Transport polls, Nearby and Explore. Details in [01 · Product spec §4.3 and §4.6](01-product-spec.md).
+
+**Example payouts** (from affiliate-network listings, October 2026; confirm on signup):
+
+| Partner (network) | Payout |
+|---|---|
+| MakeMyTrip (EarnKaro) | up to ₹180 per hotel, up to ₹120 per flight |
+| Yatra (FlexOffers) | ~6.4 % on domestic hotels; $2.40 per domestic flight |
+| ixigo (EarnKaro) | up to ₹90 per purchase |
+| Goibibo bus (INRDeals) | up to ₹35 per sale |
+| Cleartrip (Involve Asia) | flights + hotels, rate per dashboard |
+
+**Estimate for the scenario's 5,000 trips / year**
+
+| | Trips that book through us | Avg commission per booking trip | Gross | Net of 18 % GST |
+|---|---|---|---|---|
+| Conservative | 5 % → 250 | ₹150 (one bus or flight) | ₹37,500 | **₹31.8k** |
+| Expected | 10 % → 500 | ₹250 (a hotel + transport) | ₹1,25,000 | **₹1.06 L** |
+
+Why it fits this app: the group has already picked the place and dates, so search is pre-filled; one person usually books for 4–6 people, so the booking value is high; and voting on real options in a Stay poll ends in a "Book now" tap.
+
+Not subject to the 15 % app-store fee (physical services booked on the partner's site). Commissions are confirmed 30–60 days after travel and cancellations are reversed, so cash arrives late. Infra cost for v1 click-out is ~$0 (one Edge Function + one redirect); v2 live-price APIs may add caching cost.
 
 ---
 
@@ -100,6 +127,7 @@ Net to us = gross × 0.85 (15 % store fee — Apple Small Business Program / Goo
 | **A** Subscription ₹999/yr | 3 % users → 30 × ₹999 = ₹29,970 → **net ₹21.6k** | 6 % → 60 subs → ₹59,940 → **net ₹43.2k** |
 | **B** Trip Pass ₹199 | 6 % of trips → 300 passes → ₹59,700 → **net ₹43.0k** | 12 % → 600 passes → ₹1,19,400 → **net ₹86.0k** |
 | **C** Hybrid | 2 % Plus (20 × ₹1,199) + 5 % of remaining 4,900 trips (245 passes) = ₹72,735 → **net ₹52.4k** | 4 % Plus (40) + 10 % of remaining 4,800 trips (480 passes) = ₹1,43,480 → **net ₹1.03 L** |
+| **C + affiliate** | ₹52.4k + ₹31.8k → **net ₹84.2k** | ₹1.03 L + ₹1.06 L → **net ₹2.09 L** |
 
 ### Profit at 1,000 users (net revenue − annual cost)
 
@@ -108,12 +136,13 @@ Net to us = gross × 0.85 (15 % store fee — Apple Small Business Program / Goo
 | A conservative / expected | −₹23k / −₹2k | −₹90k / −₹69k |
 | B conservative / expected | −₹2k / **+₹41k** | −₹69k / −₹26k |
 | C conservative / expected | +₹7k / **+₹58k** | −₹60k / −₹9k |
+| C + affiliate conservative / expected | +₹40k / **+₹1.65 L** | −₹27k / **+₹98k** |
 
 **Takeaways**
 1. At 1,000 users this is a **pilot**: every model is roughly break-even — run lean (cap Places to the free tier, skip originals until people pay).
 2. **Model A loses** — a solo subscription doesn't fit bursty group travel.
 3. **B and C both work**; **C is recommended** — it keeps B's group-friendly pass and adds a recurring base from frequent travellers, and leads in both scenarios.
-4. Affiliate bookings are upside not counted here; even ₹50 net commission on 5 % of trips adds ~₹12.5k.
+4. **Affiliate booking roughly doubles net revenue** at the expected rate and is the only line that makes the 1,000-user pilot clearly profitable on the comfortable cost budget. Build Find & book early (v1.5), right after core planning.
 
 ---
 
@@ -140,6 +169,7 @@ Hybrid revenue at 10k users ≈ **₹5.2 L (conservative) – ₹10.3 L (expecte
 - Trip Pass in stores: non-consumable tied to a trip ID via RevenueCat attributes, validated server-side by webhook.
 
 ## Sources
+- Affiliate payouts: [EarnKaro – MakeMyTrip](https://earnkaro.com/blog/earn-money-by-becoming-a-makemytrip-affiliate/) · [EarnKaro – ixigo](https://earnkaro.com/blog/ixigo-affiliate-program/) · [FlexOffers – Yatra](https://www.flexoffers.com/affiliate-programs/yatra-travel-affiliate-program) · [INRDeals – Goibibo Bus](https://inrdeals.com/campaigns/goibibo-bus-affiliate-program) · [Involve Asia – Cleartrip](https://involve.asia/blog/cleartrip-affiliate-program/)
 - [Supabase pricing](https://supabase.com/pricing)
 - [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/)
 - [Mapbox pricing](https://docs.mapbox.com/accounts/guides/pricing/) · [third-party breakdown](https://www.woosmap.com/blog/mapbox-pricing)
