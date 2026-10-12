@@ -210,6 +210,21 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:14px;overflow:hidden}
 .grid3 .ph{aspect-ratio:1}
 .offer{padding:12px}
+.cattabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.cattabs button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:13px;color:var(--ink-2)}
+.cattabs button span{font-size:20px}
+.cattabs button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.searchbox{display:flex;flex-direction:column;gap:8px;padding:12px}
+.sfrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sf{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);min-width:0}
+.sf label,.sflabel{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.sf input{border:0;background:transparent;font:inherit;font-weight:700;color:var(--ink);padding:0;width:100%;min-width:0}
+.sf b{font-weight:700}
+.sf-guests{padding:8px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.sf-guests > div:first-child{display:flex;flex-direction:column;gap:2px}
+.step{width:36px;height:36px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:18px;font-weight:700}
+.ft{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.swap{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:16px;font-weight:800}
 .offer .thumb{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;flex:none}
 .partner{font-weight:700;color:var(--accent)}
 .nudge{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:18px;border:1.5px dashed var(--accent);background:var(--accent-soft)}
@@ -302,7 +317,8 @@ const S = {
   planTab:'itin', day:1, variant:'A', compare:false,
   tripTab:'today', tripView:'list', tripDay:2, near:'Food',
   memTpl:'grid', sheet:null, toast:null,
-  bookSeg:'find', findCat:'Stays', pending:null, myBookings:[],
+  bookSeg:'find', findCat:'Stays', tMode:'All', aKind:'All', guests:5, swap:false, pending:null, myBookings:[],
+  form:{sPlace:'Kaza, Spiti',sIn:'Sun 16 Nov',sOut:'Tue 18 Nov',tDate:'Fri 14 Nov',aArea:'Kaza & around',aDates:'16 – 19 Nov'},
   polls:[
     {id:'p1',q:'Which route into Spiti?',type:'Plan variant',dl:'Closes in 2 days',style:'single',opts:[['Plan A · via Rohtang (Manali)',3],['Plan B · via Kinnaur (Shimla)',1]],mine:null,locked:false,voters:['riya','arjun','kabir','meera']},
     {id:'p2',q:'When can everyone go?',type:'Dates',dl:'Closes Fri',style:'single',opts:[['8 – 15 Nov',2],['15 – 22 Nov',3],['22 – 29 Nov',0]],mine:null,locked:false,voters:['riya','arjun','kabir','meera']},
@@ -356,25 +372,27 @@ const nearby = {
 };
 
 const offers = {
-  Stays:{q:'Kaza · 16 – 18 Nov · 2 nights · 5 guests',unit:'/night',items:[
-    ['🛖','Zostel Kaza','Hostel · dorms + private rooms','4.5',900,'Booking.com','#BDE0FE'],
-    ['🏨','Sakya Abode','Hotel · heated rooms, parking','4.3',2400,'Agoda','#CDB4DB'],
-    ['🏔️','Hotel Deyzor','Hotel · Key monastery views','4.4',3100,'MakeMyTrip','#FFD6A5']]},
-  Flights:{q:'Kullu (KUU) → Delhi (DEL) · Wed 26 Nov · 2 adults',unit:'/person',items:[
-    ['✈️','IndiGo 6E 2134','13:05 → 14:35 · non-stop','',5840,'MakeMyTrip','#E7E7FB'],
-    ['✈️','Alliance Air 9I 832','11:10 → 12:40 · non-stop','',6210,'Cleartrip','#E7E7FB'],
-    ['✈️','Air India via CHD','09:40 → 15:20 · 1 stop','',6450,'ixigo','#E7E7FB']]},
-  Trains:{q:'New Delhi → Kalka · Fri 14 Nov · 5 passengers',unit:'/person',items:[
-    ['🚆','Kalka Shatabdi 12011','07:40 → 11:45 · CC · 42 available','',1045,'ixigo','#B7E4C7'],
-    ['🚄','Vande Bharat 22447','05:50 → 09:55 · CC · RAC 4','',1280,'ConfirmTkt','#B7E4C7']]},
-  Buses:{q:'Delhi → Manali · Fri 14 Nov · 5 seats',unit:'/seat',items:[
-    ['🚌','HRTC Volvo','18:30 → 07:15 · AC sleeper','4.2',1450,'redBus','#FFE6E2'],
-    ['🚌','Zingbus','19:15 → 08:00 · AC seater','4.4',1199,'Goibibo','#FFE6E2'],
-    ['🚐','Manali → Kaza HRTC','05:30 → 15:00 · Sun 16 Nov','4.0',480,'redBus','#FFE6E2']]},
-  Activities:{q:'Around Kaza · 16 – 19 Nov · 5 people',unit:'/person',items:[
-    ['🛕','Key Monastery guided walk','2 h · local guide','4.7',600,'Thrillophilia','#FFF1D6'],
-    ['🥾','Langza fossil hike','4 h · with lunch','4.6',900,'Thrillophilia','#FFF1D6'],
-    ['🌌','Chandratal stargazing camp','overnight · telescope','4.8',1800,'Klook','#FFF1D6']]}
+  Stays:{unit:'/night',items:[
+    {e:'🛖',name:'Zostel Kaza',sub:'Hostel · dorm beds + private rooms',rating:'4.5',price:900,partner:'Booking.com',bg:'#BDE0FE'},
+    {e:'🏨',name:'Sakya Abode',sub:'Hotel · heated rooms, parking',rating:'4.3',price:2400,partner:'Agoda',bg:'#CDB4DB'},
+    {e:'🏔️',name:'Hotel Deyzor',sub:'Hotel · Key monastery views',rating:'4.4',price:3100,partner:'MakeMyTrip',bg:'#FFD6A5'}]},
+  Transport:{unit:'/person',items:[
+    {mode:'Bus',e:'🚌',name:'Zingbus · AC seater',sub:'19:15 → 08:00 · overnight',dur:'12h 45m',price:1199,partner:'Goibibo',bg:'#FFE6E2',tag:'Cheapest'},
+    {mode:'Bus',e:'🚌',name:'HRTC Volvo · AC sleeper',sub:'18:30 → 07:15 · overnight',dur:'12h 45m',price:1450,partner:'redBus',bg:'#FFE6E2'},
+    {mode:'Train',e:'🚆',name:'Vande Bharat to Chandigarh + bus',sub:'05:50 → 16:40 · train 3h 15m, bus 7h',dur:'10h 50m',price:2050,partner:'ConfirmTkt',bg:'#B7E4C7'},
+    {mode:'Train',e:'🚆',name:'Kalka Shatabdi to Kalka + taxi',sub:'07:40 → 18:30 · CC · 42 seats left',dur:'10h 50m',price:2600,partner:'ixigo',bg:'#B7E4C7'},
+    {mode:'Flight',e:'✈️',name:'IndiGo 6E 2131 to Kullu + cab',sub:'06:10 → 09:30 · flight 1h 30m, cab 1h 20m',dur:'3h 20m',price:6340,partner:'MakeMyTrip',bg:'#E7E7FB',tag:'Fastest'}]},
+  Activities:{unit:'/person',items:[
+    {kind:'Event',e:'🪔',name:'Evening prayers at Key Monastery',sub:'Daily · 5:30 pm · free entry, guided transfer',rating:'4.8',price:350,partner:'Thrillophilia',bg:'#FFF1D6'},
+    {kind:'Event',e:'🌌',name:'Chandratal stargazing night',sub:'Sun 16 Nov · overnight · telescope + camp',rating:'4.8',price:1800,partner:'Klook',bg:'#E7E7FB'},
+    {kind:'Activity',e:'🛕',name:'Key Monastery guided walk',sub:'Any day · 2 h · local guide',rating:'4.7',price:600,partner:'Thrillophilia',bg:'#FFF1D6'},
+    {kind:'Activity',e:'🥾',name:'Langza fossil hike',sub:'Any day · 4 h · with lunch',rating:'4.6',price:900,partner:'Thrillophilia',bg:'#B7E4C7'}]}
+};
+const offerList = () => {
+  const c=offers[S.findCat];
+  if(S.findCat==='Transport') return c.items.filter(x=>S.tMode==='All'||x.mode===S.tMode);
+  if(S.findCat==='Activities') return c.items.filter(x=>S.aKind==='All'||x.kind===(S.aKind==='Events'?'Event':'Activity'));
+  return c.items;
 };
 
 /* ---------- helpers ---------- */
@@ -514,7 +532,7 @@ function planItin(){
   html += tl(v.items.map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],'',r[6]]));
   html += `<div class="stack" style="gap:8px;margin:4px 0 10px">
     <button class="nudge" data-act="find" data-k="Stays"><span class="nico">🛏️</span><span style="flex:1;min-width:0"><b>No stay for Night 3 in Kaza</b><span class="tiny muted" style="display:block">Find stays from ₹900 · 16 – 18 Nov · 5 guests</span></span><span class="link">Find →</span></button>
-    <button class="nudge" data-act="find" data-k="Buses"><span class="nico">🚌</span><span style="flex:1;min-width:0"><b>Delhi → Manali on Day 1</b><span class="tiny muted" style="display:block">Buses from ₹1,199 · trains to Kalka from ₹1,045</span></span><span class="link">Find →</span></button></div>`;
+    <button class="nudge" data-act="find" data-k="Transport"><span class="nico">🚌</span><span style="flex:1;min-width:0"><b>Delhi → Manali on Day 1</b><span class="tiny muted" style="display:block">Bus from ₹1,199 · train + bus from ₹2,050 · flight from ₹6,340</span></span><span class="link">Find →</span></button></div>`;
   html += `<div class="row" style="margin-top:6px"><button class="btn ghost" style="flex:1" data-act="toast" data-msg="Add place, activity, food, stay or transport">${ic('plus',16)} Add item</button><button class="btn primary" style="flex:1" data-act="to-poll">${ic('vote',16)} Vote A vs B</button></div>`;
   return html;
 }
@@ -537,22 +555,44 @@ function planBook(){
     <button data-act="bseg" data-v="mine" aria-pressed="${S.bookSeg==='mine'}">My bookings · ${3+S.myBookings.length}</button></div>`;
   return seg + (S.bookSeg==='find'?findBook():myBook());
 }
+function fld(id,label,val,extra){ return `<div class="sf ${extra||''}"><label for="${id}">${label}</label><input id="${id}" value="${val}"></div>`; }
+function findForm(){
+  const F=S.form;
+  if(S.findCat==='Stays') return `<div class="card searchbox">
+    ${fld('sPlace','Where',F.sPlace,'wide')}
+    <div class="sfrow">${fld('sIn','Check-in',F.sIn)}${fld('sOut','Check-out',F.sOut)}</div>
+    <div class="between sf-guests"><div><span class="sflabel">Guests</span><b>${S.guests} ${S.guests===1?'guest':'guests'}</b></div>
+      <div class="row"><button class="step" data-act="guests" data-d="-1" aria-label="Fewer guests">−</button><button class="step" data-act="guests" data-d="1" aria-label="More guests">+</button></div></div>
+    <span class="tiny muted">Pre-filled from Night 3 of the itinerary</span></div>`;
+  if(S.findCat==='Transport'){
+    const [a,b]=S.swap?['Manali','Delhi']:['Delhi','Manali'];
+    return `<div class="card searchbox">
+    <div class="ft"><div class="sf"><label>From</label><b>${a}</b></div><button class="swap" data-act="swap" aria-label="Swap from and to">⇅</button><div class="sf"><label>To</label><b>${b}</b></div></div>
+    <div class="sfrow">${fld('tDate','Date',F.tDate)}<div class="sf"><label>Travellers</label><b>${S.guests}</b></div></div>
+    <span class="tiny muted">From Day 1 of the itinerary · flights, trains and buses together</span></div>`;
+  }
+  return `<div class="card searchbox"><div class="sfrow">${fld('aArea','Area',F.aArea)}${fld('aDates','Dates',F.aDates)}</div>
+    <span class="tiny muted">Events and things to do near your stays, from several partners</span></div>`;
+}
 function findBook(){
-  const o=offers[S.findCat];
-  const pollable = S.findCat==='Stays';
-  return `<div class="hscroll" style="margin-bottom:10px">${Object.keys(offers).map(k=>`<button class="chip ${S.findCat===k?'accent':''}" data-act="fcat" data-k="${k}">${k}</button>`).join('')}</div>
-  <div class="input between" style="background:var(--surface);margin-bottom:12px"><span class="row small" style="min-width:0;gap:8px">${ic('search',16)}<span style="min-width:0">${o.q}</span></span><span class="link">Edit</span></div>
-  <div class="between tiny muted" style="margin-bottom:8px"><span>Sorted by price · from trip dates</span><span>${o.items.length} results</span></div>
-  <div class="stack">${o.items.map((it,i)=>`<div class="card offer">
+  const c=offers[S.findCat], list=offerList();
+  const tabs=[['Stays','🛏️'],['Transport','🚌'],['Activities','🎟️']];
+  let filters='';
+  if(S.findCat==='Transport') filters=`<div class="hscroll" style="margin:12px -18px 0">${[['All',''],['Flight','✈️'],['Train','🚆'],['Bus','🚌']].map(([m,e])=>`<button class="chip ${S.tMode===m?'accent':''}" data-act="tmode" data-k="${m}">${e} ${m==='All'?'All':m+'s'} · ${c.items.filter(x=>m==='All'||x.mode===m).length}</button>`).join('')}</div>`;
+  if(S.findCat==='Activities') filters=`<div class="hscroll" style="margin:12px -18px 0">${['All','Events','Activities'].map(k=>`<button class="chip ${S.aKind===k?'accent':''}" data-act="akind" data-k="${k}">${k}</button>`).join('')}</div>`;
+  return `<div class="cattabs" role="group" aria-label="What to book">${tabs.map(([k,e])=>`<button data-act="fcat" data-k="${k}" aria-pressed="${S.findCat===k}"><span>${e}</span>${k}</button>`).join('')}</div>
+  ${findForm()}${filters}
+  <div class="between tiny muted" style="margin:12px 0 8px"><span>${S.findCat==='Transport'?'Sorted by price · fastest tagged':'Sorted by price'}</span><span>${list.length} results</span></div>
+  <div class="stack">${list.map(it=>{const i=c.items.indexOf(it); return `<div class="card offer">
     <div class="row" style="align-items:flex-start;gap:12px">
-      <div class="thumb" style="background:${it[6]}">${it[0]}</div>
-      <div style="flex:1;min-width:0"><b class="item-title">${it[1]}</b><div class="tiny muted">${it[2]}</div>
-        <div class="row tiny" style="margin-top:4px;gap:6px">${it[3]?`<span>★ ${it[3]}</span>·`:''}<span class="partner">on ${it[5]}</span></div></div>
-      <div style="text-align:right;flex:none"><b class="num" style="font-family:var(--display);font-size:17px">${inr(it[4])}</b><div class="tiny muted">${o.unit}</div></div>
+      <div class="thumb" style="background:${it.bg}">${it.e}</div>
+      <div style="flex:1;min-width:0"><b class="item-title">${it.name}</b><div class="tiny muted">${it.sub}</div>
+        <div class="row tiny" style="margin-top:4px;gap:6px;flex-wrap:wrap">${it.tag?`<span class="chip mango" style="padding:2px 8px">${it.tag}</span>`:''}${it.dur?`<span>${it.dur}</span>·`:''}${it.kind?`<span>${it.kind}</span>·`:''}${it.rating?`<span>★ ${it.rating}</span>·`:''}<span class="partner">on ${it.partner}</span></div></div>
+      <div style="text-align:right;flex:none"><b class="num" style="font-family:var(--display);font-size:17px">${inr(it.price)}</b><div class="tiny muted">${c.unit}</div></div>
     </div>
-    <div class="row" style="margin-top:10px">${pollable?`<button class="btn ghost" style="flex:1;padding:10px" data-act="add-poll" data-i="${i}">${ic('vote',16)} Add to poll</button>`:''}
-      <button class="btn primary" style="flex:1;padding:10px" data-act="book" data-i="${i}">Book on ${it[5]} ↗</button></div>
-  </div>`).join('')}</div>
+    <div class="row" style="margin-top:10px">${S.findCat==='Stays'?`<button class="btn ghost" style="flex:1;padding:10px" data-act="add-poll" data-i="${i}">${ic('vote',16)} Add to poll</button>`:''}
+      <button class="btn primary" style="flex:1;padding:10px" data-act="book" data-i="${i}">Book on ${it.partner} ↗</button></div>
+  </div>`}).join('')}</div>
   <p class="tiny muted" style="margin:10px 2px 0">Partner results · we may earn a commission when you book. It never changes the order.</p>`;
 }
 function myBook(){
@@ -752,7 +792,7 @@ function sheet(){
     <p class="small muted" style="margin:4px 0 14px;text-align:center">You just came back from ${b.partner}. Save it so the whole group has the ticket offline.</p>
     <div class="stack"><div class="field"><label for="pnr">Confirmation / PNR</label><input id="pnr" class="input" value="${b.ref}"></div>
     <div class="field"><label for="bc">Total paid</label><input id="bc" class="input" inputmode="numeric" value="${b.total}"></div>
-    <label class="row small" style="gap:8px"><input type="checkbox" id="splitchk" checked> Add as an expense split 5 ways</label>
+    <label class="row small" style="gap:8px"><input type="checkbox" id="splitchk" checked> Add as an expense split ${S.guests} ways</label>
     <div class="row"><button class="btn ghost" style="flex:1" data-act="close">Not yet</button><button class="btn primary" style="flex:1" data-act="save-booking">Yes, save it</button></div></div>`;
   }
   if(S.sheet==='ig') body=`<h3 style="font-size:20px">Share to Instagram</h3><p class="small muted" style="margin:4px 0 14px">Exports in HD without watermark on Plus or Trip Pass.</p>
@@ -820,25 +860,30 @@ document.addEventListener('click',e=>{
     case 'near': S.near=d.k; break;
     case 'tpl': S.memTpl=d.k; break;
     case 'bseg': S.bookSeg=d.v; break;
-    case 'fcat': S.findCat=d.k; break;
     case 'find': S.planTab='book'; S.bookSeg='find'; S.findCat=d.k; keep=false; break;
-    case 'add-poll':{ const it=offers[S.findCat].items[+d.i]; const poll=S.polls.find(x=>x.id==='p3');
-      const label=`${it[1]} · ${inr(it[4])}/night`;
-      if(!poll.opts.some(o=>o[0]===label)) poll.opts.push([label,0,it[5]]);
-      toast(`Added ${it[1]} to “${poll.q}” — the group can vote now`); break; }
-    case 'book':{ const c=offers[S.findCat]; const it=c.items[+d.i];
-      const nights=S.findCat==='Stays'?2:1, qty=S.findCat==='Flights'?2:S.findCat==='Stays'?(it[4]<1000?5:2):5;
-      S.pending={name:it[1],partner:it[5],cat:S.findCat,total:it[4]*nights*qty,ref:'TOG'+(1000+Math.floor(Math.random()*9000)),q:c.q};
+    case 'add-poll':{ const it=offers.Stays.items[+d.i]; const poll=S.polls.find(x=>x.id==='p3');
+      const label=`${it.name} · ${inr(it.price)}/night`;
+      if(!poll.opts.some(o=>o[0]===label)) poll.opts.push([label,0,it.partner]);
+      toast(`Added ${it.name} to “${poll.q}” — the group can vote now`); break; }
+    case 'book':{ const it=offers[S.findCat].items[+d.i]; const g=S.guests;
+      const total = S.findCat==='Stays' ? it.price*2*(it.price<1000?g:Math.ceil(g/2)) : it.price*g;
+      const q = S.findCat==='Stays' ? `${S.form.sPlace} · ${S.form.sIn} → ${S.form.sOut} · ${g} guests` : S.findCat==='Transport' ? `${S.form.tDate} · ${it.sub}` : `${it.sub}`;
+      S.pending={name:it.name,partner:it.partner,cat:S.findCat,mode:it.mode,total,ref:'TOG'+(1000+Math.floor(Math.random()*9000)),q};
       S.sheet='booked'; break; }
+    case 'fcat': S.findCat=d.k; break;
+    case 'tmode': S.tMode=d.k; break;
+    case 'akind': S.aKind=d.k; break;
+    case 'guests': S.guests=Math.max(1,Math.min(12,S.guests+(+d.d))); break;
+    case 'swap': S.swap=!S.swap; break;
     case 'book-poll':{ const p=S.polls.find(x=>x.id===d.p); const max=Math.max(...p.opts.map(o=>o[1])); const w=p.opts.find(o=>o[1]===max);
       S.pending={name:w[0].split(' · ')[0],partner:w[2],cat:'Stays',total:(parseInt(w[0].replace(/[^0-9]/g,''),10)||900)*2*2,ref:'TOG'+(1000+Math.floor(Math.random()*9000)),q:'Kaza · 16 – 18 Nov'};
       S.sheet='booked'; break; }
     case 'save-booking':{ const b=S.pending; const total=parseInt(($('bc')||{}).value,10)||b.total; const ref=(($('pnr')||{}).value||b.ref).trim();
-      const map={Stays:['Stay','Kaza','2N'],Flights:['Flight','KUU','DEL'],Trains:['Train','NDLS','KLK'],Buses:['Bus','DEL','MNL'],Activities:['Activity','Kaza','🎟']};
-      const m=map[b.cat]||map.Stays;
+      const map={Stays:['Stay','Kaza','2N'],Flight:['Flight','DEL','KUU'],Train:['Train + bus','DEL','MNL'],Bus:['Bus','DEL','MNL'],Activities:['Activity','Kaza','🎟']};
+      const m=map[b.cat==='Transport'?b.mode:b.cat]||map.Stays;
       S.myBookings.unshift({type:`${m[0]} · ${b.name} · ${b.partner}`,from:m[1],to:m[2],sub:b.q,ref,cost:total});
-      S.sheet=null; S.bookSeg='mine'; S.planTab='book'; S.mode='plan'; keep=false;
-      toast(`Saved to My bookings${($('splitchk')||{}).checked!==false?' · '+inr(total)+' added to Budget':''}`); break; }
+      S.sheet=null; S.bookSeg='mine'; S.planTab='book'; S.mode='plan'; keep=false; const split=($('splitchk')||{}).checked!==false;
+      toast(`Saved to My bookings${split?' · '+inr(total)+' added to Budget':''}`); break; }
     case 'sheet': S.sheet=d.sheet; break;
     case 'close': S.sheet=null; break;
     case 'create': S.sheet=null; S.mode='plan'; S.planTab='itin'; toast('“Coorg monsoon weekend” created — invite link ready'); keep=false; break;
@@ -849,6 +894,7 @@ document.addEventListener('click',e=>{
   render(keep);
 });
 
+document.addEventListener('input',e=>{ if(e.target.id && e.target.id in S.form) S.form[e.target.id]=e.target.value; });
 try{ const s=JSON.parse(localStorage.getItem('travelog-proto')||'null'); if(s){ Object.assign(S,s); } }catch(e){}
 const h=(location.hash||'').slice(1); if(['home','plan','trip','memories'].includes(h)) S.mode=h;
 render();

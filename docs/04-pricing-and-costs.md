@@ -49,7 +49,7 @@ Core collaboration stays free — a group app dies if one friend hits a paywall 
 
 ## 2a. Affiliate booking revenue
 
-**Where it happens:** Plan mode › Bookings › **Find & book** (stays, flights, trains, buses, activities), fed by itinerary nudges, Stay/Transport polls, Nearby and Explore. Details in [01 · Product spec §4.3 and §4.6](01-product-spec.md).
+**Where it happens:** Plan mode › Bookings › **Find & book** — Stays, Transport (flights + trains + buses in one list) and Activities (events + things to do), fed by itinerary nudges, Stay/Transport polls, Nearby and Explore. Details in [01 · Product spec §4.3 and §4.6](01-product-spec.md).
 
 **Example payouts** (from affiliate-network listings, October 2026; confirm on signup):
 

@@ -138,8 +138,8 @@ erDiagram
 **Instagram share** — Skia renders to a PNG at export size → `react-native-share`: `Share.shareSingle({ social: INSTAGRAM_STORIES, backgroundImage })` for Stories (needs a Facebook App ID), share sheet for Feed posts.
 
 **Find & book (affiliate)** —
-1. App sends the pre-filled query (category, place, dates, guests) to the `partner-search` Edge Function.
-2. v1: the function returns partner **deep links** (each partner's own search URL with our affiliate tag) plus cached sample prices. v2: it calls partner/aggregator APIs, normalises results into one OfferCard shape and caches them for 24 h per (place, dates, guests).
+1. App sends the pre-filled query (Stays: place, dates, guests · Transport: from, to, date, travellers · Activities: area, dates) to the `partner-search` Edge Function.
+2. v1: the function returns partner **deep links** (each partner's own search URL with our affiliate tag) plus cached sample prices. v2: it calls partner/aggregator APIs (for Transport: flight, train and bus partners in parallel, then merged and tagged Cheapest/Fastest), normalises results into one OfferCard shape and caches them for 24 h per (place, dates, guests).
 3. **Book ↗** hits `/go/:clickId` (Edge Function or Cloudflare Worker): it inserts an `affiliate_clicks` row and 302-redirects with the click id as the network **sub-id**, so a conversion can be traced back to the trip without sending personal data to the partner.
 4. Networks report conversions by postback URL or daily CSV → `affiliate_conversions` (pending → confirmed after the stay/travel date, usually 30–60 days).
 5. When the user returns, the "Did you book it?" sheet creates a `bookings` row linked to the click. That gives the user their ticket wallet entry even before the network confirms.

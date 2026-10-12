@@ -19,5 +19,5 @@ Open [`mockups/index.html`](mockups/index.html) in a browser. The left panel jum
 | Mode | Bottom nav |
 |---|---|
 | Home | Trips · Feed · ＋ · Explore · Profile |
-| Plan / Edit | Itinerary · Budget · Bookings (Find & book + My bookings) · Polls |
+| Plan / Edit | Itinerary · Budget · Bookings (Find & book: Stays · Transport · Activities, + My bookings) · Polls |
 | Trip (live) | Today · Plan (list ⇄ map) · Nearby · Budget |

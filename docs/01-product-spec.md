@@ -98,14 +98,19 @@ Top bar: back to Home · trip name & dates · member avatars · **Invite** · �
 ### 4.3 Bookings (tab 3) — Find & book + My bookings
 A segmented control at the top switches between searching and the ticket wallet.
 
-**Find & book** (affiliate revenue lives here)
-- Search tabs: **Stays · Flights · Trains · Buses · Activities**.
-- Query is pre-filled from the trip: destination of the selected night/leg, dates, number of members ("Kaza · 16–18 Nov · 5 guests"). Editable.
-- Result card (OfferCard): photo/emoji, name, rating, price per night/seat, partner chip ("on Agoda"), "Partner · we may earn a commission" label.
-- Two actions per result:
-  - **Add to poll** — shortlist into a Stay/Transport poll. The option keeps price + partner link, so the group votes on real, bookable options.
+**Find & book** (affiliate revenue lives here) — three categories, each with its own search form pre-filled from the itinerary:
+
+| Category | Search form | Results |
+|---|---|---|
+| **Stays** | Where · Check-in · Check-out · Guests (stepper) | Hotels, hostels, homestays; price per night |
+| **Transport** | From ⇅ To · Date · Travellers | **Flights, trains and buses in one list**, filter chips All / Flights / Trains / Buses with counts; multi-leg options (e.g. train to Chandigarh + bus) shown as one result; tags **Cheapest** and **Fastest** |
+| **Activities** | Area · Dates | Events (dated: festivals, stargazing nights, prayers) and activities (any day: walks, hikes), filter All / Events / Activities, aggregated from several partners |
+
+- Result card (OfferCard): thumbnail, name, details (times + duration for transport), rating, price, partner chip ("on Agoda"), and the "Partner · we may earn a commission" label under the list.
+- Actions per result:
+  - **Add to poll** (Stays) — shortlist into the Stay poll. The option keeps price + partner link, so the group votes on real, bookable options.
   - **Book on {partner} ↗** — opens the partner app/site through a tracked affiliate link.
-- On return to the app: **"Did you book it?"** sheet → Yes saves it to My bookings (PNR, dates, cost; cost is also added as an expense split across the members it covers) → No dismisses.
+- On return to the app: **"Did you book it?"** sheet → Yes saves it to My bookings (PNR, dates, cost; cost is also added as an expense split across the travellers) → No dismisses.
 - v1: click-out to partner search via deep links (no API contracts needed). v2: live prices from partner/aggregator APIs. In-app checkout is out of scope (payments, refunds, support).
 
 **My bookings**
@@ -145,7 +150,7 @@ Find & book is the one place booking happens. Other screens only point to it, pr
 | Where | Trigger | What the user sees |
 |---|---|---|
 | Itinerary (Plan) | a night with no Stay item | NudgeCard: "No stay for Night 2 in Kaza → Find stays from ₹900" |
-| Itinerary (Plan) | city change between consecutive days | NudgeCard: "Manali → Kaza: buses from ₹1,100 · 9 h" |
+| Itinerary (Plan) | city change between consecutive days | NudgeCard: "Delhi → Manali: bus from ₹1,199 · train + bus from ₹2,050 · flight from ₹6,340" → Transport |
 | Polls | Stay / Transport poll options | price + partner chip on each option; after **Lock in**: "Book now on {partner} ↗" |
 | Trip mode · Nearby | bookable activities and events | "Book tickets ↗" |
 | Explore | forking a template | "Book this trip" checklist (stays + transport per day) |
@@ -161,10 +166,10 @@ Find & book is the one place booking happens. Other screens only point to it, pr
 | Category | Partners | Notes |
 |---|---|---|
 | Stays | Booking.com, Agoda, MakeMyTrip / Goibibo | % of booking value or fixed payout |
-| Flights | MakeMyTrip, Cleartrip, ixigo | fixed payout per booking |
-| Trains | ixigo, ConfirmTkt | IRCTC has no affiliate program; partners are authorised IRCTC agents |
-| Buses | redBus, Goibibo | small fixed payout |
-| Activities | Klook, Thrillophilia | % of booking |
+| Transport · flights | MakeMyTrip, Cleartrip, ixigo | fixed payout per booking |
+| Transport · trains | ixigo, ConfirmTkt | IRCTC has no affiliate program; partners are authorised IRCTC agents |
+| Transport · buses | redBus, Goibibo | small fixed payout |
+| Activities (events + things to do) | Klook, Thrillophilia | % of booking |
 
 Joined through affiliate networks (e.g. vCommission, EarnKaro, INRDeals, Involve Asia, Travelpayouts) where a partner has no direct program.
 
