@@ -18,6 +18,7 @@ India-first. Prices are **GST-inclusive INR** (as shown in the stores). FX assum
 | Location timeline ("time spent") | — | ✅ |
 | Photos in trip pool | 50 / trip, resized | Unlimited, optional originals |
 | Memories | 3 templates, watermark | All templates, HD, no watermark, carousel |
+| AI planner | Trip check (daily limit) + 1 AI draft / month, on Claude Haiku 5.5 | Unlimited drafts, Fill this day, Re-plan today, larger model |
 
 Core collaboration stays free — a group app dies if one friend hits a paywall before voting.
 
@@ -73,6 +74,17 @@ Why it fits this app: the group has already picked the place and dates, so searc
 Not subject to the 15 % app-store fee (physical services booked on the partner's site). Commissions are confirmed 30–60 days after travel and cancellations are reversed, so cash arrives late. Infra cost for v1 click-out is ~$0 (one Edge Function + one redirect); v2 live-price APIs may add caching cost.
 
 ---
+
+## 2b. AI cost
+
+Claude API list prices ($ per million tokens, input / output): Opus 5.5 $4 / $20 · Sonnet 5.5 $2 / $10 · Haiku 5.5 $0.10 / $0.50. Token use per action is an estimate to be measured on a prototype.
+
+| Action | Tokens (in + out) | Opus 5.5 | Sonnet 5.5 | Haiku 5.5 |
+|---|---|---|---|---|
+| Full trip draft (incl. tool calls) | ~40k + 8k | $0.32 | $0.16 | $0.008 |
+| Trip check | ~15k + 2k | $0.10 | $0.05 | $0.0025 |
+
+At 100k active users (0.5 trips created per user, 1.5 drafts + 4 checks per trip, 1 open-ended "plan a trip" request per user), free-tier AI on Haiku 5.5 costs about **₹4 per user per year**; the same traffic on Sonnet 5.5 adds ~₹23 L a year and on Opus 5.5 ~₹46 L. That is why the free tier stays on Haiku. Full model: [05 · Profit plan](05-profit-plan.md).
 
 ## 3. Cost approximation — scenario: 1,000 users × 100 photos × 5 trips
 

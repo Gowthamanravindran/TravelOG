@@ -229,6 +229,23 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
 .partner{font-weight:700;color:var(--accent)}
 .nudge{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:18px;border:1.5px dashed var(--accent);background:var(--accent-soft)}
 .nudge .nico{width:38px;height:38px;border-radius:12px;background:var(--surface);display:grid;place-items:center;font-size:18px;flex:none}
+.aibtn{padding:7px 12px;border-radius:999px;font-size:13px;font-weight:800;border:1px dashed var(--accent);color:var(--accent);background:var(--accent-soft)}
+.compare.three{grid-template-columns:1fr 1fr 1fr}.compare.three .stat b{font-size:16px}
+.issue{display:flex;gap:10px;align-items:flex-start;padding-left:10px;border-left:3px solid var(--sev)}
+.issue .ie{font-size:18px}
+.aicard{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:18px;background:linear-gradient(120deg,#5B5BD6,#E056A0);color:#fff}
+.stepdot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+.stepdot.done{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.stepdot.now{border-color:var(--indigo);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px var(--indigo-soft)}}
+.routeline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.routeline .stop{display:flex;flex-direction:column;padding:8px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.routeline .arrow{color:var(--ink-2)}
+.replan{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;margin-top:12px;padding:12px 14px;border-radius:16px;border:1px dashed var(--accent);background:var(--accent-soft);font-size:13px}
+.replan b{color:var(--accent)}
+.chip.verified{background:#DCFCE7;color:#166534}
+textarea.input{resize:vertical;font:inherit;line-height:1.4}
+.scrim.still,.scrim.still .sheet{animation:none}
 .tplchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 
 @media (max-width:460px){
@@ -249,6 +266,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
       <button class="mode-btn" data-act="go-mode" data-mode="home"><span class="dot" style="background:var(--coral)"></span><b>Home mode</b><small>Trips · Feed · Explore · Profile</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="plan"><span class="dot" style="background:var(--indigo)"></span><b>Plan mode · Spiti Road Trip</b><small>Itinerary · Budget · Find &amp; book · Polls</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="trip"><span class="dot" style="background:var(--teal)"></span><b>Trip mode · Goa (live)</b><small>Today · Plan + Map · Nearby · Budget</small></button>
+      <button class="mode-btn" data-act="go-mode" data-mode="ai"><span class="dot" style="background:linear-gradient(135deg,#5B5BD6,#E056A0)"></span><b>AI planner · “10 days in Japan”</b><small>Also: ＋ → Plan with AI · Trip check on Spiti Day 2</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="memories"><span class="dot" style="background:var(--mango)"></span><b>Memories · Kerala (past)</b><small>Collage editor → Instagram</small></button>
     </div>
     <p class="legend-note">Each mode swaps the bottom nav and the accent colour, so you always know where you are. Trip mode is always dark for glanceable use outdoors. Sample data only.</p>
@@ -316,7 +334,8 @@ const S = {
   mode:'home', tab:'trips', seg:'upcoming',
   planTab:'itin', day:1, variant:'A', compare:false,
   tripTab:'today', tripView:'list', tripDay:2, near:'Food',
-  memTpl:'grid', sheet:null, toast:null,
+  memTpl:'grid', sheet:null, toast:null, aiC:false, checkOpen:true, replanned:false, published:false, aiStep:0,
+  aiPrompt:'Help me plan a 10-day Japan trip for 4 friends in April, about ₹2L each. We love food and a bit of hiking.',
   bookSeg:'find', findCat:'Stays', tMode:'All', aKind:'All', guests:5, swap:false, pending:null, myBookings:[],
   form:{sPlace:'Kaza, Spiti',sIn:'Sun 16 Nov',sOut:'Tue 18 Nov',tDate:'Fri 14 Nov',aArea:'Kaza & around',aDates:'16 – 19 Nov'},
   polls:[
@@ -347,8 +366,31 @@ const variants = {
     ['07:00','🚙','Leave Kalpa','Apple orchards en route','Travel','#14B8A6',null],
     ['10:00','🌉','Khab confluence','Sutlej meets Spiti · photo stop','Activity','#FFB020','2h 50m drive'],
     ['13:00','🥟','Nako lake lunch','Momos by the lake','Food','#FF6B5B','1h 30m drive'],
-    ['17:30','🏡','Tabo homestay','Near 996 AD monastery','Stay','#5B5BD6','3h 40m drive']]}
+    ['17:30','🏡','Tabo homestay','Near 996 AD monastery','Stay','#5B5BD6','3h 40m drive']]},
+  C:{by:'ai',title:'Plan C · AI · via Kinnaur, slower climb',km:162,drive:'6h 10m',cost:3900,items:[
+    ['08:00','🚙','Leave Kalpa after breakfast','Kinnaur road stays open in November','Travel','#14B8A6',null],
+    ['10:30','🌉','Khab confluence','30 min photo stop','Activity','#FFB020','2h 30m drive'],
+    ['12:30','🥟','Nako lake lunch','Short walk at 3,660 m helps you acclimatise','Food','#FF6B5B','1h drive'],
+    ['16:00','🏡','Tabo homestay (night 1 above 3,000 m)','Sleep lower before Kaza · from ₹1,400 on MakeMyTrip','Stay','#5B5BD6','2h 40m drive']]}
 };
+const aiJapan = {
+  title:'Japan in April', sub:'10 days · 4 people · Tokyo → Hakone → Kyoto → Osaka',
+  route:[['Tokyo','3N'],['Hakone','1N'],['Kyoto','3N'],['Osaka','2N']],
+  budget:[['Flights (BLR/DEL ⇄ Tokyo/Osaka)',62000],['Stays · 9 nights, shared rooms',48000],['Trains · point-to-point + Suica',30000],['Food & activities',46000]],
+  notes:[['🌸','Cherry blossom season','Late Mar – early Apr is peak; book stays this month. Prices shown are estimates.'],
+         ['🚄','JR Pass not worth it here','This route costs less with point-to-point Shinkansen tickets + Suica.'],
+         ['🛂','Japan e-visa','Apply about 4 weeks before; needs bank statements and the itinerary.'],
+         ['🌤️','10 – 20 °C, some rain','Pack layers; Day 5 Hakone has an indoor backup (open-air museum).']],
+  days:[['1','Tokyo','Land · Shinjuku · Omoide Yokocho dinner'],['2','Tokyo','Tsukiji outer market · Asakusa · Sumida river walk'],['3','Tokyo','Day hike: Mt Takao (3 h) · onsen'],
+        ['4','Hakone','Romancecar · ropeway · ryokan night'],['5','Kyoto','Shinkansen 2 h · Gion evening'],['6','Kyoto','Fushimi Inari early · Nishiki market'],
+        ['7','Kyoto','Arashiyama · Philosopher\'s Path'],['8','Osaka','Nara day trip · Dotonbori food crawl'],['9','Osaka','Osaka castle · Kuromon market'],['10','Osaka','Fly home from KIX']]
+};
+const tripIssues = [
+  ['high','🏔️','Kunzum La is usually closed by mid-November','Plan A crosses it on Sun 16 Nov. Kinnaur route (Plan B / C) stays open.','Use Plan C · AI'],
+  ['high','🫁','Manali (2,050 m) → Chandratal (4,300 m) in one day','High risk of altitude sickness. Sleep a night at Tabo (3,280 m) first.','Add Tabo night'],
+  ['med','🛕','Key Monastery closes at 5 pm','Day 4 arrival is 4:40 pm. Move it to the morning.','Move to 9 am'],
+  ['low','🏧','Last reliable ATM is in Kaza','Carry cash for Langza and Komic homestays.','Add note']
+];
 const goaToday = [
   ['08:30','☕','Breakfast at Artjuna','Anjuna · 1h','Food','#FF6B5B','done',null],
   ['10:00','🏰','Chapora Fort','Sunrise crowd gone · 1h 30m','Activity','#FFB020','done','12 min scooter'],
@@ -454,6 +496,10 @@ function homeFeed(){
   return `<div class="top"><h2>Feed</h2><button class="icon-btn" aria-label="Search">${ic('search')}</button></div>
   <div class="hscroll" style="margin-bottom:12px">${['All','Itineraries','Memories','Friends'].map((f,i)=>`<span class="chip ${i===0?'accent':''}">${f}</span>`).join('')}</div>
   <div class="stack" style="gap:18px">
+    ${S.published?`<article class="card post"><div class="row">${av(['you'])}<div><b>You</b> <span class="muted small">shared an itinerary · just now</span></div></div>
+      <div class="between"><b>🛶 Kerala Backwaters · 6 days</b><span class="chip verified">✓ Verified trip</span></div>
+      <div class="small muted">Real spend ₹18.4k pp · 412 km · time per stop recorded</div>
+      <div class="row"><button class="btn primary" data-act="toast" data-msg="Copied to a new Draft trip with your dates">${ic('fork',16)} Use this plan</button><span class="tiny muted">0 copies</span></div></article>`:''}
     <article class="card post">
       <div class="row">${av(['meera'])}<div><b>Meera</b> <span class="muted small">shared a memory · 2d</span></div></div>
       ${collage(keralaTiles,3)}
@@ -463,7 +509,7 @@ function homeFeed(){
     <article class="card post">
       <div class="row">${av(['kabir'])}<div><b>Kabir</b> <span class="muted small">shared an itinerary · 5d</span></div></div>
       <div class="cover" style="background:linear-gradient(135deg,#FF6B5B,#FFB020);border-radius:16px;height:110px"><span class="emoji">🐅</span><span class="chip">4 days · Rajasthan</span></div>
-      <div><b>Ranthambore + Jaipur, long weekend</b><div class="small muted">Day 1 safari · Day 2 Amber fort · Day 3 Old city food walk · …</div></div>
+      <div><span class="chip verified" style="margin-bottom:6px">✓ Verified trip · 128 copies</span><b style="display:block">Ranthambore + Jaipur, long weekend</b><div class="small muted">Real spend ₹14.2k pp · Day 1 safari · Day 2 Amber fort · Day 3 Old city food walk · …</div></div>
       <div class="row"><button class="btn primary" data-act="toast" data-msg="Copied to a new Draft trip — open it from Planning">${ic('fork',16)} Use this plan</button><button class="btn ghost">Preview days</button></div>
     </article>
   </div>`;
@@ -518,23 +564,32 @@ function planItin(){
     return html + `<div class="card" style="margin-top:14px;text-align:center;padding:28px 16px"><div style="font-size:34px">🗺️</div><b>${spitiDays[S.day].d} · ${spitiDays[S.day].date}</b><p class="small muted" style="margin:6px 0 12px">Day 2 has the interesting bit: two competing plans. Tap it.</p><button class="btn primary" data-act="day" data-day="1">Open Day 2</button></div>`;
   }
   html += `<div class="between" style="margin:14px 0 6px"><div class="variants">
-      ${['A','B'].map(k=>`<button data-act="variant" data-v="${k}" aria-pressed="${S.variant===k&&!S.compare}">Plan ${k} · ${people[variants[k].by].n}</button>`).join('')}
-      <button data-act="variant" data-v="+" aria-label="Add plan">＋</button></div>
+      ${(S.aiC?['A','B','C']:['A','B']).map(k=>`<button data-act="variant" data-v="${k}" aria-pressed="${S.variant===k&&!S.compare}">Plan ${k} · ${k==='C'?'✨ AI':people[variants[k].by].n}</button>`).join('')}
+      ${S.aiC?'':`<button class="aibtn" data-act="ai-variant">✨ AI</button>`}</div>
     <button class="link" data-act="compare">${S.compare?'Close':'Compare'}</button></div>`;
   if(S.compare){
-    html += `<div class="compare">${['A','B'].map(k=>{const x=variants[k];return `<div class="card stack" style="gap:8px"><b>Plan ${k}</b><span class="tiny muted">${x.title.split('· ')[1]}</span>
+    html += `<div class="compare ${S.aiC?'three':''}">${(S.aiC?['A','B','C']:['A','B']).map(k=>{const x=variants[k];return `<div class="card stack" style="gap:8px"><b>Plan ${k}</b><span class="tiny muted">${x.title.split('· ')[1]}</span>
       <div class="stat"><b>${x.km} km</b><span class="tiny muted">distance</span></div><div class="stat"><b>${x.drive}</b><span class="tiny muted">driving</span></div><div class="stat"><b>${inr(x.cost)}</b><span class="tiny muted">per person</span></div>
-      <div class="row tiny muted">${av([x.by])} ${people[x.by].n}</div></div>`}).join('')}</div>
+      <div class="row tiny muted">${x.by==='ai'?'✨ AI':av([x.by])+' '+people[x.by].n}</div></div>`}).join('')}</div>
       <button class="btn primary block" style="margin-top:12px" data-act="to-poll">${ic('vote',16)} Let the group vote</button>`;
     return html;
   }
-  html += `<div class="card" style="background:var(--accent-soft);border:0;box-shadow:none;margin:6px 0 4px;padding:10px 12px"><div class="between small"><span><b>${v.km} km</b> · ${v.drive} driving · <b>${inr(v.cost)}</b> pp</span><span class="tiny muted">by ${people[v.by].n}</span></div></div>`;
+  html += tripCheck();
+  html += `<div class="card" style="background:var(--accent-soft);border:0;box-shadow:none;margin:6px 0 4px;padding:10px 12px"><div class="between small"><span><b>${v.km} km</b> · ${v.drive} driving · <b>${inr(v.cost)}</b> pp</span><span class="tiny muted">by ${v.by==='ai'?'✨ AI':people[v.by].n}</span></div></div>`;
+  if(v.by==='ai') html += `<p class="tiny muted" style="margin:2px 2px 6px">AI used: road status history, altitude data, Mapbox travel times, partner prices (estimates). The group can compare and vote; nothing changed in Plans A or B.</p>`;
   html += tl(v.items.map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],'',r[6]]));
   html += `<div class="stack" style="gap:8px;margin:4px 0 10px">
     <button class="nudge" data-act="find" data-k="Stays"><span class="nico">🛏️</span><span style="flex:1;min-width:0"><b>No stay for Night 3 in Kaza</b><span class="tiny muted" style="display:block">Find stays from ₹900 · 16 – 18 Nov · 5 guests</span></span><span class="link">Find →</span></button>
     <button class="nudge" data-act="find" data-k="Transport"><span class="nico">🚌</span><span style="flex:1;min-width:0"><b>Delhi → Manali on Day 1</b><span class="tiny muted" style="display:block">Bus from ₹1,199 · train + bus from ₹2,050 · flight from ₹6,340</span></span><span class="link">Find →</span></button></div>`;
   html += `<div class="row" style="margin-top:6px"><button class="btn ghost" style="flex:1" data-act="toast" data-msg="Add place, activity, food, stay or transport">${ic('plus',16)} Add item</button><button class="btn primary" style="flex:1" data-act="to-poll">${ic('vote',16)} Vote A vs B</button></div>`;
   return html;
+}
+function tripCheck(){
+  const sev={high:['#E5484D','Fix first'],med:['#FFB020','Worth fixing'],low:['#8A8AA3','Tip']};
+  return `<div class="card check" style="margin:8px 0 10px">
+    <button class="between" style="width:100%" data-act="check-toggle" aria-expanded="${S.checkOpen}"><span class="row" style="gap:8px"><span class="sparkle">✨</span><b>Trip check</b><span class="chip" style="background:#FDE2E2;color:#9B1C1C">2 urgent</span><span class="chip">4 issues</span></span><span class="muted">${S.checkOpen?'−':'+'}</span></button>
+    ${S.checkOpen?`<div class="stack" style="gap:10px;margin-top:10px">${tripIssues.map((t,i)=>`<div class="issue" style="--sev:${sev[t[0]][0]}"><span class="ie">${t[1]}</span><div style="flex:1;min-width:0"><b class="small">${t[2]}</b><div class="tiny muted">${t[3]}</div><div class="row" style="margin-top:6px;gap:8px"><span class="tiny" style="color:${sev[t[0]][0]};font-weight:700">${sev[t[0]][1]}</span><button class="link" data-act="fix" data-i="${i}">${t[4]} →</button></div></div></div>`).join('')}</div>`:''}
+  </div>`;
 }
 function planBudget(){
   const cats=[['Stay','#5B5BD6',9000,8200],['Travel','#14B8A6',12000,13400],['Food','#FF6B5B',6000,4800],['Activities','#FFB020',3000,2100],['Misc','#8A8AA3',2000,800]];
@@ -645,9 +700,10 @@ function tripToday(){
   const spentToday=1600/4+2840/4;
   return `<div class="nowcard">
     <div class="between"><span class="sub">NOW · 16:00 – 18:00</span><span class="chip" style="background:#04201D;color:#5EEAD4">in 25 min</span></div>
-    <div><div class="big">🛶 Kayaking at Sal river</div><div class="sub">Meet at Chapora jetty · 25 min by scooter · booked for 4</div></div>
+    <div><div class="big">${S.replanned?'🌿 Sahakari spice farm tour':'🛶 Kayaking at Sal river'}</div><div class="sub">${S.replanned?'Covered tour + lunch · 35 min by scooter · 4 people':'Meet at Chapora jetty · 25 min by scooter · booked for 4'}</div></div>
     <div class="row"><button class="btn dark" style="flex:1" data-act="toast" data-msg="Opens Google/Apple Maps with directions">${ic('nav',16)} Navigate</button><button class="btn" style="flex:1" data-act="toast" data-msg="Checked in at 16:02 — time spent starts now">${ic('check',16)} Check in</button></div>
   </div>
+  ${S.replanned?'':`<button class="replan" data-act="sheet" data-sheet="replan"><span>🌧️ Rain likely 3 – 6 pm</span><b>✨ Re-plan today →</b></button>`}
   <div class="quick" style="margin-top:12px">
     <button data-act="sheet" data-sheet="expense"><span class="q">💸</span>Expense</button>
     <button data-act="toast" data-msg="Photo saved to the trip pool, tagged “Sal river”"><span class="q">📷</span>Photo</button>
@@ -755,14 +811,33 @@ function memories(){
     <button data-act="toast" data-msg="Sizes: 4:5 post, 9:16 story, 1:1, carousel"><span class="q">📐</span>Size</button>
   </div>
   <button class="btn primary block" style="margin-top:14px;background:linear-gradient(90deg,#F58529,#DD2A7B,#8134AF);color:#fff" data-act="sheet" data-sheet="ig">${ic('share',16)} Share to Instagram</button>
-  <button class="btn ghost block" style="margin-top:8px" data-act="toast" data-msg="Posted to your TravelOG feed">Post to TravelOG feed</button>`;
+  <button class="btn ghost block" style="margin-top:8px" data-act="toast" data-msg="Posted to your TravelOG feed">Post to TravelOG feed</button>
+  <button class="btn ghost block" style="margin-top:8px" data-act="sheet" data-sheet="share">${S.published?'✓ Itinerary published · 0 copies yet':'🗺️ Share the itinerary (Verified trip)'}</button>`;
+}
+
+function aiPreview(){
+  const J=aiJapan, total=J.budget.reduce((a,b)=>a+b[1],0);
+  return `<div class="trip-head"><button class="icon-btn" data-act="go-mode" data-mode="home" aria-label="Back">${ic('back')}</button>
+    <div class="t"><div class="eyebrow" style="color:var(--indigo)">✨ AI draft · not saved yet</div><h2>🌸 ${J.title}</h2></div></div>
+  <p class="small muted" style="margin:-4px 0 12px">${J.sub}</p>
+  <div class="routeline">${J.route.map((r,i)=>`<span class="stop"><b>${r[0]}</b><span class="tiny muted">${r[1]}</span></span>${i<J.route.length-1?'<span class="arrow">→</span>':''}`).join('')}</div>
+  <div class="card" style="margin-top:12px"><div class="between"><span class="eyebrow">Budget per person</span><b class="num" style="font-family:var(--display);font-size:22px">${inr(total)}</b></div>
+    <div class="stack" style="gap:6px;margin-top:8px">${J.budget.map(b=>`<div class="between small"><span class="muted">${b[0]}</span><span class="num">${inr(b[1])}</span></div>`).join('')}</div>
+    <div class="tiny muted" style="margin-top:6px">≈ ¥${Math.round(total/0.58/1000)}k · under your ₹2L limit · estimates</div></div>
+  <div class="section-h"><h3>Things to know</h3></div>
+  <div class="stack" style="gap:8px">${J.notes.map(n=>`<div class="card row" style="align-items:flex-start;gap:10px;padding:12px;box-shadow:none"><span style="font-size:20px">${n[0]}</span><div><b class="small">${n[1]}</b><div class="tiny muted">${n[2]}</div></div></div>`).join('')}</div>
+  <div class="section-h"><h3>Day by day</h3><span class="tiny muted">Edit after creating</span></div>
+  <div class="card" style="padding:4px 14px">${J.days.map(d=>`<div class="exp" style="grid-template-columns:44px 1fr"><span class="badge" style="background:var(--indigo-soft);color:var(--indigo)">${d[0]}</span><div><b class="small">${d[1]}</b><div class="tiny muted">${d[2]}</div></div></div>`).join('')}</div>
+  <p class="tiny muted" style="margin:10px 2px">Used: April climate averages, opening hours, train timetables, partner prices. Stays and transport are ready in Find &amp; book.</p>
+  <div class="row" style="position:sticky;bottom:0;background:var(--bg);padding:10px 0"><button class="btn ghost" style="flex:1" data-act="sheet" data-sheet="ai">Change request</button><button class="btn primary" style="flex:1.4;background:var(--indigo)" data-act="ai-create">Create trip &amp; invite</button></div>`;
 }
 
 /* ---------- sheets ---------- */
 function sheet(){
   if(!S.sheet) return '';
   let body='';
-  if(S.sheet==='new') body=`<h3 style="font-size:20px">New trip</h3><p class="small muted" style="margin:4px 0 14px">Step 1 of 3 · only the name is required</p>
+  if(S.sheet==='new') body=`<button class="aicard" data-act="sheet" data-sheet="ai"><span style="font-size:22px">✨</span><span style="flex:1;text-align:left"><b>Plan with AI</b><span class="tiny" style="display:block;opacity:.85">“10 days in Japan in April for 4…” — get a full draft in a minute</span></span><span>→</span></button>
+    <h3 style="font-size:20px;margin-top:16px">Or start it yourself</h3><p class="small muted" style="margin:4px 0 14px">Step 1 of 3 · only the name is required</p>
     <div class="stack"><div class="field"><label for="tn">Trip name</label><input id="tn" class="input" value="Coorg monsoon weekend"></div>
     <div class="field"><label>Vibe</label><div class="row">${['🌧️','🏔️','🏖️','🛕','🎉','🚙'].map((e,i)=>`<span class="icon-btn" style="font-size:20px;${i===0?'border-color:var(--accent);background:var(--accent-soft)':''}">${e}</span>`).join('')}</div></div>
     <div class="field"><label for="tw">Where</label><input id="tw" class="input" value="Coorg, Karnataka"></div>
@@ -786,6 +861,27 @@ function sheet(){
     <div class="upi">upi://pay?pa=you@okaxis&amp;pn=You&amp;am=${amt}&amp;cu=INR&amp;tn=TravelOG%20Goa</div></div>
     <div class="row" style="margin-top:12px"><button class="btn ghost" style="flex:1" data-act="toast-close" data-msg="Marked as settled in cash">Cash</button><button class="btn primary" style="flex:1" data-act="toast-close" data-msg="Request sent to ${people[k[0]].n} on WhatsApp + push">Send request</button></div>`;
   }
+  if(S.sheet==='ai') body=`<h3 style="font-size:20px">✨ Plan with AI</h3><p class="small muted" style="margin:4px 0 12px">Ask for anything: a city break, a road trip, or 10 days abroad. You'll get a draft to edit and share.</p>
+    <div class="field"><label for="aip">Your trip</label><textarea id="aip" class="input" rows="4">${S.aiPrompt}</textarea></div>
+    <div class="tplchips" style="margin:10px 0 14px">${['Long weekend near Bengaluru','Spiti road trip, 8 days','Thailand on ₹60k pp'].map(c=>`<button class="chip" data-act="ai-chip" data-t="${c}">${c}</button>`).join('')}</div>
+    <button class="btn primary block" data-act="ai-go">✨ Plan it</button>
+    <p class="tiny muted" style="margin-top:8px">Free plan: 1 AI draft a month. Plus: unlimited.</p>`;
+  if(S.sheet==='aiwork'){
+    const steps=['Reading your request · 10 days, 4 people, ₹2L each','Checking April weather and cherry-blossom crowds','Ordering cities by travel time','Finding stays near each day\'s stops','Pricing trains, flights and stays (estimates)'];
+    body=`<h3 style="font-size:20px">✨ Planning Japan…</h3><div class="stack" style="gap:10px;margin-top:14px">${steps.map((t,i)=>`<div class="row small" style="gap:10px;${i>S.aiStep?'opacity:.4':''}"><span class="stepdot ${i<S.aiStep?'done':i===S.aiStep?'now':''}">${i<S.aiStep?'✓':''}</span>${t}</div>`).join('')}</div>`;
+  }
+  if(S.sheet==='replan') body=`<h3 style="font-size:20px">✨ Re-plan today</h3>
+    <div class="card" style="margin:10px 0;background:var(--surface-2);box-shadow:none"><b class="small">🌧️ Heavy rain likely 3 – 6 pm (80 %)</b><div class="tiny muted">Kayaking operators usually cancel in rain. Your booking is refundable until 2 pm.</div></div>
+    <div class="stack" style="gap:8px"><div class="tiny muted">Suggested swap</div>
+      <div class="card" style="box-shadow:none;opacity:.6"><s class="small">16:00 · 🛶 Kayaking at Sal river</s></div>
+      <div class="card" style="box-shadow:none;border-color:var(--accent)"><b class="small">15:30 · 🌿 Sahakari spice farm tour + lunch</b><div class="tiny muted">Covered tour · 35 min by scooter · ₹600 pp · dinner at Thalassa unchanged</div></div></div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" style="flex:1" data-act="close">Keep plan</button><button class="btn primary" style="flex:1" data-act="replan-apply">Apply swap</button></div>`;
+  if(S.sheet==='share') body=`<h3 style="font-size:20px">Share your itinerary</h3><p class="small muted" style="margin:4px 0 12px">We drafted this from your trip. Names, PNRs and who-paid-what are removed.</p>
+    <div class="card stack" style="gap:8px;box-shadow:none"><div class="between"><b>🛶 Kerala Backwaters</b><span class="chip verified">✓ Verified trip</span></div>
+      <div class="stats3">${[['₹18.4k','spent per person'],['6 days','412 km'],['14 stops','time per stop']].map(s=>`<div class="stat"><b style="font-size:16px">${s[0]}</b><span class="tiny muted">${s[1]}</span></div>`).join('')}</div>
+      ${['Day 1–2 · Alleppey houseboat (actual 22 h on board)','Day 3 · Kumarakom bird sanctuary — “go before 8 am”','Day 4–6 · Munnar tea estates, Top Station'].map(t=>`<div class="tiny">• ${t}</div>`).join('')}</div>
+    <div class="card between" style="margin-top:10px;box-shadow:none;background:var(--surface-2)"><span class="tiny">You earn a share when people who use your plan book stays through TravelOG, plus a free Trip Pass every 5 copies.</span></div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" style="flex:1" data-act="toast-close" data-msg="Private link copied">Copy link</button><button class="btn primary" style="flex:1" data-act="publish">Publish to Feed</button></div>`;
   if(S.sheet==='booked'){
     const b=S.pending;
     body=`<div style="text-align:center;font-size:34px">🧳</div><h3 style="font-size:20px;text-align:center">Did you book ${b.name}?</h3>
@@ -797,7 +893,7 @@ function sheet(){
   }
   if(S.sheet==='ig') body=`<h3 style="font-size:20px">Share to Instagram</h3><p class="small muted" style="margin:4px 0 14px">Exports in HD without watermark on Plus or Trip Pass.</p>
     <div class="stack">${[['Feed post','1080 × 1350 · 4:5'],['Story','1080 × 1920 · 9:16'],['Carousel','up to 10 slides']].map(o=>`<button class="card between" style="box-shadow:none" data-act="toast-close" data-msg="Opening Instagram ${o[0].toLowerCase()} with your collage"><div style="text-align:left"><b>${o[0]}</b><div class="tiny muted">${o[1]}</div></div><span class="muted">›</span></button>`).join('')}</div>`;
-  return `<div class="scrim" data-act="close-scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
+  return `<div class="scrim ${S.sheet==='aiwork'&&S.aiStep>0?'still':''}" data-act="close-scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
     <div class="between" style="margin-bottom:4px"><span></span><button class="icon-btn" style="width:32px;height:32px" data-act="close" aria-label="Close">${ic('x',16)}</button></div>${body}</div></div>`;
 }
 
@@ -808,7 +904,7 @@ const navs={
   trip:[['today','Today','sun'],['plan','Plan','map'],['near','Nearby','pin'],['budget','Budget','wallet']]
 };
 function nav(){
-  if(S.mode==='memories') return '';
+  if(S.mode==='memories'||S.mode==='ai') return '';
   const cur = S.mode==='home'?S.tab:S.mode==='plan'?S.planTab:S.tripTab;
   return navs[S.mode].map(n=> n[0]==='fab'
     ? `<button class="fab" data-act="sheet" data-sheet="new" aria-label="New trip">${ic('plus',24)}</button>`
@@ -820,9 +916,9 @@ const $=id=>document.getElementById(id);
 function render(keepScroll){
   const sc=$('screen'); const top=sc.scrollTop;
   const ph=$('phone');
-  ph.className='phone '+(S.mode==='plan'?'plan':S.mode==='trip'?'trip':'');
-  sc.innerHTML = S.mode==='home'?home():S.mode==='plan'?plan():S.mode==='trip'?trip():memories();
-  const nv=$('nav'); nv.innerHTML=nav(); nv.hidden = S.mode==='memories';
+  ph.className='phone '+(S.mode==='plan'||S.mode==='ai'?'plan':S.mode==='trip'?'trip':'');
+  sc.innerHTML = S.mode==='home'?home():S.mode==='plan'?plan():S.mode==='trip'?trip():S.mode==='ai'?aiPreview():memories();
+  const nv=$('nav'); nv.innerHTML=nav(); nv.hidden = S.mode==='memories'||S.mode==='ai';
   $('overlay').innerHTML = sheet() + (S.toast?`<div class="toast" role="status">${S.toast}</div>`:'');
   sc.scrollTop = keepScroll?top:0;
   document.querySelectorAll('.mode-btn').forEach(b=>b.setAttribute('aria-pressed', b.dataset.mode===S.mode));
@@ -845,7 +941,7 @@ document.addEventListener('click',e=>{
   let keep=true;
   switch(a){
     case 'go-mode': S.mode=d.mode; S.sheet=null; if(d.mode==='home') S.tab='trips'; keep=false; break;
-    case 'open-trip':{ const t=trips.find(x=>x.id===d.id); S.mode = t.status==='live'?'trip':t.status==='past'?'memories':'plan';
+    case 'open-trip':{ const t=trips.find(x=>x.id===d.id); S.mode = t.id==='japan'?'ai':t.status==='live'?'trip':t.status==='past'?'memories':'plan';
       if(S.mode==='trip') toast('Trip mode — Day 3, let’s go ✈️'); keep=false; break; }
     case 'tab': if(S.mode==='home') S.tab=d.tab; else if(S.mode==='plan') S.planTab=d.tab; else S.tripTab=d.tab; keep=false; break;
     case 'seg': S.seg=d.seg; break;
@@ -886,6 +982,16 @@ document.addEventListener('click',e=>{
       toast(`Saved to My bookings${split?' · '+inr(total)+' added to Budget':''}`); break; }
     case 'sheet': S.sheet=d.sheet; break;
     case 'close': S.sheet=null; break;
+    case 'ai-variant': toast('✨ Drafting Plan C from your group’s preferences…'); S.aiC=true; S.variant='C'; S.compare=false; setTimeout(()=>{toast('Plan C · AI is ready — compare it or put it to a vote'); render(true);},50); break;
+    case 'check-toggle': S.checkOpen=!S.checkOpen; break;
+    case 'fix':{ const i=+d.i; if(i<=1){ S.aiC=true; S.variant='C'; toast(i===0?'Switched the view to Plan C · AI (via Kinnaur). Plan A is unchanged.':'Plan C adds a night at Tabo before Kaza'); } else toast(i===2?'Key Monastery moved to 9 am on Day 4':'Note added to Day 3: carry cash'); break; }
+    case 'ai-chip': S.aiPrompt=d.t; break;
+    case 'ai-go':{ const t=$('aip'); if(t) S.aiPrompt=t.value; S.sheet='aiwork'; S.aiStep=0;
+      const tick=()=>{ S.aiStep++; if(S.aiStep<5){ render(true); setTimeout(tick,420);} else { S.sheet=null; S.mode='ai'; render(false);} }; setTimeout(tick,420); break; }
+    case 'ai-create':{ if(!trips.some(t=>t.id==='japan')) trips.splice(2,0,{id:'japan',name:'Japan in April',where:'Tokyo → Osaka',dates:'10 days · April',emoji:'🌸',g:'linear-gradient(135deg,#E056A0,#5B5BD6)',status:'planning',members:['you'],chip:'<span class="chip accent">✨ AI draft · invite friends</span>'});
+      S.mode='home'; S.tab='trips'; S.seg='planning'; toast('“Japan in April” created with Plan A · AI — invite link ready'); keep=false; break; }
+    case 'replan-apply': S.replanned=true; S.sheet=null; goaToday[3]=['15:30','🌿','Sahakari spice farm tour','Covered tour + lunch · ₹600 pp','Activity','#FFB020','now','35 min scooter']; toast('Today updated · kayaking cancelled free before 2 pm'); break;
+    case 'publish': S.published=true; S.sheet=null; toast('Published as a Verified trip · it’s in Feed'); break;
     case 'create': S.sheet=null; S.mode='plan'; S.planTab='itin'; toast('“Coorg monsoon weekend” created — invite link ready'); keep=false; break;
     case 'add-exp':{ const amt=parseInt(($('amt')||{}).value,10)||0; const t=(($('et')||{}).value||'Expense').trim(); if(amt>0){ S.expenses.unshift({t,cat:'🧾',by:'you',amt,split:['you','riya','arjun','meera'],when:'Just now'}); toast('Saved · '+inr(amt)+' split 4 ways'); } S.sheet=null; if(S.mode==='trip') S.tripTab='budget'; break; }
     case 'toast-close': S.sheet=null; toast(d.msg); break;

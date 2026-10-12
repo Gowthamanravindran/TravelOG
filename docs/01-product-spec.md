@@ -250,3 +250,63 @@ Free tier: watermark + standard resolution; Plus/Pass: HD, no watermark, premium
 | Trip mode Today/Plan/Map/Budget | Nearby (Places) | Public creator profiles |
 | Memories collage + IG share | Subscriptions (RevenueCat) | Find & book with live partner prices |
 | | Find & book (click-out deep links) + nudges | |
+
+---
+
+## 9. AI planner
+
+AI never edits the group's plan directly. Everything it produces is a **plan variant** ("Plan C · AI") or a suggestion the group can accept, compare and vote on.
+
+### 9.1 Entry points
+| Where | What the user does | What the AI returns |
+|---|---|---|
+| Home ＋ → **✨ Plan with AI**, and the Explore search bar | Types anything: "Help me plan a 10-day Japan trip for 4 in April, ₹2L each, we love food and hikes" | Up to 2 follow-up questions (pace? flexible dates?), then a **trip preview**: route and cities, day-by-day plan, a stay area per city, transport legs (e.g. Shinkansen vs flights, JR Pass or not), budget per person in INR and local currency, and notes (season, crowds, visa lead time, transit cards). **Create trip** turns it into a Draft trip with the AI plan as Plan A |
+| New-trip wizard, "Not sure where?" | Dates, budget, group size | 3 destination ideas → a destination poll |
+| Plan › Itinerary › **✨ Plan with AI** | "Draft the whole trip" or "Fill this day" | A new variant, Plan C · AI, next to the members' plans; Compare and vote as usual |
+| Plan › Itinerary › **Trip check** | Taps "Check my plan" (also runs automatically before the trip) | A list of issues with severity and a **Fix** button that proposes a change as a variant |
+| Trip mode › Today › **Re-plan today** | Rain, running late, place closed | One suggested swap for the rest of the day; one tap to apply |
+
+### 9.2 What Trip check looks for
+- **Season and climate:** monsoon landslides, snow-bound passes (e.g. Kunzum La usually closes around November → Spiti Plan A at risk, Plan B via Kinnaur is safer), heat, cherry-blossom or Golden Week crowds.
+- **Opening days and hours:** museums shut on Mondays, temples closing at sunset, tickets that sell out.
+- **Timing:** transfers that are too tight, too many stops in a day, late arrivals at hotels.
+- **Location:** the stay is far from that day's stops ("hotel is 45 min from Day 2's stops; a Gion stay saves 1h 20m").
+- **Practical:** permits (Rohtang), visas, transit cards, cash-only places, sunset times for viewpoints.
+
+### 9.3 Rules
+- The AI uses real data through tools (weather normals and forecast, opening hours, travel times, partner search) and shows what it used. Prices are labelled **estimate**.
+- Stays and transport in AI plans link into **Find & book** (international trips use global partners: Booking.com, Agoda, Klook, and rail-pass resellers).
+- No made-up bookings or confirmations; the AI never books on the user's behalf.
+
+### 9.4 Free vs paid
+| | Free | Plus / Trip Pass |
+|---|---|---|
+| Trip check | ✅ (daily limit) | ✅ unlimited |
+| "Plan with AI" drafts | 1 per month | Unlimited, with a more capable model |
+| Fill this day | — | ✅ |
+| Re-plan today (Trip mode) | — | ✅ |
+
+Free-tier AI runs on Claude Haiku 5.5 so it costs a few rupees per user per year; paid drafts use a larger model. See [05 · Profit plan](05-profit-plan.md) for why this split matters.
+
+---
+
+## 10. Sharing past itineraries ("Verified trips")
+
+A paid itinerary marketplace is out of scope for v1: free plans are everywhere, and payments, refunds and quality disputes cost more than the sales would earn. Instead, TravelOG makes its itineraries more useful than a blog post and rewards people for sharing them.
+
+### 10.1 Flow
+1. When a trip ends, the app drafts a **shareable itinerary** alongside the Memories prompt. Members' names, private bookings, PNRs and per-person splits are removed.
+2. The owner reviews it and taps **Publish** (public in Feed and Explore) or **Share link**.
+3. Readers see a **Verified trip** card: real spend per person, real time spent per stop, real travel times, and "would skip" notes.
+4. **Use this plan** copies it into a new Draft trip with the dates shifted; stays and transport are pre-listed in Find & book.
+
+### 10.2 Why people share
+| Reward | Detail |
+|---|---|
+| Zero effort | Auto-drafted at trip end; one tap to publish, at the same moment as the memory collage |
+| Creator earnings | A share of the affiliate commission when someone who copied the plan books through Find & book |
+| Credits | e.g. 5 copies → a free Trip Pass; tips from readers |
+| Status | Copy count, Verified badge, "Top Spiti planner", placement in Explore |
+| Instagram loop | Memories collage carries "Plan this trip on TravelOG" |
+
+Paid itineraries may return later for a small set of verified local experts.

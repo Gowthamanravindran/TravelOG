@@ -37,6 +37,7 @@ The data is **relational** (trips → days → items, polls → votes, expenses 
 | Object storage | Cloudflare R2 + custom domain CDN | photos, attachments; zero egress fees |
 | Places | Google Places API (New), cached server-side 7 days | Nearby, place search |
 | Payments | RevenueCat over App Store / Play Billing | subscriptions + Trip Pass (consumable/non-consumable) |
+| AI planner | Claude API via `ai-plan` Edge Function (Haiku 5.5 for free routes, Opus/Sonnet 5.5 for paid) | Plan with AI, Trip check, Re-plan today |
 | Affiliate booking | `partner-search` Edge Function, `/go` click redirect (Cloudflare Worker), network postbacks | Find & book in the Bookings tab |
 | Push | Expo Push → FCM/APNs | poll, expense, reminder notifications |
 | Email | Resend | invites, receipts |
@@ -121,6 +122,10 @@ erDiagram
 | `feed_posts`, `reactions`, `comments`, `follows`, `reports` | social graph + moderation |
 | `location_visits` | trip_id, user_id, item_id?, lat, lng, arrived_at, left_at |
 | `affiliate_clicks` | id (= sub-id sent to partner), trip_id, user_id, partner, category, query jsonb, offer_ref, price_shown, created_at |
+| `ai_usage` | user_id, trip_id, route (check/draft/fill/replan), model, input_tokens, output_tokens, cost_usd, created_at |
+| `itinerary_posts` | id, trip_id, author_id, title, days jsonb, actuals jsonb, verified, visibility, fork_count, published_at |
+| `forks` | post_id, new_trip_id, user_id, created_at |
+| `creator_earnings` | post_id, author_id, conversion_id, amount, status |
 | `affiliate_conversions` | click_id, network, partner_order_ref (hashed), status (pending/confirmed/cancelled), commission, currency, reported_at |
 
 **RLS rule of thumb:** every trip-scoped table has `using (is_trip_member(trip_id))`; writes additionally check role. Balances are computed by a SQL view; "simplify debts" runs in an Edge Function.
@@ -144,6 +149,15 @@ erDiagram
 4. Networks report conversions by postback URL or daily CSV → `affiliate_conversions` (pending → confirmed after the stay/travel date, usually 30–60 days).
 5. When the user returns, the "Did you book it?" sheet creates a `bookings` row linked to the click. That gives the user their ticket wallet entry even before the network confirms.
 Bookings happen on the partner's site, so no in-app purchase rules or payment handling apply.
+
+**AI planner** —
+1. Edge Function `ai-plan` (TypeScript, official Anthropic SDK, streaming) runs a tool-use loop with these tools: `search_places`, `travel_times` (Mapbox Matrix / self-hosted routing), `climate_normals` and `forecast` (Open-Meteo), `opening_hours`, `find_stays` / `find_transport` (the partner-search function), `advisories` (seasonal closures, permits, visa notes from a curated table).
+2. The final answer is returned through structured outputs in the itinerary schema (days → items, stays, transport legs, budget, notes, sources) and saved as a `plan_variant` with `author = 'ai'`.
+3. **Model routing** (config table, changed without an app release): Trip check and free drafts → Claude Haiku 5.5; paid drafts, Fill this day and Re-plan today → Claude Opus 5.5 or Claude Sonnet 5.5, chosen after a quality test on real trips.
+4. Prompt caching on the system prompt and tool definitions; `ai_usage` table enforces per-user quotas; `stop_reason` (including refusals) is handled before reading content.
+5. Open-ended requests ("plan a 10-day Japan trip") run the same loop without an existing trip, then create the Draft trip only when the user taps **Create trip**.
+
+**Verified trips** — at trip completion a job builds an `itinerary_posts` row from the main variant plus actuals (`expenses`, `location_visits`), strips private fields, and waits for the owner to publish. **Use this plan** creates a new trip and a `forks` row; affiliate clicks from a forked trip carry the post id so `creator_earnings` can be credited when the conversion confirms.
 
 **Settle up** — `upi://pay?pa=<payee upi>&pn=<name>&am=<amount>&cu=INR&tn=TravelOG <trip>`; user confirms "paid" afterwards (we never touch funds).
 
