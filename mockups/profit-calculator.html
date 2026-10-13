@@ -118,7 +118,8 @@ const AI={opus:{n:'Claude Opus 5.5',d:0.32,c:0.10},sonnet:{n:'Claude Sonnet 5.5'
 const TEAMS={Bootstrapped:[0,50000],Lean:[3600000,150000],Seed:[12000000,500000]};
 const BASE={users:100000,tripsPerUser:2,groupSize:4,intlShare:0.15,plusConv:0.025,plusPrice:1199,passRate:0.06,passPrice:199,bookRate:0.08,commDom:300,intlMult:2.5,
   draftsPerTrip:1.5,checksPerTrip:4,exploreDrafts:1,replansPerPaidTrip:3,freeModel:'haiku',paidModel:'opus',infraFixedUsd:100,infraPerUserInr:12,supportPerUser:3,
-  newShare:0.5,paidShare:0.5,cpi:50,activation:0.4,team:'Lean',fx:88};
+  newShare:0.5,paidShare:0.5,cpi:50,activation:0.4,team:'Lean',fx:88,blueprintHit:0,checkRuleShare:0,optimised:'off'};
+const OPT={blueprintHit:0.7,checkRuleShare:0.8,infraPerUserInr:7,infraFixedUsd:200}, NOOPT={blueprintHit:0,checkRuleShare:0,infraPerUserInr:12,infraFixedUsd:100}, BP_COST=0.001;
 const PRESETS={Low:{plusConv:0.01,passRate:0.03,bookRate:0.03,commDom:200,paidShare:0.7,cpi:80,activation:0.3},Base:{},High:{plusConv:0.05,passRate:0.10,bookRate:0.15,commDom:400,paidShare:0.3,cpi:30,activation:0.5}};
 
 function run(p){
@@ -127,15 +128,16 @@ function run(p){
   const covered=plusUsers*own, passes=(T-covered)*p.passRate, passRev=passes*p.passPrice*store;
   const comm=p.commDom*(1-p.intlShare)+p.commDom*p.intlMult*p.intlShare, affRev=T*p.bookRate*comm/1.18;
   const rev=plusRev+passRev+affRev;
-  const paidTrips=covered+passes, paidFrac=T?paidTrips/T:0, fd=AI[p.freeModel].d, pd=AI[p.paidModel].d;
-  const aiUsd=T*(p.draftsPerTrip*((1-paidFrac)*fd+paidFrac*pd)+p.checksPerTrip*AI.haiku.c)+N*p.exploreDrafts*fd+paidTrips*p.replansPerPaidTrip*pd*0.3;
+  const paidTrips=covered+passes, paidFrac=T?paidTrips/T:0, h=p.blueprintHit||0;
+  const fd=h*BP_COST+(1-h)*AI[p.freeModel].d, pd=h*BP_COST+(1-h)*AI[p.paidModel].d, chk=AI.haiku.c*(1-(p.checkRuleShare||0));
+  const aiUsd=T*(p.draftsPerTrip*((1-paidFrac)*fd+paidFrac*pd)+p.checksPerTrip*chk)+N*p.exploreDrafts*fd+paidTrips*p.replansPerPaidTrip*AI[p.paidModel].d*0.3;
   const ai=aiUsd*p.fx, infra=p.infraFixedUsd*12*p.fx+N*p.infraPerUserInr, support=N*p.supportPerUser, pay=0.01*(plusUsers*p.plusPrice+passes*p.passPrice);
   const variable=ai+infra+support+pay, cacPaid=p.cpi/p.activation, mkt=N*p.newShare*p.paidShare*cacPaid;
   const contrib=rev-variable-mkt, [team,oh]=TEAMS[p.team], ebitda=contrib-team-oh;
   const gmPU=(rev-variable)/N, ltv=gmPU/p.newShare, cac=p.paidShare*cacPaid;
   return {N,T,plusRev,passRev,affRev,rev,ai,infra,support,pay,variable,mkt,contrib,team,oh,ebitda,gmPU,ltv,cac,revPU:rev/N};
 }
-window.TravelOGModel={run,BASE,PRESETS};
+window.TravelOGModel={run,BASE,PRESETS,OPT};
 
 const S=Object.assign({},BASE);
 const fields=[
@@ -143,7 +145,7 @@ const fields=[
   ['Usage',[['tripsPerUser','Trips per user / year','range',0.5,5,v=>v.toFixed(1),0.5],['groupSize','People per trip','range',2,8,v=>v.toFixed(0),1],['intlShare','International trips','range',0,0.5,pct,0.05]]],
   ['Revenue',[['plusConv','Users on Plus','range',0,0.1,pct1,0.005],['plusPrice','Plus price / year','range',499,1999,inr,50],['passRate','Trips buying a Trip Pass','range',0,0.25,pct,0.01],['passPrice','Trip Pass price','range',99,399,inr,10],
     ['bookRate','Trips booking via Find & book','range',0,0.3,pct,0.01],['commDom','Commission per booking trip (domestic)','range',100,800,inr,25],['intlMult','International commission multiple','range',1,5,v=>v.toFixed(1)+'×',0.5]]],
-  ['AI',[['freeModel','Model for free users','select'],['paidModel','Model for paid drafts','select'],['draftsPerTrip','AI drafts per trip','range',0,5,v=>v.toFixed(1),0.5]]],
+  ['AI',[['optimised','Optimised costs (doc 06)','select'],['blueprintHit','Plans answered by a blueprint','range',0,0.95,pct,0.05],['freeModel','Model for free users','select'],['paidModel','Model for paid drafts','select'],['draftsPerTrip','AI drafts per trip','range',0,5,v=>v.toFixed(1),0.5]]],
   ['Marketing',[['newShare','Users who are new each year','range',0.2,1,pct,0.05],['paidShare','New users from paid ads','range',0,1,pct,0.05],['cpi','Cost per install','range',10,200,inr,5],['activation','Installs that become active','range',0.1,0.8,pct,0.05]]],
   ['Costs',[['team','Team','select'],['infraPerUserInr','Infra per user / year','range',4,40,inr,1],['fx','₹ per US$','range',80,100,v=>'₹'+v,1]]]
 ];
@@ -155,7 +157,7 @@ function buildInputs(){
     h+=`<fieldset><legend>${g}</legend>`;
     for(const [k,label,type,min,max,fmt,step] of items){
       if(type==='select'){
-        const opts = k==='team' ? Object.keys(TEAMS).map(t=>[t, t+(TEAMS[t][0]?` · ₹${TEAMS[t][0]/1e5} L/yr`:' · ₹0')]) : Object.entries(AI).map(([m,o])=>[m,o.n]);
+        const opts = k==='optimised' ? [['off','Off'],['on','On']] : k==='team' ? Object.keys(TEAMS).map(t=>[t, t+(TEAMS[t][0]?` · ₹${TEAMS[t][0]/1e5} L/yr`:' · ₹0')]) : Object.entries(AI).map(([m,o])=>[m,o.n]);
         h+=`<div class="f"><label for="i_${k}">${label}</label><select id="i_${k}" data-k="${k}">${opts.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></div>`;
       } else if(type==='log'){
         h+=`<div class="f"><label for="i_${k}">${label}</label><output id="o_${k}"></output><input type="range" id="i_${k}" data-k="${k}" data-log="1" min="${logMin}" max="${logMax}" step="0.01"></div>`;
@@ -165,10 +167,11 @@ function buildInputs(){
     }
     h+='</fieldset>';
   }
-  h+=`<p class="note">AI cost per draft ≈ 40k input + 8k output tokens; per Trip check ≈ 15k + 2k, at list prices. Team “Lean” = 2 founders + 1 engineer; “Seed” = 6–7 people. Overhead covers legal, accounting, store fees.</p>`;
+  h+=`<p class="note">AI cost per draft ≈ 40k input + 8k output tokens; per Trip check ≈ 15k + 2k, at list prices. “Optimised costs” = own places database, trip blueprints (answer ≈ $0.001), rule-based Trip check (80 %), infra ₹7/user + $200/mo fixed. Team “Lean” = 2 founders + 1 engineer; “Seed” = 6–7 people. Overhead covers legal, accounting, store fees.</p>`;
   f.innerHTML=h;
   f.addEventListener('input',e=>{const el=e.target,k=el.dataset.k; if(!k) return;
     S[k]= el.tagName==='SELECT'?el.value : el.dataset.log? Math.round(Math.pow(10,+el.value)/100)*100 : +el.value;
+    if(k==='optimised') Object.assign(S, S.optimised==='on'?OPT:NOOPT);
     setPreset(null); render();});
 }
 function syncInputs(){
@@ -180,7 +183,7 @@ function syncInputs(){
 }
 function setPreset(name){ document.querySelectorAll('[data-preset]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.preset===name)); }
 document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
-  const keep={users:S.users,team:S.team,fx:S.fx}; Object.assign(S,BASE,PRESETS[b.dataset.preset],keep); setPreset(b.dataset.preset); syncInputs(); render();
+  const keep={users:S.users,team:S.team,fx:S.fx,optimised:S.optimised,blueprintHit:S.blueprintHit,checkRuleShare:S.checkRuleShare,infraPerUserInr:S.infraPerUserInr,infraFixedUsd:S.infraFixedUsd}; Object.assign(S,BASE,PRESETS[b.dataset.preset],keep); setPreset(b.dataset.preset); syncInputs(); render();
 }));
 
 const money=x=>{const a=Math.abs(x), s=x<0?'−':''; if(a>=1e7) return s+'₹'+(a/1e7).toFixed(2)+' Cr'; if(a>=1e5) return s+'₹'+(a/1e5).toFixed(1)+' L'; return s+'₹'+Math.round(a).toLocaleString('en-IN');};

@@ -246,6 +246,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
 .chip.verified{background:#DCFCE7;color:#166534}
 textarea.input{resize:vertical;font:inherit;line-height:1.4}
 .scrim.still,.scrim.still .sheet{animation:none}
+.bpchip{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--mango-soft);margin:0 0 12px}
 .tplchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 
 @media (max-width:460px){
@@ -820,6 +821,7 @@ function aiPreview(){
   return `<div class="trip-head"><button class="icon-btn" data-act="go-mode" data-mode="home" aria-label="Back">${ic('back')}</button>
     <div class="t"><div class="eyebrow" style="color:var(--indigo)">✨ AI draft · not saved yet</div><h2>🌸 ${J.title}</h2></div></div>
   <p class="small muted" style="margin:-4px 0 12px">${J.sub}</p>
+  <div class="bpchip"><span>⚡</span><div style="flex:1;min-width:0"><b class="small">Built from our Sakura-season plan</b><div class="tiny muted">Used by 2,140 groups · ready instantly · adjusted for 4 people and your budget</div></div><button class="link" data-act="toast" data-msg="Plus: AI rewrites this plan around your group (more hiking, a slower pace, different cities)">Customise with AI</button></div>
   <div class="routeline">${J.route.map((r,i)=>`<span class="stop"><b>${r[0]}</b><span class="tiny muted">${r[1]}</span></span>${i<J.route.length-1?'<span class="arrow">→</span>':''}`).join('')}</div>
   <div class="card" style="margin-top:12px"><div class="between"><span class="eyebrow">Budget per person</span><b class="num" style="font-family:var(--display);font-size:22px">${inr(total)}</b></div>
     <div class="stack" style="gap:6px;margin-top:8px">${J.budget.map(b=>`<div class="between small"><span class="muted">${b[0]}</span><span class="num">${inr(b[1])}</span></div>`).join('')}</div>
@@ -867,7 +869,7 @@ function sheet(){
     <button class="btn primary block" data-act="ai-go">✨ Plan it</button>
     <p class="tiny muted" style="margin-top:8px">Free plan: 1 AI draft a month. Plus: unlimited.</p>`;
   if(S.sheet==='aiwork'){
-    const steps=['Reading your request · 10 days, 4 people, ₹2L each','Checking April weather and cherry-blossom crowds','Ordering cities by travel time','Finding stays near each day\'s stops','Pricing trains, flights and stays (estimates)'];
+    const steps=['Reading your request · 10 days, 4 people, ₹2L each','Found a matching plan: Japan · Sakura season · 10–12 days','Picking food + hiking blocks for each city','Adjusting dates, group size and budget','Pricing trains, flights and stays (estimates)'];
     body=`<h3 style="font-size:20px">✨ Planning Japan…</h3><div class="stack" style="gap:10px;margin-top:14px">${steps.map((t,i)=>`<div class="row small" style="gap:10px;${i>S.aiStep?'opacity:.4':''}"><span class="stepdot ${i<S.aiStep?'done':i===S.aiStep?'now':''}">${i<S.aiStep?'✓':''}</span>${t}</div>`).join('')}</div>`;
   }
   if(S.sheet==='replan') body=`<h3 style="font-size:20px">✨ Re-plan today</h3>

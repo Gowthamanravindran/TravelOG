@@ -122,6 +122,12 @@ erDiagram
 | `feed_posts`, `reactions`, `comments`, `follows`, `reports` | social graph + moderation |
 | `location_visits` | trip_id, user_id, item_id?, lat, lng, arrived_at, left_at |
 | `affiliate_clicks` | id (= sub-id sent to partner), trip_id, user_id, partner, category, query jsonb, offer_ref, price_shown, created_at |
+| `places` | id, name, category, lat, lng, address, opening_hours, source, source_id, licence, google_place_id (nullable), updated_at |
+| `blueprints` | id, destination, season, month_from, month_to, min_days, max_days, cities jsonb, notes jsonb, price_index, version |
+| `city_blocks` | id, city, nights, theme, days jsonb (place ids + times), est_cost |
+| `travel_time_cache` | from_place, to_place, mode, minutes, km, computed_at |
+| `climate_normals` | destination, month, temp_min, temp_max, rain_days, notes |
+| `advisories` | region, type (closure/permit/visa), from, to, text, source |
 | `ai_usage` | user_id, trip_id, route (check/draft/fill/replan), model, input_tokens, output_tokens, cost_usd, created_at |
 | `itinerary_posts` | id, trip_id, author_id, title, days jsonb, actuals jsonb, verified, visibility, fork_count, published_at |
 | `forks` | post_id, new_trip_id, user_id, created_at |
@@ -156,6 +162,14 @@ Bookings happen on the partner's site, so no in-app purchase rules or payment ha
 3. **Model routing** (config table, changed without an app release): Trip check and free drafts → Claude Haiku 5.5; paid drafts, Fill this day and Re-plan today → Claude Opus 5.5 or Claude Sonnet 5.5, chosen after a quality test on real trips.
 4. Prompt caching on the system prompt and tool definitions; `ai_usage` table enforces per-user quotas; `stop_reason` (including refusals) is handled before reading content.
 5. Open-ended requests ("plan a 10-day Japan trip") run the same loop without an existing trip, then create the Draft trip only when the user taps **Create trip**.
+
+**Places pipeline** (see [06](06-cost-optimization.md)) — a monthly job loads Foursquare Open Source Places, Overture places and OpenStreetMap opening hours for served regions into `places`, merges duplicates and records source + licence per row. App features read `places`; Google Places is called only for fresh details on a place screen, storing just the `place_id`.
+
+**Trip blueprints** — `blueprints` (destination, season, length range, ordered cities) and `city_blocks` (city, nights, theme, day plans referencing `places`) are generated offline with the Claude Batch API and checked by code. The `ai-plan` function first parses a request with Claude Haiku 5.5; on a blueprint match, a deterministic composer builds the plan (dates, budget scaling, Find & book links) and Haiku adds a short note. No match → the full AI draft path.
+
+**Trip-check rules engine** — plain code over the itinerary: opening days from `places`, gaps from `travel_time_cache`, stops per day, hotel distance, sunset times, and an `advisories` table (road closures, permits, visas). AI only phrases or handles unusual cases.
+
+**Self-hosting at scale** — OSRM/Valhalla on a VPS fills `travel_time_cache`; MapLibre with PMTiles on R2 replaces per-user tile fees past the Mapbox free tier; `climate_normals` is precomputed per destination and month.
 
 **Verified trips** — at trip completion a job builds an `itinerary_posts` row from the main variant plus actuals (`expenses`, `location_visits`), strips private fields, and waits for the owner to publish. **Use this plan** creates a new trip and a `forks` row; affiliate clicks from a forked trip carry the post id so `creator_earnings` can be credited when the conversion confirms.
 

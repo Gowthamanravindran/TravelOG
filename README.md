@@ -12,6 +12,8 @@ Plan trips with your crew, vote on where to go, run the trip live, and turn it i
 | [03 · Architecture](docs/03-architecture.md) | Expo + Supabase + R2 + Mapbox stack, system diagram, data model, offline, security |
 | [04 · Pricing & costs](docs/04-pricing-and-costs.md) | Subscription vs Trip Pass vs Hybrid, cost model for 1,000 users × 100 photos × 5 trips, 10k-user sensitivity, AI cost |
 | [05 · Profit plan](docs/05-profit-plan.md) | Usage, conversion, marketing, AI and team costs across 1k–1M users; when the app becomes profitable |
+| [06 · Cost optimisation](docs/06-cost-optimization.md) | Own places database, trip blueprints, rule-based checks, self-hosted maps; before/after costs |
+| [Plan log](docs/plans/) | Every planning step in order, with what was built |
 
 ## Clickable prototype
 Open [`mockups/index.html`](mockups/index.html) in a browser. The left panel jumps between modes; everything inside the phone is clickable (tabs, Find & book → Add to poll → Book on partner → save to My bookings, plan variants + compare, voting and lock-in, add expense, settle up, map view, collage templates).

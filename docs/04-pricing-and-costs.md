@@ -86,6 +86,8 @@ Claude API list prices ($ per million tokens, input / output): Opus 5.5 $4 / $20
 
 At 100k active users (0.5 trips created per user, 1.5 drafts + 4 checks per trip, 1 open-ended "plan a trip" request per user), free-tier AI on Haiku 5.5 costs about **₹4 per user per year**; the same traffic on Sonnet 5.5 adds ~₹23 L a year and on Opus 5.5 ~₹46 L. That is why the free tier stays on Haiku. Full model: [05 · Profit plan](05-profit-plan.md).
 
+With blueprints and rule-based checks ([06 · Cost optimisation](06-cost-optimization.md)), AI drops to about **₹2 per user per year** and infrastructure from ~₹13 to ~₹9.
+
 ## 3. Cost approximation — scenario: 1,000 users × 100 photos × 5 trips
 
 ### Assumptions

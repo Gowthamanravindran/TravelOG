@@ -163,7 +163,27 @@ Running costs = AI + infrastructure + support + payments. Contribution = revenue
 
 Watch these monthly: invites per trip, % of new users from invites, Plus and Pass conversion, % of trips that book, AI cost per active user, CPI and activation by channel.
 
-## 9. Caveats
+## 9. With cost optimisation
+
+Plan 6 ([06 · Cost optimisation](06-cost-optimization.md)) adds our own places database, trip blueprints and rule-based Trip check. The tables above are unchanged; this shows the effect.
+
+| Per active user / year (100k users) | Low before → after | Base before → after | High before → after |
+|---|---|---|---|
+| AI | ₹3.0 → **₹1.3** | ₹4.4 → **₹2.1** | ₹6.5 → **₹3.3** |
+| Infrastructure | ₹13.1 → **₹9.1** | ₹13.1 → **₹9.1** | ₹13.1 → **₹9.1** |
+| Running costs (AI + infra + support + payments) | ₹19.2 → **₹13.6** | ₹20.9 → **₹14.6** | ₹23.2 → **₹16.1** |
+| Contribution | −₹98.7 → **−₹93.0** | −₹13.9 → **−₹7.6** | ₹48.9 → **₹56.0** |
+
+| Scenario | Lean team: before → after | Seed team: before → after |
+|---|---|---|
+| Base | never (≤5M) → **never (≤5M)** | never (≤5M) → **never (≤5M)** |
+| Base, 10 % paid | 320,000 → **205,000** | 1,035,000 → **655,000** |
+| Base, 5 % Plus + 30 % paid | 195,000 → **145,000** | 630,000 → **460,000** |
+| High | 78,000 → **69,000** | 255,000 → **220,000** |
+
+Optimisation saves ~₹6–7 per user per year and pulls break-even forward by 10–35 %, but it does not rescue the Base case: free growth and conversion still decide profitability.
+
+## 10. Caveats
 
 - Conversion, booking and viral rates are assumptions, not measurements. The pilot's job is to measure them.
 - Commission figures come from affiliate-network listings (see [04 · Pricing](04-pricing-and-costs.md)); actual rates depend on the deal and cancellations.
