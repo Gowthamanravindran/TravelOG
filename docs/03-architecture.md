@@ -1,5 +1,7 @@
 # 03 · Architecture & Tech Stack — TravelOG
 
+> **Stack updates:** [09 · Tech stack](09-tech-stack.md) is now the complete, authoritative list. It supersedes three choices below: offline storage is **expo-sqlite + Drizzle** with our own sync ([11](11-local-db-and-sync.md)) rather than TanStack Query + MMKV; maps are **MapLibre** rather than `@rnmapbox/maps`; the web runs on **Cloudflare Pages/Workers** rather than Vercel. Auth details: [10](10-auth.md). Migrations: [12](12-migrations.md).
+
 ## 1. Recommendation
 
 **Expo (React Native) + TypeScript** on the client, **Supabase** (Postgres) as the backend, **Cloudflare R2** for photos, **Mapbox** for maps.
@@ -128,6 +130,8 @@ erDiagram
 | `travel_time_cache` | from_place, to_place, mode, minutes, km, computed_at |
 | `climate_normals` | destination, month, temp_min, temp_max, rain_days, notes |
 | `advisories` | region, type (closure/permit/visa), from, to, text, source |
+| `app_config` | key, value jsonb (min_supported_version, recommended_version, feature switches) |
+| `invites` | id, trip_id, code_hash, role, expires_at, max_uses, uses, revoked_at, created_by |
 | `ai_usage` | user_id, trip_id, route (check/draft/fill/replan), model, input_tokens, output_tokens, cost_usd, created_at |
 | `itinerary_posts` | id, trip_id, author_id, title, days jsonb, actuals jsonb, verified, visibility, fork_count, published_at |
 | `forks` | post_id, new_trip_id, user_id, created_at |
