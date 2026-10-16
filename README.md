@@ -9,7 +9,7 @@ Plan trips with your crew, vote on where to go, run the trip live, and turn it i
 |---|---|
 | [01 · Product spec](docs/01-product-spec.md) | The three modes (Home, Plan, Trip), every screen, trip lifecycle, polls and plan variants, memories, gap decisions, MVP scope |
 | [02 · Design system](docs/02-design-system.md) | Per-mode theming, colour tokens, type, components, motion |
-| [03 · Architecture](docs/03-architecture.md) | Expo + Supabase + R2 + Mapbox stack, system diagram, data model, offline, security |
+| [03 · Architecture](docs/03-architecture.md) | Expo + Supabase + R2 + MapLibre stack, system diagram, data model, offline, security |
 | [04 · Pricing & costs](docs/04-pricing-and-costs.md) | Subscription vs Trip Pass vs Hybrid, cost model for 1,000 users × 100 photos × 5 trips, 10k-user sensitivity, AI cost |
 | [05 · Profit plan](docs/05-profit-plan.md) | Usage, conversion, marketing, AI and team costs across 1k–1M users; when the app becomes profitable |
 | [06 · Cost optimisation](docs/06-cost-optimization.md) | Own places database, trip blueprints, rule-based checks, self-hosted maps; before/after costs |
@@ -21,10 +21,13 @@ Plan trips with your crew, vote on where to go, run the trip live, and turn it i
 | [12 · Migrations](docs/12-migrations.md) | Server and device migrations with commands and runbooks |
 | [13 · Development plan](docs/13-development-plan.md) | Phases 0–8 with your tasks and exit criteria |
 | [14 · Owner setup](docs/14-owner-setup.md) | Every account and secret you set up, step by step |
+| [15 · Go-to-market](docs/15-go-to-market.md) | Audience, growth loops, waitlist, pilot, channels, budget, metrics |
+| [16 · Admin & ops](docs/16-admin-and-ops.md) | Admin web app, data retention, alerts, incident steps |
+| [17 · Owner checklist](docs/17-owner-checklist.md) | Everything you need to do, end to end, in order |
 | [Plan log](docs/plans/) | Every planning step in order, with what was built |
 
 ## Start here
-1. [14 · Owner setup](docs/14-owner-setup.md) §1–§5 (Phase 0 accounts).
+1. [17 · Owner checklist](docs/17-owner-checklist.md) — your to-do list from now to launch (details in [14](docs/14-owner-setup.md)).
 2. [13 · Development plan](docs/13-development-plan.md) Phase 0.
 
 ## Clickable prototype

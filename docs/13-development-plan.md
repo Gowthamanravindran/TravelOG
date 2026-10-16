@@ -33,6 +33,7 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 - GitHub Actions: lint, typecheck, tests, migration check, bundle-size check.
 - EAS config with three profiles (development, preview, production); first development build.
 - Design tokens from [02](02-design-system.md) in `packages/ui`.
+- **Waitlist page** on the domain ([15](15-go-to-market.md) §3).
 
 **You do** — Owner setup §1–§5 (GitHub, domain, Cloudflare, Supabase staging + prod, Expo/EAS) and add the secrets listed there. Install the development build on your phone.
 
@@ -49,6 +50,7 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 - Navigation shells for the three modes (Home, Plan, Trip) with the right bottom bars and themes.
 - Sentry and PostHog wired up; first analytics events.
 - Draft privacy policy and terms (for review).
+- **Admin app skeleton** (`apps/admin`) with the Config page ([16](16-admin-and-ops.md)).
 
 **You do** — Owner setup §6 (Apple), §7 (Google Play), §8 (Google Cloud OAuth), §9 (Resend), §13 (Sentry, PostHog).
 
@@ -63,7 +65,7 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 - Invites: codes, links, universal/app links, logged-out preview page on the web, join flow, roles.
 - Itinerary: days, items, drag reorder, plan variants (A/B/C), compare.
 - Polls: all types, voting styles, deadlines, lock-in that updates the itinerary; Realtime nudges.
-- Notifications: poll opened/closing, item changed.
+- Notifications: poll opened/closing, item changed (catalogue in [01](01-product-spec.md) §11).
 
 **You do** — Owner setup §2 DNS records for the web domain (universal-link files), invite 2–3 friends as testers.
 
@@ -101,7 +103,8 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 **Claude builds**
 - Shared photo pool with background uploads; collage editor (Skia) with templates; exports in post/story sizes; Instagram Stories and share sheet.
 - Feed, likes, comments, follow; Verified trips (auto-draft at trip end, publish, fork); Explore (templates, public itineraries).
-- Report / block, moderation queue (simple admin view on the web).
+- Report / block; **admin moderation queue** ([16](16-admin-and-ops.md)).
+- Referral reward and Instagram link-back ([15](15-go-to-market.md) §2).
 
 **You do** — Owner setup §12 Meta developer app (Instagram Stories sharing ID); decide moderation rules ([07](07-open-items.md)).
 
@@ -114,6 +117,7 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 - RevenueCat: Plus (yearly) and Trip Pass (per trip); paywall; restore purchases; entitlement checks on server.
 - Find & book (Stays · Transport · Activities) with deep-link click-outs, `/go` redirect Worker, click logging, "Did you book it?" flow.
 - Free-tier limits from [04](04-pricing-and-costs.md).
+- **Admin affiliate report** ([16](16-admin-and-ops.md)).
 
 **You do** — Owner setup §12 RevenueCat + store products, tax/banking forms in App Store Connect and Play Console; sign up with affiliate networks (needs PAN; a company is better for payouts — see [07](07-open-items.md)).
 
@@ -127,6 +131,7 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 - First 20 blueprints generated with the Batch API, validated by code, reviewed by you.
 - Rule-based Trip check + AI phrasing; Re-plan today.
 - AI quality set (trip requests with expected properties) run in CI before AI changes.
+- **Admin blueprint review and AI cost pages** ([16](16-admin-and-ops.md)).
 
 **You do** — Owner setup §11 Anthropic API key + monthly spend limit; review the top blueprints (Japan, Bali, Thailand, Goa, Kerala…).
 
@@ -139,7 +144,8 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 **Claude builds**
 - Store listings text, screenshots (from the app), privacy labels / Data safety answers, final privacy policy and terms pages.
 - Accessibility and performance pass ([08](08-app-optimizations.md) targets).
-- Backup restore drill on staging; incident checklist; monitoring alerts.
+- Backup restore drill on staging; alerts and incident steps from [16](16-admin-and-ops.md); **admin support lookup**.
+- Pilot interview script and PostHog funnel dashboard ([15](15-go-to-market.md) §7).
 
 **You do**
 - **Google Play closed test:** new personal developer accounts must run a closed test with **at least 12 testers opted in for 14 consecutive days** before production access; recruit testers early (friends, travel communities). Organisation accounts are exempt.
@@ -151,6 +157,9 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 - App approved on both stores; production release live.
 
 ---
+
+## Marketing tasks alongside the build
+From [15 · Go-to-market](15-go-to-market.md): waitlist live in Phase 0; build-in-public posts and waitlist growth through Phases 2–7; creator and ambassador sign-ups by Phase 5; Play closed-test testers from the waitlist in Phase 8; pilot with 50 friend groups right after launch.
 
 ## After launch
 Phone OTP (after company + DLT), Hindi, deferred deep links, more blueprints from Verified trips, self-hosted tiles past the free tier, web planner.

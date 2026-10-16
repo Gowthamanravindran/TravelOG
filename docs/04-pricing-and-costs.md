@@ -109,8 +109,8 @@ With blueprints and rule-based checks ([06 · Cost optimisation](06-cost-optimiz
 | **Supabase** (DB, Auth, Realtime, Edge Fns) | Pro $25 incl. $10 compute credit; Small compute +$5 | $30 | $30 |
 | **Cloudflare R2** storage | $0.015/GB-mo, first 10 GB free | 54 GB → **$0.66** | 354 GB (with originals) → **$5.16** |
 | R2 operations & egress | 1M writes + 10M reads free; **egress free** | $0 | $0 |
-| **Mapbox** maps SDK | 25k MAU free | $0 | $0 |
-| **Mapbox** Directions | ~100k req/mo free | $0 (≈50k) | $0 |
+| **Map tiles** (MapLibre + hosted tile free tier; self-hosted later) | free tier | $0 | $0 |
+| **Routing** (free tier in development; self-hosted OSRM/Valhalla before beta) | free tier / VPS | $0 | $0 |
 | **Google Places** Nearby Search Pro | 5k/mo free, then $32 / 1,000 | $0 (cap to free tier / OSM fallback) | 6.25k → **$40** |
 | Expo EAS (builds, OTA) | Free tier / Starter | $0 | $19 |
 | Expo Push, Resend (3k emails), Sentry dev, PostHog (1M events), RevenueCat (< $2.5k MTR) | free tiers | $0 | $0 |
@@ -166,8 +166,8 @@ Net to us = gross × 0.85 (15 % store fee — Apple Small Business Program / Goo
 |---|---|---|
 | Supabase Pro + Medium compute | ~$75 | DB ~5 GB, 10k MAU (well under 100k included) |
 | R2 (540 GB → 3.5 TB with originals) | $8 – $52 | still zero egress |
-| Mapbox maps | $0 | under 25k MAU |
-| Routing | ~$40 | **self-host OSRM/Valhalla (India extract) on a VPS** — Mapbox Directions would be ~$800/mo at ~500k req |
+| Map tiles | $0 | hosted free tier, then self-hosted PMTiles on R2 |
+| Routing | ~$40 | **self-host OSRM/Valhalla (India extract) on a VPS** — a paid directions API (e.g. Mapbox) would be ~$800/mo at ~500k req |
 | Google Places | $150 – $450 | cache hit-rate rises with scale; consider Google's India pricing SKUs or Foursquare/OSM for POIs |
 | EAS, Sentry Team, PostHog, Resend | ~$65 – $120 | leave free tiers |
 | **Total** | **≈ $340 – $740 / mo (₹3–6.5 L / yr)** | ₹30–65 per user / yr |

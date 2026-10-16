@@ -4,7 +4,7 @@
 
 ## 1. Recommendation
 
-**Expo (React Native) + TypeScript** on the client, **Supabase** (Postgres) as the backend, **Cloudflare R2** for photos, **Mapbox** for maps.
+**Expo (React Native) + TypeScript** on the client, **Supabase** (Postgres) as the backend, **Cloudflare R2** for photos, **MapLibre** for maps (changed from Mapbox in Plan 7).
 
 ### Why Expo/React Native over Flutter
 
@@ -12,11 +12,11 @@
 |---|---|---|
 | One language across app + backend functions + future web planner | ✅ TypeScript everywhere | ❌ Dart app, TS/other backend |
 | Over-the-air updates (fix itinerary bugs without store review) | ✅ EAS Update | ⚠️ Shorebird (3rd party) |
-| Maps with offline packs | ✅ `@rnmapbox/maps` | ✅ `mapbox_maps_flutter` |
+| Maps with offline packs | ✅ `@maplibre/maplibre-react-native` | ✅ `mapbox_maps_flutter` |
 | Custom canvas for collage editor | ✅ `react-native-skia` | ✅ native Skia/Impeller |
 | Instagram/WhatsApp share intents | ✅ `react-native-share` | ✅ `share_plus` + plugins |
 | Hiring pool in India | ✅ larger (React devs) | ✅ good |
-| Web share pages (trip link previews) | ✅ reuse components via Expo web/Next.js | ⚠️ Flutter web is heavy for SEO pages |
+| Web share pages (trip link previews) | ✅ static pages on Cloudflare Pages/Workers | ⚠️ Flutter web is heavy for SEO pages |
 
 Both would work; RN wins on single-language, OTA and web reuse.
 
@@ -28,9 +28,9 @@ The data is **relational** (trips → days → items, polls → votes, expenses 
 | Layer | Choice | Purpose |
 |---|---|---|
 | App framework | Expo SDK (managed + dev client), Expo Router | iOS + Android from one codebase, file-based routes per mode |
-| State / data | TanStack Query (persisted to MMKV), Zustand (UI state) | caching, offline reads, optimistic writes |
+| State / data | expo-sqlite + Drizzle (local DB, own sync — [11](11-local-db-and-sync.md)), Zustand (UI state), MMKV (small settings) | offline-first reads, optimistic writes (changed in Plan 7) |
 | Animation | Reanimated, Gesture Handler | drag-reorder, sheets, mode transitions |
-| Maps | `@rnmapbox/maps`, Mapbox Directions, offline packs | Trip map, routes, travel times |
+| Maps | MapLibre React Native + hosted vector tiles (self-hosted later), OSRM/Valhalla routing, offline packs | Trip map, routes, travel times (changed in Plan 7) |
 | Location | `expo-location` + `expo-task-manager` | opt-in background dwell detection during Live trips |
 | Images | `expo-image-picker`, `expo-image-manipulator`, `expo-image` | pick, resize to 1600 px WebP/JPEG before upload, cached display |
 | Collage | `@shopify/react-native-skia` | templates, stickers, export 1080×1350 / 1080×1920 |
@@ -45,14 +45,14 @@ The data is **relational** (trips → days → items, polls → votes, expenses 
 | Email | Resend | invites, receipts |
 | Analytics / errors | PostHog, Sentry | product analytics, crash reporting |
 | CI/CD | GitHub Actions + EAS Build/Submit/Update | builds, store submission, OTA |
-| Web | Next.js on Vercel/Cloudflare Pages | trip invite/share previews, public itineraries (SEO) |
+| Web | Cloudflare Pages + Workers | trip invite/share previews, public itineraries (SEO) |
 
 ## 3. System diagram
 
 ```mermaid
 flowchart LR
   subgraph Device["📱 Expo app (iOS / Android)"]
-    UI[Screens per mode] --> Q[TanStack Query + MMKV cache]
+    UI[Screens per mode] --> Q[SQLite local DB · Drizzle]
     Q --> OB[Outbox queue]
     LOC[Location task<br/>dwell detection] --> OB
     SK[Skia collage editor]
@@ -65,10 +65,10 @@ flowchart LR
   EF -->|presigned PUT| R2[(Cloudflare R2)]
   UI -->|upload / CDN GET| R2
   EF --> PL[Google Places]
-  UI --> MB[Mapbox tiles & Directions]
+  UI --> MB[Map tiles · routing service]
   EF --> PUSH[Expo Push → FCM/APNs]
   UI --> RC[RevenueCat] -->|webhook| EF
-  WEB[Next.js share pages] --> SB
+  WEB[Cloudflare share pages] --> SB
   UI -->|Find & book query| PS[partner-search fn]
   PS -->|v2 live prices| PAPI[Partner / aggregator APIs]
   UI -->|Book ↗| GO["/go/:clickId redirect"] -->|302 + affiliate tag| PARTNER[Partner site / app]
@@ -146,7 +146,7 @@ erDiagram
 
 **Polls live** — clients subscribe to `votes` changes for the trip via Realtime; lock-in is a Postgres function (`lock_poll(poll_id, option_id)`) that atomically applies the result (e.g. promotes a variant) and emits a push.
 
-**Offline (Trip mode)** — at T‑1 day the app prefetches itinerary, bookings + attachments, and a Mapbox offline pack for the trip bbox. Writes (expenses, check-ins, photos) go to an outbox and replay on reconnect with client-generated UUIDs (idempotent). If collaborative conflicts grow, migrate to PowerSync (Supabase-native sync).
+**Offline (Trip mode)** — at T‑1 day the app prefetches itinerary, bookings + attachments, and a MapLibre offline pack for the trip area. Writes (expenses, check-ins, photos) go to an outbox and replay on reconnect with client-generated UUIDs (idempotent). Full design: [11](11-local-db-and-sync.md).
 
 **Location timeline** — background task only while a trip is Live and user opted in; on-device clustering → `location_visits` upload of visits only (no raw GPS trail).
 
@@ -161,7 +161,7 @@ erDiagram
 Bookings happen on the partner's site, so no in-app purchase rules or payment handling apply.
 
 **AI planner** —
-1. Edge Function `ai-plan` (TypeScript, official Anthropic SDK, streaming) runs a tool-use loop with these tools: `search_places`, `travel_times` (Mapbox Matrix / self-hosted routing), `climate_normals` and `forecast` (Open-Meteo), `opening_hours`, `find_stays` / `find_transport` (the partner-search function), `advisories` (seasonal closures, permits, visa notes from a curated table).
+1. Edge Function `ai-plan` (TypeScript, official Anthropic SDK, streaming) runs a tool-use loop with these tools: `search_places`, `travel_times` (self-hosted routing / `travel_time_cache`), `climate_normals` and `forecast` (Open-Meteo), `opening_hours`, `find_stays` / `find_transport` (the partner-search function), `advisories` (seasonal closures, permits, visa notes from a curated table).
 2. The final answer is returned through structured outputs in the itinerary schema (days → items, stays, transport legs, budget, notes, sources) and saved as a `plan_variant` with `author = 'ai'`.
 3. **Model routing** (config table, changed without an app release): Trip check and free drafts → Claude Haiku 5.5; paid drafts, Fill this day and Re-plan today → Claude Opus 5.5 or Claude Sonnet 5.5, chosen after a quality test on real trips.
 4. Prompt caching on the system prompt and tool definitions; `ai_usage` table enforces per-user quotas; `stop_reason` (including refusals) is handled before reading content.
@@ -173,7 +173,7 @@ Bookings happen on the partner's site, so no in-app purchase rules or payment ha
 
 **Trip-check rules engine** — plain code over the itinerary: opening days from `places`, gaps from `travel_time_cache`, stops per day, hotel distance, sunset times, and an `advisories` table (road closures, permits, visas). AI only phrases or handles unusual cases.
 
-**Self-hosting at scale** — OSRM/Valhalla on a VPS fills `travel_time_cache`; MapLibre with PMTiles on R2 replaces per-user tile fees past the Mapbox free tier; `climate_normals` is precomputed per destination and month.
+**Self-hosting at scale** — OSRM/Valhalla on a VPS fills `travel_time_cache`; MapLibre with PMTiles on R2 replaces per-user tile fees past the hosted tile provider's free tier; `climate_normals` is precomputed per destination and month.
 
 **Verified trips** — at trip completion a job builds an `itinerary_posts` row from the main variant plus actuals (`expenses`, `location_visits`), strips private fields, and waits for the owner to publish. **Use this plan** creates a new trip and a `forks` row; affiliate clicks from a forked trip carry the post id so `creator_earnings` can be credited when the conversion confirms.
 
@@ -188,7 +188,8 @@ Bookings happen on the partner's site, so no in-app purchase rules or payment ha
 ## 7. Repo layout (planned)
 ```
 apps/mobile      Expo app (app/(home), app/trip/[id]/plan, app/trip/[id]/live)
-apps/web         Next.js share pages
+apps/web         Cloudflare Pages share pages
+apps/admin       internal admin web (see 16)
 packages/ui      design tokens + shared components
 packages/core    types, zod schemas, split algorithm, poll logic
 supabase/        migrations, RLS policies, edge functions, seed

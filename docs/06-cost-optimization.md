@@ -85,7 +85,7 @@ Paid users: "Customise with AI" → larger model edits from this draft (fewer to
 | AI | **Prompt caching** of the system prompt and tool definitions (identical prefix on every request) | Input cost on repeated prefix drops to the cache-read rate |
 | AI | **Batch API (50 % off)** for anything not interactive: blueprints, nightly pre-trip checks, Verified-trip summaries | 50 % on those jobs |
 | AI | Short structured outputs with output caps; low effort on simple routes; per-user quotas; reuse answers for identical requests (same destination/length/month) | 10–30 % |
-| Maps | **MapLibre + self-hosted vector tiles** (PMTiles on R2) once past Mapbox's free 25k MAU; the same files serve offline packs | Per-MAU tile fees → near zero |
+| Maps | **MapLibre + self-hosted vector tiles** (PMTiles on R2) once past the hosted tile provider's free tier; the same files serve offline packs | Per-MAU tile fees → near zero |
 | Routing | **Self-hosted OSRM/Valhalla** on one VPS; cache travel-time matrices between our place IDs | Per-request routing fees → fixed ~$40–60/mo |
 | Weather | Precompute monthly **climate normals** per destination once; forecasts per trip day, cached per grid cell (check the provider's commercial licence) | Weather calls → a few per trip |
 | Storage | Device-side resize (already), WebP/AVIF thumbnails, original-photo backup only for Plus | Storage and bandwidth −30–50 % |

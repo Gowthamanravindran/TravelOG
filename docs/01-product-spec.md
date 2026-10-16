@@ -81,7 +81,7 @@ Top bar: back to Home · trip name & dates · member avatars · **Invite** · �
 ### 4.1 Itinerary (tab 1)
 - Horizontal day chips: `Day 1 · Fri 14` …, plus "Unscheduled ideas" bucket.
 - Day timeline of **items**: Place · Activity · Food · Stay · Transport · Note. Each has time, duration, cost estimate, link, notes, who added it.
-- Drag to reorder; travel time between items auto-calculated (Mapbox Directions).
+- Drag to reorder; travel time between items auto-calculated (our routing service, see [09](09-tech-stack.md)).
 - **Plan variants** (the "share different plans" requirement):
   - Any day (or the whole trip) can have **Plan A / Plan B / …**, each authored by a member.
   - Variants are shown as tabs on the day; "Compare" puts them side-by-side (time, cost, travel time).
@@ -222,11 +222,11 @@ Free tier: watermark + standard resolution; Plus/Pass: HD, no watermark, premium
 
 | # | Gap | Decision |
 |---|---|---|
-| 1 | Sign-in | Phone OTP (India default) + Google + **Sign in with Apple** (mandatory on iOS when social login exists) |
+| 1 | Sign-in | Google + **Sign in with Apple** (mandatory on iOS when social login exists) + email code at launch; phone OTP after DLT registration (changed in Plan 7, see [10](10-auth.md)) |
 | 2 | Account deletion | In-app deletion (App Store requirement); trips transfer to next Editor |
 | 3 | Invites | Link/QR, WhatsApp share first; web preview without account |
 | 4 | "Time spent everywhere" | **Opt-in** background location only during Live trips; on-device dwell detection (≥10 min within 100 m); only aggregated visits uploaded; manual check-in fallback; per-trip delete |
-| 5 | Offline | Trip mode works offline: itinerary, tickets, map region (Mapbox offline pack) prefetched at T‑1 day; expenses/check-ins queued |
+| 5 | Offline | Trip mode works offline: itinerary, tickets, map region (MapLibre offline pack) prefetched at T‑1 day; expenses/check-ins queued |
 | 6 | Events data | No open BookMyShow API → v1 uses Places POIs; live events in v2 |
 | 7 | Feed safety | Report/block, private-by-default trips, explicit publish; moderation queue (store UGC requirement) |
 | 8 | Conflicting edits | Item-level last-write-wins + edit history; realtime presence avatars on items |
@@ -310,3 +310,31 @@ A paid itinerary marketplace is out of scope for v1: free plans are everywhere, 
 | Instagram loop | Memories collage carries "Plan this trip on TravelOG" |
 
 Paid itineraries may return later for a small set of verified local experts.
+
+---
+
+## 11. Notification catalogue
+
+Users can mute any type in Settings → Notifications, and mute a whole trip from its ⋯ menu. Push requires permission, asked the first time a trip has another member.
+
+| Notification | Trigger | Who gets it | Example text | Default | Channel |
+|---|---|---|---|---|---|
+| Invited to a trip | Invite link used by someone you added, or you're added directly | Invitee | "Riya added you to Spiti Road Trip" | On | Push + email if no app |
+| Someone joined | A member joins | Owner, editors | "Kabir joined Spiti Road Trip" | On | Push |
+| Poll opened | New poll | All members | "New poll: Which route into Spiti?" | On | Push |
+| Poll closing | 2 h before deadline, only to non-voters | Members who haven't voted | "Vote closes in 2 h — you haven't voted yet" | On | Push |
+| Poll locked | Result locked in | All members | "Locked in: 15–22 Nov" | On | Push |
+| Plan changed | Item added/moved/removed on a Live or Upcoming trip (batched, max 1 per 30 min) | All members except the editor | "Arjun changed Day 2 (3 updates)" | On | Push |
+| New plan variant | Plan B/C or AI plan added | All members | "Arjun added Plan B for Day 2" | On | Push |
+| Expense added you | Expense with you in the split | People in the split | "Meera added ₹6,200 dinner — your share ₹1,550" | On | Push |
+| Settle-up request | Someone requests payment | Payer | "Riya requested ₹8,160 for Goa" | On | Push |
+| Settle-up reminder | Trip completed 3 days ago, balances open | People who owe | "You owe ₹1,240 from Goa — settle up?" | On | Push |
+| Booking reminder | Check-in opens / departure in 3 h | Travellers on that booking | "Your bus DEL→MNL leaves in 3 h · PNR 8K2QXP" | On | Push (local) |
+| Trip starts tomorrow | Day before start | All members | "Goa starts tomorrow — offline maps and tickets are ready" | On | Push (local) |
+| Live day summary | Morning of each live day | All members | "Day 3: 4 stops, first at 8:30" | On | Push (local) |
+| Re-plan suggestion | Weather or delay affects today's plan (Plus) | All members | "Rain likely 3–6 pm — see a swap for kayaking" | On | Push |
+| Memory ready | Trip completed | All members | "Your Goa trip is done — make a memory?" | On | Push |
+| Itinerary copied | Someone uses your Verified trip | Author | "3 people used your Kerala plan this week" | On (weekly digest) | Push |
+| Report outcome | A report you filed was handled | Reporter | "Thanks — we removed the post you reported" | On | In-app |
+| Account and security | New sign-in, email change, deletion | User | "New sign-in on a Pixel 8" | Always on | Email + push |
+| Product news | New features, seasonal ideas | All users | "Sakura season plans are live" | **Off** (opt-in) | Push / email |

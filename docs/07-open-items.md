@@ -15,9 +15,9 @@ Everything still undecided or not yet done before and during the build. Each ite
 ## Product
 | Item | Decision needed | Closes in |
 |---|---|---|
-| Moderation | Who reviews reports on Feed and Verified trips, response time, what gets removed | Phase 5 |
+| Moderation | Tooling and process defined in [16](16-admin-and-ops.md); rules for what gets removed still to write | Phase 5 |
 | Support channel | In-app "Help" → email first; WhatsApp support later | Phase 8 |
-| Analytics event list | Events + properties for the funnel in [05](05-profit-plan.md) §8 (invites per trip, conversion, bookings) | Phase 1, extended each phase |
+| Analytics event list | Funnel defined in [15](15-go-to-market.md) §7; event names and properties to write | Phase 1, extended each phase |
 | Languages | English at launch; Hindi after launch (strings externalised from day one) | Phase 1 (setup), post-launch |
 | App icon and store screenshots | Final brand assets | Phase 8 |
 
@@ -28,6 +28,6 @@ Everything still undecided or not yet done before and during the build. Each ite
 | AI quality checks | A fixed set of trip requests with expected properties, run before any AI change | Phase 7 |
 | Accessibility pass | Screen reader labels, dynamic type, contrast | Each phase; full pass Phase 8 |
 | Backups and restore drill | Supabase daily backups (Pro); one practice restore to staging | Phase 8 |
-| Monitoring and alerts | Sentry crash alerts, Supabase usage alerts, AI spend alert | Phase 1, Phase 7 |
+| Monitoring and alerts | Alert list defined in [16](16-admin-and-ops.md) §3 | Phase 1, Phase 7 |
 | Kill switch | `app_config.min_supported_version` forces an update; feature flags to turn features off | Phase 1 |
-| Incident checklist | What to do if login, sync or payments break | Phase 8 |
+| Incident checklist | Steps defined in [16](16-admin-and-ops.md) §4 | Done (planning) |

@@ -31,7 +31,7 @@ All amounts are per year, in INR, at ₹88 = $1. Revenue is net of the 15 % app-
 | Cost per install | ₹80 | ₹50 | ₹30 | India median ~₹20 across categories; travel and iOS cost more |
 | Installs that become active | 30 % | 40 % | 50 % | So cost per *active* paid user = ₹267 / ₹125 / ₹60 |
 | AI | free: Haiku 5.5 · paid drafts: Opus 5.5 | same | same | 1.5 drafts + 4 Trip checks per trip, 1 exploratory draft ("plan Japan") per user |
-| Infrastructure | $100/mo fixed + ₹12/user/yr | same | same | Supabase, R2, Mapbox, cached Places, monitoring |
+| Infrastructure | $100/mo fixed + ₹12/user/yr | same | same | Supabase, R2, map tiles, cached Places, monitoring |
 | Support | ₹3/user/yr | same | same | Help desk tooling + part-time support |
 
 **Team options** (used for "profit after team"):
@@ -160,6 +160,8 @@ Running costs = AI + infrastructure + support + payments. Contribution = revenue
 | Pilot | 1k–10k | Bootstrapped | ~₹0 (friends, college/travel communities) | ≥ 3 invites per trip, ≥ 3 % Plus or Pass, measure real AI token use |
 | Product–market fit | 10k–80k | Lean | Small paid tests, CPI ≤ ₹40 | Paid share ≤ 30 %, LTV > CAC on paid cohorts |
 | Scale | 80k–300k+ | Seed | Paid grows only while LTV > CAC | Contribution covers team; affiliate ≥ 30 % of revenue |
+
+How to reach these conditions: [15 · Go-to-market](15-go-to-market.md).
 
 Watch these monthly: invites per trip, % of new users from invites, Plus and Pass conversion, % of trips that book, AI cost per active user, CPI and activation by channel.
 

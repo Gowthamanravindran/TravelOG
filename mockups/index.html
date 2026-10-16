@@ -246,6 +246,31 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stro
 .chip.verified{background:#DCFCE7;color:#166534}
 textarea.input{resize:vertical;font:inherit;line-height:1.4}
 .scrim.still,.scrim.still .sheet{animation:none}
+.stbar{margin:0 -18px 12px}
+.center-col{display:flex;flex-direction:column;align-items:center;padding-top:10px}
+.logo{width:64px;height:64px;border-radius:20px;background:var(--coral);display:grid;place-items:center;font-size:30px;margin-bottom:12px}
+.authbtn{background:var(--surface);border:1px solid var(--line);margin-bottom:8px}
+.authbtn.dark{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.or{display:flex;align-items:center;gap:10px;width:100%;margin:10px 0;color:var(--ink-2);font-size:12px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.otp{display:grid;grid-template-columns:repeat(6,40px);gap:8px;margin-bottom:16px}
+.otp span{height:48px;border-radius:12px;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px;background:var(--surface)}
+.otp span.filled{border-color:var(--accent)}
+.keypad{display:grid;grid-template-columns:repeat(3,72px);gap:8px}
+.keypad button{height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:20px;font-weight:700}
+.sgroup{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:10px 14px;margin-bottom:12px}
+.srow{padding:10px 0;border-bottom:1px solid var(--line);text-align:left}
+.sgroup .srow:last-child{border-bottom:0}
+.tgl{width:46px;height:28px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.tgl i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tgl.on{background:var(--accent)}.tgl.on i{left:21px}
+.plancard{display:flex;justify-content:space-between;gap:10px;align-items:center;width:100%;text-align:left;padding:14px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);margin-bottom:8px}
+.plancard.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.emptybox{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:24px 16px;border:1.5px dashed var(--line);border-radius:20px;margin-bottom:12px}
+.emptybox p{margin:2px 0 10px}
+.emptybox.small-e{padding:16px}
+.offbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--mango-soft);font-size:13px;font-weight:600}
+.toastlike{margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--ink);color:var(--bg)}
 .bpchip{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--mango-soft);margin:0 0 12px}
 .tplchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 
@@ -267,6 +292,7 @@ textarea.input{resize:vertical;font:inherit;line-height:1.4}
       <button class="mode-btn" data-act="go-mode" data-mode="home"><span class="dot" style="background:var(--coral)"></span><b>Home mode</b><small>Trips · Feed · Explore · Profile</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="plan"><span class="dot" style="background:var(--indigo)"></span><b>Plan mode · Spiti Road Trip</b><small>Itinerary · Budget · Find &amp; book · Polls</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="trip"><span class="dot" style="background:var(--teal)"></span><b>Trip mode · Goa (live)</b><small>Today · Plan + Map · Nearby · Budget</small></button>
+      <button class="mode-btn" data-act="go-mode" data-mode="states"><span class="dot" style="background:var(--ink-2)"></span><b>App states</b><small>Sign-in · onboarding · settings · paywall · empty · offline · errors</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="ai"><span class="dot" style="background:linear-gradient(135deg,#5B5BD6,#E056A0)"></span><b>AI planner · “10 days in Japan”</b><small>Also: ＋ → Plan with AI · Trip check on Spiti Day 2</small></button>
       <button class="mode-btn" data-act="go-mode" data-mode="memories"><span class="dot" style="background:var(--mango)"></span><b>Memories · Kerala (past)</b><small>Collage editor → Instagram</small></button>
     </div>
@@ -312,6 +338,7 @@ const I = {
   exit:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/>',
   play:'<path d="M7 4v16l13-8z"/>',
   camera:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  cloud:'<path d="M7 18a4 4 0 0 1-.6-8A5.5 5.5 0 0 1 17 9a3.5 3.5 0 0 1 .5 7H7z"/><path d="m4 4 16 16"/>',
   sparkle:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'
 };
 const ic = (n,s) => `<svg class="i" viewBox="0 0 24 24" ${s?`style="width:${s}px;height:${s}px"`:''} aria-hidden="true">${I[n]}</svg>`;
@@ -335,7 +362,7 @@ const S = {
   mode:'home', tab:'trips', seg:'upcoming',
   planTab:'itin', day:1, variant:'A', compare:false,
   tripTab:'today', tripView:'list', tripDay:2, near:'Food',
-  memTpl:'grid', sheet:null, toast:null, aiC:false, checkOpen:true, replanned:false, published:false, aiStep:0,
+  memTpl:'grid', sheet:null, toast:null, st:'signin', otp:'', guestCount:0, delConfirm:'', plan:'plus', notif:{polls:true,expenses:true,plan:true,news:false}, aiC:false, checkOpen:true, replanned:false, published:false, aiStep:0,
   aiPrompt:'Help me plan a 10-day Japan trip for 4 friends in April, about ₹2L each. We love food and a bit of hiking.',
   bookSeg:'find', findCat:'Stays', tMode:'All', aKind:'All', guests:5, swap:false, pending:null, myBookings:[],
   form:{sPlace:'Kaza, Spiti',sIn:'Sun 16 Nov',sOut:'Tue 18 Nov',tDate:'Fri 14 Nov',aArea:'Kaza & around',aDates:'16 – 19 Nov'},
@@ -834,6 +861,89 @@ function aiPreview(){
   <div class="row" style="position:sticky;bottom:0;background:var(--bg);padding:10px 0"><button class="btn ghost" style="flex:1" data-act="sheet" data-sheet="ai">Change request</button><button class="btn primary" style="flex:1.4;background:var(--indigo)" data-act="ai-create">Create trip &amp; invite</button></div>`;
 }
 
+/* ---------- app states ---------- */
+const STATES=[['signin','Sign in'],['otp','Email code'],['onboarding','Onboarding'],['location','Location'],['settings','Settings'],['delete','Delete account'],['paywall','Paywall'],['empty','Empty'],['offline','Offline'],['error','Error'],['update','Update']];
+function states(){
+  const bar=`<div class="hscroll stbar">${STATES.map(([k,l])=>`<button class="chip ${S.st===k?'accent':''}" data-act="st" data-k="${k}">${l}</button>`).join('')}</div>`;
+  return bar+`<div class="stwrap">${stateScreen()}</div>`;
+}
+function toggle(k,label,sub){return `<div class="between srow"><div><b class="small">${label}</b>${sub?`<div class="tiny muted">${sub}</div>`:''}</div><button class="tgl ${S.notif[k]?'on':''}" role="switch" aria-checked="${S.notif[k]}" aria-label="${label}" data-act="tgl" data-k="${k}"><i></i></button></div>`;}
+function stateScreen(){
+  switch(S.st){
+  case 'signin': return `<div class="center-col">
+    <div class="logo">✈️</div><h2 style="font-size:28px">Travel<span style="color:var(--coral)">OG</span></h2>
+    <p class="muted" style="text-align:center;margin:4px 0 22px">Plan trips with your friends — vote, split, go.</p>
+    <button class="btn block authbtn" data-act="toast" data-msg="Google sign-in sheet opens (native)"><b style="font-size:16px">G</b> Continue with Google</button>
+    <button class="btn block authbtn dark" data-act="toast" data-msg="Apple sign-in sheet opens (native)"> Continue with Apple</button>
+    <div class="or"><span>or</span></div>
+    <div class="field" style="width:100%"><label for="em">Email</label><input id="em" class="input" value="you@example.com" inputmode="email"></div>
+    <button class="btn primary block" style="margin-top:10px" data-act="st" data-k="otp">Send me a code</button>
+    <p class="tiny muted" style="text-align:center;margin-top:14px">By continuing you agree to the Terms and Privacy Policy. Phone sign-in coming soon.</p></div>`;
+  case 'otp': return `<div class="center-col">
+    <h2 style="font-size:22px">Check your email</h2><p class="muted small" style="text-align:center;margin:6px 0 18px">We sent a 6-digit code to you@example.com</p>
+    <div class="otp">${[0,1,2,3,4,5].map(i=>`<span class="${i<S.otp.length?'filled':''}">${S.otp[i]||''}</span>`).join('')}</div>
+    <div class="keypad">${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>k?`<button data-act="key" data-k="${k}">${k}</button>`:'<span></span>').join('')}</div>
+    <button class="link" style="margin-top:12px" data-act="toast" data-msg="New code sent · you can request another in 60 s">Resend code</button></div>`;
+  case 'onboarding': return `<div class="eyebrow" style="margin-top:6px">Step 1 of 2</div><h2 style="font-size:24px;margin:4px 0 16px">Tell your friends who you are</h2>
+    <div class="row" style="gap:14px;margin-bottom:14px"><span class="av" style="width:64px;height:64px;font-size:24px;background:var(--coral);margin:0">Y</span><button class="btn ghost" data-act="toast" data-msg="Pick a photo or use your Google photo">Change photo</button></div>
+    <div class="stack"><div class="field"><label for="dn">Display name</label><input id="dn" class="input" value="Yash"></div>
+    <div class="field"><label for="hc">Home city</label><input id="hc" class="input" value="Bengaluru"></div>
+    <div class="field"><label>Currency</label><div class="row">${['₹ INR','$ USD','€ EUR','AED'].map((c,i)=>`<span class="chip ${i===0?'accent':''}">${c}</span>`).join('')}</div></div>
+    <button class="btn primary block" data-act="st" data-k="location">Continue</button></div>`;
+  case 'location': return `<div class="center-col">
+    <div class="logo" style="background:var(--teal)">📍</div><h2 style="font-size:22px;text-align:center">See where you spent your time</h2>
+    <p class="muted small" style="text-align:center;margin:8px 0 16px">During a live trip, TravelOG can notice when you arrive and leave each stop, so your map shows real time spent and your memories write themselves.</p>
+    <div class="card stack" style="gap:8px;width:100%;box-shadow:none">${['Only while a trip is live','Only stops are saved, not your full route','Only your trip-mates see it','Delete it any time in Settings'].map(t=>`<div class="row small">${ic('check',16)} ${t}</div>`).join('')}</div>
+    <button class="btn primary block" style="margin-top:16px" data-act="toast" data-msg="System permission prompt appears next">Turn on for live trips</button>
+    <button class="btn ghost block" style="margin-top:8px" data-act="toast" data-msg="You can check in manually instead">Not now</button></div>`;
+  case 'settings': return `<h2 style="font-size:24px;margin:6px 0 12px">Settings</h2>
+    <div class="sgroup"><div class="eyebrow">Sign-in methods</div>
+      <div class="between srow"><span class="small"><b>Google</b> · yash@gmail.com</span><span class="chip">Connected</span></div>
+      <div class="between srow"><span class="small"><b>Apple</b></span><button class="link" data-act="toast" data-msg="Link Apple to this account">Add</button></div>
+      <div class="between srow"><span class="small"><b>Phone</b></span><span class="tiny muted">Coming soon</span></div></div>
+    <div class="sgroup"><div class="eyebrow">Notifications</div>${toggle('polls','Polls','Opened, closing, locked')}${toggle('expenses','Expenses & settle-up')}${toggle('plan','Plan changes','Batched, max 1 per 30 min')}${toggle('news','Product news','Off by default')}</div>
+    <div class="sgroup"><div class="eyebrow">Privacy & data</div>
+      <div class="between srow"><span class="small">Location for live trips</span><span class="chip">Off</span></div>
+      <div class="between srow"><span class="small">Default trip visibility</span><span class="chip">Private</span></div>
+      <div class="between srow"><span class="small">Download my data</span><span class="muted">›</span></div></div>
+    <div class="sgroup"><div class="eyebrow">Storage</div>
+      <div class="between srow"><span class="small">Offline maps & tickets</span><span class="tiny muted">212 MB · cleared 30 days after a trip</span></div></div>
+    <div class="sgroup"><div class="between srow"><span class="small">Sign out of all devices</span><span class="muted">›</span></div>
+      <button class="between srow" style="width:100%" data-act="st" data-k="delete"><span class="small neg" style="font-weight:700">Delete account</span><span class="muted">›</span></button></div>`;
+  case 'delete': return `<h2 style="font-size:22px;margin:6px 0 10px">Delete your account?</h2>
+    <div class="card stack" style="gap:8px;box-shadow:none">
+      <div class="small">• <b>Goa</b>, which you own, moves to <b>Riya</b> (editor). <b>Spiti</b> has no other editor, so it will be archived.</div>
+      <div class="small">• Your photos, location history and profile are deleted.</div>
+      <div class="small">• On shared expenses your name becomes “Former member” so balances still add up.</div>
+      <div class="small">• You owe <b>₹1,240</b> on Goa — settle up first if you can.</div></div>
+    <div class="field" style="margin-top:14px"><label for="dc">Type DELETE to confirm</label><input id="dc" class="input" value="${S.delConfirm}" autocomplete="off"></div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" style="flex:1" data-act="st" data-k="settings">Cancel</button><button class="btn" style="flex:1;background:var(--danger);color:#fff" data-act="del-go">Delete account</button></div>
+    <p class="tiny muted" style="margin-top:8px">Completed immediately in most cases, always within 30 days. A confirmation email follows.</p>`;
+  case 'paywall': return `<div class="center-col" style="align-items:stretch">
+    <div class="eyebrow" style="text-align:center">TravelOG Plus</div><h2 style="font-size:24px;text-align:center;margin:4px 0 14px">Plan bigger trips, together</h2>
+    <div class="stack" style="gap:6px;margin-bottom:14px">${['Unlimited trips and members','✨ Unlimited AI plans + Re-plan today','Offline maps for every trip','Ranked polls and availability grid','HD memories, no watermark','Expense export'].map(t=>`<div class="row small">${ic('check',16)} ${t}</div>`).join('')}</div>
+    <button class="plancard ${S.plan==='plus'?'sel':''}" data-act="plan" data-k="plus"><div><b>Plus · yearly</b><div class="tiny muted">Every trip you create gets Plus features</div></div><div style="text-align:right"><b class="num">₹1,199</b><div class="tiny muted">≈ ₹100/month</div></div></button>
+    <button class="plancard ${S.plan==='pass'?'sel':''}" data-act="plan" data-k="pass"><div><b>Trip Pass · Spiti Road Trip</b><div class="tiny muted">Unlocks Plus features for all 5 members of this trip</div></div><div style="text-align:right"><b class="num">₹199</b><div class="tiny muted">₹40 each if split</div></div></button>
+    <button class="btn primary block" style="margin-top:12px" data-act="toast" data-msg="Store purchase sheet opens (Google Play / App Store)">${S.plan==='plus'?'Get Plus for ₹1,199/year':'Buy Trip Pass for ₹199'}</button>
+    <div class="between tiny muted" style="margin-top:10px"><button class="link" data-act="toast" data-msg="Purchases restored">Restore purchases</button><span>Cancel any time in the store</span></div></div>`;
+  case 'empty': return `<h2 style="font-size:24px;margin:6px 0 14px">Your trips</h2>
+    <div class="emptybox"><div style="font-size:44px">🧳</div><b>No trips yet</b><p class="small muted">Start one and invite your friends, or copy a ready-made plan.</p>
+      <button class="btn primary" data-act="sheet" data-sheet="new">${ic('plus',16)} Plan a trip</button><button class="btn ghost" style="margin-top:8px" data-act="go-mode" data-mode="ai">✨ Plan with AI</button></div>
+    <div class="emptybox small-e"><div style="font-size:28px">💸</div><b>No expenses yet</b><p class="tiny muted">Add the first one — everyone sees their share instantly.</p></div>
+    <div class="emptybox small-e"><div style="font-size:28px">🗳️</div><b>No polls yet</b><p class="tiny muted">Can't decide? Put it to a vote.</p></div>`;
+  case 'offline': return `<div class="offbar">${ic('cloud',16)}<span>You're offline · 3 changes will sync when you're back</span></div>
+    <h2 style="font-size:22px;margin:14px 0 10px">🌴 Goa · Budget</h2>
+    <div class="card" style="padding:4px 14px">${[['🧾','Snacks + water','₹1,200','queued'],['🛵','Fuel','₹400','queued'],['🍤','Beach shack lunch','₹2,840','']].map(e=>`<div class="exp"><span class="ico">${e[0]}</span><div><b class="small">${e[1]}</b><div class="tiny muted">${e[3]?'⏳ Waiting to sync':'Synced'}</div></div><span class="small num">${e[2]}</span></div>`).join('')}</div>
+    <div class="toastlike"><b class="small">Couldn't save one change</b><div class="tiny">Riya removed “Fuel” while you were offline, so your edit wasn't applied. We restored her version.</div></div>`;
+  case 'error': return `<div class="center-col" style="margin-top:40px"><div style="font-size:48px">🧭</div><h2 style="font-size:22px">We couldn't load the Feed</h2>
+    <p class="muted small" style="text-align:center;margin:8px 0 16px">Check your connection and try again. Your trips still work offline.</p>
+    <button class="btn primary" data-act="toast" data-msg="Retrying…">Try again</button><button class="link" style="margin-top:12px" data-act="go-mode" data-mode="home">Go to my trips</button></div>`;
+  case 'update': return `<div class="center-col" style="margin-top:40px"><div class="logo">⬆️</div><h2 style="font-size:22px;text-align:center">Update TravelOG to continue</h2>
+    <p class="muted small" style="text-align:center;margin:8px 0 16px">This version (1.2.0) can no longer sync. Your trips are safe — update to keep planning.</p>
+    <button class="btn primary block" data-act="toast" data-msg="Opens the store page">Update now</button></div>`;
+  }
+}
+
 /* ---------- sheets ---------- */
 function sheet(){
   if(!S.sheet) return '';
@@ -906,7 +1016,7 @@ const navs={
   trip:[['today','Today','sun'],['plan','Plan','map'],['near','Nearby','pin'],['budget','Budget','wallet']]
 };
 function nav(){
-  if(S.mode==='memories'||S.mode==='ai') return '';
+  if(S.mode==='memories'||S.mode==='ai'||S.mode==='states') return '';
   const cur = S.mode==='home'?S.tab:S.mode==='plan'?S.planTab:S.tripTab;
   return navs[S.mode].map(n=> n[0]==='fab'
     ? `<button class="fab" data-act="sheet" data-sheet="new" aria-label="New trip">${ic('plus',24)}</button>`
@@ -919,8 +1029,8 @@ function render(keepScroll){
   const sc=$('screen'); const top=sc.scrollTop;
   const ph=$('phone');
   ph.className='phone '+(S.mode==='plan'||S.mode==='ai'?'plan':S.mode==='trip'?'trip':'');
-  sc.innerHTML = S.mode==='home'?home():S.mode==='plan'?plan():S.mode==='trip'?trip():S.mode==='ai'?aiPreview():memories();
-  const nv=$('nav'); nv.innerHTML=nav(); nv.hidden = S.mode==='memories'||S.mode==='ai';
+  sc.innerHTML = S.mode==='home'?home():S.mode==='plan'?plan():S.mode==='trip'?trip():S.mode==='ai'?aiPreview():S.mode==='states'?states():memories();
+  const nv=$('nav'); nv.innerHTML=nav(); nv.hidden = S.mode==='memories'||S.mode==='ai'||S.mode==='states';
   $('overlay').innerHTML = sheet() + (S.toast?`<div class="toast" role="status">${S.toast}</div>`:'');
   sc.scrollTop = keepScroll?top:0;
   document.querySelectorAll('.mode-btn').forEach(b=>b.setAttribute('aria-pressed', b.dataset.mode===S.mode));
@@ -988,6 +1098,11 @@ document.addEventListener('click',e=>{
     case 'check-toggle': S.checkOpen=!S.checkOpen; break;
     case 'fix':{ const i=+d.i; if(i<=1){ S.aiC=true; S.variant='C'; toast(i===0?'Switched the view to Plan C · AI (via Kinnaur). Plan A is unchanged.':'Plan C adds a night at Tabo before Kaza'); } else toast(i===2?'Key Monastery moved to 9 am on Day 4':'Note added to Day 3: carry cash'); break; }
     case 'ai-chip': S.aiPrompt=d.t; break;
+    case 'st': S.st=d.k; keep=false; break;
+    case 'tgl': S.notif[d.k]=!S.notif[d.k]; break;
+    case 'plan': S.plan=d.k; break;
+    case 'key': if(d.k==='⌫') S.otp=S.otp.slice(0,-1); else if(S.otp.length<6){ S.otp+=d.k; if(S.otp.length===6){ toast('Signed in ✓'); S.otp=''; S.st='onboarding'; keep=false; } } break;
+    case 'del-go':{ const v=(($('dc')||{}).value||'').trim(); S.delConfirm=v; if(v!=='DELETE') toast('Type DELETE in capitals to confirm'); else { S.delConfirm=''; toast('Account deleted (prototype) · confirmation email sent'); S.st='signin'; keep=false; } break; }
     case 'ai-go':{ const t=$('aip'); if(t) S.aiPrompt=t.value; S.sheet='aiwork'; S.aiStep=0;
       const tick=()=>{ S.aiStep++; if(S.aiStep<5){ render(true); setTimeout(tick,420);} else { S.sheet=null; S.mode='ai'; render(false);} }; setTimeout(tick,420); break; }
     case 'ai-create':{ if(!trips.some(t=>t.id==='japan')) trips.splice(2,0,{id:'japan',name:'Japan in April',where:'Tokyo → Osaka',dates:'10 days · April',emoji:'🌸',g:'linear-gradient(135deg,#E056A0,#5B5BD6)',status:'planning',members:['you'],chip:'<span class="chip accent">✨ AI draft · invite friends</span>'});

@@ -82,10 +82,16 @@ The single source of truth for what the app is built with. [03 · Architecture](
 | Pages | Invite preview, public itinerary pages, privacy/terms, `/.well-known/apple-app-site-association`, `/.well-known/assetlinks.json` |
 | Framework | Astro or plain Workers (static-first; no server needed beyond Workers) |
 
+## Admin (`apps/admin`)
+| Purpose | Choice |
+|---|---|
+| Hosting and access | Cloudflare Pages behind Cloudflare Access (staff emails only) + Supabase sign-in with a `staff` role |
+| Scope | Config, moderation, affiliate report, blueprint review, AI costs, support lookup — see [16](16-admin-and-ops.md) |
+
 ## Engineering tooling
 | Purpose | Choice |
 |---|---|
-| Repo | pnpm workspaces monorepo: `apps/mobile`, `apps/web`, `packages/core` (types, zod schemas, split and sync logic), `packages/ui` (tokens, components), `supabase/` |
+| Repo | pnpm workspaces monorepo: `apps/mobile`, `apps/web`, `apps/admin`, `packages/core` (types, zod schemas, split and sync logic), `packages/ui` (tokens, components), `supabase/` |
 | Lint and format | ESLint + Prettier, TypeScript strict, import ordering |
 | Unit and component tests | Jest + React Native Testing Library |
 | Database tests | pgTAP via `supabase test db` (permission/RLS tests) |
