@@ -42,3 +42,13 @@ export function useQuery<T>(read: (db: Db) => T, deps: readonly unknown[] = []):
 export function useMutate(): DataContextValue['mutate'] {
   return useData().mutate;
 }
+
+/** Changes after every write; use to react to data changes (e.g. re-plan reminders). */
+export function useDataVersion(): number {
+  return useData().version;
+}
+
+/** The database, for background work that isn't a screen read. */
+export function useDb(): Db {
+  return useData().db;
+}

@@ -7,8 +7,15 @@ import { Text, useColorScheme, View } from 'react-native';
 
 import { openAppDatabase } from '@/data/open';
 import { DataProvider } from '@/data/provider';
+import { useReminders } from '@/lib/reminders';
 
 SplashScreen.preventAutoHideAsync();
+
+/** Work that follows the data in the background (reminders). */
+function Background() {
+  useReminders();
+  return null;
+}
 
 export default function RootLayout() {
   const scheme = useColorScheme();
@@ -39,6 +46,7 @@ export default function RootLayout() {
     <DataProvider db={db}>
       <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
         <StatusBar style="auto" />
+        <Background />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
         </Stack>

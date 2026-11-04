@@ -4,3 +4,4 @@ export * from './balances';
 export * from './upi';
 export * from './dates';
 export * from './trips';
+export * from './reminders';

@@ -46,6 +46,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Encrypted on-device database (tickets, PNRs, expenses are personal data). docs/11.
     ['expo-sqlite', { useSQLCipher: true }],
     'expo-secure-store',
+    // Local trip reminders (docs/01 §11); push comes with accounts.
+    'expo-notifications',
     [
       'expo-splash-screen',
       {

@@ -36,6 +36,7 @@ import {
   summarizeItems,
   tripMoney,
   updateTrip,
+  upcomingReminders,
 } from './index';
 import { outbox } from './schema';
 import { testDb } from './test-db';
@@ -378,5 +379,35 @@ describe('bookings', () => {
         endsAt: '2026-11-14T12:00:00Z',
       }),
     ).toThrow();
+  });
+});
+
+describe('reminders', () => {
+  it('plans from bookings, main-plan items and open polls of trips that have not ended', () => {
+    const t = goa();
+    addBooking(db, {
+      tripId: t.id,
+      type: 'flight',
+      title: '6E 501',
+      startsAt: '2026-11-12T03:00:00Z',
+    });
+    const planA = ensureMainVariant(db, t.id, '2026-11-12');
+    addItem(db, planA.id, { type: 'place', title: 'Fort Aguada', startTime: '16:00' });
+    const planB = addVariant(db, t.id, '2026-11-12');
+    addItem(db, planB.id, { type: 'place', title: 'Only in Plan B', startTime: '17:00' });
+    createPoll(db, {
+      tripId: t.id,
+      type: 'custom',
+      question: 'Dinner?',
+      deadline: '2026-11-10T12:00:00Z',
+      options: [{ label: 'Fish' }, { label: 'Thali' }],
+    });
+
+    const r = upcomingReminders(db);
+    expect(r.map((x) => x.key.split(':')[0])).toEqual(['poll', 'booking', 'item']);
+    expect(r.find((x) => x.key.startsWith('item'))?.title).toBe('Next: Fort Aguada');
+
+    // After the trip it no longer reminds.
+    expect(upcomingReminders(db, new Date('2026-11-20T00:00:00Z'))).toEqual([]);
   });
 });

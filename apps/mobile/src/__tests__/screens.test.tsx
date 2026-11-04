@@ -8,7 +8,13 @@ import {
 } from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+}));
+
 import TripsScreen from '@/app/(home)/index';
+import ProfileScreen from '@/app/(home)/profile';
+import { remindersEnabled } from '@/lib/reminders';
 import { BudgetView } from '@/components/budget-view';
 import { PollsView } from '@/components/polls-view';
 
@@ -38,6 +44,15 @@ describe('screens on a real database', () => {
     await render(withData(db, <TripsScreen />));
     fireEvent.press(screen.getByRole('tab', { name: 'Planning' }));
     expect(screen.getByText('Spiti Road Trip')).toBeTruthy();
+  });
+
+  it('Profile turns trip reminders off', async () => {
+    const db = makeDb();
+    saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
+    await render(withData(db, <ProfileScreen />));
+    expect(remindersEnabled(db)).toBe(true);
+    fireEvent(screen.getByLabelText('Trip reminders'), 'valueChange', false);
+    expect(remindersEnabled(db)).toBe(false);
   });
 
   it('Budget shows who owes whom', async () => {
