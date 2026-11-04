@@ -37,11 +37,14 @@ export function LayerView({
   scale,
   photo,
   stats,
+  onImageLoad,
 }: {
   layer: Layer;
   scale: number;
   photo?: PhotoInfo;
   stats?: StatItem[];
+  /** Called when the photo has loaded (or failed), so exports can wait for it. */
+  onImageLoad?: () => void;
 }) {
   const box = {
     position: 'absolute' as const,
@@ -89,6 +92,7 @@ export function LayerView({
             {photo?.uri ? (
               <Image
                 source={{ uri: photo.uri }}
+                onLoadEnd={onImageLoad}
                 style={{
                   position: 'absolute',
                   left: place.x,

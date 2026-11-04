@@ -1,4 +1,4 @@
-import { canvasSize, slideSize, type Layer, type StudioDoc } from '@travelog/core';
+import { canvasSize, layersOnSlide, slideSize, type Layer, type StudioDoc } from '@travelog/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ComponentRef, ReactNode, Ref } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -33,6 +33,7 @@ export function StudioCanvas({
   renderLayer,
   overlay,
   watermark = false,
+  onImageLoad,
 }: {
   ref?: Ref<CanvasRef>;
   doc: StudioDoc;
@@ -50,6 +51,7 @@ export function StudioCanvas({
   overlay?: ReactNode;
   /** "Made with TravelOG" on the last slide. */
   watermark?: boolean;
+  onImageLoad?: () => void;
 }) {
   const { width, height } = canvasSize(doc);
   const slideW = slideSize(doc.format).width;
@@ -81,13 +83,14 @@ export function StudioCanvas({
           style={StyleSheet.absoluteFill}
         />
       ) : null}
-      {doc.layers.map((layer) => {
+      {(slide == null ? doc.layers : layersOnSlide(doc, slide)).map((layer) => {
         const node = (
           <LayerView
             layer={layer}
             scale={scale}
             photo={layer.kind === 'photo' && layer.photoId ? photos[layer.photoId] : undefined}
             stats={stats}
+            onImageLoad={onImageLoad}
           />
         );
         const drawn = renderLayer ? renderLayer(layer, node) : node;

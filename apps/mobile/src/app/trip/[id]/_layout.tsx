@@ -12,6 +12,7 @@ export default function TripLayout() {
       <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
       <Stack.Screen name="studio/new" options={{ presentation: 'modal' }} />
       <Stack.Screen name="studio/[projectId]" options={{ animation: 'fade' }} />
+      <Stack.Screen name="studio/export" options={{ animation: 'slide_from_right' }} />
     </Stack>
   );
 }
