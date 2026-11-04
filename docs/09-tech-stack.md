@@ -25,7 +25,7 @@ The single source of truth for what the app is built with. [03 · Architecture](
 | Animation and gestures | Reanimated, Gesture Handler, bottom sheets (@gorhom/bottom-sheet) |
 | Lists | FlashList |
 | Images | expo-image, expo-image-picker, expo-image-manipulator |
-| Collage editor | @shopify/react-native-skia |
+| Collage editor (Studio) | Plain views + react-native-view-shot for exact-size slide export; local `social-share` Expo module for Instagram / Facebook / Photos hand-off (changed in Plan 15: Skia only if filters/brushes are added later) |
 | Maps | @maplibre/maplibre-react-native (+ offline packs) |
 | Location | expo-location + expo-task-manager (background, opt-in, live trips only) |
 | Notifications | expo-notifications (Expo push service → APNs/FCM; local reminders) |

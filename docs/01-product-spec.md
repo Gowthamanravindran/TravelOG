@@ -216,6 +216,8 @@ Dark, high-contrast UI built for one-handed use outdoors. Header: trip name · "
 
 Free tier: watermark + standard resolution; Plus/Pass: HD, no watermark, premium templates.
 
+**Studio (Plan 15).** Memories is a tab in Plan and Trip mode. The collage editor is a **seamless carousel maker**: one wide canvas of 1–10 slides (4:5, 1:1 or 9:16) where photos, text, emoji stickers and a trip-stats card can sit across the seams, so the post scrolls as one picture. Seamless templates (panorama, bridge, polaroids, film roll, split grid) plus one-page layouts; drag, pinch, twist, crop, snapping, undo. Export is exactly 1080 px wide with a small "Made with TravelOG" mark on the last slide (free for now). Posting hands the slides to the apps, because Meta's publishing API covers only Business/Creator accounts: Android opens Instagram's new-post screen or Facebook with all slides; iPhone saves them to Photos in order and opens Instagram; Instagram Story direct with the Meta App ID; save to gallery; any app via the share sheet. Candidates for Plus later: premium templates, HD, no mark.
+
 ---
 
 ## 7. Gaps filled (decisions)

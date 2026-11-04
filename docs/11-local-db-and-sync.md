@@ -20,6 +20,7 @@ Only the user's slice: trips they belong to and everything inside them, plus cac
 | `bookings`, `attachments` | same | `attachments.local_path` for downloaded files |
 | `photos` | same | Trip photo pool; `local_uri` on the phone, `remote_key` once uploads exist (added in Plan 13) |
 | `check_ins` | same | Manual "I'm here" moments with an optional one-off position (added in Plan 13) |
+| `studio_projects` | same | Studio carousels: the whole editor document as JSON in `doc` (last write wins per project); `thumbnail_uri` is device-only (added in Plan 15) |
 | `places_cache` | subset of `places` | Places referenced by the user's trips + recent Nearby results |
 | `profiles_cache` | subset of `profiles` | Names/avatars of co-members |
 | `outbox` | — | Queued local changes |

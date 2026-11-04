@@ -118,7 +118,7 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 3. Turn on usage alerts at 50 % and 80 % of the limit.
 
 ## §12 Money-making and sharing — Phases 5–6
-1. **Meta for Developers** (Phase 5): create an app → copy the App ID → EAS variable `EXPO_PUBLIC_FACEBOOK_APP_ID` (needed to share to Instagram Stories).
+1. **Meta for Developers** (Phase 5, optional): create an app → copy the App ID → EAS variable `EXPO_PUBLIC_FACEBOOK_APP_ID` (Plan 15: switches on the "Instagram Story" button in the Studio export screen; posting carousels to Instagram/Facebook works without it). The App ID is public, not a secret; add it in expo.dev → TravelOGApp → travelog → Environment variables, for development, preview and production, then rebuild.
 2. **RevenueCat** (Phase 6): sign up → create project → add iOS and Android apps (needs App Store Connect API key and Play service account from §6–§7) → EAS variables `EXPO_PUBLIC_REVENUECAT_IOS_KEY`, `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`; webhook secret → Supabase `REVENUECAT_WEBHOOK_SECRET`.
 3. **Store products:** App Store Connect → Subscriptions → "Plus Yearly"; In-App Purchases → "Trip Pass". Play Console → Monetize → same products. Fill tax and banking forms in both consoles (needs PAN and a bank account).
 4. **Affiliate networks:** sign up (e.g. vCommission, EarnKaro, Involve Asia, Travelpayouts) with PAN; tracking IDs go into the `/go` Worker config (Claude adds).
