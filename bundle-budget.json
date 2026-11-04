@@ -1,5 +1,5 @@
 {
-  "androidBundleBytes": 3576990,
+  "androidBundleBytes": 3808718,
   "maxGrowthPercent": 10,
-  "note": "Raised in Plan 12 (local-first build): Drizzle ORM + all Phase 1-4 single-phone screens took the bundle from 2.88 MB to 3.58 MB. Raise deliberately, with a reason, when a feature needs it."
+  "note": "Raised in Plan 13 (reminders, multi-currency, memories and collages, check-ins): 3.58 MB to 3.81 MB. Collages use plain views + view-shot instead of Skia to keep this small. Raise deliberately, with a reason, when a feature needs it."
 }

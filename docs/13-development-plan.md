@@ -17,6 +17,8 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 | 8 | Beta and launch | 3–4 weeks (incl. Play's 14-day test) |
 
 > **Order change (Plan 12):** the owner chose to build everything that works on one phone first and add accounts later. The single-phone parts of Phases 1–4 (on-device database, navigation, trips, itinerary with plan variants, polls, budgets and expenses with splits and settle-up, bookings with tickets, Trip mode Today/Plan/Budget) are built before sign-in. Sign-in, Supabase staging, sync, invites, maps and Nearby follow when the accounts are ready. The database is designed for sync from the start, so nothing is rebuilt.
+>
+> **Plan 13** adds more account-free parts ahead of schedule: local reminders (Phase 4), expenses in other currencies (Phase 3), the photo pool and collage editor with share-sheet export (Phase 5, without uploads or the Instagram Stories intent), and manual check-ins with an optional one-off location (Phase 4, without the background timeline). The admin app skeleton moves to the accounts milestone, since its only page edits server config.
 
 ## How each phase runs
 1. Claude opens a branch `phase-N-<name>`, works in small commits, keeps tests green.

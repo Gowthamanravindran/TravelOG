@@ -128,6 +128,7 @@ export function Button({
   disabled,
   small,
   danger,
+  accessibilityLabel,
 }: {
   label: string;
   onPress: () => void;
@@ -135,11 +136,20 @@ export function Button({
   disabled?: boolean;
   small?: boolean;
   danger?: boolean;
+  /** Required when the label is only an icon, so screen readers say what it does. */
+  accessibilityLabel?: string;
 }) {
   const t = useTheme();
   if (variant === 'link') {
     return (
-      <Pressable accessibilityRole="button" onPress={onPress} disabled={disabled} hitSlop={10}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={{ disabled }}
+        onPress={onPress}
+        disabled={disabled}
+        hitSlop={12}
+      >
         <Text style={[type.label, { color: danger ? t.danger : t.accent }]}>{label}</Text>
       </Pressable>
     );
@@ -150,9 +160,12 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled }}
       onPress={onPress}
       disabled={disabled}
+      // Small buttons are 36 pt tall; extend the touch area to the 44 pt minimum.
+      hitSlop={small ? 4 : undefined}
       style={({ pressed }) => [
         styles.button,
         small && styles.buttonSmall,
@@ -186,6 +199,7 @@ export function Chip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
+      hitSlop={6}
       style={style}
     >
       {content}
@@ -247,6 +261,7 @@ export function Field({
       <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{label}</Text>
       <TextInput
         accessibilityLabel={label}
+        accessibilityHint={error ?? hint}
         placeholderTextColor={t.ink2}
         {...input}
         style={[
@@ -313,7 +328,12 @@ export function Bar({ value, color }: { value: number; color?: string }) {
   const t = useTheme();
   const pct = Math.max(0, Math.min(1, value));
   return (
-    <View style={[styles.bar, { backgroundColor: t.surface2 }]}>
+    <View
+      style={[styles.bar, { backgroundColor: t.surface2 }]}
+      accessible
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: Math.round(value * 100) }}
+    >
       <View
         style={{
           width: `${pct * 100}%`,

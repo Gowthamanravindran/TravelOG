@@ -16,12 +16,14 @@ Only the user's slice: trips they belong to and everything inside them, plus cac
 | `trips`, `trip_members` | same | |
 | `plan_variants`, `itinerary_items` | same | Days aren't a table: they come from the trip's dates, and each plan variant stores its `day_date` (changed in Plan 12, simpler to sync) |
 | `polls`, `poll_options`, `votes` | same | |
-| `budgets`, `expenses`, `expense_splits`, `settlements` | same | Amounts in minor units |
+| `budgets`, `expenses`, `expense_splits`, `settlements` | same | Amounts in minor units; `expenses.fx_rate` keeps the rate used for a foreign-currency expense (Plan 13) |
 | `bookings`, `attachments` | same | `attachments.local_path` for downloaded files |
+| `photos` | same | Trip photo pool; `local_uri` on the phone, `remote_key` once uploads exist (added in Plan 13) |
+| `check_ins` | same | Manual "I'm here" moments with an optional one-off position (added in Plan 13) |
 | `places_cache` | subset of `places` | Places referenced by the user's trips + recent Nearby results |
 | `profiles_cache` | subset of `profiles` | Names/avatars of co-members |
 | `outbox` | — | Queued local changes |
-| `settings` | — | Device-only key/value (local profile until sign-in; sync cursor later) |
+| `settings` | — | Device-only key/value (local profile until sign-in, reminder and location switches, saved exchange rates; sync cursor later) |
 | `sync_state` | — | Cursor and status per scope |
 | `file_queue` | — | Pending photo/attachment uploads and downloads |
 

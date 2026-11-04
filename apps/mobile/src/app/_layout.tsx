@@ -1,15 +1,27 @@
 import type { Db } from '@travelog/db';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import {
+  DarkTheme,
+  DefaultTheme,
+  Stack,
+  ThemeProvider,
+  type ErrorBoundaryProps,
+} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Text, useColorScheme, View } from 'react-native';
+import { useColorScheme } from 'react-native';
 
+import { ErrorScreen } from '@/components/error-screen';
 import { openAppDatabase } from '@/data/open';
 import { DataProvider } from '@/data/provider';
 import { useReminders } from '@/lib/reminders';
 
 SplashScreen.preventAutoHideAsync();
+
+/** Any screen that crashes shows this instead of a blank app. */
+export function ErrorBoundary(props: ErrorBoundaryProps) {
+  return <ErrorScreen {...props} />;
+}
 
 /** Work that follows the data in the background (reminders). */
 function Background() {
@@ -22,22 +34,25 @@ export default function RootLayout() {
   const [db, setDb] = useState<Db | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [attempt, setAttempt] = useState(0);
+
   useEffect(() => {
     // Keep the splash screen up until the database is open and migrated (docs/08: no network at startup).
     openAppDatabase()
       .then(setDb)
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => SplashScreen.hideAsync());
-  }, []);
+  }, [attempt]);
 
   if (error) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ fontSize: 16, textAlign: 'center' }}>
-          TravelOG couldn&apos;t open its storage on this phone. Please restart the app.{'\n\n'}
-          {error}
-        </Text>
-      </View>
+      <ErrorScreen
+        error={new Error(`TravelOG couldn't open its storage on this phone. ${error}`)}
+        retry={async () => {
+          setError(null);
+          setAttempt((n) => n + 1);
+        }}
+      />
     );
   }
   if (!db) return null;

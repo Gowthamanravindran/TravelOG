@@ -16,3 +16,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 10 | [Expo organisation, EXPO_TOKEN steps, Android development build workflow](10-expo-org-and-dev-build.md) | see git log |
 | 11 | [Show the EAS build link on the GitHub run page](11-build-link.md) | see git log |
 | 12 | [Local-first build: on-device database + all single-phone features](12-local-first.md) | 7fe44d2 |
+| 13 | [More account-free features: reminders, currencies, memories, check-ins, polish](13-account-free-features.md) | see git log |

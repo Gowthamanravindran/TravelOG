@@ -68,11 +68,18 @@ export function TripHeader() {
           </View>
           <Button
             label="📸"
+            accessibilityLabel="Memories"
             variant="ghost"
             small
             onPress={() => router.push(`/trip/${id}/memories`)}
           />
-          <Button label="⋯" variant="ghost" small onPress={() => router.push(`/trip/${id}/edit`)} />
+          <Button
+            label="⋯"
+            accessibilityLabel="Trip settings"
+            variant="ghost"
+            small
+            onPress={() => router.push(`/trip/${id}/edit`)}
+          />
         </Row>
         {mode === 'plan' && state === 'live' ? (
           <Button label="Open trip mode" small onPress={() => router.replace(`/trip/${id}/live`)} />
