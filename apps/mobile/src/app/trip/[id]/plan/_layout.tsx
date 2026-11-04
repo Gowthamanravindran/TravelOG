@@ -9,9 +9,10 @@ const TABS = [
   { name: 'budget', label: 'Budget', icon: '💰' },
   { name: 'bookings', label: 'Bookings', icon: '🎫' },
   { name: 'polls', label: 'Polls', icon: '🗳️' },
+  { name: 'memories', label: 'Memories', icon: '📸' },
 ];
 
-/** Plan mode (indigo): Itinerary · Budget · Bookings · Polls. */
+/** Plan mode (indigo): Itinerary · Budget · Bookings · Polls · Memories. */
 export default function PlanLayout() {
   return (
     <ModeProvider mode="plan">

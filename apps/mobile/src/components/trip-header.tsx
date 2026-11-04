@@ -67,13 +67,6 @@ export function TripHeader() {
             </Text>
           </View>
           <Button
-            label="📸"
-            accessibilityLabel="Memories"
-            variant="ghost"
-            small
-            onPress={() => router.push(`/trip/${id}/memories`)}
-          />
-          <Button
             label="⋯"
             accessibilityLabel="Trip settings"
             variant="ghost"

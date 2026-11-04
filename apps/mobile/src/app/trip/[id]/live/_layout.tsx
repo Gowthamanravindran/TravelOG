@@ -9,9 +9,10 @@ const TABS = [
   { name: 'plan', label: 'Plan', icon: '🗺️' },
   { name: 'nearby', label: 'Nearby', icon: '📍' },
   { name: 'budget', label: 'Budget', icon: '💰' },
+  { name: 'memories', label: 'Memories', icon: '📸' },
 ];
 
-/** Trip mode (always dark, teal): Today · Plan · Nearby · Budget. */
+/** Trip mode (always dark, teal): Today · Plan · Nearby · Budget · Memories. */
 export default function LiveLayout() {
   return (
     <ModeProvider mode="trip">

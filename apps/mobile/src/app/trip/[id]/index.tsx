@@ -12,6 +12,6 @@ export default function TripEntry() {
   const state = tripState(trip);
   if (state === 'live') return <Redirect href={`/trip/${id}/live`} />;
   if (state === 'completed' || state === 'archived')
-    return <Redirect href={`/trip/${id}/memories`} />;
+    return <Redirect href={`/trip/${id}/plan/memories`} />;
   return <Redirect href={`/trip/${id}/plan`} />;
 }

@@ -1,20 +1,20 @@
-import { addPhotos, createTrip } from '@travelog/db';
+import { addPhotos, createProject, createTrip, listProjects } from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-import CollageScreen from '@/app/trip/[id]/collage';
-import MemoriesScreen from '@/app/trip/[id]/memories';
+import NewCarousel from '@/app/trip/[id]/studio/new';
+import { MemoriesView } from '@/components/memories-view';
 import { exifTakenAt } from '@/lib/photos';
 import { makeDb, withData } from '@/testing/test-utils';
 
 let mockParams: Record<string, string> = {};
 const mockPush = jest.fn();
+const mockReplace = jest.fn();
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: mockPush, back: jest.fn(), replace: jest.fn() }),
+  useRouter: () => ({ push: mockPush, back: jest.fn(), replace: mockReplace }),
   useLocalSearchParams: () => mockParams,
 }));
 jest.mock('expo-image-picker', () => ({ launchImageLibraryAsync: jest.fn() }));
 jest.mock('expo-sharing', () => ({ isAvailableAsync: jest.fn(), shareAsync: jest.fn() }));
-jest.mock('react-native-view-shot', () => ({ captureRef: jest.fn() }));
 
 function tripWithPhotos(count: number) {
   const db = makeDb();
@@ -41,30 +41,45 @@ function tripWithPhotos(count: number) {
   return { db, trip };
 }
 
-describe('memories', () => {
-  it('groups photos by trip day and opens the collage editor', async () => {
+describe('Memories tab', () => {
+  it('lists carousels and groups photos by trip day', async () => {
     const { db, trip } = tripWithPhotos(5);
-    await render(withData(db, <MemoriesScreen />));
+    const project = createProject(db, {
+      tripId: trip.id,
+      format: 'post',
+      slides: 3,
+      template: 'bridge',
+    });
+    await render(withData(db, <MemoriesView tripId={trip.id} />, 'plan'));
     expect(screen.getByText(/trip is done/)).toBeTruthy();
-    expect(screen.getByText('Day 1 · 12 Jul')).toBeTruthy();
-    expect(screen.getByText('Day 3 · 14 Jul')).toBeTruthy();
-    fireEvent.press(screen.getByRole('button', { name: 'Make a collage' }));
-    expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/collage`);
+    expect(screen.getByText('Day 1 · 12 Jul · 2')).toBeTruthy();
+    expect(screen.getByText('3 slides · 4:5')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: /^Goa, 3 slides/ }));
+    expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/studio/${project.id}`);
+    await fireEvent.press(screen.getByRole('button', { name: '＋ New carousel' }));
+    expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/studio/new`);
   });
 
-  it('shows an empty state without photos', async () => {
-    const { db } = tripWithPhotos(0);
-    await render(withData(db, <MemoriesScreen />));
+  it('shows empty states without photos or carousels', async () => {
+    const { db, trip } = tripWithPhotos(0);
+    await render(withData(db, <MemoriesView tripId={trip.id} />, 'plan'));
     expect(screen.getByText('No photos yet')).toBeTruthy();
+    expect(screen.getByText(/Add a few photos first/)).toBeTruthy();
   });
+});
 
-  it('collage editor fills the template with auto-picked photos and switches templates', async () => {
-    const { db } = tripWithPhotos(6);
-    await render(withData(db, <CollageScreen />));
-    expect(screen.getAllByLabelText(/^Photo \d, tap to change$/)).toHaveLength(6);
-    await fireEvent.press(screen.getByText('Trip stats'));
-    expect(screen.getAllByLabelText(/^Photo \d, tap to change$/)).toHaveLength(2);
-    expect(screen.getByText('stops')).toBeTruthy();
+describe('New carousel', () => {
+  it('creates a project from the chosen template and opens the editor', async () => {
+    const { db, trip } = tripWithPhotos(6);
+    await render(withData(db, <NewCarousel />));
+    await fireEvent.press(screen.getByRole('button', { name: 'More slides' }));
+    await fireEvent.press(screen.getByRole('radio', { name: /^Film roll/ }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Create carousel' }));
+
+    const [project] = listProjects(db, trip.id);
+    expect(project).toMatchObject({ slides: 4, format: 'post', title: 'Goa' });
+    expect(mockReplace).toHaveBeenCalledWith(`/trip/${trip.id}/studio/${project!.id}`);
   });
 });
 

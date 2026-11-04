@@ -10,6 +10,8 @@ export default function TripLayout() {
       <Stack.Screen name="poll" options={{ presentation: 'modal' }} />
       <Stack.Screen name="settle" options={{ presentation: 'modal' }} />
       <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="studio/new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="studio/[projectId]" options={{ animation: 'fade' }} />
     </Stack>
   );
 }
