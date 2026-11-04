@@ -1,0 +1,5 @@
+{
+  "androidBundleBytes": 2883101,
+  "maxGrowthPercent": 10,
+  "note": "Baseline from Phase 0. Raise deliberately (with a reason in the commit) when a feature needs it."
+}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TravelOG · Plan trips with your friends</title>
+<meta name="description" content="Plan trips with your friends — vote on where to go, split the money, and keep the memories. Join the waitlist.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#FAF7F2; --surface:#FFFFFF; --surface-2:#F2EEE7; --ink:#1B1A3A; --ink-2:#5E5C78; --line:#E8E3DA;
+    --coral:#FF6B5B; --coral-soft:#FFE6E2; --indigo:#5B5BD6; --teal:#14B8A6; --mango:#FFB020;
+    --ok:#16A34A; --err:#E5484D;
+    --display:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif; --body:"Figtree","Segoe UI",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --bg:#0F1020; --surface:#1A1B2E; --surface-2:#24253B; --ink:#F4F3FA; --ink-2:#A9A8C2; --line:#2E2F48;
+    --coral-soft:#3A2230; --ok:#34D399; --err:#FF6B6E; color-scheme:dark }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+  main{max-width:1040px;margin:0 auto;padding:32px 20px 56px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center}
+  @media (max-width:820px){main{grid-template-columns:1fr;gap:32px;padding-top:20px}}
+  .brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em}
+  .brand span{color:var(--coral)}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,56px);line-height:1.04;letter-spacing:-.03em;margin:18px 0 14px;text-wrap:balance}
+  h1 em{font-style:normal;color:var(--coral)}
+  .lede{font-size:18px;color:var(--ink-2);max-width:52ch;margin:0 0 24px}
+  .points{list-style:none;padding:0;margin:0 0 28px;display:grid;gap:10px}
+  .points li{display:flex;gap:12px;align-items:flex-start}
+  .dot{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px}
+  form{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:12px;max-width:460px}
+  label{font-size:13px;font-weight:700;color:var(--ink-2)}
+  input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+  button{font:700 16px var(--display);border:0;border-radius:14px;padding:14px;background:var(--coral);color:#fff;cursor:pointer}
+  button[disabled]{opacity:.6;cursor:default}
+  .msg{font-size:14px;min-height:20px;margin:0}
+  .msg.ok{color:var(--ok)} .msg.err{color:var(--err)}
+  .fine{font-size:12px;color:var(--ink-2);margin:0}
+  .fine a{color:inherit}
+  .phone{justify-self:center;width:min(320px,100%);aspect-ratio:9/18.5;border-radius:40px;border:10px solid var(--ink);background:var(--bg);padding:18px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 30px 60px rgba(27,26,58,.18)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px}
+  .cover{height:84px;border-radius:14px;background:linear-gradient(135deg,var(--teal),#0EA5E9);display:flex;align-items:flex-end;padding:10px;color:#04201D;font:800 15px var(--display)}
+  .poll{display:grid;gap:6px;font-size:13px;font-weight:600}
+  .opt{position:relative;border:1px solid var(--line);border-radius:10px;padding:7px 10px;overflow:hidden}
+  .opt i{position:absolute;inset:0 auto 0 0;background:color-mix(in srgb,var(--mango) 30%,transparent)}
+  .opt span{position:relative}
+  .split{display:flex;justify-content:space-between;font-size:13px}
+  .chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--coral-soft);color:var(--ink)}
+  footer{max-width:1040px;margin:0 auto;padding:0 20px 32px;color:var(--ink-2);font-size:13px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <div class="brand">Travel<span>OG</span></div>
+    <h1>Plan trips with your friends — <em>vote, split, go.</em></h1>
+    <p class="lede">One place for the plan, the vote, the money and the memories. Works offline on the road. Built in India for group trips anywhere.</p>
+    <ul class="points">
+      <li><span class="dot" style="background:#E7E7FB">🗳️</span><span><b>Decide together.</b> Plan A vs Plan B, dates, stays — everyone votes, one tap locks it in.</span></li>
+      <li><span class="dot" style="background:#DFF6F2">🧭</span><span><b>Trip mode.</b> Today's plan, the map and your tickets — even with no signal.</span></li>
+      <li><span class="dot" style="background:#FFE6E2">💸</span><span><b>Split without the awkward bit.</b> Expenses, balances and UPI settle-up.</span></li>
+      <li><span class="dot" style="background:#FFF1D6">✨</span><span><b>AI that knows the road.</b> “10 days in Japan in April” — a full plan in seconds.</span></li>
+    </ul>
+    <form id="wl" novalidate>
+      <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div><label for="size">How many friends do you usually travel with?</label>
+        <select id="size" name="size">
+          <option value="">Choose…</option><option value="2">Just one friend</option><option value="4">2–4 friends</option>
+          <option value="7">5–8 friends</option><option value="10">More than 8</option>
+        </select></div>
+      <button id="go" type="submit">Join the waitlist</button>
+      <p id="msg" class="msg" role="status" aria-live="polite"></p>
+      <p class="fine">We'll email you when early access opens. No spam. <a href="privacy.html">Privacy</a></p>
+    </form>
+  </section>
+  <aside class="phone" aria-hidden="true">
+    <div class="cover">🌴 Goa Monsoon Escape</div>
+    <div class="card poll"><div style="font:800 14px var(--display)">Which beach on Day 2?</div>
+      <div class="opt"><i style="width:62%"></i><span>Palolem · 62%</span></div>
+      <div class="opt"><i style="width:38%"></i><span>Agonda · 38%</span></div></div>
+    <div class="card"><div class="split"><b>Beach shack lunch</b><span>₹2,840</span></div>
+      <div class="split" style="color:var(--ink-2)"><span>Split 4 ways</span><span>₹710 each</span></div></div>
+    <div class="card"><span class="chip">✨ Trip check</span><div style="font-size:13px;margin-top:6px">Rain likely 3–6 pm — swap kayaking for the spice farm?</div></div>
+  </aside>
+</main>
+<footer>© TravelOG</footer>
+<script src="config.js"></script>
+<script>
+(function () {
+  var form = document.getElementById('wl'), msg = document.getElementById('msg'), btn = document.getElementById('go');
+  var cfg = window.TRAVELOG_CONFIG || {};
+  function say(text, kind) { msg.textContent = text; msg.className = 'msg ' + (kind || ''); }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = form.email.value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { say('Please enter a valid email address.', 'err'); form.email.focus(); return; }
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) { say('Sign-ups open very soon — the waitlist isn’t connected yet.', 'err'); return; }
+    btn.disabled = true; say('Adding you…');
+    var size = parseInt(form.size.value, 10);
+    fetch(cfg.supabaseUrl.replace(/\/$/, '') + '/rest/v1/waitlist', {
+      method: 'POST',
+      headers: { apikey: cfg.supabaseAnonKey, Authorization: 'Bearer ' + cfg.supabaseAnonKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ email: email, travel_group_size: isNaN(size) ? null : size, source: 'website' })
+    }).then(function (r) {
+      if (r.ok) { form.reset(); say('You’re on the list. We’ll email you when early access opens.', 'ok'); }
+      else if (r.status === 409) { say('You’re already on the list — see you soon.', 'ok'); }
+      else { say('Something went wrong on our side. Please try again in a minute.', 'err'); }
+    }).catch(function () { say('Couldn’t reach the server. Check your connection and try again.', 'err'); })
+      .finally(function () { btn.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

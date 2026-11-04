@@ -15,7 +15,7 @@ The single source of truth for what the app is built with. [03 · Architecture](
 ## Mobile app (`apps/mobile`)
 | Purpose | Choice |
 |---|---|
-| Framework | Expo (latest stable SDK at Phase 0 — currently SDK 55 with React Native 0.83, New Architecture only), TypeScript strict |
+| Framework | Expo **SDK 58** with React Native 0.88 and React 19.3 (pinned in Phase 0, New Architecture only), TypeScript 6 strict |
 | Navigation | Expo Router (file-based; route groups per mode: `(home)`, `trip/[id]/plan`, `trip/[id]/live`) |
 | Local database | expo-sqlite (SQLCipher encryption on) + Drizzle ORM + drizzle-kit migrations |
 | Small key-value settings | react-native-mmkv |
@@ -93,7 +93,7 @@ The single source of truth for what the app is built with. [03 · Architecture](
 |---|---|
 | Repo | pnpm workspaces monorepo: `apps/mobile`, `apps/web`, `apps/admin`, `packages/core` (types, zod schemas, split and sync logic), `packages/ui` (tokens, components), `supabase/` |
 | Lint and format | ESLint + Prettier, TypeScript strict, import ordering |
-| Unit and component tests | Jest + React Native Testing Library |
+| Unit and component tests | Jest (jest-expo) + React Native Testing Library in `apps/mobile`; Vitest for the pure-TypeScript packages |
 | Database tests | pgTAP via `supabase test db` (permission/RLS tests) |
 | End-to-end tests | Maestro flows on Android emulator in CI |
 | CI | GitHub Actions: lint, typecheck, tests, migration check, bundle-size check |

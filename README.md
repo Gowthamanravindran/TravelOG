@@ -2,7 +2,7 @@
 
 Plan trips with your crew, vote on where to go, run the trip live, and turn it into memories you can post to Instagram. iOS + Android, India-first.
 
-**Status:** design complete; ready for Phase 0 of the development plan. No app code yet.
+**Status:** Phase 0 in progress — monorepo, app shell, first database migration, CI and waitlist page are built. See [CLAUDE.md](CLAUDE.md) for commands.
 
 ## Design docs
 | Doc | What's inside |
@@ -25,6 +25,14 @@ Plan trips with your crew, vote on where to go, run the trip live, and turn it i
 | [16 · Admin & ops](docs/16-admin-and-ops.md) | Admin web app, data retention, alerts, incident steps |
 | [17 · Owner checklist](docs/17-owner-checklist.md) | Everything you need to do, end to end, in order |
 | [Plan log](docs/plans/) | Every planning step in order, with what was built |
+
+## Development
+```bash
+pnpm install
+pnpm lint && pnpm typecheck && pnpm test
+pnpm --filter @travelog/mobile start   # open in Expo Go
+```
+Structure, commands and conventions: [CLAUDE.md](CLAUDE.md).
 
 ## Start here
 1. [17 · Owner checklist](docs/17-owner-checklist.md) — your to-do list from now to launch (details in [14](docs/14-owner-setup.md)).

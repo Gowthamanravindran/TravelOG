@@ -1,0 +1,10 @@
+node_modules
+pnpm-lock.yaml
+docs
+mockups
+supabase/.temp
+apps/mobile/.expo
+apps/mobile/dist
+*.md
+apps/web/public/*.html
+apps/mobile/assets

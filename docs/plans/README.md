@@ -12,3 +12,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 6 | [Cost optimisation (AI + infrastructure)](06-cost-optimisation.md) | see git log |
 | 7 | [Build readiness: open items, optimisations, stack, auth, local DB, migrations, dev plan, owner setup](07-build-readiness.md) | see git log |
 | 8 | [Final planning gaps: consistency, go-to-market, app states, admin & ops, owner checklist](08-final-planning-gaps.md) | see git log |
+| 9 | [Phase 0 build: monorepo, app shell, first migration, CI, waitlist page](09-phase-0.md) | see git log |

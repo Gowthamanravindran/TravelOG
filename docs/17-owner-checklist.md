@@ -22,8 +22,10 @@ Tick items here as you go (edit this file, or ask Claude to tick them).
 - [ ] §1 GitHub: branch protection on `main`; Actions enabled.
 - [ ] §2 Buy the domain; move its DNS to Cloudflare.
 - [ ] §3 Cloudflare: account; R2 buckets (staging, prod) + API token; Pages connected to the repo; API token for CI.
-- [ ] §4 Supabase: projects `travelog-staging` and `travelog-prod` in **Mumbai**; save DB passwords; add URL/keys/refs to EAS and GitHub secrets; personal access token → `SUPABASE_ACCESS_TOKEN`.
-- [ ] §5 Expo: account; `npm i -g eas-cli`; `eas login`; run `eas init` when Claude asks; `EXPO_TOKEN` → GitHub.
+- [ ] §4 Supabase: projects `travelog-staging` and `travelog-prod` in **Mumbai**; save DB passwords; add URL/keys/refs to EAS and GitHub secrets; personal access token → `SUPABASE_ACCESS_TOKEN`. *(Not needed to start coding — local development uses Docker. Needed by mid-Phase 1 for the shared staging database and the live waitlist.)*
+- [x] §5 Expo: account and project created (project id `c1fca343-…` linked in `apps/mobile/app.config.ts`, Plan 9).
+- [ ] §5 Tell Claude your Expo **account or organisation name** (shown at expo.dev, top left) so the app config's `owner` matches; create an access token → GitHub secret `EXPO_TOKEN` (needed when builds start in Phase 1).
+- [ ] Don't run `npx create-expo-app` yourself — the app already exists in `apps/mobile`. To try it: install the free **Expo Go** app, then on your computer run `pnpm install` and `pnpm --filter @travelog/mobile start` and scan the QR code.
 - [ ] On your computer (for local runs, optional but useful): install Node.js LTS, pnpm, Docker Desktop.
 - [ ] Install the development build on your Android phone (and iPhone after step C).
 - [ ] Post on Instagram/LinkedIn/X that you're building TravelOG; share the waitlist page once Claude publishes it.
