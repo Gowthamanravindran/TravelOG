@@ -24,6 +24,7 @@ import {
   startHistory,
   swapSlides,
   templatePhotoCount,
+  transformLayer,
   undo,
   updateLayer,
   type Layer,
@@ -222,5 +223,106 @@ describe('edits and history', () => {
     h = commit(h, addSlide(b));
     expect(h.future).toEqual([]);
     expect(undo(startHistory(a)).present).toBe(a);
+  });
+});
+
+describe('transformLayer', () => {
+  const doc = addLayer(newDoc('post', 2), sticker('s', 100, 100));
+  const start = doc.layers[0]!;
+
+  it('moves and snaps a plain drag to the seam', () => {
+    const r = transformLayer(
+      doc,
+      start,
+      { dx: 885, dy: 0, scale: 1, rotation: 0 },
+      {
+        mode: 'move',
+        snapThreshold: 10,
+      },
+    );
+    // Left edge would be at 985; right edge at 1185; the left snaps to nothing,
+    // the centre (1085) snaps to the seam at 1080.
+    expect(r.patch.x).toBe(980);
+    expect(r.guides.vertical).toEqual([1080]);
+  });
+
+  it('pinches around the centre, keeps a minimum size and snaps rotation to square', () => {
+    const r = transformLayer(
+      doc,
+      start,
+      { dx: 0, dy: 0, scale: 2, rotation: 92 },
+      {
+        mode: 'move',
+        snapThreshold: 10,
+      },
+    );
+    expect(r.patch).toMatchObject({ x: 0, y: 0, w: 400, h: 400, rotation: 90 });
+    const tiny = transformLayer(
+      doc,
+      start,
+      { dx: 0, dy: 0, scale: 0.01, rotation: 0 },
+      {
+        mode: 'move',
+        snapThreshold: 0,
+      },
+    );
+    expect(tiny.patch.w).toBe(40);
+  });
+
+  it('scales text size with the box', () => {
+    const text: Layer = {
+      id: 't',
+      kind: 'text',
+      text: 'Hi',
+      font: 'sans',
+      size: 80,
+      color: '#000000',
+      align: 'center',
+      bold: false,
+      background: null,
+      x: 0,
+      y: 0,
+      w: 400,
+      h: 100,
+      rotation: 0,
+    };
+    const r = transformLayer(
+      addLayer(newDoc('post', 1), text),
+      text,
+      { dx: 0, dy: 0, scale: 1.5, rotation: 0 },
+      {
+        mode: 'move',
+        snapThreshold: 0,
+      },
+    );
+    expect(r.patch).toMatchObject({ size: 120, w: 600 });
+  });
+
+  it('crops: zoom and pan the photo inside its frame', () => {
+    const photoDoc = docFromTemplate('panorama', 'square', 1, ['p'], ids);
+    const frame = photoDoc.layers.find((l) => l.kind === 'photo')!;
+    // Square 1080 frame, landscape 2160×1080 photo: 1080 px of horizontal overflow.
+    const r = transformLayer(
+      photoDoc,
+      frame,
+      { dx: 540, dy: 0, scale: 1, rotation: 0 },
+      {
+        mode: 'crop',
+        snapThreshold: 0,
+        photoSize: { w: 2160, h: 1080 },
+      },
+    );
+    expect(r.patch).toEqual({ crop: { scale: 1, x: 0, y: 0.5 } });
+    const zoomed = transformLayer(
+      photoDoc,
+      frame,
+      { dx: 0, dy: 0, scale: 20, rotation: 0 },
+      {
+        mode: 'crop',
+        snapThreshold: 0,
+        photoSize: { w: 2160, h: 1080 },
+      },
+    );
+    expect((zoomed.patch as { crop: { scale: number } }).crop.scale).toBe(8);
   });
 });

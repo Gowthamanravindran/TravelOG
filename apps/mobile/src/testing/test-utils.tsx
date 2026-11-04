@@ -5,6 +5,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import path from 'node:path';
 import type { ReactNode } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { DataProvider } from '@/data/provider';
 import { ModeProvider } from '@/ui/theme';
@@ -19,8 +20,10 @@ export function makeDb(): Db {
 
 export function withData(db: Db, ui: ReactNode, mode: 'home' | 'plan' | 'trip' = 'home') {
   return (
-    <DataProvider db={db}>
-      <ModeProvider mode={mode}>{ui}</ModeProvider>
-    </DataProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <DataProvider db={db}>
+        <ModeProvider mode={mode}>{ui}</ModeProvider>
+      </DataProvider>
+    </GestureHandlerRootView>
   );
 }

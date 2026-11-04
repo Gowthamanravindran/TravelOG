@@ -31,3 +31,4 @@ export type {
 export * from './geometry';
 export * from './edit';
 export * from './templates';
+export * from './transform';

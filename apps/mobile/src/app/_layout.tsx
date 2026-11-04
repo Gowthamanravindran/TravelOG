@@ -10,6 +10,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ErrorScreen } from '@/components/error-screen';
 import { openAppDatabase } from '@/data/open';
@@ -58,14 +59,16 @@ export default function RootLayout() {
   if (!db) return null;
 
   return (
-    <DataProvider db={db}>
-      <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <StatusBar style="auto" />
-        <Background />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
-        </Stack>
-      </ThemeProvider>
-    </DataProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <DataProvider db={db}>
+        <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <StatusBar style="auto" />
+          <Background />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
+          </Stack>
+        </ThemeProvider>
+      </DataProvider>
+    </GestureHandlerRootView>
   );
 }
