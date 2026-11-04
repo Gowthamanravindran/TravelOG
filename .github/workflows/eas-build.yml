@@ -28,11 +28,11 @@ jobs:
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: steps.secrets.outputs.ready == 'true'
       - uses: pnpm/action-setup@v4
         if: steps.secrets.outputs.ready == 'true'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: steps.secrets.outputs.ready == 'true'
         with:
           node-version-file: .nvmrc
@@ -47,4 +47,22 @@ jobs:
       - name: Start EAS build
         if: steps.secrets.outputs.ready == 'true'
         working-directory: apps/mobile
-        run: eas build --platform android --profile "${{ inputs.profile }}" --non-interactive --no-wait
+        run: |
+          eas build --platform android --profile "${{ inputs.profile }}" --non-interactive --no-wait --json > build.json
+          cat build.json
+          id=$(jq -r '.[0].id' build.json)
+          link="https://expo.dev/accounts/travelogapp/projects/travelog/builds/$id"
+          echo "::notice title=Android build started::Open on your Android phone: $link"
+          {
+            echo "## 📱 Android ${{ inputs.profile }} build started"
+            echo
+            echo "**Build page:** $link"
+            echo
+            echo "1. Open the link on your Android phone (sign in to expo.dev if asked)."
+            echo "2. Wait until it says **Finished** — usually 10–20 minutes."
+            echo "3. Tap **Install** / **Download build**, allow your browser to install unknown apps, and install **TravelOG**."
+            echo
+            echo "All builds: https://expo.dev/accounts/travelogapp/projects/travelog/builds"
+            echo
+            echo "_This is a development build: it is its own app, not opened through Expo Go._"
+          } >> "$GITHUB_STEP_SUMMARY"

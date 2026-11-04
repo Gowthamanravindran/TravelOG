@@ -14,3 +14,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 8 | [Final planning gaps: consistency, go-to-market, app states, admin & ops, owner checklist](08-final-planning-gaps.md) | see git log |
 | 9 | [Phase 0 build: monorepo, app shell, first migration, CI, waitlist page](09-phase-0.md) | see git log |
 | 10 | [Expo organisation, EXPO_TOKEN steps, Android development build workflow](10-expo-org-and-dev-build.md) | see git log |
+| 11 | [Show the EAS build link on the GitHub run page](11-build-link.md) | see git log |
