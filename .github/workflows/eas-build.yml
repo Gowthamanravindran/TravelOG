@@ -1,0 +1,50 @@
+name: EAS build (Android development)
+
+# Manual: GitHub → Actions → "EAS build (Android development)" → Run workflow.
+# Builds an installable Android development build on Expo's servers (about 10–20 min).
+# Needs the EXPO_TOKEN secret (docs/14-owner-setup.md §5); skips with a notice until it exists.
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'eas.json build profile'
+        required: true
+        default: development
+        type: choice
+        options: [development, preview]
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Check secrets
+        id: secrets
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::notice::EXPO_TOKEN is not set yet (docs/14-owner-setup.md §5). Skipping build."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.secrets.outputs.ready == 'true'
+      - uses: pnpm/action-setup@v4
+        if: steps.secrets.outputs.ready == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: expo/expo-github-action@v8
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+        if: steps.secrets.outputs.ready == 'true'
+      - name: Start EAS build
+        if: steps.secrets.outputs.ready == 'true'
+        working-directory: apps/mobile
+        run: eas build --platform android --profile "${{ inputs.profile }}" --non-interactive --no-wait

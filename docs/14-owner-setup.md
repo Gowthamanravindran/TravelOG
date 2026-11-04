@@ -49,11 +49,20 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 7. The service-role key stays in Supabase only — never in the app or GitHub.
 
 ## §5 Expo / EAS — Phase 0 · free tier to start
-1. Create an account at expo.dev.
-2. On your computer: `npm i -g eas-cli` → `eas login`.
-3. Claude creates the project config; you run `eas init` once when asked (links the project to your account).
-4. Account settings → Access tokens → create → GitHub secret `EXPO_TOKEN`.
-5. Install the development build on your phone from the link EAS prints (Android: allow install; iOS: register your device with `eas device:create`, needs §6).
+**Done:** organisation **TravelOGApp** (account name `travelogapp`) with project **travelog** (`c1fca343-1181-4e23-a750-137c4ca9447d`), linked in `apps/mobile/app.config.ts`. You don't need `eas init` or `create-expo-app` — the app already lives in `apps/mobile`.
+
+**Create the `EXPO_TOKEN` for GitHub Actions (use a robot user, not your personal token):**
+1. expo.dev → switch to the **TravelOGApp** organisation (top-left account switcher). Check the address bar shows `expo.dev/accounts/travelogapp/…`; if the name differs, tell Claude.
+2. Organisation **Settings → Access tokens** (some layouts: **Members → Robot users**) → **Add robot** → name `github-actions`, role **Developer**.
+3. On that robot → **Create token** → name `github-actions` → **copy it now** (shown only once).
+   *Fallback if robots aren't available: your **Account settings → Access tokens → Create token**.*
+4. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret** → Name `EXPO_TOKEN`, Secret = the token → **Add secret**. Tell Claude it's added; never paste the token in chat.
+
+**Get the app on your Android phone:**
+5. GitHub → **Actions → "EAS build (Android development)" → Run workflow** (profile `development`). The build runs on Expo's servers (~10–20 min); the link appears at expo.dev → travelog → Builds.
+6. Open the link on your Android phone → download the `.apk` → allow your browser to "install unknown apps" → install **TravelOG**.
+7. On your computer (same Wi-Fi): `pnpm install`, then `pnpm --filter @travelog/mobile start --dev-client`, then open TravelOG on the phone. (Later Claude sets up EAS Update so preview builds load without your computer.)
+8. iPhone: needs the Apple Developer account (§6) first, then `eas device:create` to register your iPhone.
 
 ## §6 Apple Developer Program — Phase 1 · $99/yr (individual)
 1. Enrol at developer.apple.com/programs with your Apple ID (individual; needs 2-factor auth). Approval usually takes 1–2 days.

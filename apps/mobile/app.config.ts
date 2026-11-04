@@ -8,12 +8,14 @@ const APP_NAME = 'TravelOG';
 const BUNDLE_ID = 'app.travelog.mobile';
 const SCHEME = 'travelog';
 const WEB_DOMAIN = process.env.EXPO_PUBLIC_WEB_DOMAIN ?? 'travelog.app';
-/** EAS project created by the owner (not a secret). */
+/** EAS project created by the owner (not a secret), in the TravelOGApp organisation. */
 const EAS_PROJECT_ID = 'c1fca343-1181-4e23-a750-137c4ca9447d';
+const EAS_OWNER = 'travelogapp';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: APP_NAME,
+  owner: EAS_OWNER,
   slug: 'travelog',
   version: '0.1.0',
   orientation: 'portrait',
