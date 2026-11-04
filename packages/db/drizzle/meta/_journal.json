@@ -15,6 +15,13 @@
       "when": 1793809663967,
       "tag": "0001_expense_fx_rate",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793809789307,
+      "tag": "0002_photos",
+      "breakpoints": true
     }
   ]
 }

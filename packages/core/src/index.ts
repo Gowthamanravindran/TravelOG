@@ -6,3 +6,4 @@ export * from './dates';
 export * from './trips';
 export * from './reminders';
 export * from './fx';
+export * from './collage';

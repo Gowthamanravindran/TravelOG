@@ -66,6 +66,12 @@ export function TripHeader() {
               {trip.emoji} {trip.title}
             </Text>
           </View>
+          <Button
+            label="📸"
+            variant="ghost"
+            small
+            onPress={() => router.push(`/trip/${id}/memories`)}
+          />
           <Button label="⋯" variant="ghost" small onPress={() => router.push(`/trip/${id}/edit`)} />
         </Row>
         {mode === 'plan' && state === 'live' ? (

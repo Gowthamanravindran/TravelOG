@@ -8,3 +8,4 @@ export * from './repo/polls';
 export * from './repo/money';
 export * from './repo/bookings';
 export * from './repo/reminders';
+export * from './repo/photos';

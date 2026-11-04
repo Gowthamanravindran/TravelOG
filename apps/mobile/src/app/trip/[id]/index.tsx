@@ -4,10 +4,14 @@ import { Redirect, useLocalSearchParams } from 'expo-router';
 
 import { useQuery } from '@/data/provider';
 
-/** Opens the right mode for the trip: Trip mode while it's live, Plan mode otherwise. */
+/** Opens the right place for the trip: Trip mode while live, Memories once it's over, else Plan mode. */
 export default function TripEntry() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const trip = useQuery((db) => getTrip(db, id), [id]);
   if (!trip) return <Redirect href="/" />;
-  return <Redirect href={tripState(trip) === 'live' ? `/trip/${id}/live` : `/trip/${id}/plan`} />;
+  const state = tripState(trip);
+  if (state === 'live') return <Redirect href={`/trip/${id}/live`} />;
+  if (state === 'completed' || state === 'archived')
+    return <Redirect href={`/trip/${id}/memories`} />;
+  return <Redirect href={`/trip/${id}/plan`} />;
 }

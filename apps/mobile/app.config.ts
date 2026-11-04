@@ -48,6 +48,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-secure-store',
     // Local trip reminders (docs/01 §11); push comes with accounts.
     'expo-notifications',
+    // Memories: pick trip photos with the system photo picker (docs/01 §6). Collages are saved
+    // through the share sheet, so no gallery permission (Play restricts READ_MEDIA_*).
+    [
+      'expo-image-picker',
+      {
+        photosPermission: 'TravelOG uses your photos to add them to your trip memories.',
+        cameraPermission: false,
+        microphonePermission: false,
+      },
+    ],
     [
       'expo-splash-screen',
       {

@@ -270,6 +270,28 @@ export const attachments = sqliteTable(
   (t) => [index('attachments_booking_idx').on(t.bookingId)],
 );
 
+/** Trip photo pool (docs/01 §6). Files stay on the phone until uploads exist (Phase 5). Plan 13. */
+export const photos = sqliteTable(
+  'photos',
+  {
+    ...syncColumns,
+    tripId: text('trip_id').notNull(),
+    addedByMemberId: text('added_by_member_id'),
+    /** File on this device; null on other devices until downloaded. */
+    localUri: text('local_uri'),
+    /** Object key in storage once uploaded (Phase 5). */
+    remoteKey: text('remote_key'),
+    width: integer('width'),
+    height: integer('height'),
+    /** When it was taken (UTC ISO) if the photo says so, else when it was added. */
+    takenAt: text('taken_at').notNull(),
+    /** Local date of the trip day it belongs to. */
+    dayDate: text('day_date'),
+    caption: text('caption'),
+  },
+  (t) => [index('photos_trip_idx').on(t.tripId, t.takenAt)],
+);
+
 /** Local changes waiting to be sent to the server once sync exists. */
 export const outbox = sqliteTable(
   'outbox',
@@ -307,6 +329,7 @@ export const syncedTables = {
   settlements,
   bookings,
   attachments,
+  photos,
 } as const;
 
 export type SyncedTableName = keyof typeof syncedTables;

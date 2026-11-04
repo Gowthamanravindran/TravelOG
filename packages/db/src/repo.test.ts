@@ -37,6 +37,10 @@ import {
   tripMoney,
   updateTrip,
   upcomingReminders,
+  addPhotos,
+  listPhotos,
+  deletePhoto,
+  tripRecap,
 } from './index';
 import { outbox } from './schema';
 import { testDb } from './test-db';
@@ -432,6 +436,50 @@ describe('foreign-currency expenses', () => {
       id: e.id,
       fxRate: '83.2',
       tripAmountMinor: 104000,
+    });
+  });
+});
+
+describe('photos and recap', () => {
+  it('places photos on the trip day they were taken, in the trip time zone', () => {
+    const t = goa();
+    const added = addPhotos(db, t.id, [
+      { localUri: 'file:///a.jpg', takenAt: '2026-11-12T20:00:00Z' }, // 01:30 IST on the 13th
+      { localUri: 'file:///b.jpg', takenAt: '2026-10-01T10:00:00Z' }, // before the trip
+      { localUri: 'file:///c.jpg', takenAt: 'not a date' }, // falls back to now
+    ]);
+    expect(added.map((p) => p.dayDate)).toEqual(['2026-11-13', null, null]);
+    expect(added[2]?.takenAt).toBe('2026-11-04T06:00:00.000Z');
+    deletePhoto(db, added[1]!.id);
+    expect(listPhotos(db, t.id)).toHaveLength(2);
+  });
+
+  it('sums up the trip for the stats card', () => {
+    const t = goa();
+    const me_ = myMember(db, t.id)!;
+    const a = ensureMainVariant(db, t.id, '2026-11-12');
+    addItem(db, a.id, { type: 'place', title: 'Fort' });
+    addItem(db, a.id, { type: 'note', title: 'Carry cash' });
+    const b = addVariant(db, t.id, '2026-11-12');
+    addItem(db, b.id, { type: 'place', title: 'Alt' });
+    addExpense(db, {
+      tripId: t.id,
+      title: 'Lunch',
+      category: 'food',
+      amountMinor: 120000,
+      currency: 'INR',
+      paidByMemberId: me_.id,
+      splitMethod: 'equal',
+      participants: [{ memberId: me_.id }],
+    });
+    addPhotos(db, t.id, [{ localUri: 'file:///a.jpg' }]);
+    expect(tripRecap(db, t.id)).toEqual({
+      days: 5,
+      stops: 1,
+      people: 1,
+      spentMinor: 120000,
+      currency: 'INR',
+      photos: 1,
     });
   });
 });
