@@ -1,0 +1,25 @@
+{
+  "name": "@travelog/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@travelog/core": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "uuid": "^14.0.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-kit": "0.31.11",
+    "typescript": "~6.0.3",
+    "vitest": "^4.0.0"
+  }
+}

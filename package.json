@@ -22,8 +22,9 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "supabase",
-      "esbuild"
+      "better-sqlite3",
+      "esbuild",
+      "supabase"
     ]
   }
 }

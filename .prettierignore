@@ -8,3 +8,4 @@ apps/mobile/dist
 *.md
 apps/web/public/*.html
 apps/mobile/assets
+packages/db/drizzle
