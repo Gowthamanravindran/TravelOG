@@ -36,14 +36,13 @@ export async function getQuote(
 ): Promise<SavedQuote | null> {
   const saved = savedQuote(db, from, to);
   if (saved && Date.now() - Date.parse(saved.fetchedAt) < DAY / 2) return saved;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
     const res = await fetcher(
       `https://api.frankfurter.dev/v1/latest?base=${encodeURIComponent(from)}&symbols=${encodeURIComponent(to)}`,
       { signal: controller.signal },
     );
-    clearTimeout(timer);
     const quote = res.ok ? quoteFromFrankfurter(await res.json(), from, to) : null;
     if (quote) {
       const fresh: SavedQuote = { ...quote, fetchedAt: new Date().toISOString() };
@@ -52,6 +51,8 @@ export async function getQuote(
     }
   } catch {
     // Offline or blocked: fall through to the saved rate.
+  } finally {
+    clearTimeout(timer);
   }
   return saved ? { ...saved, stale: true } : null;
 }
