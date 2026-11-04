@@ -1,5 +1,5 @@
 {
-  "androidBundleBytes": 2883101,
+  "androidBundleBytes": 3576990,
   "maxGrowthPercent": 10,
-  "note": "Baseline from Phase 0. Raise deliberately (with a reason in the commit) when a feature needs it."
+  "note": "Raised in Plan 12 (local-first build): Drizzle ORM + all Phase 1-4 single-phone screens took the bundle from 2.88 MB to 3.58 MB. Raise deliberately, with a reason, when a feature needs it."
 }

@@ -55,3 +55,13 @@ describe('tripState', () => {
     expect(daysUntilStart(trip, new Date('2026-11-01T06:00:00Z'))).toBe(4);
   });
 });
+
+describe('localToUtcIso', () => {
+  it('converts trip-local times to UTC', async () => {
+    const { localToUtcIso, timeZoneOffsetMinutes } = await import('./dates');
+    expect(localToUtcIso('2026-11-14', '18:30', 'Asia/Kolkata')).toBe('2026-11-14T13:00:00.000Z');
+    expect(localToUtcIso('2027-04-02', '09:00', 'Asia/Tokyo')).toBe('2027-04-02T00:00:00.000Z');
+    expect(localToUtcIso('2026-07-01', '12:00', 'Europe/London')).toBe('2026-07-01T11:00:00.000Z');
+    expect(timeZoneOffsetMinutes('Asia/Kolkata', new Date())).toBe(330);
+  });
+});

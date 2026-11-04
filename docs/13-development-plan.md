@@ -16,6 +16,8 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 | 7 | AI planner | 2–3 weeks |
 | 8 | Beta and launch | 3–4 weeks (incl. Play's 14-day test) |
 
+> **Order change (Plan 12):** the owner chose to build everything that works on one phone first and add accounts later. The single-phone parts of Phases 1–4 (on-device database, navigation, trips, itinerary with plan variants, polls, budgets and expenses with splits and settle-up, bookings with tickets, Trip mode Today/Plan/Budget) are built before sign-in. Sign-in, Supabase staging, sync, invites, maps and Nearby follow when the accounts are ready. The database is designed for sync from the start, so nothing is rebuilt.
+
 ## How each phase runs
 1. Claude opens a branch `phase-N-<name>`, works in small commits, keeps tests green.
 2. Each working session ends with a preview build (EAS) you can install, plus a short "what to try" list.

@@ -43,6 +43,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-router',
+    // Encrypted on-device database (tickets, PNRs, expenses are personal data). docs/11.
+    ['expo-sqlite', { useSQLCipher: true }],
+    'expo-secure-store',
     [
       'expo-splash-screen',
       {

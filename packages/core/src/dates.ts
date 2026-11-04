@@ -64,3 +64,38 @@ export function timeToMinutes(time: string): number {
   if (h > 23 || min > 59) throw new RangeError(`time must be HH:MM, got ${time}`);
   return h * 60 + min;
 }
+
+/** Offset of `timeZone` from UTC at instant `at`, in minutes (e.g. +330 for India). */
+export function timeZoneOffsetMinutes(timeZone: string, at: Date): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(at);
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+  const asUtc = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour'),
+    get('minute'),
+    get('second'),
+  );
+  return Math.round((asUtc - Math.floor(at.getTime() / 1000) * 1000) / 60000);
+}
+
+/** A wall-clock date and time in `timeZone` -> UTC ISO string. */
+export function localToUtcIso(date: string, time: string, timeZone: string): string {
+  if (!isLocalDate(date)) throw new RangeError('date must be YYYY-MM-DD');
+  const minutes = timeToMinutes(time);
+  const naive = Date.parse(`${date}T00:00:00Z`) + minutes * 60000;
+  let guess = naive - timeZoneOffsetMinutes(timeZone, new Date(naive)) * 60000;
+  // Second pass handles days when the offset changes (daylight saving).
+  guess = naive - timeZoneOffsetMinutes(timeZone, new Date(guess)) * 60000;
+  return new Date(guess).toISOString();
+}

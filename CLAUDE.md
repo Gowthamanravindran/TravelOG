@@ -10,6 +10,7 @@ Group trip-planning app (iOS + Android, India-first). Design and plans live in `
 | `apps/web` | Static pages for Cloudflare Pages (waitlist now; invite pages and universal-link files later) |
 | `packages/core` | Shared logic and types (money, splits; later sync, zod schemas) — pure TypeScript, Vitest |
 | `packages/ui` | Design tokens from `docs/02-design-system.md` — Vitest |
+| `packages/db` | On-device database: Drizzle schema, migrations (`drizzle/`), repositories that also fill the sync outbox — Vitest on better-sqlite3 |
 | `supabase/` | Migrations, seed (local only), pgTAP tests |
 | `docs/` | Product, design, architecture, plans. `docs/09-tech-stack.md` is the authoritative stack |
 | `mockups/` | Clickable HTML prototype and profit calculator |
@@ -21,10 +22,11 @@ pnpm lint                    # expo lint
 pnpm typecheck               # tsc in every package
 pnpm test                    # Vitest (packages) + Jest/jest-expo (mobile)
 pnpm format                  # Prettier
-pnpm --filter @travelog/mobile start          # dev server (Expo Go / dev build)
+pnpm --filter @travelog/mobile start          # dev server (development build only; Expo Go no longer works)
 pnpm --filter @travelog/mobile export:android # production bundle → apps/mobile/dist
 node scripts/check-bundle-size.mjs            # bundle budget (docs/08)
 pnpm db:start | db:reset | db:test | db:types # local Supabase (needs Docker)
+pnpm --filter @travelog/db exec drizzle-kit generate   # after editing packages/db/src/schema.ts
 ```
 In this cloud environment the Expo CLI cannot reach `api.expo.dev`; prefix Expo commands with
 `EXPO_OFFLINE=1` (e.g. `EXPO_OFFLINE=1 npx expo install <pkg>` inside `apps/mobile`).
