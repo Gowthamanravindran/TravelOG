@@ -9,6 +9,7 @@ export default function TripLayout() {
       <Stack.Screen name="booking" options={{ presentation: 'modal' }} />
       <Stack.Screen name="poll" options={{ presentation: 'modal' }} />
       <Stack.Screen name="settle" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

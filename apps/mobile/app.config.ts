@@ -50,6 +50,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-notifications',
     // Memories: pick trip photos with the system photo picker (docs/01 §6). Collages are saved
     // through the share sheet, so no gallery permission (Play restricts READ_MEDIA_*).
+    // Check-ins may add a one-off location while the app is open; never in the background.
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'TravelOG adds your location to a check-in only when you choose to.',
+        locationAlwaysAndWhenInUsePermission: false,
+        isIosBackgroundLocationEnabled: false,
+        isAndroidBackgroundLocationEnabled: false,
+        isAndroidForegroundServiceEnabled: false,
+      },
+    ],
     [
       'expo-image-picker',
       {

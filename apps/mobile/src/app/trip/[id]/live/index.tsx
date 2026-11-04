@@ -1,23 +1,26 @@
 import {
+  deleteCheckIn,
   ensureMainVariant,
   getTrip,
+  listCheckIns,
   listItems,
   listVariants,
   myMember,
   tripMoney,
   listBookings,
 } from '@travelog/db';
-import { localDateIn, localTimeIn } from '@travelog/core';
+import { durationLabel, localDateIn, localTimeIn, timeline } from '@travelog/core';
 import { type } from '@travelog/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 
-import { useMutate, useQuery } from '@/data/provider';
-import { dateTimeIn, money } from '@/lib/format';
+import { useDb, useMutate, useQuery } from '@/data/provider';
+import { checkInNow } from '@/lib/check-in';
+import { dateTimeIn, errorMessage, money } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
 import { minutesUntil, statusAt } from '@/lib/today';
-import { Between, Body, Button, Card, Empty, H2, Row, Screen, Strong } from '@/ui/kit';
+import { Between, Body, Button, Card, Empty, ErrorText, H2, Row, Screen, Strong } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
 export default function TodayTab() {
@@ -25,6 +28,9 @@ export default function TodayTab() {
   const t = useTheme();
   const router = useRouter();
   const mutate = useMutate();
+  const db = useDb();
+  const [checkingIn, setCheckingIn] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [clock, setClock] = useState(() => new Date());
   useEffect(() => {
     const timer = setInterval(() => setClock(new Date()), 60_000);
@@ -50,7 +56,34 @@ export default function TodayTab() {
     (db) => listBookings(db, id).find((b) => b.startsAt && new Date(b.startsAt) > clock),
     [id, clock.getTime()],
   );
+  const checkIns = useQuery((db) => listCheckIns(db, id, today), [id, today]);
   if (!trip) return null;
+
+  const checkedIn = new Map(checkIns.filter((c) => c.itemId).map((c) => [c.itemId, c]));
+  const day = timeline(checkIns, clock);
+  const timeOf = (iso: string) => localTimeIn(trip.timeZone, new Date(iso));
+
+  const imHere = async (itemId: string, title: string) => {
+    setCheckingIn(itemId);
+    setError(null);
+    try {
+      await checkInNow(db, mutate, { tripId: id, itemId, title });
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setCheckingIn(null);
+    }
+  };
+
+  const removeCheckIn = (checkInId: string) =>
+    Alert.alert('Remove this check-in?', undefined, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => mutate((db) => deleteCheckIn(db, checkInId)),
+      },
+    ]);
 
   const nowTime = localTimeIn(trip.timeZone, clock);
   const statuses = statusAt(items, nowTime);
@@ -103,6 +136,13 @@ export default function TodayTab() {
         </View>
         <View style={{ flex: 1 }}>
           <Button
+            label="📍 Check in"
+            variant="ghost"
+            onPress={() => router.push(`/trip/${id}/check-in`)}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
             label="🎫 Tickets"
             variant="ghost"
             onPress={() => router.push(`/trip/${id}/plan/bookings`)}
@@ -146,9 +186,59 @@ export default function TodayTab() {
                 {item.durationMin} min
               </Body>
             ) : null}
+            {checkedIn.get(item.id) ? (
+              <Body small style={{ color: t.accent }}>
+                ✓ Checked in at {timeOf(checkedIn.get(item.id)!.at)}
+              </Body>
+            ) : status !== 'done' && status !== 'later' ? (
+              <Button
+                label={checkingIn === item.id ? 'Checking in…' : "📍 I'm here"}
+                variant="ghost"
+                small
+                disabled={checkingIn !== null}
+                onPress={() => imHere(item.id, item.title)}
+              />
+            ) : null}
           </Card>
         </Row>
       ))}
+      <ErrorText>{error}</ErrorText>
+
+      {day.length ? (
+        <>
+          <H2>Today&apos;s timeline</H2>
+          {day.map(({ checkIn, minutes, ongoing }) => (
+            <Pressable
+              key={checkIn.id}
+              onLongPress={() => removeCheckIn(checkIn.id)}
+              accessibilityRole="button"
+              accessibilityHint="Long-press to remove"
+            >
+              <Row>
+                <Text style={[type.caption, { width: 44, color: t.ink2 }]}>
+                  {timeOf(checkIn.at)}
+                </Text>
+                <View style={{ flex: 1 }}>
+                  <Strong>
+                    📍 {checkIn.title}
+                    {checkIn.lat != null ? '  🛰️' : ''}
+                  </Strong>
+                  {checkIn.note ? (
+                    <Body muted small>
+                      {checkIn.note}
+                    </Body>
+                  ) : null}
+                </View>
+                {minutes != null ? (
+                  <Body muted small>
+                    {ongoing ? `here ${durationLabel(minutes)}` : durationLabel(minutes)}
+                  </Body>
+                ) : null}
+              </Row>
+            </Pressable>
+          ))}
+        </>
+      ) : null}
     </Screen>
   );
 }

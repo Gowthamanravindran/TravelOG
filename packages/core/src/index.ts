@@ -7,3 +7,4 @@ export * from './trips';
 export * from './reminders';
 export * from './fx';
 export * from './collage';
+export * from './timeline';

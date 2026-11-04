@@ -12,7 +12,7 @@
  * Dates of a trip are local calendar dates ('YYYY-MM-DD') in the trip's time zone;
  * instants (bookings, expenses) are UTC ISO strings.
  */
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 const syncColumns = {
   id: text('id').primaryKey(),
@@ -292,6 +292,29 @@ export const photos = sqliteTable(
   (t) => [index('photos_trip_idx').on(t.tripId, t.takenAt)],
 );
 
+/** "I'm here" moments during a live trip (docs/01 §7 #4: manual check-ins). Plan 13. */
+export const checkIns = sqliteTable(
+  'check_ins',
+  {
+    ...syncColumns,
+    tripId: text('trip_id').notNull(),
+    memberId: text('member_id'),
+    /** The itinerary stop checked in at, if any. */
+    itemId: text('item_id'),
+    title: text('title').notNull(),
+    /** When (UTC ISO). */
+    at: text('at').notNull(),
+    /** Local date in the trip's time zone. */
+    dayDate: text('day_date').notNull(),
+    /** One-off position, only if the person chose to add it. */
+    lat: real('lat'),
+    lng: real('lng'),
+    accuracyM: integer('accuracy_m'),
+    note: text('note'),
+  },
+  (t) => [index('check_ins_trip_day_idx').on(t.tripId, t.dayDate, t.at)],
+);
+
 /** Local changes waiting to be sent to the server once sync exists. */
 export const outbox = sqliteTable(
   'outbox',
@@ -330,6 +353,7 @@ export const syncedTables = {
   bookings,
   attachments,
   photos,
+  check_ins: checkIns,
 } as const;
 
 export type SyncedTableName = keyof typeof syncedTables;

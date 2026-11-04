@@ -41,6 +41,9 @@ import {
   listPhotos,
   deletePhoto,
   tripRecap,
+  checkIn,
+  listCheckIns,
+  deleteCheckIn,
 } from './index';
 import { outbox } from './schema';
 import { testDb } from './test-db';
@@ -481,5 +484,27 @@ describe('photos and recap', () => {
       currency: 'INR',
       photos: 1,
     });
+  });
+});
+
+describe('check-ins', () => {
+  it('records the local day in the trip time zone and an optional position', () => {
+    const t = goa();
+    const late = checkIn(db, { tripId: t.id, title: 'Baga beach', at: '2026-11-12T19:00:00Z' });
+    expect(late.dayDate).toBe('2026-11-13'); // 00:30 IST
+    const here = checkIn(db, {
+      tripId: t.id,
+      title: '  Fort Aguada ',
+      at: '2026-11-13T05:00:00Z',
+      position: { lat: 15.49, lng: 73.77, accuracyM: 12.4 },
+    });
+    expect(here).toMatchObject({ title: 'Fort Aguada', lat: 15.49, lng: 73.77, accuracyM: 12 });
+    expect(listCheckIns(db, t.id, '2026-11-13').map((c) => c.id)).toEqual([late.id, here.id]);
+    deleteCheckIn(db, late.id);
+    expect(listCheckIns(db, t.id, '2026-11-13')).toHaveLength(1);
+    expect(() => checkIn(db, { tripId: t.id, title: ' ' })).toThrow();
+    expect(() =>
+      checkIn(db, { tripId: t.id, title: 'X', position: { lat: 200, lng: 0 } }),
+    ).toThrow();
   });
 });
