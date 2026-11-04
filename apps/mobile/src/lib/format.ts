@@ -1,4 +1,4 @@
-import { formatMoney, toMinor } from '@travelog/core';
+import { formatMoney, minorDigits, toMinor } from '@travelog/core';
 
 export const CURRENCIES = [
   'INR',
@@ -28,7 +28,7 @@ export function parseAmount(text: string, currency: string): number | null {
 
 export function amountText(minor: number | null | undefined, currency: string): string {
   if (minor == null) return '';
-  const digits = currency === 'JPY' || currency === 'IDR' || currency === 'VND' ? 0 : 2;
+  const digits = minorDigits(currency);
   const v = minor / 10 ** digits;
   return Number.isInteger(v) ? String(v) : v.toFixed(digits);
 }

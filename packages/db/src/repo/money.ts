@@ -65,6 +65,8 @@ export interface ExpenseInput {
   currency: string;
   /** Amount in the trip currency when `currency` differs; defaults to amountMinor. */
   tripAmountMinor?: number;
+  /** Rate used for tripAmountMinor, e.g. "83.2"; stored for display. */
+  fxRate?: string | null;
   paidByMemberId: string;
   splitMethod: SplitMethod;
   /** Who shares the cost (and their weights for shares / percent / exact). */
@@ -96,6 +98,7 @@ export function addExpense(db: Db, input: ExpenseInput): Expense {
       amountMinor: input.amountMinor,
       currency: input.currency,
       tripAmountMinor: tripAmount,
+      fxRate: input.fxRate ?? null,
       paidByMemberId: input.paidByMemberId,
       splitMethod: input.splitMethod,
       spentAt: input.spentAt ?? now().toISOString(),

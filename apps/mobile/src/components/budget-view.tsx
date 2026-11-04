@@ -1,3 +1,4 @@
+import { formatRate } from '@travelog/core';
 import {
   BUDGET_CATEGORIES,
   getTrip,
@@ -246,8 +247,10 @@ export function BudgetView({ tripId }: { tripId: string }) {
                   </Between>
                   <Body muted small>
                     {name(e.paidByMemberId)} paid {money(e.amountMinor, e.currency)}
-                    {e.currency !== cur ? ` (${money(e.tripAmountMinor, cur)})` : ''} · split{' '}
-                    {e.splits.length} ways
+                    {e.currency !== cur
+                      ? ` (${money(e.tripAmountMinor, cur)}${e.fxRate ? ` @ ${formatRate(Number(e.fxRate))}` : ''})`
+                      : ''}{' '}
+                    · split {e.splits.length} ways
                   </Body>
                 </View>
               </View>

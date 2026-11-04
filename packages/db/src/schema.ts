@@ -185,6 +185,8 @@ export const expenses = sqliteTable(
     currency: text('currency').notNull(),
     /** Amount converted to the trip currency at the time it was added. */
     tripAmountMinor: integer('trip_amount_minor').notNull(),
+    /** Rate used for that conversion (trip currency per 1 unit paid), as typed or fetched. Plan 13. */
+    fxRate: text('fx_rate'),
     paidByMemberId: text('paid_by_member_id').notNull(),
     splitMethod: text('split_method', { enum: SPLIT_METHODS }).notNull(),
     spentAt: text('spent_at').notNull(),

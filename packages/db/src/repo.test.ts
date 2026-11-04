@@ -411,3 +411,27 @@ describe('reminders', () => {
     expect(upcomingReminders(db, new Date('2026-11-20T00:00:00Z'))).toEqual([]);
   });
 });
+
+describe('foreign-currency expenses', () => {
+  it('stores the rate used for the trip-currency amount', () => {
+    const t = goa();
+    const me_ = myMember(db, t.id)!;
+    const e = addExpense(db, {
+      tripId: t.id,
+      title: 'Taxi',
+      category: 'travel',
+      amountMinor: 1250,
+      currency: 'USD',
+      tripAmountMinor: 104000,
+      fxRate: '83.2',
+      paidByMemberId: me_.id,
+      splitMethod: 'equal',
+      participants: [{ memberId: me_.id }],
+    });
+    expect(listExpenses(db, t.id)[0]).toMatchObject({
+      id: e.id,
+      fxRate: '83.2',
+      tripAmountMinor: 104000,
+    });
+  });
+});
