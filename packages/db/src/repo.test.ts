@@ -44,7 +44,15 @@ import {
   checkIn,
   listCheckIns,
   deleteCheckIn,
+  createProject,
+  listProjects,
+  getProject,
+  saveProjectDoc,
+  duplicateProject,
+  deleteProject,
+  renameProject,
 } from './index';
+import * as schema from './schema';
 import { outbox } from './schema';
 import { testDb } from './test-db';
 
@@ -506,5 +514,40 @@ describe('check-ins', () => {
     expect(() =>
       checkIn(db, { tripId: t.id, title: 'X', position: { lat: 200, lng: 0 } }),
     ).toThrow();
+  });
+});
+
+describe('studio projects', () => {
+  it('creates a carousel filled with trip photos, saves edits, duplicates and deletes', () => {
+    const t = goa();
+    addPhotos(db, t.id, [
+      { localUri: 'file:///a.jpg', takenAt: '2026-11-12T06:00:00Z' },
+      { localUri: 'file:///b.jpg', takenAt: '2026-11-13T06:00:00Z' },
+    ]);
+    const p = createProject(db, { tripId: t.id, format: 'post', slides: 3, template: 'bridge' });
+    expect(p).toMatchObject({ title: 'Goa Monsoon Escape', slides: 3, format: 'post' });
+
+    const loaded = getProject(db, p.id)!;
+    const photoSlots = loaded.doc.layers.filter((l) => l.kind === 'photo');
+    expect(photoSlots).toHaveLength(5); // 3 slides + 2 seams
+    expect(photoSlots.filter((l) => l.kind === 'photo' && l.photoId)).toHaveLength(2);
+
+    saveProjectDoc(db, p.id, { ...loaded.doc, slides: 4 });
+    expect(getProject(db, p.id)?.project.slides).toBe(4);
+    renameProject(db, p.id, 'Goa ☀️');
+
+    setClock(() => new Date('2026-11-04T07:00:00Z'));
+    const copy = duplicateProject(db, p.id);
+    expect(listProjects(db, t.id).map((x) => x.title)).toEqual(['Goa ☀️ (copy)', 'Goa ☀️']);
+    deleteProject(db, copy.id);
+    expect(listProjects(db, t.id)).toHaveLength(1);
+    expect(() => renameProject(db, p.id, ' ')).toThrow();
+  });
+
+  it('survives a damaged stored document', () => {
+    const t = goa();
+    const p = createProject(db, { tripId: t.id, format: 'story', slides: 2, template: 'blank' });
+    db.update(schema.studioProjects).set({ doc: '{broken' }).run();
+    expect(getProject(db, p.id)?.doc).toMatchObject({ format: 'story', slides: 2, layers: [] });
   });
 });

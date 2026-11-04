@@ -10,3 +10,4 @@ export * from './repo/bookings';
 export * from './repo/reminders';
 export * from './repo/photos';
 export * from './repo/check-ins';
+export * from './repo/studio';

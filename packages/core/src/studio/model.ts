@@ -201,7 +201,11 @@ function parseLayer(v: unknown, index: number): Layer | null {
 }
 
 /** Reads a stored document (JSON string or object); never throws. */
-export function parseDoc(input: unknown, fallbackFormat: StudioFormat = 'post'): StudioDoc {
+export function parseDoc(
+  input: unknown,
+  fallbackFormat: StudioFormat = 'post',
+  fallbackSlides = 3,
+): StudioDoc {
   let raw: unknown = input;
   if (typeof input === 'string') {
     try {
@@ -210,7 +214,7 @@ export function parseDoc(input: unknown, fallbackFormat: StudioFormat = 'post'):
       raw = null;
     }
   }
-  if (!isObj(raw)) return newDoc(fallbackFormat, 3);
+  if (!isObj(raw)) return newDoc(fallbackFormat, fallbackSlides);
   const format: StudioFormat =
     raw.format === 'post' || raw.format === 'story' || raw.format === 'square'
       ? raw.format
@@ -228,7 +232,7 @@ export function parseDoc(input: unknown, fallbackFormat: StudioFormat = 'post'):
   return {
     version: STUDIO_VERSION,
     format,
-    slides: clampSlides(num(raw.slides, 3)),
+    slides: clampSlides(num(raw.slides, fallbackSlides)),
     background: parseBackground(raw.background),
     layers: parsed,
   };

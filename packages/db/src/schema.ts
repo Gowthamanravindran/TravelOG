@@ -315,6 +315,23 @@ export const checkIns = sqliteTable(
   (t) => [index('check_ins_trip_day_idx').on(t.tripId, t.dayDate, t.at)],
 );
 
+/** Studio carousel projects (Plan 15). `doc` is the JSON document from @travelog/core studio. */
+export const studioProjects = sqliteTable(
+  'studio_projects',
+  {
+    ...syncColumns,
+    tripId: text('trip_id').notNull(),
+    title: text('title').notNull(),
+    format: text('format', { enum: ['post', 'square', 'story'] }).notNull(),
+    slides: integer('slides').notNull(),
+    doc: text('doc').notNull(),
+    /** Small preview of the first slide on this device. */
+    thumbnailUri: text('thumbnail_uri'),
+    exportedAt: text('exported_at'),
+  },
+  (t) => [index('studio_projects_trip_idx').on(t.tripId, t.updatedAt)],
+);
+
 /** Local changes waiting to be sent to the server once sync exists. */
 export const outbox = sqliteTable(
   'outbox',
@@ -354,6 +371,7 @@ export const syncedTables = {
   attachments,
   photos,
   check_ins: checkIns,
+  studio_projects: studioProjects,
 } as const;
 
 export type SyncedTableName = keyof typeof syncedTables;

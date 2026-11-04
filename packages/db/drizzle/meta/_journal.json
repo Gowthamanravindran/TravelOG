@@ -29,6 +29,13 @@
       "when": 1793810139601,
       "tag": "0003_check_ins",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793819558564,
+      "tag": "0004_studio_projects",
+      "breakpoints": true
     }
   ]
 }
