@@ -50,6 +50,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-notifications',
     // Memories: pick trip photos with the system photo picker (docs/01 §6). Collages are saved
     // through the share sheet, so no gallery permission (Play restricts READ_MEDIA_*).
+    // Studio: hand slides to Instagram / Facebook / Photos (local module, Plan 15).
+    ['./modules/social-share/app.plugin.js', {}],
     // Check-ins may add a one-off location while the app is open; never in the background.
     [
       'expo-location',
@@ -94,5 +96,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Filled from EAS environment variables once the Supabase projects exist (docs/14 §4).
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? null,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? null,
+    // Meta App ID: only needed to share to Instagram Stories (docs/14 §12). Public, not a secret.
+    facebookAppId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID ?? null,
   },
 });

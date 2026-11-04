@@ -1,0 +1,27 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Lets Instagram / Facebook read the exported slides (content:// links to our files). -->
+    <provider
+      android:name=".SocialShareFileProvider"
+      android:authorities="${applicationId}.SocialShareFileProvider"
+      android:exported="false"
+      android:grantUriPermissions="true">
+      <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/social_share_paths" />
+    </provider>
+  </application>
+
+  <!-- Android 11+ package visibility: check whether these apps are installed. -->
+  <queries>
+    <package android:name="com.instagram.android" />
+    <package android:name="com.facebook.katana" />
+    <intent>
+      <action android:name="android.intent.action.SEND" />
+      <data android:mimeType="image/*" />
+    </intent>
+    <intent>
+      <action android:name="com.instagram.share.ADD_TO_STORY" />
+    </intent>
+  </queries>
+</manifest>

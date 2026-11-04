@@ -1,43 +1,166 @@
 import type { StudioFormat } from '@travelog/core';
 import { type } from '@travelog/ui';
-import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Platform, Text, View } from 'react-native';
 
 import { errorMessage } from '@/lib/format';
-import { shareImage } from '@/lib/photos';
+import {
+  postStory,
+  postToFacebook,
+  postToInstagram,
+  saveAll,
+  shareAll,
+  shareTargets,
+  type PostResult,
+  type ShareTargets,
+} from '@/lib/social-share';
 import { Button, ErrorText } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
-/**
- * Where exported slides go. Replaced with Instagram / Facebook hand-off in the
- * next step; for now each slide can be shared on its own.
- */
+/** Where exported slides go: Instagram, Facebook, the gallery or any app (Plan 15). */
 export function ShareActions({
   files,
   current,
+  format,
 }: {
   files: string[];
   current: number;
   format: StudioFormat;
 }) {
   const t = useTheme();
+  const [targets, setTargets] = useState<ShareTargets | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const run = async (fn: () => Promise<void>) => {
+
+  useEffect(() => {
+    let live = true;
+    shareTargets()
+      .then((x) => live && setTargets(x))
+      .catch(
+        () =>
+          live && setTargets({ native: false, instagram: false, facebook: false, story: false }),
+      );
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const n = files.length;
+  const run = async (
+    key: string,
+    fn: () => Promise<PostResult>,
+    done: (r: PostResult) => string | null,
+  ) => {
+    setBusy(key);
     setError(null);
+    setMessage(null);
     try {
-      await fn();
+      setMessage(done(await fn()));
     } catch (e) {
       setError(errorMessage(e));
+    } finally {
+      setBusy(null);
     }
   };
-  const file = files[current] ?? files[0];
+  const label = (key: string, text: string) => (busy === key ? 'Opening…' : text);
+  const storyFile = files[current] ?? files[0];
+
   return (
     <View style={{ gap: 10 }}>
-      <Text style={[type.headline, { color: t.ink }]}>✓ {files.length} slides ready</Text>
+      <Text style={[type.headline, { color: t.ink }]}>
+        ✓ {n} {n === 1 ? 'slide' : 'slides'} ready
+      </Text>
+
+      {targets && !targets.native ? (
+        <Text style={[type.caption, { color: t.ink2 }]}>
+          Install the latest TravelOG build to post straight to Instagram and Facebook. Until then,
+          share each slide below.
+        </Text>
+      ) : null}
+
       <Button
-        label={`Share slide ${current + 1}`}
-        onPress={() => run(() => (file ? shareImage(file) : Promise.resolve()))}
+        label={label('ig', '📷 Post to Instagram')}
+        disabled={!!busy || (targets?.native === true && !targets.instagram)}
+        onPress={() =>
+          run(
+            'ig',
+            () => postToInstagram(files),
+            (r) =>
+              r === 'saved-and-opened'
+                ? `Slides saved to Photos in order. In Instagram, tap the stack icon and pick slides 1 to ${n}.`
+                : r === 'saved'
+                  ? `Slides saved to Photos in order. Open Instagram, start a post and pick slides 1 to ${n}.`
+                  : null,
+          )
+        }
       />
+      {targets?.native && !targets.instagram ? (
+        <Text style={[type.caption, { color: t.ink2 }]}>
+          Instagram isn&apos;t installed on this phone.
+        </Text>
+      ) : null}
+
+      {targets?.story ? (
+        <Button
+          label={label('story', `Instagram Story · slide ${current + 1}`)}
+          variant="ghost"
+          disabled={!!busy || !storyFile}
+          onPress={() =>
+            run(
+              'story',
+              () => postStory(storyFile!),
+              () => null,
+            )
+          }
+        />
+      ) : null}
+      {format !== 'story' && targets?.story ? (
+        <Text style={[type.caption, { color: t.ink2 }]}>
+          Stories are 9:16; a {format === 'post' ? '4:5' : 'square'} slide shows with a background.
+        </Text>
+      ) : null}
+
+      <Button
+        label={label('fb', 'Share to Facebook')}
+        variant="ghost"
+        disabled={
+          !!busy || (targets?.native === true && Platform.OS === 'android' && !targets.facebook)
+        }
+        onPress={() =>
+          run(
+            'fb',
+            () => postToFacebook(files),
+            () => null,
+          )
+        }
+      />
+      <Button
+        label={label('save', '⬇ Save all to gallery')}
+        variant="ghost"
+        disabled={!!busy}
+        onPress={() =>
+          run(
+            'save',
+            () => saveAll(files),
+            (r) => (r === 'saved' ? `Saved ${n} slides to your gallery, in order.` : null),
+          )
+        }
+      />
+      <Button
+        label={label('more', 'More apps…')}
+        variant="ghost"
+        disabled={!!busy}
+        onPress={() =>
+          run(
+            'more',
+            () => shareAll(files),
+            () => null,
+          )
+        }
+      />
+
+      {message ? <Text style={[type.body, { color: t.ink }]}>{message}</Text> : null}
       <ErrorText>{error}</ErrorText>
     </View>
   );

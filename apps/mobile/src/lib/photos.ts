@@ -2,7 +2,6 @@ import { localToUtcIso } from '@travelog/core';
 import type { PhotoInput } from '@travelog/db';
 import { Directory, File, Paths } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import * as Sharing from 'expo-sharing';
 
 /**
  * Trip photos live in the app's own folder, so the pool keeps working if the
@@ -67,10 +66,4 @@ export function deletePhotoFile(localUri: string | null): void {
   } catch {
     // Already gone.
   }
-}
-
-/** Opens the share sheet with an exported collage: Instagram, WhatsApp, or "Save image". */
-export async function shareImage(uri: string): Promise<void> {
-  if (!(await Sharing.isAvailableAsync())) throw new Error('sharing is not available here');
-  await Sharing.shareAsync(uri, { mimeType: 'image/jpeg', dialogTitle: 'Share your trip' });
 }

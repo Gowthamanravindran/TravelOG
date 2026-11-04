@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["SocialShareModule"]
+  },
+  "android": {
+    "modules": ["app.travelog.socialshare.SocialShareModule"]
+  }
+}
