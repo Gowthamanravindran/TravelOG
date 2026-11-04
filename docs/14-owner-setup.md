@@ -59,9 +59,18 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 4. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret** → Name `EXPO_TOKEN`, Secret = the token → **Add secret**. Tell Claude it's added; never paste the token in chat.
 
 **Get the app on your Android phone:**
-5. GitHub → **Actions → "EAS build (Android development)" → Run workflow** (profile `development`). The GitHub job finishes in about a minute because it only *starts* the build; the build itself runs on Expo's servers (~10–20 min). **Where's the link?** Open the finished run in GitHub: the build link is at the top of the run page (summary) and in the annotations. You can also go to expo.dev → TravelOGApp → travelog → **Builds**.
+5. GitHub → **Actions → "EAS build (Android development)" → Run workflow** → branch `claude/kind-allen-2woote` (or `main` once merged) → profile **`preview`** to try the app (changed in Plan 14; see step 7 for `development`). The GitHub job finishes in about a minute because it only *starts* the build; the build itself runs on Expo's servers (~10–20 min). **Where's the link?** Open the finished run in GitHub: the build link is at the top of the run page (summary) and in the annotations. You can also go to expo.dev → TravelOGApp → travelog → **Builds**.
 6. Open the link on your Android phone → wait for **Finished** → tap **Install** / **Download build** → allow your browser to "install unknown apps" → install **TravelOG**. It's its own app; don't open it through Expo Go.
-7. On your computer (same Wi-Fi): `pnpm install`, then `pnpm --filter @travelog/mobile start --dev-client`, then open TravelOG on the phone. (Later Claude sets up EAS Update so preview builds load without your computer.)
+7. That's it for a **preview** build: the app code is inside the APK, so it works on its own, offline, with no computer. Each new change from Claude needs a new preview build (run step 5 again; ~15 min in the queue plus the build) until EAS Update is set up.
+   *Only for live-editing:* a **development** build has no app code inside; it loads it from a dev server on your computer. On a computer with Node 22 and pnpm 10, on the same Wi-Fi as the phone, run inside a copy of the repo:
+   ```bash
+   git clone https://github.com/Gowthamanravindran/TravelOG.git
+   cd TravelOG
+   git checkout claude/kind-allen-2woote
+   pnpm install
+   pnpm --filter @travelog/mobile start --dev-client
+   ```
+   then open the development build of TravelOG on the phone.
 8. iPhone: needs the Apple Developer account (§6) first, then `eas device:create` to register your iPhone.
 
 ## §6 Apple Developer Program — Phase 1 · $99/yr (individual)

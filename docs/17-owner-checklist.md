@@ -29,7 +29,7 @@ Tick items here as you go (edit this file, or ask Claude to tick them).
 - [ ] §5 Run **Actions → "EAS build (Android development)"** and install the `.apk` on your phone ([14](14-owner-setup.md) §5 steps 5–7).
 - [ ] Don't run `npx create-expo-app` yourself — the app already exists in `apps/mobile`. To try it: install the free **Expo Go** app, then on your computer run `pnpm install` and `pnpm --filter @travelog/mobile start` and scan the QR code.
 - [ ] On your computer (for local runs, optional but useful): install Node.js LTS, pnpm, Docker Desktop.
-- [ ] Install the development build on your Android phone (and iPhone after step C).
+- [ ] Install a **preview** build on your Android phone to test (no computer needed; Plan 14), and on iPhone after step C. Development builds only if you want live editing from a computer (doc 14 §5 step 7).
 - [ ] Post on Instagram/LinkedIn/X that you're building TravelOG; share the waitlist page once Claude publishes it.
 - [ ] **Approve Phase 0**: CI green, dev build opens on your phone.
 
