@@ -3,11 +3,11 @@
 **Status:** Built in seven commits on `claude/kind-allen-2woote`: M1 `3623b7b`, M2 `fd6011c`, M3 `e871dec`, M4 `c0236f3`, M5 `c0758ba`, M6 `3cace55`, and M7 (the commit that adds this file).
 
 ### Context
-The owner wants an in-trip collage maker like **SCRL**: photos placed freely across a wide canvas that is cut into carousel slides, so the post scrolls seamlessly on Instagram. It should live as its own section inside each trip and post to Instagram and Facebook. Plan 13 already built a basic version (photo pool + one-page collage templates, opened from 📸 in the trip header). This plan replaces that with a full editor.
+The owner wants an in-trip carousel collage maker (an existing seamless-carousel app was shared as a reference only): photos placed freely across a wide canvas that is cut into carousel slides, so the post scrolls seamlessly on Instagram. It should live as its own section inside each trip and post to Instagram and Facebook. Plan 13 already built a basic version (photo pool + one-page collage templates, opened from 📸 in the trip header). This plan replaces that with a full editor.
 
 **Decisions (asked):**
 - **Placement:** a **Memories** tab in both Plan mode and Trip mode, holding the photo pool, the Studio and saved projects. The 📸 header button goes away.
-- **Posting:** hand the slides off to the Instagram / Facebook apps, as SCRL does. Personal accounts can't be posted for: Meta's publishing API covers only Business/Creator accounts, after app review.
+- **Posting:** hand the slides off to the Instagram / Facebook apps, the usual approach for apps of this kind. Personal accounts can't be posted for: Meta's publishing API covers only Business/Creator accounts, after app review.
 - **Pricing:** everything free for now, with a small "Made with TravelOG" mark on the last slide. Premium templates and HD export are noted as Plus candidates for when payments exist.
 
 ### What the person gets

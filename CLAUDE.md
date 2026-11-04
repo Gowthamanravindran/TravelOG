@@ -41,5 +41,7 @@ In this cloud environment the Expo CLI cannot reach `api.expo.dev`; prefix Expo 
   Secret stores: GitHub Actions, EAS environment variables, Supabase function secrets (`docs/14`).
 - **Placeholders** to change once the owner decides: bundle id `app.travelog.mobile`, scheme `travelog`,
   domain `travelog.app` — all in `apps/mobile/app.config.ts`.
+- **Reference apps:** never name other apps or products the owner shares as inspiration in docs, code, comments
+  or commit messages; describe the feature itself, and if needed say "a reference app (reference only)".
 - **Plan log:** any change of plan gets a new numbered file in `docs/plans/`; earlier plans are never edited.
 - Before finishing work: `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`.
