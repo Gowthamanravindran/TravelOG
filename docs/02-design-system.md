@@ -56,7 +56,7 @@ Category colours (budget, map pins): Stay `#5B5BD6`, Travel `#14B8A6`, Food `#FF
 
 | Component | Notes |
 |---|---|
-| **ModeNavBar** | 4 items (Home has centre FAB). Active item = accent pill behind icon + label |
+| **ModeNavBar** | Floating, detached rounded bar (Plan 18) in the mode's surface colour with a soft shadow; active item = accent icon and label on a soft accent pill; Home has a raised round New trip button above the bar |
 | **TripCard** | Cover gradient/photo, emoji, title, dates, avatar stack, status chip |
 | **DayChips** | Horizontal scroll, selected = accent fill |
 | **TimelineItem** | Time column · category dot + line · card (title, meta, cost). States: upcoming / now (accent glow) / done (muted) |

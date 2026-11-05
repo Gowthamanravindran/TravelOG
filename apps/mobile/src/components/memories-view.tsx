@@ -17,7 +17,7 @@ import { Alert, Image, Pressable, useWindowDimensions, View } from 'react-native
 import { useMutate, useQuery } from '@/data/provider';
 import { errorMessage, shortDate } from '@/lib/format';
 import { deletePhotoFile, pickPhotos } from '@/lib/photos';
-import { Body, Button, Card, Empty, ErrorText, H2, Strong } from '@/ui/kit';
+import { Body, Button, Card, Empty, ErrorText, H2, IconTile, Row, Strong } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
 const FORMAT_LABEL = { post: '4:5', square: '1:1', story: '9:16' } as const;
@@ -99,27 +99,41 @@ export function MemoriesView({ tripId }: { tripId: string }) {
 
   return (
     <>
-      {state === 'completed' || state === 'archived' ? (
-        <Card>
-          <Strong>Your {trip.destination || trip.title} trip is done</Strong>
-          <Body muted small>
-            Make a carousel that scrolls across slides and post it to Instagram or Facebook.
-          </Body>
-        </Card>
-      ) : null}
+      <Card>
+        <Row style={{ gap: 12 }}>
+          <IconTile icon="memories" size={44} />
+          <View style={{ flex: 1 }}>
+            <Strong>
+              {state === 'completed' || state === 'archived'
+                ? `Your ${trip.destination || trip.title} trip is done`
+                : `${photos.length} ${photos.length === 1 ? 'photo' : 'photos'} · ${projects.length} ${projects.length === 1 ? 'carousel' : 'carousels'}`}
+            </Strong>
+            <Body muted small>
+              Add your photos, then make a carousel that scrolls across slides on Instagram.
+            </Body>
+          </View>
+        </Row>
+        <Row>
+          <View style={{ flex: 1 }}>
+            <Button
+              label={busy ? 'Adding…' : 'Add photos'}
+              icon="addPhoto"
+              onPress={add}
+              disabled={busy}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button
+              label="New carousel"
+              icon="add"
+              variant="ghost"
+              onPress={() => router.push(`/trip/${tripId}/studio/new`)}
+            />
+          </View>
+        </Row>
+      </Card>
 
-      <H2
-        right={
-          <Button
-            label="New carousel"
-            icon="add"
-            small
-            onPress={() => router.push(`/trip/${tripId}/studio/new`)}
-          />
-        }
-      >
-        Carousels
-      </H2>
+      <H2>Carousels</H2>
       {projects.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {projects.map((p) => {
@@ -164,20 +178,7 @@ export function MemoriesView({ tripId }: { tripId: string }) {
         </Body>
       )}
 
-      <H2
-        right={
-          <Button
-            label={busy ? 'Adding…' : 'Add photos'}
-            icon="addPhoto"
-            variant="ghost"
-            small
-            onPress={add}
-            disabled={busy}
-          />
-        }
-      >
-        Photos
-      </H2>
+      <H2>Photos</H2>
       <ErrorText>{error}</ErrorText>
       {!photos.length ? (
         <Empty

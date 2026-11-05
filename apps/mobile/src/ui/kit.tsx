@@ -367,6 +367,60 @@ export function Bar({ value, color }: { value: number; color?: string }) {
   );
 }
 
+/** A rounded square holding an icon, used at the start of list rows and cards. */
+export function IconTile({
+  icon,
+  size = 40,
+  tint,
+}: {
+  icon: IconName;
+  size?: number;
+  /** Icon colour; the tile uses the mode's soft accent behind it. */
+  tint?: string;
+}) {
+  const t = useTheme();
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size * 0.32,
+        backgroundColor: t.accentSoft,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Icon name={icon} size={size * 0.52} color={tint ?? t.accent} />
+    </View>
+  );
+}
+
+/** A section title with an optional primary action on the right. */
+export function Section({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: { label: string; icon?: IconName; onPress: () => void };
+  children?: ReactNode;
+}) {
+  return (
+    <View style={{ gap: 10 }}>
+      <H2
+        right={
+          action ? (
+            <Button label={action.label} icon={action.icon} small onPress={action.onPress} />
+          ) : null
+        }
+      >
+        {title}
+      </H2>
+      {children}
+    </View>
+  );
+}
+
 /** An icon followed by text on one line (titles of items, bookings, expenses). */
 export function WithIcon({
   icon,

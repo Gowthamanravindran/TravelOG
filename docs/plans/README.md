@@ -21,3 +21,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 15 | [Memories tab + Studio: seamless carousel maker, Instagram / Facebook hand-off](15-studio.md) | see git log |
 | 16 | [Fixes from the phone test: icons, film error, trip setup, Instagram hand-off](16-phone-test-fixes.md) | see git log |
 | 17 | [`pnpm dev` installs new packages before starting](17-dev-script.md) | see git log |
+| 18 | [Blank tabs fix, floating bar, calendar dates, trip header and screens](18-tabs-nav-dates-redesign.md) | see git log |

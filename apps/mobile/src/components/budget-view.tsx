@@ -28,11 +28,12 @@ import {
   ErrorText,
   Field,
   H2,
+  IconTile,
   Row,
   Strong,
   WithIcon,
 } from '@/ui/kit';
-import { useTheme } from '@/ui/theme';
+import { useMode, useTheme } from '@/ui/theme';
 
 import { PeopleCard } from './people-card';
 
@@ -45,6 +46,7 @@ export function BudgetView({
   startEditing?: boolean;
 }) {
   const t = useTheme();
+  const mode = useMode();
   const router = useRouter();
   const mutate = useMutate();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
@@ -89,12 +91,16 @@ export function BudgetView({
 
   return (
     <View style={{ gap: 16 }}>
-      <PeopleCard tripId={tripId} />
       <Card>
-        <Body muted small>
-          Group spent
-        </Body>
-        <Strong style={{ fontSize: 28 }}>{money(m.spentMinor, cur)}</Strong>
+        <Row style={{ gap: 12 }}>
+          <IconTile icon="budget" size={44} />
+          <View style={{ flex: 1 }}>
+            <Body muted small>
+              Group spent
+            </Body>
+            <Strong style={{ fontSize: 28 }}>{money(m.spentMinor, cur)}</Strong>
+          </View>
+        </Row>
         {groupBudget > 0 ? (
           <>
             <Bar value={m.spentMinor / groupBudget} />
@@ -103,14 +109,11 @@ export function BudgetView({
               {members.length})
             </Body>
           </>
-        ) : !editing ? (
-          <View style={{ gap: 8 }}>
-            <Body muted small>
-              No budget set yet.
-            </Body>
-            <Button label="Set budget" icon="budget" small onPress={startEdit} />
-          </View>
-        ) : null}
+        ) : (
+          <Body muted small>
+            No budget set yet.
+          </Body>
+        )}
         {me ? (
           <Body
             style={{
@@ -125,17 +128,32 @@ export function BudgetView({
                 : 'You are all square'}
           </Body>
         ) : null}
+        <Row>
+          <View style={{ flex: 1 }}>
+            <Button
+              label="Add expense"
+              icon="add"
+              onPress={() =>
+                router.push(`/trip/${tripId}/expense${mode === 'trip' ? '?mode=trip' : ''}`)
+              }
+            />
+          </View>
+          {!editing ? (
+            <View style={{ flex: 1 }}>
+              <Button
+                label={groupBudget > 0 ? 'Edit budget' : 'Set budget'}
+                icon="budget"
+                variant="ghost"
+                onPress={startEdit}
+              />
+            </View>
+          ) : null}
+        </Row>
       </Card>
 
-      <H2
-        right={
-          !editing ? (
-            <Button label="Edit budget" icon="edit" variant="link" onPress={startEdit} />
-          ) : null
-        }
-      >
-        By category
-      </H2>
+      <PeopleCard tripId={tripId} />
+
+      <H2>By category</H2>
       {editing ? (
         <Card>
           <Body muted small>
