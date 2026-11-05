@@ -30,3 +30,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 24 | [Layouts always visible while editing; smoother gestures](24-layouts-visible.md) | see git log |
 | 25 | [Crash fix: item returning to straight (transform null)](25-transform-crash.md) | see git log |
 | 26 | [App redesign: Sunset and Colour block themes](26-app-redesign.md) | see git log |
+| 27 | [Exported collage photos came out half see-through (Android fade-in)](27-export-fade.md) | see git log |

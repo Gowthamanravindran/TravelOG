@@ -94,6 +94,9 @@ export function LayerView({
             {photo?.uri ? (
               <Image
                 source={{ uri: photo.uri }}
+                // Android fades file photos in over 300 ms after loading; an export
+                // captured mid-fade saved them half see-through (Plan 27).
+                fadeDuration={0}
                 onLoadEnd={onImageLoad}
                 style={{
                   position: 'absolute',
