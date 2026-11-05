@@ -204,6 +204,36 @@ describe('editing a collage', () => {
     expect(saved.background).toMatchObject({ kind: 'gradient', from: '#0EA5E9' });
   });
 
+  it('rotating back to straight keeps every transform an array (Plan 25 crash)', async () => {
+    const { db, project } = await open();
+    const transforms = () => {
+      const bad: unknown[] = [];
+      const walk = (node: unknown) => {
+        if (!node || typeof node !== 'object') return;
+        const n = node as { props?: { style?: unknown }; children?: unknown[] };
+        const flat = [n.props?.style].flat(Infinity) as Record<string, unknown>[];
+        for (const st of flat)
+          if (st && typeof st === 'object' && 'transform' in st && !Array.isArray(st.transform))
+            bad.push(st.transform);
+        n.children?.forEach(walk);
+      };
+      walk(screen.toJSON());
+      return bad;
+    };
+    await press('Photo');
+    await press('Rotate right');
+    await press('Rotate left'); // back to exactly 0°
+    expect(transforms()).toEqual([]);
+    await press('Rotate right');
+    await press('Straighten');
+    expect(transforms()).toEqual([]);
+    await press('Undo');
+    await press('Undo');
+    expect(transforms()).toEqual([]);
+    await close();
+    expect(doc(db, project.id).layers.every((l) => Number.isFinite(l.rotation))).toBe(true);
+  });
+
   it('layouts stay visible while a photo is selected or cropped, and apply from there', async () => {
     const { db, project } = await open();
     const layout = (name: string) => screen.getByRole('radio', { name: `Layout ${name}` });

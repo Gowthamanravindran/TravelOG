@@ -1,6 +1,7 @@
 import { photoPlacement, type Layer, type StudioFont } from '@travelog/core';
 import { Image, Platform, StyleSheet, Text, View, type TextStyle } from 'react-native';
 import { Icon, isIconName } from '@/ui/icon';
+import { rotationStyle } from './rotation';
 
 /** What the canvas needs to know about a trip photo. */
 export interface PhotoInfo {
@@ -53,7 +54,7 @@ export function LayerView({
     top: layer.y * scale,
     width: layer.w * scale,
     height: layer.h * scale,
-    transform: layer.rotation ? [{ rotate: `${layer.rotation}deg` }] : undefined,
+    transform: rotationStyle(layer.rotation),
   };
 
   switch (layer.kind) {

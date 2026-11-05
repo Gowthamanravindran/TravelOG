@@ -28,3 +28,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 22 | [Select photos, then make a collage](22-select-to-collage.md) | see git log |
 | 23 | [Edit collages directly: handles, frames, background, text](23-collage-editing.md) | see git log |
 | 24 | [Layouts always visible while editing; smoother gestures](24-layouts-visible.md) | see git log |
+| 25 | [Crash fix: item returning to straight (transform null)](25-transform-crash.md) | see git log |

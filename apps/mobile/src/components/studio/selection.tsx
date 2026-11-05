@@ -16,6 +16,8 @@ import {
   type PanResponderGestureState,
 } from 'react-native';
 
+import { rotationStyle } from './rotation';
+
 type Guides = { vertical: number[]; horizontal: number[] };
 const NO_GUIDES: Guides = { vertical: [], horizontal: [] };
 
@@ -71,7 +73,7 @@ export function Selection(props: Props) {
         top: layer.y * scale - PAD,
         width: w + 2 * PAD,
         height: h + 2 * PAD,
-        transform: layer.rotation ? [{ rotate: `${layer.rotation}deg` }] : undefined,
+        transform: rotationStyle(layer.rotation),
       }}
     >
       <View

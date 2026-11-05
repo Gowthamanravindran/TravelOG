@@ -4,6 +4,7 @@ import type { ComponentRef, ReactNode, Ref } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LayerView, type PhotoInfo, type StatItem } from './layer-view';
+import { rotationStyle } from './rotation';
 
 export type CanvasRef = ComponentRef<typeof View>;
 
@@ -113,7 +114,7 @@ export function StudioCanvas({
                 top: layer.y * scale,
                 width: layer.w * scale,
                 height: layer.h * scale,
-                transform: layer.rotation ? [{ rotate: `${layer.rotation}deg` }] : undefined,
+                transform: rotationStyle(layer.rotation),
               }}
             />
           </View>
