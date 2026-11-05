@@ -52,19 +52,19 @@ export default function TripsScreen() {
       {live ? (
         <Card
           onPress={() => open(live)}
-          style={{ backgroundColor: '#0F1020', borderColor: '#0F1020' }}
+          style={{ backgroundColor: t.accent, borderColor: t.accent }}
         >
-          <Body small style={{ color: '#5EEAD4' }}>
+          <Body small style={{ color: t.onAccent }}>
             LIVE NOW
             {(() => {
               const d = tripDayNumber(live);
               return d ? ` · Day ${d.day} of ${d.of}` : '';
             })()}
           </Body>
-          <WithIcon icon={tripIcon(live.emoji)} color="#A9D9D2" size={22}>
-            <Strong style={{ color: '#F4F3FA', fontSize: 20 }}>{live.title}</Strong>
+          <WithIcon icon={tripIcon(live.emoji)} color={t.onAccent} size={22}>
+            <Strong style={{ color: t.onAccent, fontSize: 20 }}>{live.title}</Strong>
           </WithIcon>
-          <Body small style={{ color: '#A9D9D2' }}>
+          <Body small style={{ color: t.onAccent }}>
             Open trip mode →
           </Body>
         </Card>

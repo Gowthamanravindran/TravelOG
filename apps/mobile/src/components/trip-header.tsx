@@ -154,11 +154,7 @@ export function TripHeader() {
               justifyContent: 'center',
             }}
           >
-            <Icon
-              name={icon}
-              size={32}
-              color={tile.fg === '#FFFFFF' && t.band ? tile.bg : tile.fg}
-            />
+            <Icon name={icon} size={32} color={tile.fg} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={[type.display, { color: t.ink }]} numberOfLines={1}>

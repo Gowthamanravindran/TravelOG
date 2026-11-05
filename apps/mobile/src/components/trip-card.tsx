@@ -1,5 +1,5 @@
 import type { TripWithState } from '@travelog/db';
-import { radius, spacing, type } from '@travelog/ui';
+import { radius, spacing, type, type TileFamily } from '@travelog/ui';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { dateRange } from '@/lib/format';
@@ -16,25 +16,26 @@ const STATE_LABELS = {
   archived: 'Archived',
 } as const;
 
-const COVERS = {
-  planning: ['#5B5BD6', '#A78BFA'],
-  upcoming: ['#FF6B5B', '#FFB020'],
-  live: ['#14B8A6', '#0EA5E9'],
-  completed: ['#16A34A', '#14B8A6'],
-  archived: ['#8A8AA3', '#5E5C78'],
-} as const;
+/** Cover colour by trip state, from the theme's tile families (Plan 26). */
+const COVERS: Record<TripWithState['state'], TileFamily> = {
+  planning: 'sea',
+  upcoming: 'clay',
+  live: 'leaf',
+  completed: 'mango',
+  archived: 'rose',
+};
 
 export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () => void }) {
   const t = useTheme();
-  const [a] = COVERS[trip.state];
+  const cover = t.tiles[COVERS[trip.state]];
   return (
     <Card
       onPress={onPress}
       style={styles.card}
       accessibilityLabel={`${trip.title}, ${STATE_LABELS[trip.state]}`}
     >
-      <View style={[styles.cover, { backgroundColor: a }]}>
-        <Icon name={tripIcon(trip.emoji)} size={34} color="#FFFFFF" />
+      <View style={[styles.cover, { backgroundColor: cover.bg }]}>
+        <Icon name={tripIcon(trip.emoji)} size={34} color={cover.fg} />
         <View style={[styles.badge, { backgroundColor: t.surface }]}>
           <Text style={[type.caption, { color: t.ink }]}>{STATE_LABELS[trip.state]}</Text>
         </View>

@@ -267,9 +267,10 @@ export function MemoriesView({ tripId }: { tripId: string }) {
                               borderRadius: 12,
                               alignItems: 'center',
                               justifyContent: 'center',
-                              backgroundColor: on ? t.accent : '#00000044',
+                              backgroundColor: on ? t.accent : 'rgba(0,0,0,0.27)',
                               borderWidth: 2,
-                              borderColor: '#FFFFFF',
+                              // A white ring reads on any photo, whatever the theme.
+                              borderColor: 'rgba(255,255,255,1)',
                             }}
                           >
                             {on ? (

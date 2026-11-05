@@ -57,3 +57,24 @@ it('no ghost buttons (one outlined secondary style, Plan 26)', () => {
   );
   expect(offenders.map((f) => path.basename(f))).toEqual([]);
 });
+
+it('no hex colours in app chrome (colours come from the theme, Plan 26)', () => {
+  // Collage content and the icon map keep their own colours; appearance-card shows theme specimens.
+  const allowed = [
+    `${path.sep}components${path.sep}studio${path.sep}`,
+    `${path.sep}studio${path.sep}`,
+    `${path.sep}ui${path.sep}icon.tsx`,
+    `${path.sep}components${path.sep}appearance-card.tsx`,
+  ];
+  const offenders = files(path.join(__dirname, '..'))
+    .filter((f) => !allowed.some((a) => f.includes(a)))
+    .flatMap((f) =>
+      fs
+        .readFileSync(f, 'utf8')
+        .split('\n')
+        .map((line, i) => ({ line, at: `${path.basename(f)}:${i + 1}` }))
+        .filter(({ line }) => /#[0-9A-Fa-f]{6}\b/.test(line))
+        .map(({ at }) => at),
+    );
+  expect(offenders).toEqual([]);
+});

@@ -120,8 +120,8 @@ export default function TodayTab() {
               </Text>
             ) : null}
           </Between>
-          <WithIcon icon={ITEM_LABELS[focus.item.type].icon} color="#FFFFFF" size={26}>
-            <Text style={[type.display, { color: '#FFFFFF' }]}>{focus.item.title}</Text>
+          <WithIcon icon={ITEM_LABELS[focus.item.type].icon} color={t.onAccent} size={26}>
+            <Text style={[type.display, { color: t.onAccent }]}>{focus.item.title}</Text>
           </WithIcon>
           {focus.item.notes ? (
             <Text style={[type.body, { color: t.onAccent }]}>{focus.item.notes}</Text>
