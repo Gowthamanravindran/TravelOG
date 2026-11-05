@@ -4,6 +4,21 @@
 
 See it live in [`/mockups/index.html`](../mockups/index.html).
 
+> **Plan 26 (current app look).** The phone app now uses two switchable themes, **Sunset** and **Colour block**, chosen in Profile → Appearance with Light / Dark / Match phone. Trip mode follows that switch; the collage editor stays dark. Sections 1–4 below describe the earlier design and are **superseded by Plan 26** for colours, type and shape; the rest still applies.
+>
+> - **Colours:** only from `themeFor(theme, mode, scheme)` / `useTheme()` in `packages/ui`. Every value is in the spec, [`superpowers/specs/2026-11-05-app-redesign-design.md`](superpowers/specs/2026-11-05-app-redesign-design.md) §3.
+> - **Rules, enforced by tests:**
+>   - no violet: OKLCH hue 270–330° (`packages/ui/src/themes.test.ts`);
+>   - every text pair at least 4.5:1 (same test);
+>   - no hex colours or `fontWeight` in app chrome (`apps/mobile/src/__tests__/style-guard.test.ts`).
+> - **Type:** Plus Jakarta Sans 700/800 for headings and Figtree 400/500/600 for text, loaded with `expo-font`. Each weight is its own family (`font(role, weight)`).
+> - **System:**
+>   - one filled pill button for the main action, one outlined secondary;
+>   - flat cards (radius 16, hairline, no shadow);
+>   - chips select with the mode tint;
+>   - icon tiles coloured by type (sea, clay, mango, leaf, rose);
+>   - a quiet press shrink, off with reduce motion.
+
 ## 1. Mode theming
 
 Each mode re-themes the app through a single token: `--accent`.

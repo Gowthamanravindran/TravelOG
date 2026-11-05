@@ -1,6 +1,6 @@
 # Plan 26 — App redesign: Sunset and Colour block themes
 
-**Status:** 📝 Spec written, waiting for owner review
+**Status:** ✅ Built
 
 ## Context
 The owner asked for a redesign of the phone app on the principles of the design-taste-frontend skill: a new look with the same screens and navigation.
@@ -22,5 +22,14 @@ The owner chose **Sunset** and **Colour block**, switchable in settings, plus a 
 ## Spec
 [`docs/superpowers/specs/2026-11-05-app-redesign-design.md`](../superpowers/specs/2026-11-05-app-redesign-design.md)
 
-## Next
-Owner reviews the spec, then an implementation plan is written. No app code has changed yet.
+## Built
+Implementation plan: [`docs/superpowers/plans/2026-11-05-app-redesign.md`](../superpowers/plans/2026-11-05-app-redesign.md), built in seven tested commits:
+1. Theme data with a contrast and violet test.
+2. Fonts, loaded.
+3. The appearance setting, with the collage editor kept dark.
+4. Kit components, tab bar, tiles and header band.
+5. Colours taken from the theme only.
+6. Profile → Appearance.
+7. Docs.
+
+Owner: `git pull && pnpm dev:go`, then try both themes × Light / Dark / Match phone. No new build is needed.

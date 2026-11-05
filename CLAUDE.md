@@ -47,5 +47,6 @@ In this cloud environment the Expo CLI cannot reach `api.expo.dev`; prefix Expo 
   domain `travelog.app` — all in `apps/mobile/app.config.ts`.
 - **Reference apps:** never name other apps or products the owner shares as inspiration in docs, code, comments
   or commit messages; describe the feature itself, and if needed say "a reference app (reference only)".
+- **Design:** colours only from `themeFor` / `useTheme()` (`packages/ui`). No violet (OKLCH hue 270–330°). Every text pair at least 4.5:1, enforced by the `packages/ui` theme test. No hex colours or `fontWeight` in app chrome (style guard). Fonts come from `font(role, weight)`.
 - **Plan log:** any change of plan gets a new numbered file in `docs/plans/`; earlier plans are never edited.
 - Before finishing work: `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`.
