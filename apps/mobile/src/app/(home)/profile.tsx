@@ -60,7 +60,7 @@ export default function ProfileScreen() {
           {expoGo
             ? "Running in Expo Go: test data is kept apart and isn't encrypted; Instagram posting uses the share sheet."
             : sharing === 2
-              ? 'Up to date: posting carousels to Instagram and Facebook is included.'
+              ? 'Up to date: posting collages to Instagram and Facebook is included.'
               : sharing === 1
                 ? 'Older build: install the latest build to open Instagram with your slides.'
                 : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}

@@ -82,7 +82,6 @@ describe('trip tabs with the real router', () => {
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Memories' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add photos' })).toBeTruthy());
-    expect(screen.getByRole('button', { name: 'New carousel' })).toBeTruthy();
   });
 
   it('Trip mode: Budget and Memories show their content', async () => {

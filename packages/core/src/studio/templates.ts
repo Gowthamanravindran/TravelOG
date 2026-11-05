@@ -3,6 +3,7 @@ import { fillEmptyPhotos } from './edit';
 import {
   DEFAULT_CROP,
   DEFAULT_FRAME,
+  MAX_SLIDES,
   STUDIO_VERSION,
   canvasSize,
   clampSlides,
@@ -303,4 +304,35 @@ export function fitsCanvas(doc: StudioDoc, layer: Layer): boolean {
     layer.x + layer.w <= width + 1 &&
     layer.y + layer.h <= height + 1
   );
+}
+
+/**
+ * A template laid out for exactly these photos (Plan 22): the fewest slides
+ * whose frames hold them all (up to 10), photos in order, and frames left empty
+ * removed so there are no blank holes. Photos beyond 10 slides' worth are left
+ * out.
+ */
+export function fitTemplate(
+  template: StudioTemplateId,
+  format: StudioFormat,
+  photoIds: readonly string[],
+  makeId: IdMaker,
+  heading = '',
+): StudioDoc {
+  const most = templatePhotoCount(template, format, MAX_SLIDES);
+  let slides = MAX_SLIDES;
+  if (templatePhotoCount(template, format, 1) === most) {
+    // Frames don't grow with slides (e.g. one panorama photo): a 3-slide strip.
+    slides = 3;
+  } else {
+    const target = Math.min(photoIds.length, most);
+    for (let s = 1; s <= MAX_SLIDES; s++) {
+      if (templatePhotoCount(template, format, s) >= target) {
+        slides = s;
+        break;
+      }
+    }
+  }
+  const doc = docFromTemplate(template, format, slides, photoIds, makeId, heading);
+  return { ...doc, layers: doc.layers.filter((l) => l.kind !== 'photo' || l.photoId) };
 }

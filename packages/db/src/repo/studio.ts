@@ -97,3 +97,35 @@ export function duplicateProject(db: Db, id: string): StudioProject {
 export function deleteProject(db: Db, id: string): void {
   deleteRow(db, 'studio_projects', id);
 }
+
+/** "Europe · 3": the trip's name and the next collage number (Plan 22). */
+export function nextCollageTitle(db: Db, tripId: string): string {
+  const trip = getTrip(db, tripId);
+  const name = (trip?.title ?? 'Trip').trim().slice(0, 50) || 'Trip';
+  // Count every collage ever made for the trip (deleted ones too), so numbers aren't reused.
+  const made = db
+    .select()
+    .from(studioProjects)
+    .where(eq(studioProjects.tripId, tripId))
+    .all().length;
+  return `${name} · ${made + 1}`;
+}
+
+/** Saves a collage built in the compose screen. */
+export function createProjectFromDoc(
+  db: Db,
+  tripId: string,
+  doc: StudioDoc,
+  title: string = nextCollageTitle(db, tripId),
+): StudioProject {
+  if (!getTrip(db, tripId)) throw new Error('trip not found');
+  return insertRow(db, 'studio_projects', {
+    tripId,
+    title: title.trim().slice(0, 60) || nextCollageTitle(db, tripId),
+    format: doc.format,
+    slides: doc.slides,
+    doc: serializeDoc(doc),
+    thumbnailUri: null,
+    exportedAt: null,
+  });
+}

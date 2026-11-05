@@ -97,3 +97,15 @@ export function tripRecap(db: Db, tripId: string): TripRecap | null {
     photos: listPhotos(db, tripId).length,
   };
 }
+
+/** Removes several photos from the trip at once; returns their file paths so the app can delete its copies. */
+export function deletePhotos(db: Db, ids: readonly string[]): (string | null)[] {
+  return tx(db, (db) =>
+    ids.map((id) => {
+      const p = getRow(db, 'photos', id);
+      if (!p) return null;
+      deleteRow(db, 'photos', id);
+      return p.localUri;
+    }),
+  );
+}

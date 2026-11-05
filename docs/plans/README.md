@@ -25,3 +25,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 19 | [Test in Expo Go without building (`pnpm dev:go`)](19-expo-go.md) | see git log |
 | 20 | [Time picker without a native package](20-time-sheet.md) | see git log |
 | 21 | [Empty trip tabs: every tab gets the trip id](21-tab-params.md) | see git log |
+| 22 | [Select photos, then make a collage](22-select-to-collage.md) | see git log |

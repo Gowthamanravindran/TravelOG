@@ -96,7 +96,7 @@ function Editor() {
       <SafeAreaView
         style={{ flex: 1, backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Text style={[type.body, { color: t.ink }]}>This carousel no longer exists.</Text>
+        <Text style={[type.body, { color: t.ink }]}>This collage no longer exists.</Text>
         <Button label="Back" variant="link" onPress={() => router.back()} />
       </SafeAreaView>
     );

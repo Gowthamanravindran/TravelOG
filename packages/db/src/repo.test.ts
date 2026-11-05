@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setClock, type Db } from './db';
+import { fitTemplate } from '@travelog/core';
+
+import { newId, setClock, type Db } from './db';
 import {
   addAttachment,
   addBooking,
@@ -52,6 +54,9 @@ import {
   deleteProject,
   renameProject,
   tripSetupStatus,
+  createProjectFromDoc,
+  nextCollageTitle,
+  deletePhotos,
 } from './index';
 import * as schema from './schema';
 import { outbox } from './schema';
@@ -572,5 +577,33 @@ describe('trip setup status', () => {
       bookings: true,
       plan: true,
     });
+  });
+});
+
+describe('collages from selected photos', () => {
+  it('numbers collages per trip and saves a composed document', () => {
+    const t = goa();
+    expect(nextCollageTitle(db, t.id)).toBe('Goa Monsoon Escape · 1');
+    const doc = fitTemplate('bridge', 'post', ['a', 'b', 'c'], newId, '');
+    const p = createProjectFromDoc(db, t.id, doc);
+    expect(p).toMatchObject({ title: 'Goa Monsoon Escape · 1', slides: 2 });
+    deleteProject(db, p.id);
+    // Numbers aren't reused after a delete.
+    expect(nextCollageTitle(db, t.id)).toBe('Goa Monsoon Escape · 2');
+  });
+
+  it('deletes several photos and returns their files', () => {
+    const t = goa();
+    const [a, b, c] = addPhotos(db, t.id, [
+      { localUri: 'file:///a.jpg' },
+      { localUri: 'file:///b.jpg' },
+      { localUri: 'file:///c.jpg' },
+    ]);
+    expect(deletePhotos(db, [a!.id, c!.id, 'missing'])).toEqual([
+      'file:///a.jpg',
+      'file:///c.jpg',
+      null,
+    ]);
+    expect(listPhotos(db, t.id).map((p) => p.id)).toEqual([b!.id]);
   });
 });

@@ -7,6 +7,7 @@ import {
   canvasSize,
   commit,
   docFromTemplate,
+  fitTemplate,
   duplicateLayer,
   layerBounds,
   layersOnSlide,
@@ -345,5 +346,29 @@ describe('transformLayer', () => {
       },
     );
     expect((zoomed.patch as { crop: { scale: number } }).crop.scale).toBe(8);
+  });
+});
+
+describe('fitTemplate', () => {
+  it('uses just enough slides for the selected photos and leaves no empty frames', () => {
+    const photos = ['a', 'b', 'c', 'd', 'e'];
+    for (const t of STUDIO_TEMPLATES.filter((x) => x.id !== 'blank')) {
+      const doc = fitTemplate(t.id, 'post', photos, ids, 'Europe');
+      const frames = doc.layers.filter((l) => l.kind === 'photo');
+      expect(frames.every((l) => l.kind === 'photo' && l.photoId)).toBe(true);
+      // Every selected photo is used, unless the template only has one frame.
+      if (templatePhotoCount(t.id, 'post', 10) >= photos.length)
+        expect(photosInDoc(doc)).toEqual(photos);
+      // Fewer slides wouldn't fit them.
+      if (doc.slides > 1)
+        expect(templatePhotoCount(t.id, 'post', doc.slides - 1)).toBeLessThan(photos.length);
+    }
+  });
+
+  it('a panorama is a 3-slide strip; bridge with 3 photos needs 2 slides', () => {
+    expect(fitTemplate('panorama', 'post', ['a', 'b'], ids).slides).toBe(3);
+    const doc = fitTemplate('bridge', 'post', ['a', 'b', 'c'], ids);
+    expect(doc.slides).toBe(2);
+    expect(photosInDoc(doc)).toEqual(['a', 'b', 'c']);
   });
 });
