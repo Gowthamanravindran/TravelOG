@@ -121,11 +121,7 @@ export function StudioCanvas({
       })}
       {seams
         ? Array.from({ length: doc.slides - 1 }, (_, i) => (
-            <View
-              key={i}
-              pointerEvents="none"
-              style={[styles.seam, { left: (i + 1) * slideW * scale - 1, height: height * scale }]}
-            />
+            <SeamLine key={i} left={(i + 1) * slideW * scale - 1} height={height * scale} />
           ))
         : null}
       {seams
@@ -175,6 +171,32 @@ export function StudioCanvas({
   );
 }
 
+/**
+ * A dashed line drawn as short solid segments. (A dashed border on one side
+ * only is not supported on Android and broke the film-roll layout.)
+ */
+function SeamLine({ left, height }: { left: number; height: number }) {
+  const dash = 10;
+  const gap = 6;
+  const count = Math.max(1, Math.floor(height / (dash + gap)));
+  return (
+    <View pointerEvents="none" style={{ position: 'absolute', left, top: 0, width: 2, height }}>
+      {Array.from({ length: count }, (_, i) => (
+        <View
+          key={i}
+          style={{
+            position: 'absolute',
+            top: i * (dash + gap),
+            width: 2,
+            height: dash,
+            backgroundColor: '#FFFFFFCC',
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
 function describe(layer: Layer): string {
   switch (layer.kind) {
     case 'photo':
@@ -189,14 +211,6 @@ function describe(layer: Layer): string {
 }
 
 const styles = StyleSheet.create({
-  seam: {
-    position: 'absolute',
-    top: 0,
-    width: 0,
-    borderLeftWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#FFFFFFCC',
-  },
   number: {
     position: 'absolute',
     top: 6,

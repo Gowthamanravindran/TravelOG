@@ -118,7 +118,6 @@ function NewCarouselForm() {
               backgroundColor: t.accentSoft,
               borderColor: t.accent,
               borderWidth: 1,
-              borderStyle: 'dashed',
             }}
           />
         ))}

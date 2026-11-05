@@ -124,7 +124,7 @@ export function Selection({
           transform: layer.rotation ? [{ rotate: `${layer.rotation}deg` }] : undefined,
           borderWidth: 2,
           borderColor: accent,
-          borderStyle: mode === 'crop' ? 'dashed' : 'solid',
+          opacity: mode === 'crop' ? 0.6 : 1,
         }}
       />
     </GestureDetector>
