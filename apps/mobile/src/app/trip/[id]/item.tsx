@@ -16,6 +16,7 @@ import { amountText, errorMessage, parseAmount } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
 import { Between, Button, Chip, ChipRow, ErrorText, Field, H1, Row, Screen } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
+import { TimeField } from '@/ui/date-field';
 
 export default function ItemEditor() {
   const { id, variantId, itemId } = useLocalSearchParams<{
@@ -88,13 +89,7 @@ export default function ItemEditor() {
         />
         <Row>
           <View style={{ flex: 1 }}>
-            <Field
-              label="Time"
-              value={time}
-              onChangeText={setTime}
-              placeholder="10:00"
-              keyboardType="numbers-and-punctuation"
-            />
+            <TimeField label="Time" value={time} onChange={setTime} />
           </View>
           <View style={{ flex: 1 }}>
             <Field

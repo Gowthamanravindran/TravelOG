@@ -8,6 +8,7 @@ import { useMutate } from '@/data/provider';
 import { errorMessage, shortDate } from '@/lib/format';
 import { Between, Body, Button, ErrorText, Field, H1, Row, Screen, Segmented } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
+import { DateRangeField } from '@/ui/date-field';
 
 type Kind = 'custom' | 'dates';
 
@@ -109,28 +110,15 @@ export default function NewPoll() {
               Everyone ticks every range that works. Locking it in sets the trip dates.
             </Body>
             {ranges.map((r, i) => (
-              <Row key={i}>
-                <View style={{ flex: 1 }}>
-                  <Field
-                    label={`Option ${i + 1} from`}
-                    value={r.start}
-                    placeholder="YYYY-MM-DD"
-                    onChangeText={(v) =>
-                      setRanges(ranges.map((x, j) => (j === i ? { ...x, start: v } : x)))
-                    }
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Field
-                    label="to"
-                    value={r.end}
-                    placeholder="YYYY-MM-DD"
-                    onChangeText={(v) =>
-                      setRanges(ranges.map((x, j) => (j === i ? { ...x, end: v } : x)))
-                    }
-                  />
-                </View>
-              </Row>
+              <DateRangeField
+                key={i}
+                label={`Option ${i + 1}`}
+                start={r.start}
+                end={r.end}
+                onChange={(start, end) =>
+                  setRanges(ranges.map((x, j) => (j === i ? { start, end } : x)))
+                }
+              />
             ))}
             <Button
               label="Another range"

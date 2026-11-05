@@ -35,6 +35,7 @@ import {
   Screen,
 } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
+import { DateField, TimeField } from '@/ui/date-field';
 
 export default function BookingEditor() {
   const { id, bookingId } = useLocalSearchParams<{ id: string; bookingId?: string }>();
@@ -161,38 +162,18 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
       </Row>
       <Row>
         <View style={{ flex: 3 }}>
-          <Field
-            label="Starts (date)"
-            value={start.d}
-            onChangeText={(d) => setStart({ ...start, d })}
-            placeholder="YYYY-MM-DD"
-          />
+          <DateField label="Starts" value={start.d} onChange={(d) => setStart({ ...start, d })} />
         </View>
         <View style={{ flex: 2 }}>
-          <Field
-            label="Time"
-            value={start.t}
-            onChangeText={(t) => setStart({ ...start, t })}
-            placeholder="18:30"
-          />
+          <TimeField label="Time" value={start.t} onChange={(t) => setStart({ ...start, t })} />
         </View>
       </Row>
       <Row>
         <View style={{ flex: 3 }}>
-          <Field
-            label="Ends (date)"
-            value={end.d}
-            onChangeText={(d) => setEnd({ ...end, d })}
-            placeholder="YYYY-MM-DD"
-          />
+          <DateField label="Ends" value={end.d} onChange={(d) => setEnd({ ...end, d })} />
         </View>
         <View style={{ flex: 2 }}>
-          <Field
-            label="Time"
-            value={end.t}
-            onChangeText={(t) => setEnd({ ...end, t })}
-            placeholder="07:15"
-          />
+          <TimeField label="Time" value={end.t} onChange={(t) => setEnd({ ...end, t })} />
         </View>
       </Row>
       <Body muted small>

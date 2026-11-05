@@ -1,5 +1,5 @@
 import type { BottomTabBarProps } from 'expo-router/tabs';
-import { radius, type } from '@travelog/ui';
+import { type } from '@travelog/ui';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -13,8 +13,10 @@ export interface TabSpec {
 }
 
 /**
- * The mode bottom bar (docs/02 ModeNavBar): accent pill behind the active item.
- * `center` adds the round add button in the middle (Home mode).
+ * The mode bottom bar (Plan 18): a detached, floating rounded bar in the mode's
+ * colours. The active tab is drawn in the accent colour on a soft pill. `center`
+ * adds a raised round button above the bar (Home's "New trip").
+ * The bar sits below the screen in the layout, so it never covers content.
  */
 export function ModeTabBar({
   state,
@@ -24,6 +26,8 @@ export function ModeTabBar({
 }: BottomTabBarProps & { tabs: TabSpec[]; center?: { label: string; onPress: () => void } }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const dark = t.scheme === 'dark' || t.mode === 'trip';
+
   const items = tabs.map((tab) => {
     const index = state.routes.findIndex((r) => r.name === tab.name);
     const focused = state.index === index;
@@ -42,63 +46,102 @@ export function ModeTabBar({
         <View style={[styles.pill, focused && { backgroundColor: t.accentSoft }]}>
           <Icon name={tab.icon} size={22} color={focused ? t.accent : t.ink2} />
         </View>
-        <Text style={[type.caption, { color: focused ? t.ink : t.ink2 }]}>{tab.label}</Text>
+        <Text
+          numberOfLines={1}
+          style={[
+            type.caption,
+            { color: focused ? t.accent : t.ink2, fontWeight: focused ? '700' : '500' },
+          ]}
+        >
+          {tab.label}
+        </Text>
       </Pressable>
     );
   });
+
   if (center) {
     items.splice(
       Math.ceil(items.length / 2),
       0,
-      <Pressable
-        key="center"
-        accessibilityRole="button"
-        accessibilityLabel={center.label}
-        onPress={center.onPress}
-        style={[styles.fab, { backgroundColor: t.accent }]}
-      >
-        <Icon name="add" size={28} color={t.onAccent} />
-      </Pressable>,
+      <View key="center" style={styles.item}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={center.label}
+          onPress={center.onPress}
+          style={({ pressed }) => [
+            styles.fab,
+            {
+              backgroundColor: t.accent,
+              borderColor: t.bg,
+              shadowColor: t.accent,
+              transform: [{ scale: pressed ? 0.95 : 1 }],
+            },
+          ]}
+        >
+          <Icon name="add" size={28} color={t.onAccent} />
+        </Pressable>
+        <Text numberOfLines={1} style={[type.caption, { color: t.ink2, fontWeight: '600' }]}>
+          {center.label}
+        </Text>
+      </View>,
     );
   }
+
   return (
     <View
-      style={[
-        styles.bar,
-        {
-          backgroundColor: t.surface,
-          borderTopColor: t.line,
-          paddingBottom: Math.max(insets.bottom, 10),
-        },
-      ]}
+      style={[styles.outer, { backgroundColor: t.bg, paddingBottom: Math.max(insets.bottom, 12) }]}
     >
-      {items}
+      <View
+        style={[
+          styles.bar,
+          {
+            backgroundColor: t.surface,
+            borderColor: t.line,
+            shadowOpacity: dark ? 0.45 : 0.12,
+          },
+        ]}
+      >
+        {items}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outer: { paddingHorizontal: 16, paddingTop: 10 },
   bar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 8,
+    borderRadius: 28,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
   },
-  item: { alignItems: 'center', gap: 2, minWidth: 64, minHeight: 44 },
+  item: { flex: 1, alignItems: 'center', gap: 3, minHeight: 48 },
   pill: {
-    width: 48,
+    width: 52,
     height: 30,
-    borderRadius: radius.chip,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
   fab: {
-    width: 54,
-    height: 54,
-    borderRadius: 18,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -24,
+    marginTop: -34,
+    marginBottom: -2,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 10,
   },
 });

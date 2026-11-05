@@ -8,6 +8,7 @@ import { TRIP_ICONS, tripIcon } from '@/lib/labels';
 import { Icon } from '@/ui/icon';
 import { Body, Chip, ChipRow, Field, Row } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
+import { DateRangeField } from '@/ui/date-field';
 
 export interface TripFormValue {
   title: string;
@@ -53,8 +54,6 @@ export function TripForm({
   const t = useTheme();
   const set = (patch: Partial<TripFormValue>) => onChange({ ...value, ...patch });
   const [showTz, setShowTz] = useState(false);
-  const dateError = (d: string) =>
-    d && !isLocalDate(d) ? 'Use YYYY-MM-DD, e.g. 2026-11-14' : null;
 
   return (
     <View style={{ gap: 16 }}>
@@ -96,28 +95,13 @@ export function TripForm({
         onChangeText={(destination) => set({ destination })}
         placeholder="North Goa"
       />
-      <Row style={{ alignItems: 'flex-start' }}>
-        <View style={{ flex: 1 }}>
-          <Field
-            label="Start"
-            value={value.startDate}
-            onChangeText={(startDate) => set({ startDate })}
-            placeholder="YYYY-MM-DD"
-            keyboardType="numbers-and-punctuation"
-            error={dateError(value.startDate)}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Field
-            label="End"
-            value={value.endDate}
-            onChangeText={(endDate) => set({ endDate })}
-            placeholder="YYYY-MM-DD"
-            keyboardType="numbers-and-punctuation"
-            error={dateError(value.endDate)}
-          />
-        </View>
-      </Row>
+      <DateRangeField
+        label="Dates"
+        start={value.startDate}
+        end={value.endDate}
+        onChange={(startDate, endDate) => set({ startDate, endDate })}
+        placeholder="Pick start and end"
+      />
       <Body muted small>
         Not sure of the dates yet? Leave them empty and decide with a dates poll later.
       </Body>
