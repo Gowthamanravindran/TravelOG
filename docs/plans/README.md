@@ -19,3 +19,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 13 | [More account-free features: reminders, currencies, memories, check-ins, polish](13-account-free-features.md) | see git log |
 | 14 | [Test the app without a computer: preview builds](14-preview-builds.md) | see git log |
 | 15 | [Memories tab + Studio: seamless carousel maker, Instagram / Facebook hand-off](15-studio.md) | see git log |
+| 16 | [Fixes from the phone test: icons, film error, trip setup, Instagram hand-off](16-phone-test-fixes.md) | see git log |

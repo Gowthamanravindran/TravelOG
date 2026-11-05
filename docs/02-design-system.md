@@ -82,7 +82,7 @@ Category colours (budget, map pins): Stay `#5B5BD6`, Travel `#14B8A6`, Food `#FF
 - Respect "Reduce motion".
 
 ## 7. Iconography & imagery
-- Icons: Lucide/Phosphor-style 1.75 px rounded line icons.
+- Icons: Lucide/Phosphor-style 1.75 px rounded line icons. (Changed in Plan 16: the app uses each platform's own system icons, SF Symbols on iOS and Material Symbols on Android, via `ui/icon.tsx`. No emoji in the UI; a trip has an icon, not an emoji.)
 - Trip covers: user photo, or emoji on a 2-stop gradient derived from the destination (beach → teal/sky, mountains → indigo/lilac, city → coral/mango).
 - Illustrations only for empty states — flat, 3 colours max.
 

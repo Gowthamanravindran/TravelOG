@@ -23,6 +23,7 @@ The single source of truth for what the app is built with. [03 · Architecture](
 | UI state | Zustand |
 | Forms and validation | react-hook-form + zod (zod schemas shared with server in `packages/core`) |
 | Animation and gestures | Reanimated, Gesture Handler, bottom sheets (@gorhom/bottom-sheet) |
+| Icons | expo-symbols: SF Symbols on iOS, Material Symbols on Android, through one semantic map in `apps/mobile/src/ui/icon.tsx`; no emoji in the UI (Plan 16) |
 | Lists | FlashList |
 | Images | expo-image, expo-image-picker, expo-image-manipulator |
 | Collage editor (Studio) | Plain views + react-native-view-shot for exact-size slide export; local `social-share` Expo module for Instagram / Facebook / Photos hand-off (changed in Plan 15: Skia only if filters/brushes are added later) |

@@ -5,6 +5,7 @@ import { Switch } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
 import { remindersEnabled, setRemindersEnabled } from '@/lib/reminders';
+import { sharingBuildLevel } from '@/lib/social-share';
 import { Between, Body, Button, Card, H1, Screen, Strong } from '@/ui/kit';
 
 export default function ProfileScreen() {
@@ -12,6 +13,7 @@ export default function ProfileScreen() {
   const profile = useQuery((db) => getLocalProfile(db));
   const trips = useQuery((db) => listTrips(db));
   const mutate = useMutate();
+  const sharing = sharingBuildLevel();
   const reminders = useQuery((db) => remindersEnabled(db));
   const done = trips.filter((t) => t.state === 'completed' || t.state === 'archived').length;
 
@@ -48,6 +50,16 @@ export default function ProfileScreen() {
         <Body muted small>
           Before flights, trains and buses (3 h), other bookings (1 h), planned stops (30 min) and
           poll deadlines (1 h).
+        </Body>
+      </Card>
+      <Card>
+        <Strong>This app build</Strong>
+        <Body muted small>
+          {sharing === 2
+            ? 'Up to date: posting carousels to Instagram and Facebook is included.'
+            : sharing === 1
+              ? 'Older build: install the latest build to open Instagram with your slides.'
+              : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}
         </Body>
       </Card>
       <Card>

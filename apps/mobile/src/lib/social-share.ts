@@ -142,3 +142,14 @@ export async function shareAll(files: readonly string[]): Promise<PostResult> {
   await native.shareImages([...files], null);
   return 'shared';
 }
+
+/**
+ * What the installed app build can do (shown in Profile): 0 = no sharing module
+ * (build older than Plan 15), 1 = Plan 15 module, 2 = Plan 16 (opens Instagram's
+ * post screen directly).
+ */
+export function sharingBuildLevel(): 0 | 1 | 2 {
+  if (!native) return 0;
+  if (Platform.OS === 'android' && !native.openInstagramFeed) return 1;
+  return 2;
+}
