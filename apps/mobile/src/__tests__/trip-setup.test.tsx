@@ -1,4 +1,4 @@
-import { createTrip, listMembers } from '@travelog/db';
+import { createTrip, listBudgets, listMembers } from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { BudgetView } from '@/components/budget-view';
@@ -59,5 +59,20 @@ describe('Budget tab', () => {
     const { db, trip } = newTrip();
     await render(withData(db, <BudgetView tripId={trip.id} startEditing />, 'plan'));
     expect(screen.getByRole('button', { name: 'Save budget' })).toBeTruthy();
+  });
+
+  it('saves a budget, then edits it again', async () => {
+    const { db, trip } = newTrip();
+    await render(withData(db, <BudgetView tripId={trip.id} startEditing />, 'plan'));
+    await fireEvent.changeText(screen.getByLabelText('Stay'), '12,000');
+    await fireEvent.changeText(screen.getByLabelText('Food'), '1500.50');
+    await fireEvent.press(screen.getByRole('button', { name: 'Save budget' }));
+    expect(screen.queryByText(/must be|not found|Error/i)).toBeNull();
+    expect(listBudgets(db, trip.id)).toMatchObject({ stay: 1200000, food: 150050, travel: 0 });
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Edit budget' }));
+    await fireEvent.changeText(screen.getByLabelText('Stay'), '');
+    await fireEvent.press(screen.getByRole('button', { name: 'Save budget' }));
+    expect(listBudgets(db, trip.id)).toMatchObject({ stay: 0, food: 150050 });
   });
 });
