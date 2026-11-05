@@ -1,0 +1,190 @@
+import * as Haptics from 'expo-haptics';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { Platform, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  LinearTransition,
+  ZoomIn,
+  useReducedMotion,
+} from 'react-native-reanimated';
+
+import { Icon } from './icon';
+import { useTheme } from './theme';
+
+/**
+ * Motion for the app (Plan 28). One place for durations and springs, all of it
+ * following the phone's Reduce motion setting. Only transform and opacity animate
+ * (react-native-skills: animation-gpu-properties). Nothing moves because of scrolling.
+ */
+export const MOTION = {
+  fast: 150,
+  base: 220,
+  slow: 300,
+  /** Delay between rows when a list appears, and how many rows get a delay. */
+  stagger: 40,
+  maxStagger: 8,
+  /** Settles without a visible bounce. */
+  spring: { damping: 22, stiffness: 240, mass: 1 },
+} as const;
+
+/** False when the person has asked their phone to reduce motion. */
+export function useMotionOk(): boolean {
+  return !useReducedMotion();
+}
+
+/** A row that fades and rises into place when a list opens, one after another. */
+export function Appear({
+  index = 0,
+  children,
+  style,
+}: {
+  index?: number;
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const ok = useMotionOk();
+  const delay = Math.min(index, MOTION.maxStagger) * MOTION.stagger;
+  return (
+    <Animated.View
+      style={style}
+      entering={
+        ok
+          ? FadeInDown.delay(delay)
+              .duration(MOTION.base)
+              .withInitialValues({ transform: [{ translateY: 8 }] })
+          : undefined
+      }
+      exiting={ok ? FadeOut.duration(MOTION.fast) : undefined}
+      layout={ok ? LinearTransition.duration(MOTION.base) : undefined}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
+/** A number that counts up to its value (budget totals). Shows the final value at once with reduced motion. */
+export function CountUp({
+  value,
+  format,
+  style,
+  duration = 600,
+}: {
+  value: number;
+  format: (n: number) => string;
+  style?: StyleProp<import('react-native').TextStyle>;
+  duration?: number;
+}) {
+  const ok = useMotionOk();
+  const [shown, setShown] = useState(ok ? 0 : value);
+  const from = useRef(ok ? 0 : value);
+  useEffect(() => {
+    if (!ok) {
+      setShown(value);
+      return;
+    }
+    const start = from.current;
+    const began = Date.now();
+    const timer = setInterval(() => {
+      const t = Math.min(1, (Date.now() - began) / duration);
+      const eased = 1 - (1 - t) ** 3;
+      const next = t >= 1 ? value : Math.round(start + (value - start) * eased);
+      setShown(next);
+      if (t >= 1) {
+        from.current = value;
+        clearInterval(timer);
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [value, ok, duration]);
+  return <Text style={style}>{format(shown)}</Text>;
+}
+
+type HapticKind = 'select' | 'light' | 'success';
+
+/** A light haptic; never throws (no motor, web, or a refusing device). */
+export function haptic(kind: HapticKind): void {
+  if (Platform.OS === 'web') return;
+  const run =
+    kind === 'select'
+      ? () => Haptics.selectionAsync()
+      : kind === 'light'
+        ? () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+        : () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  try {
+    Promise.resolve(run()).catch(() => {});
+  } catch {
+    // No haptics on this device.
+  }
+}
+
+const CelebrateContext = createContext<(label: string) => void>(() => {});
+
+/** Shows a short check-mark burst over the app for big moments (trip created, settled up…). */
+export function useCelebrate(): (label: string) => void {
+  return useContext(CelebrateContext);
+}
+
+/** Hosts the celebration overlay; wrap the app once. */
+export function CelebrationHost({ children }: { children: ReactNode }) {
+  const [shown, setShown] = useState<{ label: string; key: number } | null>(null);
+  const celebrate = useCallback((label: string) => {
+    haptic('success');
+    setShown({ label, key: Date.now() });
+  }, []);
+  useEffect(() => {
+    if (!shown) return;
+    const timer = setTimeout(() => setShown(null), 1100);
+    return () => clearTimeout(timer);
+  }, [shown]);
+  return (
+    <CelebrateContext.Provider value={celebrate}>
+      {children}
+      {shown ? <Burst key={shown.key} label={shown.label} /> : null}
+    </CelebrateContext.Provider>
+  );
+}
+
+function Burst({ label }: { label: string }) {
+  const t = useTheme();
+  const ok = useMotionOk();
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Animated.View
+        accessible
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={label}
+        entering={ok ? FadeIn.duration(MOTION.fast) : undefined}
+        exiting={ok ? FadeOut.duration(MOTION.base) : undefined}
+        style={styles.burst}
+      >
+        <Animated.View
+          entering={ok ? ZoomIn.springify().damping(12).stiffness(220) : undefined}
+          style={[styles.check, { backgroundColor: t.accent }]}
+        >
+          <Icon name="check" size={44} color={t.onAccent} />
+        </Animated.View>
+      </Animated.View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  burst: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  check: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
