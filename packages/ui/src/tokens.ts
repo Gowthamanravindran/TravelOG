@@ -1,12 +1,22 @@
 /**
- * Design tokens from docs/02-design-system.md.
- * Each mode re-themes the app through its accent; Trip mode is always dark.
+ * Design tokens (docs/02-design-system.md, Plan 26).
+ * Two themes × light/dark × three modes; each mode re-themes the app through its accent.
  */
 
 export type Mode = 'home' | 'plan' | 'trip';
 export type Scheme = 'light' | 'dark';
 
-export interface Palette {
+import { THEMES, type ThemeName, type TileFamily } from './themes';
+
+export { THEMES, type ThemeName, type TileFamily } from './themes';
+
+export type CategoryKey = 'stay' | 'travel' | 'food' | 'activities' | 'shopping' | 'misc';
+
+export interface Theme {
+  name: ThemeName;
+  mode: Mode;
+  scheme: Scheme;
+  /** Screen background; in Colour block, the mode colour. */
   bg: string;
   surface: string;
   surface2: string;
@@ -16,74 +26,72 @@ export interface Palette {
   mango: string;
   success: string;
   danger: string;
-}
-
-export interface Theme extends Palette {
-  mode: Mode;
-  scheme: Scheme;
   accent: string;
   accentSoft: string;
   /** Text/icon colour placed on top of `accent`. */
   onAccent: string;
+  /** Header band fill behind the trip header, or null for none. */
+  band: string | null;
+  tabBar: { bg: string; fg: string; activeBg: string; activeFg: string; line: string | null };
+  tiles: Record<TileFamily, { bg: string; fg: string }>;
+  categories: Record<CategoryKey, string>;
+  /** Size of screen titles (display style). */
+  displaySize: number;
 }
 
-export const palettes: Record<Scheme, Palette> = {
-  light: {
-    bg: '#FAF7F2',
-    surface: '#FFFFFF',
-    surface2: '#F2EEE7',
-    ink: '#1B1A3A',
-    ink2: '#5E5C78',
-    line: '#E8E3DA',
-    mango: '#FFB020',
-    success: '#16A34A',
-    danger: '#E5484D',
-  },
-  dark: {
-    bg: '#0F1020',
-    surface: '#1A1B2E',
-    surface2: '#24253B',
-    ink: '#F4F3FA',
-    ink2: '#A9A8C2',
-    line: '#2E2F48',
-    mango: '#FFC24D',
-    success: '#34D399',
-    danger: '#FF6B6E',
-  },
+export const THEME_NAMES: readonly ThemeName[] = ['sunset', 'block'];
+
+/** Status colours, the same in both themes (light values darkened for 4.5:1 in Plan 26). */
+const STATUS: Record<Scheme, { mango: string; success: string; danger: string }> = {
+  light: { mango: '#FFB020', success: '#15803D', danger: '#C62828' },
+  dark: { mango: '#FFC24D', success: '#34D399', danger: '#FF6B6E' },
 };
 
-const accents: Record<
-  Mode,
-  Record<Scheme, { accent: string; accentSoft: string; onAccent: string }>
-> = {
-  home: {
-    light: { accent: '#FF6B5B', accentSoft: '#FFE6E2', onAccent: '#FFFFFF' },
-    dark: { accent: '#FF6B5B', accentSoft: '#3A2230', onAccent: '#FFFFFF' },
-  },
-  plan: {
-    light: { accent: '#5B5BD6', accentSoft: '#E7E7FB', onAccent: '#FFFFFF' },
-    dark: { accent: '#8B8BF0', accentSoft: '#262759', onAccent: '#0F1020' },
-  },
-  trip: {
-    light: { accent: '#14B8A6', accentSoft: '#0F3B38', onAccent: '#04201D' },
-    dark: { accent: '#14B8A6', accentSoft: '#0F3B38', onAccent: '#04201D' },
-  },
-};
+/** A tile's most saturated colour: the fill for solid tiles, else the icon. */
+const strong = (tile: { bg: string; fg: string }) => (tile.fg === '#FFFFFF' ? tile.bg : tile.fg);
 
-/** Trip mode ignores the system setting and is always dark. */
-export function themeFor(mode: Mode, systemScheme: Scheme | null | undefined): Theme {
-  const scheme: Scheme = mode === 'trip' ? 'dark' : systemScheme === 'dark' ? 'dark' : 'light';
-  return { mode, scheme, ...palettes[scheme], ...accents[mode][scheme] };
+/**
+ * The full set of colours for a theme, app mode and light/dark scheme. Trip mode follows
+ * the scheme like the others (Plan 26); an unknown scheme is light.
+ */
+export function themeFor(
+  name: ThemeName,
+  mode: Mode,
+  systemScheme: Scheme | null | undefined,
+): Theme {
+  const data = THEMES[name] ?? THEMES.sunset;
+  const scheme: Scheme = systemScheme === 'dark' ? 'dark' : 'light';
+  const n = data.neutrals[scheme];
+  const [accent, accentSoft, onAccent] = data.accents[mode][scheme];
+  const tiles = Object.fromEntries(
+    Object.entries(data.tiles).map(([k, v]) => [k, v[scheme]]),
+  ) as Theme['tiles'];
+  return {
+    name: data === THEMES.sunset ? 'sunset' : name,
+    mode,
+    scheme,
+    bg: data.grounds[mode][scheme],
+    ...n,
+    ...STATUS[scheme],
+    accent,
+    accentSoft,
+    onAccent,
+    band: data.band ? accentSoft : null,
+    tabBar: data.inkTabBar
+      ? { bg: '#141414', fg: '#C9C9C4', activeBg: accent, activeFg: onAccent, line: null }
+      : { bg: n.surface, fg: n.ink2, activeBg: accentSoft, activeFg: accent, line: n.line },
+    tiles,
+    categories: {
+      stay: strong(tiles.clay),
+      travel: strong(tiles.sea),
+      food: strong(tiles.mango),
+      activities: strong(tiles.leaf),
+      shopping: strong(tiles.rose),
+      misc: n.ink2,
+    },
+    displaySize: data.displaySize,
+  };
 }
-
-export const categoryColors = {
-  stay: '#5B5BD6',
-  travel: '#14B8A6',
-  food: '#FF6B5B',
-  activities: '#FFB020',
-  shopping: '#E056A0',
-  misc: '#8A8AA3',
-} as const;
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, xxxl: 48 } as const;
 

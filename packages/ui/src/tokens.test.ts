@@ -1,27 +1,33 @@
 import { describe, expect, it } from 'vitest';
-import { themeFor } from './tokens';
+
+import { THEME_NAMES, themeFor, type Mode } from './tokens';
 
 describe('themeFor', () => {
-  it('follows the system scheme in Home and Plan modes', () => {
-    expect(themeFor('home', 'light').bg).toBe('#FAF7F2');
-    expect(themeFor('home', 'dark').bg).toBe('#0F1020');
-    expect(themeFor('plan', 'dark').scheme).toBe('dark');
+  it('uses each theme’s background', () => {
+    expect(themeFor('sunset', 'home', 'light').bg).toBe('#FFF4EC');
+    expect(themeFor('block', 'plan', 'light').bg).toBe('#C6D9FF');
   });
 
-  it('keeps Trip mode dark even when the system is light', () => {
-    const t = themeFor('trip', 'light');
-    expect(t.scheme).toBe('dark');
-    expect(t.accent).toBe('#14B8A6');
+  it('lets Trip mode follow the scheme', () => {
+    const t = themeFor('sunset', 'trip', 'light');
+    expect(t.scheme).toBe('light');
+    expect(t.accent).toBe('#9A5600');
   });
 
-  it('defaults to light when the system scheme is unknown', () => {
-    expect(themeFor('home', null).scheme).toBe('light');
+  it('themeFor with null scheme is light', () => {
+    expect(themeFor('sunset', 'home', null).scheme).toBe('light');
   });
 
-  it('gives each mode its own accent', () => {
-    const accents = new Set(
-      ['home', 'plan', 'trip'].map((m) => themeFor(m as 'home', 'light').accent),
-    );
-    expect(accents.size).toBe(3);
+  it('gives each mode its own accent in every theme', () => {
+    for (const name of THEME_NAMES) {
+      const accents = new Set(
+        (['home', 'plan', 'trip'] as Mode[]).map((m) => themeFor(name, m, 'light').accent),
+      );
+      expect(accents.size).toBe(3);
+    }
+  });
+
+  it('draws Colour block’s tab bar in black', () => {
+    expect(themeFor('block', 'home', 'dark').tabBar.bg).toBe('#141414');
   });
 });

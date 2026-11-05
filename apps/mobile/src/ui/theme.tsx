@@ -15,5 +15,5 @@ export function useMode(): Mode {
 
 export function useTheme(modeOverride?: Mode): Theme {
   const mode = useContext(ModeContext);
-  return themeFor(modeOverride ?? mode, useColorScheme());
+  return themeFor('sunset', modeOverride ?? mode, useColorScheme());
 }

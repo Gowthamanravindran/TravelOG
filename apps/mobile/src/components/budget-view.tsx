@@ -9,7 +9,6 @@ import {
   tripMoney,
   type BudgetCategory,
 } from '@travelog/db';
-import { categoryColors } from '@travelog/ui';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -196,12 +195,7 @@ export function BudgetView({
                     {budget ? ` / ${money(budget, cur)}` : ''}
                   </Body>
                 </Between>
-                {budget ? (
-                  <Bar
-                    value={spent / budget}
-                    color={categoryColors[c === 'travel' ? 'travel' : c]}
-                  />
-                ) : null}
+                {budget ? <Bar value={spent / budget} color={t.categories[c]} /> : null}
               </View>
             );
           })}

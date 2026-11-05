@@ -7,7 +7,7 @@ import { Icon } from '@/ui/icon';
  * database, so "Try again" re-renders the screen.
  */
 export function ErrorScreen({ error, retry }: { error: Error; retry: () => Promise<void> }) {
-  const t = themeFor('home', useColorScheme());
+  const t = themeFor('sunset', 'home', useColorScheme());
   return (
     <View
       style={{
