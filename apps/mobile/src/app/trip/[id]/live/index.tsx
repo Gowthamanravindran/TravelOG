@@ -11,7 +11,7 @@ import {
 } from '@travelog/db';
 import { durationLabel, localDateIn, localTimeIn, timeline } from '@travelog/core';
 import { type } from '@travelog/ui';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 
@@ -36,9 +36,10 @@ import {
 } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 import { Icon } from '@/ui/icon';
+import { useTripId } from '@/lib/use-trip-id';
 
 export default function TodayTab() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useTripId();
   const t = useTheme();
   const router = useRouter();
   const mutate = useMutate();

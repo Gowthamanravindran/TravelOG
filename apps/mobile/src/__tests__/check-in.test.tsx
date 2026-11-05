@@ -9,6 +9,7 @@ let mockParams: Record<string, string> = {};
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn(), replace: jest.fn() }),
   useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
 }));
 const mockRequest = jest.fn();
 jest.mock('expo-location', () => ({

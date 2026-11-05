@@ -10,6 +10,7 @@ let mockParams: Record<string, string> = {};
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn(), replace: jest.fn() }),
   useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
 }));
 jest.mock('expo-linear-gradient', () => ({ LinearGradient: () => null }));
 jest.mock('react-native-view-shot', () => ({

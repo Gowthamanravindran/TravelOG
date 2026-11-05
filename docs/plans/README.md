@@ -24,3 +24,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 18 | [Blank tabs fix, floating bar, calendar dates, trip header and screens](18-tabs-nav-dates-redesign.md) | see git log |
 | 19 | [Test in Expo Go without building (`pnpm dev:go`)](19-expo-go.md) | see git log |
 | 20 | [Time picker without a native package](20-time-sheet.md) | see git log |
+| 21 | [Empty trip tabs: every tab gets the trip id](21-tab-params.md) | see git log |

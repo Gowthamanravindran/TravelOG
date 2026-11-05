@@ -1,13 +1,14 @@
 import { getTrip, listMembers } from '@travelog/db';
 import { daysUntilStart, tripDayNumber, tripState } from '@travelog/core';
 import { type } from '@travelog/ui';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useQuery } from '@/data/provider';
 import { dateRange } from '@/lib/format';
 import { tripIcon } from '@/lib/labels';
+import { useTripId } from '@/lib/use-trip-id';
 import { Icon, type IconName } from '@/ui/icon';
 import { useMode, useTheme } from '@/ui/theme';
 
@@ -20,7 +21,7 @@ export function TripHeader() {
   const t = useTheme();
   const mode = useMode();
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useTripId();
   const trip = useQuery((db) => getTrip(db, id), [id]);
   const people = useQuery((db) => listMembers(db, id).length, [id]);
   if (!trip) return null;

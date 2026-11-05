@@ -10,6 +10,7 @@ const mockBack = jest.fn();
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, back: mockBack, replace: jest.fn() }),
   useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
 }));
 jest.mock('expo-linear-gradient', () => ({ LinearGradient: () => null }));
 

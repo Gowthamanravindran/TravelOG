@@ -12,6 +12,7 @@ const mockReplace = jest.fn();
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, back: jest.fn(), replace: mockReplace }),
   useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
 }));
 jest.mock('expo-image-picker', () => ({ launchImageLibraryAsync: jest.fn() }));
 jest.mock('expo-sharing', () => ({ isAvailableAsync: jest.fn(), shareAsync: jest.fn() }));

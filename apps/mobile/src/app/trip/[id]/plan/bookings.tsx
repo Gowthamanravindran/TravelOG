@@ -1,10 +1,9 @@
-import { useLocalSearchParams } from 'expo-router';
-
 import { BookingsView } from '@/components/bookings-view';
 import { Screen } from '@/ui/kit';
+import { useTripId } from '@/lib/use-trip-id';
 
 export default function BookingsTab() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useTripId();
   return (
     <Screen edges={[]}>
       <BookingsView tripId={id} />
