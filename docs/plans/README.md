@@ -20,3 +20,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 14 | [Test the app without a computer: preview builds](14-preview-builds.md) | see git log |
 | 15 | [Memories tab + Studio: seamless carousel maker, Instagram / Facebook hand-off](15-studio.md) | see git log |
 | 16 | [Fixes from the phone test: icons, film error, trip setup, Instagram hand-off](16-phone-test-fixes.md) | see git log |
+| 17 | [`pnpm dev` installs new packages before starting](17-dev-script.md) | see git log |

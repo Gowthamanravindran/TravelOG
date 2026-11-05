@@ -22,7 +22,8 @@ pnpm lint                    # expo lint
 pnpm typecheck               # tsc in every package
 pnpm test                    # Vitest (packages) + Jest/jest-expo (mobile)
 pnpm format                  # Prettier
-pnpm --filter @travelog/mobile start          # dev server (development build only; Expo Go no longer works)
+pnpm dev                     # installs anything new after a pull, then starts the dev server (development build only)
+pnpm --filter @travelog/mobile start          # dev server without the install step
 pnpm --filter @travelog/mobile export:android # production bundle → apps/mobile/dist
 node scripts/check-bundle-size.mjs            # bundle budget (docs/08)
 pnpm db:start | db:reset | db:test | db:types # local Supabase (needs Docker)

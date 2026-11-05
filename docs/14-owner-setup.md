@@ -67,10 +67,9 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
    git clone https://github.com/Gowthamanravindran/TravelOG.git
    cd TravelOG
    git checkout claude/kind-allen-2woote
-   pnpm install
-   pnpm --filter @travelog/mobile start --dev-client
+   pnpm dev
    ```
-   then open the development build of TravelOG on the phone.
+   then open the development build of TravelOG on the phone. After every `git pull`, start with `pnpm dev` again: it installs any packages a plan added (otherwise you'd see `Unable to resolve "<package>"`). When a plan adds phone features, also install a new development build; Profile → **This app build** says whether yours is up to date.
 8. iPhone: needs the Apple Developer account (§6) first, then `eas device:create` to register your iPhone.
 
 ## §6 Apple Developer Program — Phase 1 · $99/yr (individual)
