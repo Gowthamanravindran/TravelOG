@@ -38,7 +38,7 @@ const TABS: [string, ComponentType, 'plan' | 'trip'][] = [
 
 // Every trip tab must draw something (a crash in one tab left the others blank on a phone).
 describe.each(TABS)('%s tab', (_name, Tab, mode) => {
-  it.each([{}, { edit: '1' }])('renders with params %j', async (extra) => {
+  it.each<Record<string, string>>([{}, { edit: '1' }])('renders with params %j', async (extra) => {
     const db = makeDb();
     const today = localDateIn('Asia/Kolkata');
     const trip = createTrip(
