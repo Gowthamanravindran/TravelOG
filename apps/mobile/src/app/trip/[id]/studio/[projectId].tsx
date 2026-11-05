@@ -46,14 +46,13 @@ import { ModeProvider, useTheme } from '@/ui/theme';
 import { Icon, type IconName } from '@/ui/icon';
 import { LayoutStrip } from '@/components/studio/layout-strip';
 
-type Tool = 'photos' | 'text' | 'stickers' | 'background' | 'slides' | 'layout';
+type Tool = 'photos' | 'text' | 'stickers' | 'background' | 'slides';
 const TOOLS: { id: Tool; label: string; icon: IconName }[] = [
   { id: 'photos', label: 'Photos', icon: 'addPhoto' },
   { id: 'text', label: 'Text', icon: 'text' },
   { id: 'stickers', label: 'Stickers', icon: 'sticker' },
   { id: 'background', label: 'Background', icon: 'palette' },
   { id: 'slides', label: 'Slides', icon: 'slides' },
-  { id: 'layout', label: 'Layout', icon: 'layout' },
 ];
 
 /** The Studio editor (Plan 15): a wide canvas of slides; photos can cross the seams. */
@@ -66,11 +65,8 @@ export default function StudioEditorScreen() {
 }
 
 function Editor() {
-  const { id, projectId, start } = useLocalSearchParams<{
-    id: string;
-    projectId: string;
-    start?: string;
-  }>();
+  // `start=layouts` (from Make a collage) needs nothing special: layouts are always shown.
+  const { id, projectId } = useLocalSearchParams<{ id: string; projectId: string }>();
   const router = useRouter();
   const t = useTheme();
   const editor = useStudioEditor(projectId);
@@ -81,7 +77,7 @@ function Editor() {
 
   const [area, setArea] = useState({ width: 0, height: 0 });
   const [scrollX, setScrollX] = useState(0);
-  const [tool, setTool] = useState<Tool>(start === 'layouts' ? 'layout' : 'photos');
+  const [tool, setTool] = useState<Tool>('photos');
   const [layoutId, setLayoutId] = useState<StudioTemplateId | null>(null);
   const [cropping, setCropping] = useState(false);
   const [replacing, setReplacing] = useState(false);
@@ -119,6 +115,8 @@ function Editor() {
     : 0;
   const shown: StudioDoc = live ? updateLayer(doc, live.id, live.patch) : doc;
   const selected = shown.layers.find((l) => l.id === selectedId) ?? null;
+  // The tools show the committed item, so they don't re-render on every gesture frame.
+  const committed = doc.layers.find((l) => l.id === selectedId) ?? null;
   const used = photosInDoc(doc);
   const heading = trip.destination || trip.title;
 
@@ -177,6 +175,12 @@ function Editor() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: doIt },
     ]);
+  };
+
+  const deselect = () => {
+    select(null);
+    setCropping(false);
+    setReplacing(false);
   };
 
   const close = () => {
@@ -302,197 +306,211 @@ function Editor() {
       </View>
 
       {/* Tools */}
-      <View
-        style={{ borderTopWidth: 1, borderColor: t.line, padding: 12, gap: 10, minHeight: 190 }}
-      >
-        {selected && !replacing ? (
-          <LayerPanel
-            layer={selected}
-            cropping={cropping}
-            onPatch={(patch) => apply((d) => updateLayer(d, selected.id, patch))}
-            onToggleCrop={() => setCropping(!cropping)}
-            onReplace={() => setReplacing(true)}
-            onArrange={(to) => apply((d) => moveLayerZ(d, selected.id, to))}
-            onDuplicate={() => {
-              const copy = newId();
-              apply((d) => duplicateLayer(d, selected.id, copy));
-              select(copy);
-            }}
-            onDelete={() => {
-              apply((d) => removeLayer(d, selected.id));
-              select(null);
-            }}
-            onDone={() => {
-              select(null);
-              setCropping(false);
+      <View style={{ borderTopWidth: 1, borderColor: t.line, paddingTop: 10, gap: 8 }}>
+        {/* Layouts stay on screen while editing (Plan 24): pick one, edit, pick again. */}
+        <View style={{ gap: 6, paddingHorizontal: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <Text style={[type.label, { color: t.ink2 }]}>Layouts</Text>
+            <View style={{ flex: 1 }}>
+              <Segmented<StudioFormat>
+                value={doc.format}
+                onChange={(format) => {
+                  const next = fitTemplate(layoutId ?? 'bridge', format, used, newId, heading);
+                  apply(() => next);
+                  deselect();
+                }}
+                options={[
+                  { value: 'post', label: '4:5' },
+                  { value: 'square', label: 'Square' },
+                  { value: 'story', label: '9:16' },
+                ]}
+              />
+            </View>
+          </View>
+          <LayoutStrip
+            compact
+            photoIds={used}
+            format={doc.format}
+            current={layoutId}
+            heading={heading}
+            photos={photos}
+            stats={stats}
+            onPick={(template, next) => {
+              // Applied straight away; Undo brings the previous layout back.
+              setLayoutId(template);
+              apply(() => next);
+              deselect();
             }}
           />
-        ) : replacing ? (
-          <>
-            <PhotoTray
-              photos={tripPhotos}
-              used={used}
-              onPick={addPhoto}
-              hint="Pick the photo for this frame"
+        </View>
+        <ScrollView
+          style={{ maxHeight: 210 }}
+          contentContainerStyle={{
+            paddingHorizontal: 12,
+            paddingBottom: 12,
+            gap: 10,
+            minHeight: 150,
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {committed && !replacing ? (
+            <LayerPanel
+              layer={committed}
+              cropping={cropping}
+              onPatch={(patch) => apply((d) => updateLayer(d, committed.id, patch))}
+              onToggleCrop={() => setCropping(!cropping)}
+              onReplace={() => setReplacing(true)}
+              onArrange={(to) => apply((d) => moveLayerZ(d, committed.id, to))}
+              onDuplicate={() => {
+                const copy = newId();
+                apply((d) => duplicateLayer(d, committed.id, copy));
+                select(copy);
+              }}
+              onDelete={() => {
+                apply((d) => removeLayer(d, committed.id));
+                select(null);
+              }}
+              onDone={() => {
+                select(null);
+                setCropping(false);
+              }}
             />
-            <Button label="Cancel" variant="link" small onPress={() => setReplacing(false)} />
-          </>
-        ) : (
-          <>
-            <ChipRow>
-              {TOOLS.map((x) => (
-                <Chip
-                  key={x.id}
-                  label={x.label}
-                  icon={x.icon}
-                  selected={tool === x.id}
-                  onPress={() => setTool(x.id)}
-                />
-              ))}
-            </ChipRow>
-            {tool === 'photos' ? (
+          ) : replacing ? (
+            <>
               <PhotoTray
                 photos={tripPhotos}
                 used={used}
                 onPick={addPhoto}
-                hint={`Tap a photo to add it to slide ${current + 1}. Drag it across the dashed line to make it scroll.`}
+                hint="Pick the photo for this frame"
               />
-            ) : null}
-            {tool === 'text' ? (
+              <Button label="Cancel" variant="link" small onPress={() => setReplacing(false)} />
+            </>
+          ) : (
+            <>
               <ChipRow>
-                {[
-                  { label: 'Heading', size: 110, bold: true },
-                  { label: 'Caption', size: 56, bold: false },
-                  { label: 'Label', size: 48, bold: true, background: '#FFFFFF' },
-                ].map((s) => (
+                {TOOLS.map((x) => (
                   <Chip
-                    key={s.label}
-                    label={s.label}
-                    onPress={() =>
-                      place((cx, cy) => ({
-                        id: newId(),
-                        kind: 'text',
-                        x: cx - slideW * 0.4,
-                        y: cy - s.size * 0.75,
-                        w: slideW * 0.8,
-                        h: s.size * 1.5,
-                        rotation: 0,
-                        text:
-                          s.label === 'Heading'
-                            ? trip.destination || trip.title
-                            : 'Write something',
-                        font: 'sans',
-                        size: s.size,
-                        color: s.background ? '#1B1A3A' : darkBg ? '#FFFFFF' : '#1B1A3A',
-                        align: 'center',
-                        bold: s.bold,
-                        background: s.background ?? null,
-                      }))
-                    }
+                    key={x.id}
+                    label={x.label}
+                    icon={x.icon}
+                    selected={tool === x.id}
+                    onPress={() => setTool(x.id)}
                   />
                 ))}
               </ChipRow>
-            ) : null}
-            {tool === 'stickers' ? (
-              <View style={{ gap: 8 }}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 6 }}
-                >
-                  {STICKERS.map((icon) => (
-                    <Pressable
-                      key={icon}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Sticker ${icon}`}
+              {tool === 'photos' ? (
+                <PhotoTray
+                  photos={tripPhotos}
+                  used={used}
+                  onPick={addPhoto}
+                  hint={`Tap a photo to add it to slide ${current + 1}. Drag it across the dashed line to make it scroll.`}
+                />
+              ) : null}
+              {tool === 'text' ? (
+                <ChipRow>
+                  {[
+                    { label: 'Heading', size: 110, bold: true },
+                    { label: 'Caption', size: 56, bold: false },
+                    { label: 'Label', size: 48, bold: true, background: '#FFFFFF' },
+                  ].map((s) => (
+                    <Chip
+                      key={s.label}
+                      label={s.label}
                       onPress={() =>
                         place((cx, cy) => ({
                           id: newId(),
-                          kind: 'sticker',
-                          icon,
-                          color: darkBg ? '#FFFFFF' : '#FF6B5B',
-                          emoji: '',
-                          x: cx - 110,
-                          y: cy - 110,
-                          w: 220,
-                          h: 220,
+                          kind: 'text',
+                          x: cx - slideW * 0.4,
+                          y: cy - s.size * 0.75,
+                          w: slideW * 0.8,
+                          h: s.size * 1.5,
                           rotation: 0,
+                          text:
+                            s.label === 'Heading'
+                              ? trip.destination || trip.title
+                              : 'Write something',
+                          font: 'sans',
+                          size: s.size,
+                          color: s.background ? '#1B1A3A' : darkBg ? '#FFFFFF' : '#1B1A3A',
+                          align: 'center',
+                          bold: s.bold,
+                          background: s.background ?? null,
                         }))
                       }
-                      style={{ padding: 8 }}
-                    >
-                      <Icon name={icon} size={30} color={t.ink} />
-                    </Pressable>
+                    />
                   ))}
-                </ScrollView>
-                <Button
-                  label="Trip stats card"
-                  icon="stats"
-                  small
-                  variant="ghost"
-                  onPress={() =>
-                    place((cx, cy) => ({
-                      id: newId(),
-                      kind: 'stats',
-                      x: cx - slideW * 0.42,
-                      y: cy - slideH * 0.15,
-                      w: slideW * 0.84,
-                      h: slideH * 0.3,
-                      rotation: 0,
-                      color: '#FF6B5B',
-                    }))
-                  }
+                </ChipRow>
+              ) : null}
+              {tool === 'stickers' ? (
+                <View style={{ gap: 8 }}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 6 }}
+                  >
+                    {STICKERS.map((icon) => (
+                      <Pressable
+                        key={icon}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Sticker ${icon}`}
+                        onPress={() =>
+                          place((cx, cy) => ({
+                            id: newId(),
+                            kind: 'sticker',
+                            icon,
+                            color: darkBg ? '#FFFFFF' : '#FF6B5B',
+                            emoji: '',
+                            x: cx - 110,
+                            y: cy - 110,
+                            w: 220,
+                            h: 220,
+                            rotation: 0,
+                          }))
+                        }
+                        style={{ padding: 8 }}
+                      >
+                        <Icon name={icon} size={30} color={t.ink} />
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  <Button
+                    label="Trip stats card"
+                    icon="stats"
+                    small
+                    variant="ghost"
+                    onPress={() =>
+                      place((cx, cy) => ({
+                        id: newId(),
+                        kind: 'stats',
+                        x: cx - slideW * 0.42,
+                        y: cy - slideH * 0.15,
+                        w: slideW * 0.84,
+                        h: slideH * 0.3,
+                        rotation: 0,
+                        color: '#FF6B5B',
+                      }))
+                    }
+                  />
+                </View>
+              ) : null}
+              {tool === 'background' ? (
+                <BackgroundPanel
+                  background={doc.background}
+                  onChange={(bg) => apply((d) => setBackground(d, bg))}
                 />
-              </View>
-            ) : null}
-            {tool === 'background' ? (
-              <BackgroundPanel
-                background={doc.background}
-                onChange={(bg) => apply((d) => setBackground(d, bg))}
-              />
-            ) : null}
-            {tool === 'slides' ? (
-              <SlidesPanel
-                doc={doc}
-                current={current}
-                onAdd={() => apply(addSlide)}
-                onRemove={removeCurrentSlide}
-                onMove={(to) => apply((d) => swapSlides(d, current, to))}
-              />
-            ) : null}
-            {tool === 'layout' ? (
-              <View style={{ gap: 8 }}>
-                <Segmented<StudioFormat>
-                  value={doc.format}
-                  onChange={(format) => {
-                    const next = fitTemplate(layoutId ?? 'bridge', format, used, newId, heading);
-                    apply(() => next);
-                    select(null);
-                  }}
-                  options={[
-                    { value: 'post', label: '4:5' },
-                    { value: 'square', label: 'Square' },
-                    { value: 'story', label: '9:16' },
-                  ]}
+              ) : null}
+              {tool === 'slides' ? (
+                <SlidesPanel
+                  doc={doc}
+                  current={current}
+                  onAdd={() => apply(addSlide)}
+                  onRemove={removeCurrentSlide}
+                  onMove={(to) => apply((d) => swapSlides(d, current, to))}
                 />
-                <LayoutStrip
-                  photoIds={used}
-                  format={doc.format}
-                  current={layoutId}
-                  heading={heading}
-                  photos={photos}
-                  stats={stats}
-                  onPick={(template, next) => {
-                    // Applied straight away; Undo brings the previous layout back.
-                    setLayoutId(template);
-                    apply(() => next);
-                    select(null);
-                  }}
-                />
-              </View>
-            ) : null}
-          </>
-        )}
+              ) : null}
+            </>
+          )}
+        </ScrollView>
       </View>
     </SafeAreaView>
   );

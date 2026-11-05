@@ -90,7 +90,8 @@ describe('Studio editor', () => {
     expect(saved.background).toEqual({ kind: 'color', color: '#0F1020' });
     expect(saved.layers.map((l) => l.kind)).toEqual(['text', 'stats']);
     expect(saved.layers[0]).toMatchObject({ text: 'Monsoon magic' });
-    expect(screen.queryByText('stops')).toBeTruthy();
+    // On the canvas (layout previews below may show stats cards too).
+    expect(screen.queryAllByText('stops').length).toBeGreaterThan(0);
   });
 
   it('adds a trip photo to the visible slide and opens export', async () => {

@@ -204,7 +204,59 @@ describe('editing a collage', () => {
     expect(saved.background).toMatchObject({ kind: 'gradient', from: '#0EA5E9' });
   });
 
-  it('layouts: opens on the strip, every layout and format applies live, undo works', async () => {
+  it('layouts stay visible while a photo is selected or cropped, and apply from there', async () => {
+    const { db, project } = await open();
+    const layout = (name: string) => screen.getByRole('radio', { name: `Layout ${name}` });
+    expect(layout('Film roll')).toBeTruthy();
+    await press('Photo');
+    expect(screen.getByLabelText('Selected item')).toBeTruthy();
+    expect(layout('Film roll')).toBeTruthy();
+    await press('Crop');
+    expect(screen.getByLabelText('Cropping photo')).toBeTruthy();
+    await fireEvent.press(layout('Film roll'));
+    // Applied, and the old selection is gone (its item may no longer exist).
+    expect(screen.queryByLabelText('Cropping photo')).toBeNull();
+    expect(layout('Film roll').props.accessibilityState).toMatchObject({ selected: true });
+    await press('Photo');
+    await fireEvent.press(screen.getByRole('tab', { name: 'Square' }));
+    expect(screen.queryByLabelText('Selected item')).toBeNull();
+    await close();
+    expect(doc(db, project.id).format).toBe('square');
+    expectFinite(doc(db, project.id));
+  });
+
+  it('two-finger twist ignores fingers swapping order between events', async () => {
+    const { db, project } = await open();
+    const before = doc(db, project.id).layers.find((l) => l.kind === 'photo')!;
+    await press('Photo');
+    const el = screen.getByLabelText('Selected item');
+    const touch = (id: number, x: number, y: number) => ({
+      identifier: id,
+      pageX: x,
+      pageY: y,
+      locationX: x,
+      locationY: y,
+    });
+    const ev = (touches: ReturnType<typeof touch>[]) => ({
+      touchHistory: {
+        numberActiveTouches: touches.length,
+        indexOfSingleActiveTouch: 0,
+        mostRecentTimeStamp: 3,
+        touchBank: [],
+      },
+      nativeEvent: { touches, changedTouches: touches, pageX: 0, pageY: 0, timestamp: 3 },
+    });
+    await fireEvent(el, 'responderGrant', ev([touch(0, 100, 100), touch(1, 200, 100)]));
+    await fireEvent(el, 'responderMove', ev([touch(0, 100, 100), touch(1, 200, 100)]));
+    // Same fingers, listed the other way round: no 180° flip.
+    await fireEvent(el, 'responderMove', ev([touch(1, 200, 100), touch(0, 100, 100)]));
+    await fireEvent(el, 'responderRelease', ev([]));
+    await close();
+    const after = doc(db, project.id).layers.find((l) => l.id === before.id)!;
+    expect(after.rotation).toBe(before.rotation);
+  });
+
+  it('layouts: every layout and format applies live, undo works', async () => {
     const { db, project } = await open('bridge', { start: 'layouts' });
     for (const tpl of STUDIO_TEMPLATES.filter((t) => t.id !== 'blank')) {
       await fireEvent.press(screen.getByRole('radio', { name: `Layout ${tpl.name}` }));

@@ -89,6 +89,13 @@ export function ShareActions({
         </Text>
       ) : null}
 
+      {format === 'post' ? (
+        <Text accessibilityRole="text" style={[type.caption, { color: t.ink2 }]}>
+          Instagram crops a carousel to square at first. Tap Ratio in Instagram and choose 4:5 so
+          nothing is cut off and the slides join up.
+        </Text>
+      ) : null}
+
       <Button
         label={label('ig', 'Post to Instagram')}
         icon="camera"

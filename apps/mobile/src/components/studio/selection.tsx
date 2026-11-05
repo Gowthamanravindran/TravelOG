@@ -150,8 +150,17 @@ function makeResponders(latest: Latest) {
   let total: GestureDelta = IDENTITY;
   let phase:
     | { fingers: 1; dx: number; dy: number }
-    | { fingers: 2; dist: number; angle: number; cx: number; cy: number }
+    | { fingers: 2; ids: string; dist: number; angle: number; cx: number; cy: number }
     | null = null;
+  // Touch events can arrive faster than the screen draws (120 Hz on many phones):
+  // draw at most once per frame, always with the newest position.
+  let frame: number | null = null;
+  let pending: { patch: Partial<Layer>; guides: Guides } | null = null;
+  const flush = () => {
+    frame = null;
+    if (pending) latest.current.onLive(pending.patch, pending.guides);
+    pending = null;
+  };
 
   const begin = () => {
     start = latest.current.layer;
@@ -162,9 +171,13 @@ function makeResponders(latest: Latest) {
   };
   const show = (patch: Partial<Layer>, guides: Guides = NO_GUIDES) => {
     last = patch;
-    latest.current.onLive(patch, guides);
+    pending = { patch, guides };
+    if (frame === null) frame = requestAnimationFrame(flush);
   };
   const end = () => {
+    if (frame !== null) cancelAnimationFrame(frame);
+    frame = null;
+    pending = null;
     const patch = last;
     start = null;
     last = null;
@@ -181,25 +194,30 @@ function makeResponders(latest: Latest) {
     onPanResponderMove: (e: GestureResponderEvent, g: PanResponderGestureState) => {
       const { doc, scale, mode, photoSize } = latest.current;
       if (!start) return;
-      const touches: { pageX: number; pageY: number }[] = [...(e.nativeEvent.touches ?? [])];
+      // Android may list the fingers in a different order from one event to the next;
+      // sorting by id keeps the twist angle from jumping by 180°.
+      const touches: { identifier?: number; pageX: number; pageY: number }[] = [
+        ...(e.nativeEvent.touches ?? []),
+      ].sort((p, q) => Number(p.identifier ?? 0) - Number(q.identifier ?? 0));
       const fingers = touches.length >= 2 ? 2 : 1;
       let step: GestureDelta;
       if (fingers === 2) {
         const a = touches[0]!;
         const b = touches[1]!;
+        const ids = `${a.identifier}:${b.identifier}`;
         const dist = Math.hypot(b.pageX - a.pageX, b.pageY - a.pageY) || 1;
         const angle = Math.atan2(b.pageY - a.pageY, b.pageX - a.pageX);
         const cx = (a.pageX + b.pageX) / 2;
         const cy = (a.pageY + b.pageY) / 2;
-        if (phase?.fingers !== 2) {
+        if (phase?.fingers !== 2 || phase.ids !== ids) {
           acc = total;
-          phase = { fingers: 2, dist, angle, cx, cy };
+          phase = { fingers: 2, ids, dist, angle, cx, cy };
         }
         step = {
           dx: (cx - phase.cx) / scale,
           dy: (cy - phase.cy) / scale,
           scale: dist / phase.dist,
-          rotation: ((angle - phase.angle) * 180) / Math.PI,
+          rotation: wrapDegrees(((angle - phase.angle) * 180) / Math.PI),
         };
       } else {
         if (phase?.fingers !== 1) {
@@ -267,6 +285,11 @@ function makeResponders(latest: Latest) {
       br: cornerResponder('br'),
     },
   };
+}
+
+/** An angle change as the shortest turn, so crossing ±180° doesn't spin the item. */
+function wrapDegrees(deg: number): number {
+  return ((((deg + 180) % 360) + 360) % 360) - 180;
 }
 
 /** Never commit NaN/Infinity (a bad touch reading must not break the collage). */
