@@ -36,7 +36,9 @@ const ids = () => `id${n++}`;
 const sticker = (id: string, x: number, y = 100, w = 200, h = 200, rotation = 0): Layer => ({
   id,
   kind: 'sticker',
-  emoji: '🌴',
+  icon: 'beach',
+  color: '#FF6B5B',
+  emoji: '',
   x,
   y,
   w,
@@ -69,6 +71,25 @@ describe('studio documents', () => {
     const [p, t] = repaired.layers;
     expect(p).toMatchObject({ x: 0, crop: { scale: 1, x: 0.5, y: 0.5 } });
     expect(t).toMatchObject({ size: 600, font: 'sans' });
+  });
+});
+
+describe('stickers', () => {
+  it('reads icon stickers and keeps old emoji stickers drawable', () => {
+    const doc = parseDoc({
+      format: 'post',
+      slides: 1,
+      layers: [
+        { id: 'a', kind: 'sticker', icon: 'beach', color: '#14B8A6', x: 0, y: 0, w: 100, h: 100 },
+        { id: 'b', kind: 'sticker', emoji: '🌴', x: 0, y: 0, w: 100, h: 100 },
+        { id: 'c', kind: 'sticker', icon: 'not a name!', color: 'red', x: 0, y: 0, w: 100, h: 100 },
+      ],
+    });
+    expect(doc.layers).toMatchObject([
+      { icon: 'beach', color: '#14B8A6', emoji: '' },
+      { icon: null, emoji: '🌴' },
+      { icon: null, color: '#FF6B5B' },
+    ]);
   });
 });
 

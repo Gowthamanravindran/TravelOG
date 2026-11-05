@@ -1,15 +1,15 @@
 import { Tabs } from 'expo-router/tabs';
 
 import { TripHeader } from '@/components/trip-header';
-import { ModeTabBar } from '@/ui/tab-bar';
+import { ModeTabBar, type TabSpec } from '@/ui/tab-bar';
 import { ModeProvider } from '@/ui/theme';
 
-const TABS = [
-  { name: 'index', label: 'Itinerary', icon: '🗓️' },
-  { name: 'budget', label: 'Budget', icon: '💰' },
-  { name: 'bookings', label: 'Bookings', icon: '🎫' },
-  { name: 'polls', label: 'Polls', icon: '🗳️' },
-  { name: 'memories', label: 'Memories', icon: '📸' },
+const TABS: TabSpec[] = [
+  { name: 'index', label: 'Itinerary', icon: 'itinerary' },
+  { name: 'budget', label: 'Budget', icon: 'budget' },
+  { name: 'bookings', label: 'Bookings', icon: 'bookings' },
+  { name: 'polls', label: 'Polls', icon: 'polls' },
+  { name: 'memories', label: 'Memories', icon: 'memories' },
 ];
 
 /** Plan mode (indigo): Itinerary · Budget · Bookings · Polls · Memories. */

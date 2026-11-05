@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { useQuery } from '@/data/provider';
 import { dateTimeIn, money } from '@/lib/format';
 import { BOOKING_LABELS } from '@/lib/labels';
-import { Between, Body, Button, Card, Empty, Strong } from '@/ui/kit';
+import { Between, Body, Button, Card, Empty, Strong, WithIcon } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
 export function BookingsView({ tripId }: { tripId: string }) {
@@ -33,13 +33,15 @@ export function BookingsView({ tripId }: { tripId: string }) {
             accessibilityLabel={b.title}
           >
             <Between>
-              <Body small style={{ color: t.accent, fontWeight: '700' }}>
-                {BOOKING_LABELS[b.type].icon} {BOOKING_LABELS[b.type].label.toUpperCase()}
-                {b.provider ? ` · ${b.provider}` : ''}
-              </Body>
+              <WithIcon icon={BOOKING_LABELS[b.type].icon} color={t.accent} size={16}>
+                <Body small style={{ color: t.accent, fontWeight: '700' }}>
+                  {BOOKING_LABELS[b.type].label.toUpperCase()}
+                  {b.provider ? ` · ${b.provider}` : ''}
+                </Body>
+              </WithIcon>
               {b.files ? (
                 <Body small muted>
-                  📎 {b.files}
+                  {b.files} {b.files === 1 ? 'file' : 'files'}
                 </Body>
               ) : null}
             </Between>
@@ -60,12 +62,16 @@ export function BookingsView({ tripId }: { tripId: string }) {
         ))
       ) : (
         <Empty
-          icon="🎫"
+          icon="bookings"
           title="No bookings yet"
           body="Add flights, trains, buses, stays and event tickets with their PDFs."
         />
       )}
-      <Button label="＋ Add booking" onPress={() => router.push(`/trip/${tripId}/booking`)} />
+      <Button
+        label="Add booking"
+        icon="add"
+        onPress={() => router.push(`/trip/${tripId}/booking`)}
+      />
     </View>
   );
 }

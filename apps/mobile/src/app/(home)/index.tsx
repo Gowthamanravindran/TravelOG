@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 import { TripCard } from '@/components/trip-card';
 import { useQuery } from '@/data/provider';
-import { Body, Button, Card, Empty, H1, Screen, Segmented, Strong } from '@/ui/kit';
+import { Body, Button, Card, Empty, H1, Screen, Segmented, Strong, WithIcon } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 import { tripDayNumber } from '@travelog/core';
+import { tripIcon } from '@/lib/labels';
 
 type Filter = 'upcoming' | 'planning' | 'past';
 
@@ -30,22 +31,22 @@ export default function TripsScreen() {
 
   return (
     <Screen>
-      <H1 eyebrow={`Hi ${profile?.displayName ?? 'there'} 👋`}>Your trips</H1>
+      <H1 eyebrow={`Hi ${profile?.displayName ?? 'there'}`}>Your trips</H1>
       {live ? (
         <Card
           onPress={() => open(live)}
           style={{ backgroundColor: '#0F1020', borderColor: '#0F1020' }}
         >
           <Body small style={{ color: '#5EEAD4' }}>
-            ● LIVE NOW
+            LIVE NOW
             {(() => {
               const d = tripDayNumber(live);
               return d ? ` · Day ${d.day} of ${d.of}` : '';
             })()}
           </Body>
-          <Strong style={{ color: '#F4F3FA', fontSize: 20 }}>
-            {live.emoji} {live.title}
-          </Strong>
+          <WithIcon icon={tripIcon(live.emoji)} color="#A9D9D2" size={22}>
+            <Strong style={{ color: '#F4F3FA', fontSize: 20 }}>{live.title}</Strong>
+          </WithIcon>
           <Body small style={{ color: '#A9D9D2' }}>
             Open trip mode →
           </Body>
@@ -70,7 +71,7 @@ export default function TripsScreen() {
         </>
       ) : (
         <Empty
-          icon="🧳"
+          icon="trips"
           title="No trips yet"
           body="Start one, add the people coming, and plan it day by day."
           action={<Button label="Plan a trip" onPress={() => router.push('/new-trip')} />}

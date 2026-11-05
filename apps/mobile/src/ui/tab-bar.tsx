@@ -3,17 +3,18 @@ import { radius, type } from '@travelog/ui';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon, type IconName } from './icon';
 import { useTheme } from './theme';
 
 export interface TabSpec {
   name: string;
   label: string;
-  icon: string;
+  icon: IconName;
 }
 
 /**
  * The mode bottom bar (docs/02 ModeNavBar): accent pill behind the active item.
- * `center` adds the round ＋ button in the middle (Home mode).
+ * `center` adds the round add button in the middle (Home mode).
  */
 export function ModeTabBar({
   state,
@@ -39,7 +40,7 @@ export function ModeTabBar({
         style={styles.item}
       >
         <View style={[styles.pill, focused && { backgroundColor: t.accentSoft }]}>
-          <Text style={{ fontSize: 18 }}>{tab.icon}</Text>
+          <Icon name={tab.icon} size={22} color={focused ? t.accent : t.ink2} />
         </View>
         <Text style={[type.caption, { color: focused ? t.ink : t.ink2 }]}>{tab.label}</Text>
       </Pressable>
@@ -56,7 +57,7 @@ export function ModeTabBar({
         onPress={center.onPress}
         style={[styles.fab, { backgroundColor: t.accent }]}
       >
-        <Text style={[styles.fabText, { color: t.onAccent }]}>＋</Text>
+        <Icon name="add" size={28} color={t.onAccent} />
       </Pressable>,
     );
   }
@@ -100,5 +101,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: -24,
   },
-  fabText: { fontSize: 28, lineHeight: 30, fontWeight: '600' },
 });

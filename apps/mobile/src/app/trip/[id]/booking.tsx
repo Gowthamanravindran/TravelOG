@@ -133,7 +133,8 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         {BOOKING_TYPES.map((b) => (
           <Chip
             key={b}
-            label={`${BOOKING_LABELS[b].icon} ${BOOKING_LABELS[b].label}`}
+            label={BOOKING_LABELS[b].label}
+            icon={BOOKING_LABELS[b].icon}
             selected={kind === b}
             onPress={() => setKind(b)}
           />
@@ -205,7 +206,8 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
       />
       {!existing ? (
         <Chip
-          label={`${addAsExpense ? '✓ ' : ''}Also add to expenses, split equally`}
+          label="Also add to expenses, split equally"
+          icon={addAsExpense ? 'check' : 'circle'}
           selected={addAsExpense}
           onPress={() => setAddAsExpense(!addAsExpense)}
         />
@@ -214,12 +216,13 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         <Card>
           <Between>
             <Body>Tickets on this phone</Body>
-            <Button label="＋ Attach" variant="link" onPress={attach} />
+            <Button label="Attach" icon="attach" variant="link" onPress={attach} />
           </Between>
           {files.map((f) => (
             <Between key={f.id}>
               <Button
-                label={`📎 ${f.name}`}
+                label={f.name}
+                icon="attach"
                 variant="link"
                 onPress={() =>
                   f.localUri && openAttachment(f.localUri).catch((e) => setError(errorMessage(e)))

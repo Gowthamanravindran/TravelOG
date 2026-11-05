@@ -31,8 +31,10 @@ import {
   ErrorText,
   Row,
   Strong,
+  WithIcon,
 } from '@/ui/kit';
 import { useMode, useTheme } from '@/ui/theme';
+import { Icon, type IconName } from '@/ui/icon';
 
 export const IDEAS_DAY = 'ideas';
 
@@ -155,7 +157,7 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
             {variants.map((v) => (
               <Chip
                 key={v.id}
-                label={`${v.name}${v.isMain ? ' ★' : ''}`}
+                label={v.isMain ? `${v.name} (main)` : v.name}
                 selected={!compare && v.id === variant?.id}
                 onPress={() => {
                   setVariantId(v.id);
@@ -163,7 +165,7 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
                 }}
               />
             ))}
-            {editable ? <Chip label="＋ Plan" onPress={addPlan} /> : null}
+            {editable ? <Chip label="Plan" icon="add" onPress={addPlan} /> : null}
           </ChipRow>
           {variants.length > 1 ? (
             <Button
@@ -183,7 +185,7 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
               <Between>
                 <Strong>
                   {v.name}
-                  {v.isMain ? ' ★ main' : ''}
+                  {v.isMain ? ' · main' : ''}
                 </Strong>
                 {editable && !v.isMain ? (
                   <Button
@@ -199,11 +201,11 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
               </Body>
             </Card>
           ))}
-          {editable ? <Button label="🗳 Let the group vote" onPress={putToVote} /> : null}
+          {editable ? <Button label="Let the group vote" icon="polls" onPress={putToVote} /> : null}
         </View>
       ) : !variant ? (
         <Empty
-          icon={day === IDEAS_DAY ? '💡' : '🗺️'}
+          icon={day === IDEAS_DAY ? 'idea' : 'plan'}
           title={day === IDEAS_DAY ? 'Collect ideas here' : 'Nothing planned for this day'}
           body={
             editable
@@ -245,7 +247,8 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
           ))}
           {editable ? (
             <Button
-              label="＋ Add stop"
+              label="Add stop"
+              icon="add"
               variant="ghost"
               onPress={() => router.push(`/trip/${tripId}/item?variantId=${variant.id}`)}
             />
@@ -290,13 +293,15 @@ function ItemRow({
         accessibilityLabel={item.title}
       >
         <Between>
-          <Strong style={{ flex: 1 }}>
-            {ITEM_LABELS[item.type].icon} {item.title}
-          </Strong>
+          <View style={{ flex: 1 }}>
+            <WithIcon icon={ITEM_LABELS[item.type].icon}>
+              <Strong>{item.title}</Strong>
+            </WithIcon>
+          </View>
           {editable ? (
             <Row style={{ gap: 4 }}>
-              <SmallIcon label="Move up" glyph="↑" onPress={onUp} />
-              <SmallIcon label="Move down" glyph="↓" onPress={onDown} />
+              <SmallIcon label="Move up" icon="up" onPress={onUp} />
+              <SmallIcon label="Move down" icon="down" onPress={onDown} />
             </Row>
           ) : null}
         </Between>
@@ -315,11 +320,11 @@ function ItemRow({
 
 function SmallIcon({
   label,
-  glyph,
+  icon,
   onPress,
 }: {
   label: string;
-  glyph: string;
+  icon: IconName;
   onPress?: () => void;
 }) {
   const t = useTheme();
@@ -332,7 +337,7 @@ function SmallIcon({
       hitSlop={6}
       style={[styles.icon, { backgroundColor: t.surface2, opacity: onPress ? 1 : 0.3 }]}
     >
-      <Text style={{ color: t.ink }}>{glyph}</Text>
+      <Icon name={icon} size={16} color={t.ink} />
     </Pressable>
   );
 }

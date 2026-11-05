@@ -40,7 +40,7 @@ export default function Settle() {
     const payee = member(to);
     try {
       if (!payee?.upiId)
-        throw new Error(`add ${payee?.displayName ?? 'their'} UPI ID first (⋯ → People)`);
+        throw new Error(`add ${payee?.displayName ?? 'their'} UPI ID first (Budget → People)`);
       const url = upiPayLink({
         payeeVpa: payee.upiId,
         payeeName: payee.displayName,
@@ -96,7 +96,7 @@ export default function Settle() {
             );
           })
         ) : (
-          <Empty icon="🎉" title="Everyone is square" />
+          <Empty icon="check" title="Everyone is square" />
         )}
         <ErrorText>{error}</ErrorText>
       </Screen>

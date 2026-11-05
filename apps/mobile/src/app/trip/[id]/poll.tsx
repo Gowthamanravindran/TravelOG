@@ -89,7 +89,8 @@ export default function NewPoll() {
               />
             ))}
             <Button
-              label="＋ Another option"
+              label="Another option"
+              icon="add"
               variant="link"
               onPress={() => setOptions([...options, ''])}
             />
@@ -132,7 +133,8 @@ export default function NewPoll() {
               </Row>
             ))}
             <Button
-              label="＋ Another range"
+              label="Another range"
+              icon="add"
               variant="link"
               onPress={() => setRanges([...ranges, { start: '', end: '' }])}
             />

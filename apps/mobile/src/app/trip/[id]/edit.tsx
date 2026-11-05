@@ -125,7 +125,8 @@ export default function EditTrip() {
             autoCapitalize="none"
           />
           <Button
-            label="＋ Add person"
+            label="Add person"
+            icon="personAdd"
             variant="ghost"
             disabled={!newName.trim()}
             onPress={() =>

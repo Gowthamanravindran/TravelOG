@@ -177,7 +177,8 @@ function ExpenseForm({ tripId }: { tripId: string }) {
         {BUDGET_CATEGORIES.map((c) => (
           <Chip
             key={c}
-            label={`${CATEGORY_LABELS[c].icon} ${CATEGORY_LABELS[c].label}`}
+            label={CATEGORY_LABELS[c].label}
+            icon={CATEGORY_LABELS[c].icon}
             selected={category === c}
             onPress={() => setCategory(c)}
           />
@@ -215,7 +216,8 @@ function ExpenseForm({ tripId }: { tripId: string }) {
           <Row key={m.id}>
             <View style={{ flex: 1 }}>
               <Chip
-                label={`${on ? '✓ ' : ''}${m.isMe ? 'You' : m.displayName}`}
+                label={m.isMe ? 'You' : m.displayName}
+                icon={on ? 'check' : 'circle'}
                 selected={on}
                 onPress={() => toggle(m.id)}
               />

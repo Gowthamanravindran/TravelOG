@@ -32,7 +32,7 @@ describe('screens on a real database', () => {
     saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
     const view = await render(withData(db, <TripsScreen />));
     expect(screen.getByText('No trips yet')).toBeTruthy();
-    expect(screen.getByText('Hi Gowtham 👋')).toBeTruthy();
+    expect(screen.getByText('Hi Gowtham')).toBeTruthy();
 
     createTrip(
       db,
@@ -73,7 +73,7 @@ describe('screens on a real database', () => {
     await render(withData(db, <BudgetView tripId={trip.id} />, 'plan'));
     expect(screen.getByText('You are owed ₹5,000')).toBeTruthy();
     expect(screen.getByText('owes ₹5,000')).toBeTruthy();
-    expect(screen.getByText('🏡 Villa')).toBeTruthy();
+    expect(screen.getByText('Villa')).toBeTruthy();
   });
 
   it('Polls records a vote when an option is tapped', async () => {

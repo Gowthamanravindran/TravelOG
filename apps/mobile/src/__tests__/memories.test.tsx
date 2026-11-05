@@ -57,7 +57,7 @@ describe('Memories tab', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: /^Goa, 3 slides/ }));
     expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/studio/${project.id}`);
-    await fireEvent.press(screen.getByRole('button', { name: '＋ New carousel' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'New carousel' }));
     expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/studio/new`);
   });
 

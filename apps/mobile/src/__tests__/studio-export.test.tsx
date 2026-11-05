@@ -42,7 +42,7 @@ it('exports every slide in order, remembers the export and offers sharing', asyn
   mockParams = { id: trip.id, projectId: project.id };
 
   await render(withData(db, <StudioExport />, 'trip'));
-  await waitFor(() => expect(screen.getByText('✓ 3 slides ready')).toBeTruthy());
+  await waitFor(() => expect(screen.getByText('3 slides ready')).toBeTruthy());
 
   expect(mockKeep).toHaveBeenCalledWith(project.id, [
     'file:///tmp/shot-0.jpg',

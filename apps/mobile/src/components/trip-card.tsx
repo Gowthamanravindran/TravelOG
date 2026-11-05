@@ -5,11 +5,13 @@ import { StyleSheet, Text, View } from 'react-native';
 import { dateRange } from '@/lib/format';
 import { Body, Card, Strong } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
+import { tripIcon } from '@/lib/labels';
+import { Icon } from '@/ui/icon';
 
 const STATE_LABELS = {
   planning: 'Planning',
   upcoming: 'Upcoming',
-  live: '● Live now',
+  live: 'Live now',
   completed: 'Completed',
   archived: 'Archived',
 } as const;
@@ -32,7 +34,7 @@ export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () =
       accessibilityLabel={`${trip.title}, ${STATE_LABELS[trip.state]}`}
     >
       <View style={[styles.cover, { backgroundColor: a }]}>
-        <Text style={styles.emoji}>{trip.emoji}</Text>
+        <Icon name={tripIcon(trip.emoji)} size={34} color="#FFFFFF" />
         <View style={[styles.badge, { backgroundColor: t.surface }]}>
           <Text style={[type.caption, { color: t.ink }]}>{STATE_LABELS[trip.state]}</Text>
         </View>

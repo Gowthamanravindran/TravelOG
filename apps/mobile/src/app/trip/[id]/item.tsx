@@ -72,7 +72,8 @@ export default function ItemEditor() {
           {ITEM_TYPES.map((k) => (
             <Chip
               key={k}
-              label={`${ITEM_LABELS[k].icon} ${ITEM_LABELS[k].label}`}
+              label={ITEM_LABELS[k].label}
+              icon={ITEM_LABELS[k].icon}
               selected={kind === k}
               onPress={() => setKind(k)}
             />

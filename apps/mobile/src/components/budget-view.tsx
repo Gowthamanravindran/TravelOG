@@ -30,6 +30,7 @@ import {
   H2,
   Row,
   Strong,
+  WithIcon,
 } from '@/ui/kit';
 import { useMode, useTheme } from '@/ui/theme';
 
@@ -129,7 +130,7 @@ export function BudgetView({ tripId }: { tripId: string }) {
           {BUDGET_CATEGORIES.map((c) => (
             <Field
               key={c}
-              label={`${CATEGORY_LABELS[c].icon} ${CATEGORY_LABELS[c].label}`}
+              label={CATEGORY_LABELS[c].label}
               value={draft[c] ?? ''}
               onChangeText={(v) => setDraft({ ...draft, [c]: v })}
               keyboardType="decimal-pad"
@@ -155,9 +156,9 @@ export function BudgetView({ tripId }: { tripId: string }) {
             return (
               <View key={c} style={{ gap: 6 }}>
                 <Between>
-                  <Strong>
-                    {CATEGORY_LABELS[c].icon} {CATEGORY_LABELS[c].label}
-                  </Strong>
+                  <WithIcon icon={CATEGORY_LABELS[c].icon}>
+                    <Strong>{CATEGORY_LABELS[c].label}</Strong>
+                  </WithIcon>
                   <Body small>
                     {money(spent, cur)}
                     {budget ? ` / ${money(budget, cur)}` : ''}
@@ -207,7 +208,7 @@ export function BudgetView({ tripId }: { tripId: string }) {
         })}
         {members.length < 2 ? (
           <Body muted small>
-            Add the people on this trip from ⋯ at the top to split costs.
+            Add the people on this trip in People above to split costs.
           </Body>
         ) : null}
       </Card>
@@ -215,7 +216,8 @@ export function BudgetView({ tripId }: { tripId: string }) {
       <H2
         right={
           <Button
-            label="＋ Add"
+            label="Add"
+            icon="add"
             variant="link"
             onPress={() => router.push(`/trip/${tripId}/expense`)}
           />
@@ -237,9 +239,11 @@ export function BudgetView({ tripId }: { tripId: string }) {
                   accessibilityLabel={`${e.title}, ${money(e.tripAmountMinor, cur)}, paid by ${name(e.paidByMemberId)}`}
                 >
                   <Between>
-                    <Strong style={{ flex: 1 }}>
-                      {CATEGORY_LABELS[e.category].icon} {e.title}
-                    </Strong>
+                    <View style={{ flex: 1 }}>
+                      <WithIcon icon={CATEGORY_LABELS[e.category].icon}>
+                        <Strong>{e.title}</Strong>
+                      </WithIcon>
+                    </View>
                     <Body style={{ color: net >= 0 ? t.success : t.danger, fontWeight: '700' }}>
                       {net >= 0 ? '+' : '−'}
                       {money(Math.abs(net), cur)}
@@ -259,7 +263,7 @@ export function BudgetView({ tripId }: { tripId: string }) {
         </Card>
       ) : (
         <Empty
-          icon="💸"
+          icon="expense"
           title="No expenses yet"
           body="Add the first one — everyone's share is worked out for you."
         />

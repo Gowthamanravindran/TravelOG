@@ -1,5 +1,6 @@
 import { photoPlacement, type Layer, type StudioFont } from '@travelog/core';
 import { Image, Platform, StyleSheet, Text, View, type TextStyle } from 'react-native';
+import { Icon, isIconName } from '@/ui/icon';
 
 /** What the canvas needs to know about a trip photo. */
 export interface PhotoInfo {
@@ -103,7 +104,7 @@ export function LayerView({
               />
             ) : (
               <View style={styles.empty}>
-                <Text style={{ fontSize: Math.max(10, 44 * scale), color: '#00000055' }}>＋</Text>
+                <Icon name="addPhoto" size={Math.max(12, 64 * scale)} color="#00000055" />
               </View>
             )}
           </View>
@@ -150,7 +151,17 @@ export function LayerView({
     case 'sticker':
       return (
         <View style={[box, styles.center]}>
-          <Text style={{ fontSize: Math.min(layer.w, layer.h) * 0.78 * scale }}>{layer.emoji}</Text>
+          {isIconName(layer.icon) ? (
+            <Icon
+              name={layer.icon}
+              size={Math.min(layer.w, layer.h) * 0.9 * scale}
+              color={layer.color}
+            />
+          ) : (
+            <Text style={{ fontSize: Math.min(layer.w, layer.h) * 0.78 * scale }}>
+              {layer.emoji}
+            </Text>
+          )}
         </View>
       );
 

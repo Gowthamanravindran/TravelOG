@@ -7,8 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useQuery } from '@/data/provider';
 import { dateRange } from '@/lib/format';
-import { Button, Row } from '@/ui/kit';
+import { Button, Row, WithIcon } from '@/ui/kit';
 import { useMode, useTheme } from '@/ui/theme';
+import { tripIcon } from '@/lib/labels';
+import { Icon } from '@/ui/icon';
 
 /** Header shared by Plan and Trip mode: back/exit, trip name, and the switch between modes. */
 export function TripHeader() {
@@ -53,7 +55,7 @@ export function TripHeader() {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: t.ink, fontSize: 18 }}>‹</Text>
+            <Icon name="back" size={20} color={t.ink} />
           </Pressable>
           <View style={{ flex: 1 }}>
             <Text
@@ -62,12 +64,15 @@ export function TripHeader() {
             >
               {eyebrow}
             </Text>
-            <Text style={[type.title, { color: t.ink }]} numberOfLines={1}>
-              {trip.emoji} {trip.title}
-            </Text>
+            <WithIcon icon={tripIcon(trip.emoji)} color={t.accent} size={20}>
+              <Text style={[type.title, { color: t.ink }]} numberOfLines={1}>
+                {trip.title}
+              </Text>
+            </WithIcon>
           </View>
           <Button
-            label="⋯"
+            label=""
+            icon="more"
             accessibilityLabel="Trip settings"
             variant="ghost"
             small

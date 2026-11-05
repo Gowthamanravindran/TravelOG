@@ -44,7 +44,7 @@ export function createTrip(
   return tx(db, (db) => {
     const trip = insertRow(db, 'trips', {
       title: input.title.trim().slice(0, 80),
-      emoji: input.emoji ?? '🧳',
+      emoji: input.emoji ?? 'trips',
       destination: input.destination?.trim() || null,
       startDate: input.startDate ?? null,
       endDate: input.endDate ?? null,

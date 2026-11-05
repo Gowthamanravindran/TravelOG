@@ -7,6 +7,7 @@ import { useMutate, useQuery } from '@/data/provider';
 import { CURRENCIES, errorMessage } from '@/lib/format';
 import { Body, Button, Chip, ChipRow, ErrorText, Field, H1, Screen } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
+import { Icon } from '@/ui/icon';
 
 /** First launch: who are you? (Sign-in arrives later; this profile stays on this phone.) */
 export default function Welcome() {
@@ -32,7 +33,7 @@ export default function Welcome() {
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <Text style={{ fontSize: 44 }}>✈️</Text>
+      <Icon name="flight" size={44} color={t.accent} />
       <H1 eyebrow="Welcome to TravelOG">Plan trips with your friends</H1>
       <Body muted>Vote, split, go. Your trips are saved on this phone and work offline.</Body>
       <Field

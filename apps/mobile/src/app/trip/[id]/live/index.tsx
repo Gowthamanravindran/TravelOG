@@ -20,8 +20,21 @@ import { checkInNow } from '@/lib/check-in';
 import { dateTimeIn, errorMessage, money } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
 import { minutesUntil, statusAt } from '@/lib/today';
-import { Between, Body, Button, Card, Empty, ErrorText, H2, Row, Screen, Strong } from '@/ui/kit';
+import {
+  Between,
+  Body,
+  Button,
+  Card,
+  Empty,
+  ErrorText,
+  H2,
+  Row,
+  Screen,
+  Strong,
+  WithIcon,
+} from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
+import { Icon } from '@/ui/icon';
 
 export default function TodayTab() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -104,16 +117,16 @@ export default function TodayTab() {
               </Text>
             ) : null}
           </Between>
-          <Text style={[type.display, { color: '#FFFFFF' }]}>
-            {ITEM_LABELS[focus.item.type].icon} {focus.item.title}
-          </Text>
+          <WithIcon icon={ITEM_LABELS[focus.item.type].icon} color="#FFFFFF" size={26}>
+            <Text style={[type.display, { color: '#FFFFFF' }]}>{focus.item.title}</Text>
+          </WithIcon>
           {focus.item.notes ? (
             <Text style={[type.body, { color: t.onAccent }]}>{focus.item.notes}</Text>
           ) : null}
         </View>
       ) : (
         <Empty
-          icon="☀️"
+          icon="today"
           title={items.length ? 'Nothing else timed today' : 'No plan for today'}
           body={items.length ? 'Enjoy the evening.' : "Add today's stops in the plan."}
           action={
@@ -132,18 +145,24 @@ export default function TodayTab() {
 
       <Row>
         <View style={{ flex: 1 }}>
-          <Button label="💸 Expense" onPress={() => router.push(`/trip/${id}/expense?mode=trip`)} />
+          <Button
+            label="Expense"
+            icon="expense"
+            onPress={() => router.push(`/trip/${id}/expense?mode=trip`)}
+          />
         </View>
         <View style={{ flex: 1 }}>
           <Button
-            label="📍 Check in"
+            label="Check in"
+            icon="checkIn"
             variant="ghost"
             onPress={() => router.push(`/trip/${id}/check-in`)}
           />
         </View>
         <View style={{ flex: 1 }}>
           <Button
-            label="🎫 Tickets"
+            label="Tickets"
+            icon="bookings"
             variant="ghost"
             onPress={() => router.push(`/trip/${id}/plan/bookings`)}
           />
@@ -177,22 +196,29 @@ export default function TodayTab() {
               status === 'now' && { borderColor: t.accent, borderWidth: 2 },
             ]}
           >
-            <Strong>
-              {ITEM_LABELS[item.type].icon} {item.title}
-              {status === 'done' ? '  ✓' : ''}
-            </Strong>
+            <Between>
+              <WithIcon icon={ITEM_LABELS[item.type].icon}>
+                <Strong>{item.title}</Strong>
+              </WithIcon>
+              {status === 'done' ? (
+                <Icon name="check" size={18} color={t.accent} label="Done" />
+              ) : null}
+            </Between>
             {item.durationMin ? (
               <Body muted small>
                 {item.durationMin} min
               </Body>
             ) : null}
             {checkedIn.get(item.id) ? (
-              <Body small style={{ color: t.accent }}>
-                ✓ Checked in at {timeOf(checkedIn.get(item.id)!.at)}
-              </Body>
+              <WithIcon icon="check" color={t.accent} size={16}>
+                <Body small style={{ color: t.accent }}>
+                  Checked in at {timeOf(checkedIn.get(item.id)!.at)}
+                </Body>
+              </WithIcon>
             ) : status !== 'done' && status !== 'later' ? (
               <Button
-                label={checkingIn === item.id ? 'Checking in…' : "📍 I'm here"}
+                label={checkingIn === item.id ? 'Checking in…' : "I'm here"}
+                icon="checkIn"
                 variant="ghost"
                 small
                 disabled={checkingIn !== null}
@@ -219,10 +245,9 @@ export default function TodayTab() {
                   {timeOf(checkIn.at)}
                 </Text>
                 <View style={{ flex: 1 }}>
-                  <Strong>
-                    📍 {checkIn.title}
-                    {checkIn.lat != null ? '  🛰️' : ''}
-                  </Strong>
+                  <WithIcon icon={checkIn.lat != null ? 'located' : 'place'} color={t.accent}>
+                    <Strong>{checkIn.title}</Strong>
+                  </WithIcon>
                   {checkIn.note ? (
                     <Body muted small>
                       {checkIn.note}

@@ -56,6 +56,6 @@ describe.each(STUDIO_TEMPLATES.map((t) => t.id))('template %s', (template) => {
     await editor.unmount();
 
     await render(withData(db, <StudioExport />, 'trip'));
-    await waitFor(() => expect(screen.getByText('✓ 3 slides ready')).toBeTruthy());
+    await waitFor(() => expect(screen.getByText('3 slides ready')).toBeTruthy());
   });
 });

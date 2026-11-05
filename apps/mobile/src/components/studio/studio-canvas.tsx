@@ -204,7 +204,7 @@ function describe(layer: Layer): string {
     case 'text':
       return `Text: ${layer.text}`;
     case 'sticker':
-      return `Sticker ${layer.emoji}`;
+      return `Sticker ${layer.icon ?? layer.emoji}`;
     case 'stats':
       return 'Trip stats';
   }

@@ -59,7 +59,7 @@ export function PollsView({ tripId }: { tripId: string }) {
                 <Chip label={POLL_LABELS[poll.type]} />
                 <Body small muted>
                   {poll.lockedOptionId
-                    ? '🔒 Decided'
+                    ? 'Decided'
                     : `${results.totalVoters} voted · ${poll.style === 'multi' ? 'pick any' : 'pick one'}`}
                 </Body>
               </Between>
@@ -88,7 +88,7 @@ export function PollsView({ tripId }: { tripId: string }) {
                       ]}
                     />
                     <Text style={[type.label, { color: t.ink, flex: 1 }]}>
-                      {won ? '🏆 ' : ''}
+                      {won ? 'Winner · ' : ''}
                       {o.label}
                       {mine ? ' · your vote' : ''}
                     </Text>
@@ -116,12 +116,12 @@ export function PollsView({ tripId }: { tripId: string }) {
         })
       ) : (
         <Empty
-          icon="🗳️"
+          icon="polls"
           title="No polls yet"
           body="Can't decide on dates, a stay or Plan A vs B? Put it to a vote."
         />
       )}
-      <Button label="＋ New poll" onPress={() => router.push(`/trip/${tripId}/poll`)} />
+      <Button label="New poll" icon="add" onPress={() => router.push(`/trip/${tripId}/poll`)} />
     </View>
   );
 }

@@ -4,7 +4,7 @@ export default function NearbyTab() {
   return (
     <Screen edges={[]}>
       <Empty
-        icon="📍"
+        icon="nearby"
         title="Nearby is coming"
         body="Food, sights, events and essentials around you, plus the map with today's route. Arrives with the maps update."
       />

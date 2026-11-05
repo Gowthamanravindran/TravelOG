@@ -68,6 +68,11 @@ export interface TextLayer extends LayerBase {
 
 export interface StickerLayer extends LayerBase {
   kind: 'sticker';
+  /** Icon name from the app's icon set (Plan 16). */
+  icon: string | null;
+  /** Icon colour. */
+  color: string;
+  /** Stickers made before Plan 16 were emoji; still drawn when there's no icon. */
   emoji: string;
 }
 
@@ -192,7 +197,13 @@ function parseLayer(v: unknown, index: number): Layer | null {
         background: v.background == null ? null : color(v.background, '#FFFFFF'),
       };
     case 'sticker':
-      return { ...base, kind: 'sticker', emoji: str(v.emoji, '✨', 16) || '✨' };
+      return {
+        ...base,
+        kind: 'sticker',
+        icon: typeof v.icon === 'string' && /^[A-Za-z]{1,40}$/.test(v.icon) ? v.icon : null,
+        color: color(v.color, '#FF6B5B'),
+        emoji: str(v.emoji, '', 16),
+      };
     case 'stats':
       return { ...base, kind: 'stats', color: color(v.color, '#FF6B5B') };
     default:

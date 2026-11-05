@@ -10,6 +10,7 @@ import type { Photo } from '@travelog/db';
 import { type } from '@travelog/ui';
 import { Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
+import type { IconName } from '@/ui/icon';
 import { Button, Chip, ChipRow, Row } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
@@ -34,25 +35,26 @@ export const GRADIENTS: [string, string][] = [
   ['#FFE6E2', '#E7E7FB'],
 ];
 
-export const STICKERS = [
-  '✈️',
-  '🌴',
-  '🏔️',
-  '🌊',
-  '☀️',
-  '🍜',
-  '📍',
-  '❤️',
-  '✨',
-  '🚗',
-  '🚆',
-  '🏖️',
-  '🎒',
-  '📸',
-  '🗺️',
-  '⛺',
-  '🌸',
-  '🍹',
+export const STICKERS: IconName[] = [
+  'flight',
+  'beach',
+  'mountain',
+  'waves',
+  'sun',
+  'food',
+  'place',
+  'heart',
+  'sparkle',
+  'car',
+  'train',
+  'camping',
+  'hiking',
+  'camera',
+  'plan',
+  'flower',
+  'drink',
+  'globe',
+  'star',
 ];
 
 export const FRAME_STYLES: { label: string; frame: Frame }[] = [
@@ -220,7 +222,7 @@ export function SlidesPanel({
         Slide {current + 1} of {doc.slides} · scroll the canvas to pick a slide
       </Text>
       <Row>
-        <Button label="＋ Add slide" small onPress={onAdd} disabled={doc.slides >= 10} />
+        <Button label="Add slide" icon="add" small onPress={onAdd} disabled={doc.slides >= 10} />
         <Button
           label="Remove this slide"
           small
@@ -232,14 +234,16 @@ export function SlidesPanel({
       </Row>
       <Row>
         <Button
-          label="◀ Move left"
+          label="Move left"
+          icon="left"
           small
           variant="ghost"
           onPress={() => onMove(current - 1)}
           disabled={current === 0}
         />
         <Button
-          label="Move right ▶"
+          label="Move right"
+          icon="right"
           small
           variant="ghost"
           onPress={() => onMove(current + 1)}
@@ -279,7 +283,8 @@ export function LayerPanel({
           <Row>
             <Button label="Replace" small onPress={onReplace} />
             <Button
-              label={cropping ? '✓ Done cropping' : 'Crop'}
+              label={cropping ? 'Done cropping' : 'Crop'}
+              icon={cropping ? 'check' : 'crop'}
               small
               variant={cropping ? 'primary' : 'ghost'}
               onPress={onToggleCrop}
@@ -299,6 +304,13 @@ export function LayerPanel({
         </>
       ) : null}
       {layer.kind === 'text' ? <TextTools layer={layer} onPatch={onPatch} /> : null}
+      {layer.kind === 'sticker' ? (
+        <Swatches
+          label="Sticker colour"
+          value={layer.color}
+          onPick={(color) => onPatch({ color } as Partial<Layer>)}
+        />
+      ) : null}
       {layer.kind === 'stats' ? (
         <Swatches
           label="Card colour"
@@ -354,11 +366,11 @@ function TextTools({ layer, onPatch }: { layer: TextLayer; onPatch: (p: Partial<
       <Swatches label="Text colour" value={layer.color} onPick={(color) => patch({ color })} />
       <ChipRow>
         <Chip
-          label="A−"
+          label="Smaller"
           onPress={() => patch({ size: Math.max(12, Math.round(layer.size / 1.15)) })}
         />
         <Chip
-          label="A＋"
+          label="Bigger"
           onPress={() => patch({ size: Math.min(600, Math.round(layer.size * 1.15)) })}
         />
         <Chip label="Bold" selected={layer.bold} onPress={() => patch({ bold: !layer.bold })} />

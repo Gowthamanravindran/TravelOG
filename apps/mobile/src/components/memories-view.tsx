@@ -101,7 +101,7 @@ export function MemoriesView({ tripId }: { tripId: string }) {
     <>
       {state === 'completed' || state === 'archived' ? (
         <Card>
-          <Strong>Your {trip.destination || trip.title} trip is done 🎉</Strong>
+          <Strong>Your {trip.destination || trip.title} trip is done</Strong>
           <Body muted small>
             Make a carousel that scrolls across slides and post it to Instagram or Facebook.
           </Body>
@@ -111,7 +111,8 @@ export function MemoriesView({ tripId }: { tripId: string }) {
       <H2
         right={
           <Button
-            label="＋ New carousel"
+            label="New carousel"
+            icon="add"
             small
             onPress={() => router.push(`/trip/${tripId}/studio/new`)}
           />
@@ -166,7 +167,8 @@ export function MemoriesView({ tripId }: { tripId: string }) {
       <H2
         right={
           <Button
-            label={busy ? 'Adding…' : '＋ Add photos'}
+            label={busy ? 'Adding…' : 'Add photos'}
+            icon="addPhoto"
             variant="ghost"
             small
             onPress={add}
@@ -179,7 +181,7 @@ export function MemoriesView({ tripId }: { tripId: string }) {
       <ErrorText>{error}</ErrorText>
       {!photos.length ? (
         <Empty
-          icon="📸"
+          icon="memories"
           title="No photos yet"
           body="Photos you add stay on this phone. Sharing them with your group comes with accounts."
         />

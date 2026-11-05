@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { CURRENCIES, deviceTimeZone } from '@/lib/format';
-import { TRIP_EMOJIS } from '@/lib/labels';
+import { TRIP_ICONS, tripIcon } from '@/lib/labels';
+import { Icon } from '@/ui/icon';
 import { Body, Chip, ChipRow, Field, Row } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
@@ -21,7 +22,7 @@ export interface TripFormValue {
 export function emptyTripForm(currency = 'INR'): TripFormValue {
   return {
     title: '',
-    emoji: '🧳',
+    emoji: 'trips',
     destination: '',
     startDate: '',
     endDate: '',
@@ -67,12 +68,12 @@ export function TripForm({
         Pick an icon
       </Body>
       <Row style={{ flexWrap: 'wrap' }}>
-        {TRIP_EMOJIS.map((e) => (
+        {TRIP_ICONS.map(({ icon: e, label }) => (
           <Pressable
             key={e}
             accessibilityRole="button"
-            accessibilityLabel={`Icon ${e}`}
-            accessibilityState={{ selected: value.emoji === e }}
+            accessibilityLabel={`Icon: ${label}`}
+            accessibilityState={{ selected: tripIcon(value.emoji) === e }}
             onPress={() => set({ emoji: e })}
             style={{
               width: 44,
@@ -81,11 +82,11 @@ export function TripForm({
               alignItems: 'center',
               justifyContent: 'center',
               borderWidth: 2,
-              borderColor: value.emoji === e ? t.accent : t.line,
-              backgroundColor: value.emoji === e ? t.accentSoft : t.surface,
+              borderColor: tripIcon(value.emoji) === e ? t.accent : t.line,
+              backgroundColor: tripIcon(value.emoji) === e ? t.accentSoft : t.surface,
             }}
           >
-            <Text style={{ fontSize: 22 }}>{e}</Text>
+            <Icon name={e} size={22} color={tripIcon(value.emoji) === e ? t.accent : t.ink2} />
           </Pressable>
         ))}
       </Row>

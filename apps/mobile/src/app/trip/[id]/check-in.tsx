@@ -73,7 +73,8 @@ function CheckInForm() {
       </Card>
       <ErrorText>{error}</ErrorText>
       <Button
-        label={busy ? (locationOn ? 'Finding you…' : 'Saving…') : "📍 I'm here"}
+        label={busy ? (locationOn ? 'Finding you…' : 'Saving…') : "I'm here"}
+        icon="checkIn"
         onPress={save}
         disabled={busy || !title.trim()}
       />

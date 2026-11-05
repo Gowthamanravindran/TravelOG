@@ -155,7 +155,7 @@ function ExportScreen() {
             paddingVertical: 8,
           }}
         >
-          <Button label="‹ Edit" variant="link" onPress={() => router.back()} />
+          <Button label="Edit" icon="back" variant="link" onPress={() => router.back()} />
           <Text
             style={[type.headline, { color: t.ink, flex: 1, textAlign: 'center' }]}
             numberOfLines={1}

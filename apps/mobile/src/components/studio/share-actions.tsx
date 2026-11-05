@@ -79,7 +79,7 @@ export function ShareActions({
   return (
     <View style={{ gap: 10 }}>
       <Text style={[type.headline, { color: t.ink }]}>
-        ✓ {n} {n === 1 ? 'slide' : 'slides'} ready
+        {n} {n === 1 ? 'slide' : 'slides'} ready
       </Text>
 
       {targets && !targets.native ? (
@@ -90,7 +90,8 @@ export function ShareActions({
       ) : null}
 
       <Button
-        label={label('ig', '📷 Post to Instagram')}
+        label={label('ig', 'Post to Instagram')}
+        icon="camera"
         disabled={!!busy || (targets?.native === true && !targets.instagram)}
         onPress={() => run('ig', () => postToInstagram(files), igMessage)}
       />
@@ -128,6 +129,7 @@ export function ShareActions({
 
       <Button
         label={label('fb', 'Share to Facebook')}
+        icon="share"
         variant="ghost"
         disabled={
           !!busy || (targets?.native === true && Platform.OS === 'android' && !targets.facebook)
@@ -141,7 +143,8 @@ export function ShareActions({
         }
       />
       <Button
-        label={label('save', '⬇ Save all to gallery')}
+        label={label('save', 'Save all to gallery')}
+        icon="download"
         variant="ghost"
         disabled={!!busy}
         onPress={() =>
@@ -154,6 +157,7 @@ export function ShareActions({
       />
       <Button
         label={label('more', 'More apps…')}
+        icon="share"
         variant="ghost"
         disabled={!!busy}
         onPress={() =>

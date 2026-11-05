@@ -32,7 +32,7 @@ describe('Today check-ins', () => {
     mockParams = { id: trip.id };
 
     await render(withData(db, <TodayTab />, 'trip'));
-    await fireEvent.press(screen.getByRole('button', { name: "📍 I'm here" }));
+    await fireEvent.press(screen.getByRole('button', { name: "I'm here" }));
 
     await waitFor(() => expect(screen.getByText(/Checked in at/)).toBeTruthy());
     expect(screen.getByText("Today's timeline")).toBeTruthy();

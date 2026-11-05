@@ -84,7 +84,8 @@ function NewCarouselForm() {
         <Strong>Slides</Strong>
         <Row>
           <Button
-            label="−"
+            label=""
+            icon="remove"
             accessibilityLabel="Fewer slides"
             variant="ghost"
             small
@@ -98,7 +99,8 @@ function NewCarouselForm() {
             {slides}
           </Text>
           <Button
-            label="＋"
+            label=""
+            icon="add"
             accessibilityLabel="More slides"
             variant="ghost"
             small
@@ -146,7 +148,7 @@ function NewCarouselForm() {
             <Between>
               <Strong>
                 {tpl.name}
-                {tpl.seamless ? '  ↔' : ''}
+                {tpl.seamless ? ' · seamless' : ''}
               </Strong>
               {slots ? (
                 <Body muted small>

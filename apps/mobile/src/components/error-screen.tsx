@@ -1,5 +1,6 @@
 import { themeFor } from '@travelog/ui';
 import { Pressable, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { Icon } from '@/ui/icon';
 
 /**
  * Shown when a screen crashes (docs/08 app states). Data is safe in the local
@@ -17,7 +18,7 @@ export function ErrorScreen({ error, retry }: { error: Error; retry: () => Promi
         backgroundColor: t.bg,
       }}
     >
-      <Text style={{ fontSize: 44 }}>🧭</Text>
+      <Icon name="error" size={44} color={t.accent} />
       <Text accessibilityRole="header" style={{ color: t.ink, fontSize: 24, fontWeight: '800' }}>
         Something went wrong
       </Text>

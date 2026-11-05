@@ -43,15 +43,16 @@ import { money } from '@/lib/format';
 import { useStudioEditor } from '@/lib/studio-editor';
 import { Button, Chip, ChipRow } from '@/ui/kit';
 import { ModeProvider, useTheme } from '@/ui/theme';
+import { Icon, type IconName } from '@/ui/icon';
 
 type Tool = 'photos' | 'text' | 'stickers' | 'background' | 'slides' | 'layout';
-const TOOLS: { id: Tool; label: string }[] = [
-  { id: 'photos', label: '🖼️ Photos' },
-  { id: 'text', label: 'Aa Text' },
-  { id: 'stickers', label: '✨ Stickers' },
-  { id: 'background', label: '🎨 Background' },
-  { id: 'slides', label: '▭ Slides' },
-  { id: 'layout', label: '▦ Layout' },
+const TOOLS: { id: Tool; label: string; icon: IconName }[] = [
+  { id: 'photos', label: 'Photos', icon: 'addPhoto' },
+  { id: 'text', label: 'Text', icon: 'text' },
+  { id: 'stickers', label: 'Stickers', icon: 'sticker' },
+  { id: 'background', label: 'Background', icon: 'palette' },
+  { id: 'slides', label: 'Slides', icon: 'slides' },
+  { id: 'layout', label: 'Layout', icon: 'layout' },
 ];
 
 /** The Studio editor (Plan 15): a wide canvas of slides; photos can cross the seams. */
@@ -225,7 +226,8 @@ function Editor() {
           {editor.project.title}
         </Text>
         <Button
-          label="↶"
+          label=""
+          icon="undo"
           accessibilityLabel="Undo"
           variant="ghost"
           small
@@ -233,7 +235,8 @@ function Editor() {
           disabled={!editor.canUndo}
         />
         <Button
-          label="↷"
+          label=""
+          icon="redo"
           accessibilityLabel="Redo"
           variant="ghost"
           small
@@ -355,6 +358,7 @@ function Editor() {
                 <Chip
                   key={x.id}
                   label={x.label}
+                  icon={x.icon}
                   selected={tool === x.id}
                   onPress={() => setTool(x.id)}
                 />
@@ -410,16 +414,18 @@ function Editor() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{ gap: 6 }}
                 >
-                  {STICKERS.map((emoji) => (
+                  {STICKERS.map((icon) => (
                     <Pressable
-                      key={emoji}
+                      key={icon}
                       accessibilityRole="button"
-                      accessibilityLabel={`Sticker ${emoji}`}
+                      accessibilityLabel={`Sticker ${icon}`}
                       onPress={() =>
                         place((cx, cy) => ({
                           id: newId(),
                           kind: 'sticker',
-                          emoji,
+                          icon,
+                          color: darkBg ? '#FFFFFF' : '#FF6B5B',
+                          emoji: '',
                           x: cx - 110,
                           y: cy - 110,
                           w: 220,
@@ -427,14 +433,15 @@ function Editor() {
                           rotation: 0,
                         }))
                       }
-                      style={{ padding: 6 }}
+                      style={{ padding: 8 }}
                     >
-                      <Text style={{ fontSize: 32 }}>{emoji}</Text>
+                      <Icon name={icon} size={30} color={t.ink} />
                     </Pressable>
                   ))}
                 </ScrollView>
                 <Button
-                  label="＋ Trip stats card"
+                  label="Trip stats card"
+                  icon="stats"
                   small
                   variant="ghost"
                   onPress={() =>
@@ -472,7 +479,8 @@ function Editor() {
                 {STUDIO_TEMPLATES.filter((x) => x.id !== 'blank').map((x) => (
                   <Chip
                     key={x.id}
-                    label={`${x.name}${x.seamless ? ' ↔' : ''}`}
+                    label={x.name}
+                    icon={x.seamless ? 'seamless' : 'layout'}
                     onPress={() => applyTemplate(x.id)}
                   />
                 ))}

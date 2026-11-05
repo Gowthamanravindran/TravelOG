@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Icon, type IconName } from './icon';
 import { useTheme } from './theme';
 
 export function Screen({
@@ -129,8 +130,11 @@ export function Button({
   small,
   danger,
   accessibilityLabel,
+  icon,
 }: {
   label: string;
+  /** Icon before the label (or alone when the label is empty). */
+  icon?: IconName;
   onPress: () => void;
   variant?: 'primary' | 'ghost' | 'link';
   disabled?: boolean;
@@ -150,7 +154,12 @@ export function Button({
         disabled={disabled}
         hitSlop={12}
       >
-        <Text style={[type.label, { color: danger ? t.danger : t.accent }]}>{label}</Text>
+        <View style={styles.inline}>
+          {icon ? <Icon name={icon} size={18} color={danger ? t.danger : t.accent} /> : null}
+          {label ? (
+            <Text style={[type.label, { color: danger ? t.danger : t.accent }]}>{label}</Text>
+          ) : null}
+        </View>
       </Pressable>
     );
   }
@@ -172,7 +181,12 @@ export function Button({
         { backgroundColor: bg, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 },
       ]}
     >
-      <Text style={[small ? type.label : type.headline, { color: fg }]}>{label}</Text>
+      <View style={styles.inline}>
+        {icon ? <Icon name={icon} size={small ? 18 : 20} color={fg} /> : null}
+        {label ? (
+          <Text style={[small ? type.label : type.headline, { color: fg }]}>{label}</Text>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -181,16 +195,21 @@ export function Chip({
   label,
   selected,
   onPress,
+  icon,
 }: {
   label: string;
   selected?: boolean;
   onPress?: () => void;
+  icon?: IconName;
 }) {
   const t = useTheme();
   const content = (
-    <Text style={[type.label, { color: selected ? t.onAccent : t.ink }]} numberOfLines={1}>
-      {label}
-    </Text>
+    <View style={styles.inline}>
+      {icon ? <Icon name={icon} size={16} color={selected ? t.onAccent : t.ink2} /> : null}
+      <Text style={[type.label, { color: selected ? t.onAccent : t.ink }]} numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
   );
   const style = [styles.chip, { backgroundColor: selected ? t.accent : t.surface2 }];
   if (!onPress) return <View style={style}>{content}</View>;
@@ -286,7 +305,7 @@ export function Empty({
   body,
   action,
 }: {
-  icon: string;
+  icon: IconName;
   title: string;
   body?: string;
   action?: ReactNode;
@@ -294,7 +313,9 @@ export function Empty({
   const t = useTheme();
   return (
     <View style={[styles.empty, { borderColor: t.line }]}>
-      <Text style={{ fontSize: 40 }}>{icon}</Text>
+      <View style={[styles.emptyIcon, { backgroundColor: t.accentSoft }]}>
+        <Icon name={icon} size={30} color={t.accent} />
+      </View>
       <Text style={[type.headline, { color: t.ink, textAlign: 'center' }]}>{title}</Text>
       {body ? (
         <Text style={[type.body, { color: t.ink2, textAlign: 'center' }]}>{body}</Text>
@@ -346,6 +367,27 @@ export function Bar({ value, color }: { value: number; color?: string }) {
   );
 }
 
+/** An icon followed by text on one line (titles of items, bookings, expenses). */
+export function WithIcon({
+  icon,
+  children,
+  color,
+  size = 18,
+}: {
+  icon: IconName;
+  children: ReactNode;
+  color?: string;
+  size?: number;
+}) {
+  const t = useTheme();
+  return (
+    <View style={[styles.inline, { flexShrink: 1 }]}>
+      <Icon name={icon} size={size} color={color ?? t.ink2} />
+      <View style={{ flexShrink: 1 }}>{children}</View>
+    </View>
+  );
+}
+
 export function ErrorText({ children }: { children: ReactNode }) {
   const t = useTheme();
   if (!children) return null;
@@ -381,6 +423,14 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 36,
     borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inline: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },

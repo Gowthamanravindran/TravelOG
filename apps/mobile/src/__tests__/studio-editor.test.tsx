@@ -58,8 +58,8 @@ describe('Studio editor', () => {
 
   it('undo and redo', async () => {
     const { db, project } = await openEditor('blank');
-    await fireEvent.press(screen.getByRole('button', { name: '✨ Stickers' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Sticker 🌴' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Stickers' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sticker beach' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Done' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Undo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
@@ -68,19 +68,19 @@ describe('Studio editor', () => {
 
   it('adds text, a sticker, the stats card, a slide and a background', async () => {
     const { db, project } = await openEditor('blank');
-    await fireEvent.press(screen.getByRole('button', { name: 'Aa Text' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Text' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Heading' }));
     // The new text is selected: edit it.
     await fireEvent.changeText(screen.getByLabelText('Text'), 'Monsoon magic');
     await fireEvent.press(screen.getByRole('button', { name: 'Done' }));
 
-    await fireEvent.press(screen.getByRole('button', { name: '✨ Stickers' }));
-    await fireEvent.press(screen.getByRole('button', { name: '＋ Trip stats card' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Stickers' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Trip stats card' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Done' }));
 
-    await fireEvent.press(screen.getByRole('button', { name: '▭ Slides' }));
-    await fireEvent.press(screen.getByRole('button', { name: '＋ Add slide' }));
-    await fireEvent.press(screen.getByRole('button', { name: '🎨 Background' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Slides' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Add slide' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Background' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Background #0F1020' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
 
