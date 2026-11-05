@@ -16,15 +16,10 @@ export default function TripLayout() {
         name="expense"
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
-      {/* A bottom sheet as tall as the form (Plan 31). */}
+      {/* Full height so a long, filled-in form scrolls (Plan 32). */}
       <Stack.Screen
         name="booking"
-        options={{
-          presentation: 'formSheet',
-          sheetAllowedDetents: 'fitToContents',
-          sheetCornerRadius: 28,
-          sheetGrabberVisible: false,
-        }}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen
         name="poll"

@@ -1,10 +1,10 @@
 import { font, radius, type } from '@travelog/ui';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { SlideInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from './icon';
-import { useMotionOk } from './motion';
+import { sheetEntering, useMotionOk } from './motion';
 import { useTheme } from './theme';
 
 export interface Choice {
@@ -35,7 +35,7 @@ export function ChoiceSheet({
 }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const sheetIn = useMotionOk() ? SlideInDown.springify().damping(22).stiffness(240) : undefined;
+  const sheetIn = sheetEntering(useMotionOk());
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable

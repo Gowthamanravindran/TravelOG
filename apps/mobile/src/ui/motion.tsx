@@ -10,6 +10,8 @@ import {
 } from 'react';
 import { Platform, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
+  Easing,
+  SlideInDown,
   FadeIn,
   FadeInDown,
   FadeOut,
@@ -22,7 +24,7 @@ import { Icon } from './icon';
 import { useTheme } from './theme';
 
 /**
- * Motion for the app (Plan 28). One place for durations and springs, all of it
+ * Motion for the app (Plans 28, 32). One place for durations and easing, all of it
  * following the phone's Reduce motion setting. Only transform and opacity animate
  * (react-native-skills: animation-gpu-properties). Nothing moves because of scrolling.
  */
@@ -33,9 +35,14 @@ export const MOTION = {
   /** Delay between rows when a list appears, and how many rows get a delay. */
   stagger: 40,
   maxStagger: 8,
-  /** Settles without a visible bounce. */
-  spring: { damping: 22, stiffness: 240, mass: 1 },
+  /** Eases out and stops; nothing overshoots or bounces (Plan 32). */
+  ease: { duration: 220, easing: Easing.out(Easing.cubic) },
 } as const;
+
+/** Bottom sheets slide up and stop, with no bounce; nothing moves with Reduce motion on. */
+export function sheetEntering(ok: boolean) {
+  return ok ? SlideInDown.duration(MOTION.slow).easing(Easing.out(Easing.cubic)) : undefined;
+}
 
 /** False when the person has asked their phone to reduce motion. */
 export function useMotionOk(): boolean {
@@ -168,7 +175,7 @@ function Burst({ label }: { label: string }) {
         style={styles.burst}
       >
         <Animated.View
-          entering={ok ? ZoomIn.springify().damping(12).stiffness(220) : undefined}
+          entering={ok ? ZoomIn.duration(MOTION.base) : undefined}
           style={[styles.check, { backgroundColor: t.accent }]}
         >
           <Icon name="check" size={44} color={t.onAccent} />

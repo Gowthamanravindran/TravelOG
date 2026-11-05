@@ -11,13 +11,12 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Animated, {
   FadeIn,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -49,25 +48,6 @@ export function Screen({
         )}
       </Animated.View>
     </SafeAreaView>
-  );
-}
-
-/**
- * The body of a bottom sheet screen (Plan 31: `presentation: 'formSheet'` sized to
- * its content). Nothing in it stretches, so the sheet is as tall as the form.
- */
-export function SheetScreen({ children }: { children: ReactNode }) {
-  const t = useTheme();
-  const insets = useSafeAreaInsets();
-  return (
-    <ScrollView
-      style={[styles.sheet, { backgroundColor: t.bg }]}
-      contentContainerStyle={[styles.sheetContent, { paddingBottom: insets.bottom + spacing.lg }]}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={[styles.grabber, { backgroundColor: t.line }]} />
-      {children}
-    </ScrollView>
   );
 }
 
@@ -332,7 +312,7 @@ export function Segmented<T extends string>({
   const x = useSharedValue(index * (segment + gap));
   useEffect(() => {
     const target = index * (segment + gap);
-    x.set(ok && segment ? withSpring(target, MOTION.spring) : target);
+    x.set(ok && segment ? withTiming(target, MOTION.ease) : target);
   }, [index, segment, ok, x]);
   const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.get() }] }));
   return (
@@ -577,9 +557,6 @@ export function ErrorText({ children }: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  sheet: { flexGrow: 0 },
-  sheetContent: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, gap: spacing.lg },
-  grabber: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2 },
   content: { padding: spacing.lg, gap: spacing.lg, paddingBottom: spacing.xxxl },
   eyebrow: { textTransform: 'uppercase', letterSpacing: 0.8 },
   card: { borderWidth: 1, borderRadius: radius.card, padding: spacing.lg, gap: spacing.sm },

@@ -35,3 +35,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 29 | [Places autocomplete: our own places database](29-places.md) | see git log |
 | 30 | [Cities come from our server, not the app](30-places-from-server.md) | see git log |
 | 31 | [Add bookings from a document, read on the phone](31-booking-documents.md) | see git log |
+| 32 | [No bounce; the booking form scrolls again](32-no-bounce.md) | see git log |

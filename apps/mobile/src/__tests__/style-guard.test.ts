@@ -78,3 +78,15 @@ it('no hex colours in app chrome (colours come from the theme, Plan 26)', () => 
     );
   expect(offenders).toEqual([]);
 });
+
+it('nothing bounces: no springs, only eased timing (Plan 32)', () => {
+  const offenders = files(path.join(__dirname, '..')).flatMap((f) =>
+    fs
+      .readFileSync(f, 'utf8')
+      .split('\n')
+      .map((line, i) => ({ line, at: `${path.basename(f)}:${i + 1}` }))
+      .filter(({ line }) => /springify\(|withSpring\b/.test(line))
+      .map(({ at }) => at),
+  );
+  expect(offenders).toEqual([]);
+});

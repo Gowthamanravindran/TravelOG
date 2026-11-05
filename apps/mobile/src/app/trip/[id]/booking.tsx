@@ -40,7 +40,7 @@ import {
   H1,
   IconTile,
   Row,
-  SheetScreen,
+  Screen,
   Strong,
   WithIcon,
 } from '@/ui/kit';
@@ -48,7 +48,7 @@ import { ModeProvider } from '@/ui/theme';
 import { DateField, TimeField } from '@/ui/date-field';
 
 /**
- * Add or edit a booking, in a bottom sheet (Plan 31). Opened from an uploaded
+ * Add or edit a booking (Plans 31, 32): a full page that slides up from the bottom. Opened from an uploaded
  * document, it starts filled in from it, one booking at a time ("1 of 2" for a
  * return flight), with the document attached.
  */
@@ -203,7 +203,7 @@ function BookingForm({
   const last = step + 1 >= steps;
 
   return (
-    <SheetScreen>
+    <Screen edges={['top', 'bottom']}>
       <Between>
         <Row style={{ gap: 12, flex: 1 }}>
           <IconTile icon={label.icon} family={label.family} />
@@ -379,6 +379,6 @@ function BookingForm({
           }}
         />
       ) : null}
-    </SheetScreen>
+    </Screen>
   );
 }

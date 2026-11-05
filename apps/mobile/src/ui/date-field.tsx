@@ -1,4 +1,4 @@
-import Animated, { SlideInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import {
   localDateIn,
   monthGrid,
@@ -20,7 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shortDate } from '@/lib/format';
 
-import { useMotionOk } from './motion';
+import { sheetEntering, useMotionOk } from './motion';
 import { Icon } from './icon';
 import { Button } from './kit';
 import { useTheme } from './theme';
@@ -226,7 +226,7 @@ export function TimeSheet({
   const t = useTheme();
   const insets = useSafeAreaInsets();
   // The sheet springs up while the backdrop fades (Plan 28).
-  const sheetIn = useMotionOk() ? SlideInDown.springify().damping(22).stiffness(240) : undefined;
+  const sheetIn = sheetEntering(useMotionOk());
   const initial = () => splitTime(value) ?? { hour: 9, minute: 0 };
   const [picked, setPicked] = useState(initial);
   const [wasVisible, setWasVisible] = useState(visible);
@@ -346,7 +346,7 @@ export function CalendarSheet({
   const t = useTheme();
   const insets = useSafeAreaInsets();
   // The sheet springs up while the backdrop fades (Plan 28).
-  const sheetIn = useMotionOk() ? SlideInDown.springify().damping(22).stiffness(240) : undefined;
+  const sheetIn = sheetEntering(useMotionOk());
   const today = localDateIn(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata');
   const [picked, setPicked] = useState<DateRange>(range);
   const [month, setMonth] = useState(() => monthOf(range.start ?? today));

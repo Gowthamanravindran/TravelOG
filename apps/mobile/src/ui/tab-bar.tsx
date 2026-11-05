@@ -2,7 +2,7 @@ import type { BottomTabBarProps } from 'expo-router/tabs';
 import { font, type } from '@travelog/ui';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from './icon';
@@ -39,7 +39,7 @@ export function ModeTabBar({
   useEffect(() => {
     if (!spot) return;
     const target = spot.x + (spot.width - PILL_W) / 2;
-    pillX.set(ok ? withSpring(target, MOTION.spring) : target);
+    pillX.set(ok ? withTiming(target, MOTION.ease) : target);
   }, [spot, ok, pillX]);
   const pillStyle = useAnimatedStyle(() => ({ transform: [{ translateX: pillX.get() }] }));
 

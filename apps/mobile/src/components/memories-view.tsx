@@ -23,7 +23,7 @@ import { errorMessage, shortDate } from '@/lib/format';
 import { deletePhotoFile, pickPhotos } from '@/lib/photos';
 import { Icon } from '@/ui/icon';
 import { Body, Button, Card, Empty, ErrorText, H2, IconTile, Row, Strong } from '@/ui/kit';
-import { Appear, useMotionOk } from '@/ui/motion';
+import { Appear, MOTION, useMotionOk } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
 const FORMAT_LABEL = { post: '4:5', square: '1:1', story: '9:16' } as const;
@@ -279,7 +279,7 @@ export function MemoriesView({ tripId }: { tripId: string }) {
                           >
                             {on ? (
                               <Animated.View
-                                entering={motionOk ? ZoomIn.springify().damping(14) : undefined}
+                                entering={motionOk ? ZoomIn.duration(MOTION.fast) : undefined}
                               >
                                 <Text
                                   style={[
