@@ -43,6 +43,7 @@ export default function EditTrip() {
           title: trip.title,
           emoji: trip.emoji,
           destination: trip.destination ?? '',
+          destinationPlaceId: trip.destinationPlaceId ?? null,
           startDate: trip.startDate ?? '',
           endDate: trip.endDate ?? '',
           currency: trip.currency,

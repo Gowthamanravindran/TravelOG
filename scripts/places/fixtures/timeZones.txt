@@ -1,0 +1,5 @@
+CountryCode	TimeZoneId	GMT offset 1. Jan 2026	DST offset 1. Jul 2026	rawOffset (independant of DST)
+IN	Asia/Kolkata	5.5	5.5	5.5
+JP	Asia/Tokyo	9.0	9.0	9.0
+FR	Europe/Paris	1.0	2.0	1.0
+AQ	Antarctica/Casey	8.0	8.0	8.0

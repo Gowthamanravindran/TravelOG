@@ -17,6 +17,7 @@ import { openAppDatabase } from '@/data/open';
 import { DataProvider } from '@/data/provider';
 import { AppearanceProvider } from '@/lib/appearance';
 import { FONT_ASSETS, FontGate } from '@/lib/fonts';
+import { usePlacesSeed } from '@/lib/places';
 import { CelebrationHost } from '@/ui/motion';
 import { useScheme } from '@/ui/theme';
 import { useReminders } from '@/lib/reminders';
@@ -39,9 +40,10 @@ function Themed({ children }: { children: ReactNode }) {
   );
 }
 
-/** Work that follows the data in the background (reminders). */
+/** Work that follows the data in the background (reminders, places seed). */
 function Background() {
   useReminders();
+  usePlacesSeed();
   return null;
 }
 

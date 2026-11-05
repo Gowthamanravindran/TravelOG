@@ -32,3 +32,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 26 | [App redesign: Sunset and Colour block themes](26-app-redesign.md) | see git log |
 | 27 | [Exported collage photos came out half see-through (Android fade-in)](27-export-fade.md) | see git log |
 | 28 | [Lively animations, plus the React Native skill](28-animations.md) | see git log |
+| 29 | [Places autocomplete: our own places database](29-places.md) | see git log |

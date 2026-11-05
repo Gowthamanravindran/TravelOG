@@ -11,6 +11,8 @@ export interface TripInput {
   title: string;
   emoji?: string;
   destination?: string | null;
+  /** The picked place's id (Plan 29); null when the destination was typed. */
+  destinationPlaceId?: string | null;
   startDate?: string | null;
   endDate?: string | null;
   timeZone: string;
@@ -46,6 +48,7 @@ export function createTrip(
       title: input.title.trim().slice(0, 80),
       emoji: input.emoji ?? 'trips',
       destination: input.destination?.trim() || null,
+      destinationPlaceId: input.destinationPlaceId ?? null,
       startDate: input.startDate ?? null,
       endDate: input.endDate ?? null,
       timeZone: input.timeZone,

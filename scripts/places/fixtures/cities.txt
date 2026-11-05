@@ -1,0 +1,6 @@
+1850147	Tokyo	Tokyo	TYO,Tokio,Tòquio,Токио,東京	35.6895	139.69171	P	PPLC	JP		40				8336599		44	Asia/Tokyo	2024-01-01
+1277333	Bengaluru	Bengaluru	Bangalore,Bengaluru,BLR,Bangalor,ಬೆಂಗಳೂರು	12.97194	77.59369	P	PPLA	IN		19				8443675		920	Asia/Kolkata	2024-01-01
+1275339	Mumbai	Mumbai	Bombay,Mumbai,BOM,मुंबई	19.07283	72.88261	P	PPLA	IN		16				12691836		8	Asia/Kolkata	2024-01-01
+1260607	Panaji	Panaji	Panjim,Pangim	15.49574	73.82624	P	PPLA	IN		33				114405		7	Asia/Kolkata	2024-01-01
+2988507	Paris	Paris	Lutece,Paris,PAR	48.85341	2.3488	P	PPLC	FR		11				2138551		42	Europe/Paris	2024-01-01
+1269750	New Delhi	New Delhi	Nai Dilli	28.63576	77.22445	P	PPLC	IN		07				317797		215	Asia/Kolkata	2024-01-01

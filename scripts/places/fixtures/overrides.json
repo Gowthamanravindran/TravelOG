@@ -1,0 +1,17 @@
+{
+  "aliases": [{ "name": "Panaji", "country": "IN", "add": ["Goa capital"] }],
+  "boosts": [{ "name": "Goa", "country": "IN", "kind": "region", "boost": 20 }],
+  "places": [
+    {
+      "id": "ours:hampi",
+      "kind": "city",
+      "name": "Hampi",
+      "country": "IN",
+      "region": "Karnataka",
+      "lat": 15.335,
+      "lng": 76.46,
+      "timeZone": "Asia/Kolkata",
+      "boost": 10
+    }
+  ]
+}

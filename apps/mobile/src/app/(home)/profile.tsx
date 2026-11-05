@@ -59,6 +59,13 @@ export default function ProfileScreen() {
         <AppearanceCard />
       </Section>
       <Card>
+        <Strong>Place data</Strong>
+        <Body muted small>
+          Places © GeoNames (geonames.org, CC-BY 4.0). Places found online © OpenStreetMap
+          contributors (openstreetmap.org, ODbL), through Geoapify.
+        </Body>
+      </Card>
+      <Card>
         <Strong>This app build</Strong>
         <Body muted small>
           {expoGo

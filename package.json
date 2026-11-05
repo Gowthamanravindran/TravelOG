@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm -r --if-present test && node --test scripts/places/lib.test.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:start": "supabase start",
@@ -16,7 +16,8 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local > packages/core/src/db.types.ts",
     "dev": "pnpm install --frozen-lockfile --prefer-offline && pnpm --filter @travelog/mobile start --dev-client",
-    "dev:go": "pnpm install --frozen-lockfile --prefer-offline && pnpm --filter @travelog/mobile start --go"
+    "dev:go": "pnpm install --frozen-lockfile --prefer-offline && pnpm --filter @travelog/mobile start --go",
+    "places:build": "node scripts/places/build.mjs"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

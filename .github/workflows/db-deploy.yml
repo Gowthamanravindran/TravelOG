@@ -1,11 +1,12 @@
-name: Deploy database (staging)
+name: Deploy database and functions (staging)
 
-# Applies new migrations to the staging Supabase project after they reach main.
+# Applies new migrations and deploys Edge Functions (place-search, Plan 29) to the
+# staging Supabase project after they reach main, or when run by hand.
 # Stays dormant until the owner adds the secrets in docs/14-owner-setup.md §4.
 on:
   push:
     branches: [main]
-    paths: ['supabase/migrations/**']
+    paths: ['supabase/migrations/**', 'supabase/functions/**']
   workflow_dispatch:
 
 jobs:
@@ -36,3 +37,6 @@ jobs:
         run: |
           supabase link --project-ref "$PROJECT_REF"
           supabase db push
+      - name: Deploy functions to staging
+        if: steps.secrets.outputs.ready == 'true'
+        run: supabase functions deploy place-search --project-ref "$PROJECT_REF"

@@ -29,6 +29,8 @@ export const trips = sqliteTable(
     title: text('title').notNull(),
     emoji: text('emoji').notNull().default('🧳'),
     destination: text('destination'),
+    /** The picked place (Plan 29): `gn:…`, `osm:…`, `ctry:…` or `cont:…`; null for typed text. */
+    destinationPlaceId: text('destination_place_id'),
     startDate: text('start_date'),
     endDate: text('end_date'),
     timeZone: text('time_zone').notNull(),
@@ -346,6 +348,49 @@ export const outbox = sqliteTable(
     lastError: text('last_error'),
   },
   (t) => [index('outbox_client_ts_idx').on(t.clientTs)],
+);
+
+/**
+ * Places for destination autocomplete (Plan 29): reference data from GeoNames and
+ * OpenStreetMap, seeded on the phone and filled from our server. Not synced, no outbox.
+ */
+export const places = sqliteTable(
+  'places',
+  {
+    id: text('id').primaryKey(),
+    kind: text('kind', { enum: ['city', 'region', 'country', 'continent'] }).notNull(),
+    name: text('name').notNull(),
+    countryCode: text('country_code'),
+    countryName: text('country_name'),
+    region: text('region'),
+    continent: text('continent'),
+    lat: real('lat'),
+    lng: real('lng'),
+    timeZone: text('time_zone'),
+    currency: text('currency'),
+    population: integer('population').notNull().default(0),
+    boost: real('boost').notNull().default(0),
+    source: text('source', { enum: ['geonames', 'osm', 'ours'] }).notNull(),
+  },
+  (t) => [index('places_country_idx').on(t.countryCode)],
+);
+
+/** Searchable names of a place: its own name and aliases, normalized (Plan 29). */
+export const placeNames = sqliteTable(
+  'place_names',
+  {
+    placeId: text('place_id').notNull(),
+    /** Normalized for search (lowercase, no accents). */
+    key: text('key').notNull(),
+    /** The name as written (Bangalore). */
+    text: text('text').notNull(),
+    /** 1 for the place's own name, 0 for an alias. */
+    own: integer('own', { mode: 'boolean' }).notNull(),
+  },
+  (t) => [
+    uniqueIndex('place_names_pk').on(t.placeId, t.key),
+    index('place_names_key_idx').on(t.key),
+  ],
 );
 
 /** Device-only key/value settings (my name, home currency, sync cursor later). Not synced. */

@@ -1,0 +1,71 @@
+{
+  "_about": "Our corrections on top of GeoNames (Plan 29). A rule that matches no place stops the build. Places listed under \"places\" are ours (source: ours); keep coordinates to the town or valley centre.",
+  "aliases": [],
+  "boosts": [
+    { "name": "Goa", "country": "IN", "kind": "region", "boost": 25 },
+    { "name": "Kerala", "country": "IN", "kind": "region", "boost": 15 },
+    { "name": "Himachal Pradesh", "country": "IN", "kind": "region", "boost": 10 }
+  ],
+  "places": [
+    {
+      "id": "ours:spiti-valley",
+      "kind": "region",
+      "name": "Spiti Valley",
+      "country": "IN",
+      "region": "Himachal Pradesh",
+      "lat": 32.2276,
+      "lng": 78.071,
+      "timeZone": "Asia/Kolkata",
+      "boost": 20,
+      "aliases": ["Spiti", "Kaza"]
+    },
+    {
+      "id": "ours:hampi",
+      "kind": "city",
+      "name": "Hampi",
+      "country": "IN",
+      "region": "Karnataka",
+      "lat": 15.335,
+      "lng": 76.46,
+      "timeZone": "Asia/Kolkata",
+      "boost": 20,
+      "aliases": []
+    },
+    {
+      "id": "ours:kodagu",
+      "kind": "region",
+      "name": "Kodagu",
+      "country": "IN",
+      "region": "Karnataka",
+      "lat": 12.4244,
+      "lng": 75.7382,
+      "timeZone": "Asia/Kolkata",
+      "boost": 20,
+      "aliases": ["Coorg"]
+    },
+    {
+      "id": "ours:kasol",
+      "kind": "city",
+      "name": "Kasol",
+      "country": "IN",
+      "region": "Himachal Pradesh",
+      "lat": 32.0098,
+      "lng": 77.3149,
+      "timeZone": "Asia/Kolkata",
+      "boost": 15,
+      "aliases": []
+    },
+    {
+      "id": "ours:kerala-backwaters",
+      "kind": "region",
+      "name": "Kerala Backwaters",
+      "country": "IN",
+      "region": "Kerala",
+      "lat": 9.4981,
+      "lng": 76.3388,
+      "timeZone": "Asia/Kolkata",
+      "boost": 15,
+      "aliases": ["Alleppey backwaters", "Backwaters"]
+    }
+  ]
+}

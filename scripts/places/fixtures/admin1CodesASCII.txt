@@ -1,0 +1,5 @@
+IN.33	Goa	Goa	1270260
+IN.19	Karnataka	Karnataka	1267701
+IN.16	Maharashtra	Maharashtra	1264418
+JP.40	Tokyo	Tokyo	1850144
+FR.11	Île-de-France	Ile-de-France	3012874

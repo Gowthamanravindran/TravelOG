@@ -1,6 +1,6 @@
 import type { TripInput } from '@travelog/db';
-import { isLocalDate } from '@travelog/core';
-import { useState } from 'react';
+import { currencyLabel, placeText, timeZoneLabel, type Place } from '@travelog/core';
+import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { CURRENCIES, deviceTimeZone } from '@/lib/format';
@@ -9,11 +9,14 @@ import { Icon } from '@/ui/icon';
 import { Body, Chip, ChipRow, Field, Row } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 import { DateRangeField } from '@/ui/date-field';
+import { PlaceField } from '@/ui/place-field';
 
 export interface TripFormValue {
   title: string;
   emoji: string;
   destination: string;
+  /** The picked place (Plan 29); null when the destination was typed. */
+  destinationPlaceId: string | null;
   startDate: string;
   endDate: string;
   currency: string;
@@ -25,6 +28,7 @@ export function emptyTripForm(currency = 'INR'): TripFormValue {
     title: '',
     emoji: 'trips',
     destination: '',
+    destinationPlaceId: null,
     startDate: '',
     endDate: '',
     currency,
@@ -37,6 +41,7 @@ export function toTripInput(v: TripFormValue): TripInput {
     title: v.title,
     emoji: v.emoji,
     destination: v.destination || null,
+    destinationPlaceId: v.destination ? v.destinationPlaceId : null,
     startDate: v.startDate || null,
     endDate: v.endDate || null,
     currency: v.currency,
@@ -54,6 +59,20 @@ export function TripForm({
   const t = useTheme();
   const set = (patch: Partial<TripFormValue>) => onChange({ ...value, ...patch });
   const [showTz, setShowTz] = useState(false);
+  // A picked place fills the time zone and currency, unless they were changed by hand.
+  const touched = useRef({ timeZone: false, currency: false });
+  const [placeCountry, setPlaceCountry] = useState<string | null>(null);
+  const pick = (p: Place) => {
+    setPlaceCountry(p.countryName);
+    set({
+      destination: placeText(p),
+      destinationPlaceId: p.id,
+      ...(p.timeZone && !touched.current.timeZone ? { timeZone: p.timeZone } : {}),
+      ...(p.currency && !touched.current.currency ? { currency: p.currency } : {}),
+    });
+  };
+  const known: readonly string[] = CURRENCIES;
+  const currencies = known.includes(value.currency) ? known : [value.currency, ...known];
 
   return (
     <View style={{ gap: 16 }}>
@@ -89,11 +108,12 @@ export function TripForm({
           </Pressable>
         ))}
       </Row>
-      <Field
+      <PlaceField
         label="Where"
         value={value.destination}
-        onChangeText={(destination) => set({ destination })}
-        placeholder="North Goa"
+        onChangeText={(destination) => set({ destination, destinationPlaceId: null })}
+        onPick={pick}
+        placeholder="Goa, Tokyo, Europe…"
       />
       <DateRangeField
         label="Dates"
@@ -109,27 +129,36 @@ export function TripForm({
         Trip currency
       </Body>
       <ChipRow>
-        {CURRENCIES.map((c) => (
+        {currencies.map((c) => (
           <Chip
             key={c}
             label={c}
             selected={value.currency === c}
-            onPress={() => set({ currency: c })}
+            onPress={() => {
+              touched.current.currency = true;
+              set({ currency: c });
+            }}
           />
         ))}
       </ChipRow>
+      <Body muted small>
+        {currencyLabel(value.currency)}
+      </Body>
       {showTz ? (
         <Field
           label="Time zone"
           value={value.timeZone}
-          onChangeText={(timeZone) => set({ timeZone })}
+          onChangeText={(timeZone) => {
+            touched.current.timeZone = true;
+            set({ timeZone });
+          }}
           autoCapitalize="none"
           hint="IANA name, e.g. Asia/Kolkata or Asia/Tokyo. Trip days follow this time zone."
         />
       ) : (
         <Pressable accessibilityRole="button" onPress={() => setShowTz(true)}>
           <Body small muted>
-            Time zone: {value.timeZone} · change
+            Time zone: {timeZoneLabel(value.timeZone, placeCountry)} · change
           </Body>
         </Pressable>
       )}

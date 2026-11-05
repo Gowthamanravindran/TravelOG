@@ -47,6 +47,14 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 5. Account → Access Tokens → Generate token → GitHub secret `SUPABASE_ACCESS_TOKEN`.
 6. Authentication → URL configuration: add `travelog://*` and `https://<domain>/*` to redirect URLs.
 7. The service-role key stays in Supabase only — never in the app or GitHub.
+8. **Places autocomplete (Plan 29):**
+   - **App settings for local testing:** put the staging Project URL and anon key in `apps/mobile/.env` as `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Both are public values. The file isn't committed.
+   - **Database connection for seeding:** in Project Settings → Database → Connection string, choose the **Session pooler** (it works from GitHub). Copy the URI with your database password filled in, and add it as the GitHub secret `STAGING_DB_URL`.
+   - **Geoapify:**
+     1. Create a free account at geoapify.com and create an API key. In its Places API terms, confirm that results may be stored and reused with OpenStreetMap credit.
+     2. In Supabase, go to Edge Functions → Secrets and add `PLACES_API_KEY` with that key. It never goes in the app or GitHub.
+   - **Deploy:** Actions → **Deploy database and functions (staging)** → Run workflow. This creates the `places` table and the `place-search` function.
+   - **Seed:** Actions → **Places data** → Run workflow, with "Also load the full list into Supabase" ticked. This also rebuilds the phone's basic list and commits it.
 
 ## §5 Expo / EAS — Phase 0 · free tier to start
 **Done:** organisation **TravelOGApp** (account name `travelogapp`) with project **travelog** (`c1fca343-1181-4e23-a750-137c4ca9447d`), linked in `apps/mobile/app.config.ts`. You don't need `eas init` or `create-expo-app` — the app already lives in `apps/mobile`.
