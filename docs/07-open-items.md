@@ -9,6 +9,7 @@ Everything still undecided or not yet done before and during the build. Each ite
 | App Store privacy labels, Play Data safety form | Store submission blocks without them | Claude prepares answers, owner submits | Phase 8 |
 | Company registration (Pvt Ltd or LLP) | Needed for: DLT SMS sender registration (phone OTP), GST invoices, affiliate payouts at scale, organisation store accounts (skips Play's 12-tester rule, shows a company name on Apple) | Owner | Before Phase 6 |
 | GST registration | Required once turnover crosses the threshold; foreign platforms (Apple/Google) handle GST on in-app sales they collect | Owner + accountant | When revenue starts |
+| Geoapify before launch (Plan 29) | Dev use on the free plan is allowed. Before GA: (1) email info@geoapify.com to confirm production use on the free plan, and that we may keep lookup results permanently in our `places` table, or move to a paid plan; (2) show "Powered by Geoapify" next to "© OpenStreetMap contributors" under place results and in Profile → Place data, required on the free plan. The provider may change before then, so neither is done yet | Owner (email), Claude (credit) | Before GA (Phase 8) |
 | Name and trademark check for "TravelOG" | Avoid a rename after launch | Owner | Phase 0 |
 | Domain | Invite links, universal links, email sender, website | Owner | Phase 0 |
 
