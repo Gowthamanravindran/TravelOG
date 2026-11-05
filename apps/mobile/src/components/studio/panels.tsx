@@ -26,6 +26,12 @@ export const SWATCHES = [
   '#5B5BD6',
   '#14B8A6',
   '#F59E0B',
+  '#E11D48',
+  '#0EA5E9',
+  '#22C55E',
+  '#A855F7',
+  '#9CA3AF',
+  '#000000',
 ];
 
 export const GRADIENTS: [string, string][] = [
@@ -33,6 +39,11 @@ export const GRADIENTS: [string, string][] = [
   ['#5B5BD6', '#14B8A6'],
   ['#0F1020', '#5B5BD6'],
   ['#FFE6E2', '#E7E7FB'],
+  ['#0EA5E9', '#22C55E'],
+  ['#A855F7', '#E11D48'],
+  ['#F59E0B', '#E11D48'],
+  ['#1B1A3A', '#000000'],
+  ['#FAF7F2', '#EFE7DA'],
 ];
 
 export const STICKERS: IconName[] = [
@@ -282,6 +293,32 @@ export function LayerPanel({
         <>
           <Row>
             <Button label="Replace" small onPress={onReplace} />
+            {cropping ? (
+              <>
+                <Button
+                  label="Zoom out"
+                  icon="remove"
+                  variant="ghost"
+                  small
+                  onPress={() =>
+                    onPatch({
+                      crop: { ...layer.crop, scale: Math.max(1, layer.crop.scale - 0.25) },
+                    } as Partial<Layer>)
+                  }
+                />
+                <Button
+                  label="Zoom in"
+                  icon="add"
+                  variant="ghost"
+                  small
+                  onPress={() =>
+                    onPatch({
+                      crop: { ...layer.crop, scale: Math.min(8, layer.crop.scale + 0.25) },
+                    } as Partial<Layer>)
+                  }
+                />
+              </>
+            ) : null}
             <Button
               label={cropping ? 'Done cropping' : 'Crop'}
               icon={cropping ? 'check' : 'crop'}
@@ -318,6 +355,23 @@ export function LayerPanel({
           onPick={(color) => onPatch({ color } as Partial<Layer>)}
         />
       ) : null}
+      <ChipRow>
+        <Chip label="Smaller" icon="remove" onPress={() => onPatch(scaledPatch(layer, 1 / 1.1))} />
+        <Chip label="Bigger" icon="add" onPress={() => onPatch(scaledPatch(layer, 1.1))} />
+        <Chip
+          label="Rotate left"
+          icon="undo"
+          onPress={() => onPatch({ rotation: roundAngle(layer.rotation - 15) })}
+        />
+        <Chip
+          label="Rotate right"
+          icon="redo"
+          onPress={() => onPatch({ rotation: roundAngle(layer.rotation + 15) })}
+        />
+        {layer.rotation ? (
+          <Chip label="Straighten" onPress={() => onPatch({ rotation: 0 })} />
+        ) : null}
+      </ChipRow>
       <ChipRow>
         <Chip label="Forward" onPress={() => onArrange('forward')} />
         <Chip label="Back" onPress={() => onArrange('backward')} />
@@ -391,4 +445,23 @@ function TextTools({ layer, onPatch }: { layer: TextLayer; onPatch: (p: Partial<
       </ChipRow>
     </View>
   );
+}
+
+/** Grows or shrinks an item around its centre (text size too). */
+function scaledPatch(layer: Layer, k: number): Partial<Layer> {
+  const w = Math.max(40, layer.w * k);
+  const h = Math.max(40, layer.h * k);
+  const patch: Partial<Layer> = {
+    x: layer.x + (layer.w - w) / 2,
+    y: layer.y + (layer.h - h) / 2,
+    w,
+    h,
+  };
+  if (layer.kind === 'text')
+    (patch as { size?: number }).size = Math.max(12, Math.min(600, layer.size * (w / layer.w)));
+  return patch;
+}
+
+function roundAngle(deg: number): number {
+  return ((Math.round(deg) + 540) % 360) - 180;
 }

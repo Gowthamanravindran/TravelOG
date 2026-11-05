@@ -83,3 +83,65 @@ export function transformLayer(
     (patch as { size?: number }).size = Math.max(12, Math.min(600, start.size * s));
   return { patch, guides };
 }
+
+export type Corner = 'tl' | 'tr' | 'bl' | 'br';
+
+const SIGN: Record<Corner, { x: -1 | 1; y: -1 | 1 }> = {
+  tl: { x: -1, y: -1 },
+  tr: { x: 1, y: -1 },
+  bl: { x: -1, y: 1 },
+  br: { x: 1, y: 1 },
+};
+
+/**
+ * Dragging a corner handle by (dx, dy) canvas px (Plan 23). The opposite corner
+ * stays put, in the layer's own rotated frame. Photo and template frames resize
+ * freely; text keeps its shape and its font size scales with it.
+ */
+export function resizeLayer(start: Layer, corner: Corner, dx: number, dy: number): Partial<Layer> {
+  const rad = (start.rotation * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  // Drag in the layer's local axes.
+  const lx = dx * cos + dy * sin;
+  const ly = -dx * sin + dy * cos;
+  const s = SIGN[corner];
+  let w = Math.max(MIN_SIZE, start.w + s.x * lx);
+  let h = Math.max(MIN_SIZE, start.h + s.y * ly);
+  if (start.kind === 'text' || start.kind === 'sticker') {
+    const k = Math.max(w / start.w, h / start.h);
+    w = Math.max(MIN_SIZE, start.w * k);
+    h = Math.max(MIN_SIZE, start.h * k);
+  }
+  // The centre moves half the growth towards the dragged corner.
+  const gx = (s.x * (w - start.w)) / 2;
+  const gy = (s.y * (h - start.h)) / 2;
+  const cx = start.x + start.w / 2 + gx * cos - gy * sin;
+  const cy = start.y + start.h / 2 + gx * sin + gy * cos;
+  const patch: Partial<Layer> = { x: cx - w / 2, y: cy - h / 2, w, h };
+  if (start.kind === 'text')
+    (patch as { size?: number }).size = Math.max(12, Math.min(600, (start.size * w) / start.w));
+  return patch;
+}
+
+/**
+ * Turning with the round handle above the layer: the angle of the pointer
+ * around the layer's centre (handle straight up = 0°), snapped to square.
+ */
+export function rotateWithHandle(start: Layer, pointer: { x: number; y: number }): number {
+  const cx = start.x + start.w / 2;
+  const cy = start.y + start.h / 2;
+  const deg = (Math.atan2(pointer.y - cy, pointer.x - cx) * 180) / Math.PI + 90;
+  const norm = ((deg + 540) % 360) - 180;
+  return snapAngle(norm);
+}
+
+/** Where the rotate handle sits (canvas px), `gap` above the top edge. */
+export function rotateHandlePosition(layer: Layer, gap: number): { x: number; y: number } {
+  const rad = (layer.rotation * Math.PI) / 180;
+  const r = layer.h / 2 + gap;
+  return {
+    x: layer.x + layer.w / 2 + r * Math.sin(rad),
+    y: layer.y + layer.h / 2 - r * Math.cos(rad),
+  };
+}

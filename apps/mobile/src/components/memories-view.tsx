@@ -1,12 +1,14 @@
-import { daysBetween, parseDoc, photosInDoc, tripState } from '@travelog/core';
+import { daysBetween, fitTemplate, parseDoc, photosInDoc, tripState } from '@travelog/core';
 import {
   addPhotos,
+  createProjectFromDoc,
   deletePhotos,
   deleteProject,
   duplicateProject,
   getTrip,
   listPhotos,
   listProjects,
+  newId,
   type Photo,
   type StudioProject,
 } from '@travelog/db';
@@ -91,7 +93,10 @@ export function MemoriesView({ tripId }: { tripId: string }) {
   const makeCollage = () => {
     // Keep the photos in the order they were taken.
     const ordered = photos.filter((p) => chosen.includes(p.id)).map((p) => p.id);
-    router.push(`/trip/${tripId}/studio/compose?photos=${ordered.join(',')}`);
+    // Saved straight away as "<trip> · n"; the editor opens on its layouts.
+    const doc = fitTemplate('bridge', 'post', ordered, newId, trip.destination || trip.title);
+    const project = mutate((db) => createProjectFromDoc(db, tripId, doc));
+    router.push(`/trip/${tripId}/studio/${project.id}?start=layouts`);
     setSelected([]);
   };
 

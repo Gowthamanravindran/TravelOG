@@ -1,8 +1,14 @@
-import { addPhotos, createProject, createTrip, listPhotos, listProjects } from '@travelog/db';
+import {
+  addPhotos,
+  createProject,
+  createTrip,
+  getProject,
+  listPhotos,
+  listProjects,
+} from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
-import ComposeCollage from '@/app/trip/[id]/studio/compose';
 import { MemoriesView } from '@/components/memories-view';
 import { exifTakenAt } from '@/lib/photos';
 import { makeDb, withData } from '@/testing/test-utils';
@@ -60,7 +66,7 @@ describe('Memories tab', () => {
     expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/studio/${project.id}`);
   });
 
-  it('select photos, then make a collage from them in the order taken', async () => {
+  it('select photos, then make a collage: saved as "Trip · 1" and opened on its layouts', async () => {
     const { db, trip } = tripWithPhotos(4);
     await render(withData(db, <MemoriesView tripId={trip.id} />, 'plan'));
     expect(screen.queryByText(/selected/)).toBeNull();
@@ -69,13 +75,18 @@ describe('Memories tab', () => {
     await fireEvent.press(tiles[0]!);
     expect(screen.getByText('2 selected')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Make a collage (2)' }));
-    const ids = listPhotos(db, trip.id).map((p) => p.id);
-    const [url] = mockPush.mock.lastCall!;
-    expect(url).toMatch(new RegExp(`^/trip/${trip.id}/studio/compose\\?photos=`));
-    const sent = String(url).split('photos=')[1]!.split(',');
+    const [project] = listProjects(db, trip.id);
+    expect(project).toMatchObject({ title: 'Goa Monsoon Escape · 1' });
+    expect(mockPush).toHaveBeenLastCalledWith(
+      `/trip/${trip.id}/studio/${project!.id}?start=layouts`,
+    );
     // In the order the photos were taken, not the order tapped.
-    expect(sent).toEqual(ids.filter((id) => sent.includes(id)));
-    expect(sent).toHaveLength(2);
+    const ids = listPhotos(db, trip.id).map((p) => p.id);
+    const used = getProject(db, project!.id)!.doc.layers.flatMap((l) =>
+      l.kind === 'photo' && l.photoId ? [l.photoId] : [],
+    );
+    expect(used).toEqual(ids.filter((id) => used.includes(id)));
+    expect(used).toHaveLength(2);
   });
 
   it('selects a whole day and deletes the selection', async () => {
@@ -95,27 +106,6 @@ describe('Memories tab', () => {
     const { db, trip } = tripWithPhotos(0);
     await render(withData(db, <MemoriesView tripId={trip.id} />, 'plan'));
     expect(screen.getByText('No photos yet')).toBeTruthy();
-  });
-});
-
-describe('Make a collage', () => {
-  it('previews layouts live and saves "Trip · n" then opens sharing', async () => {
-    const { db, trip } = tripWithPhotos(3);
-    const ids = listPhotos(db, trip.id).map((p) => p.id);
-    mockParams = { id: trip.id, photos: ids.join(',') };
-    await render(withData(db, <ComposeCollage />, 'trip'));
-    expect(screen.getByText('3 photos')).toBeTruthy();
-    // Bridge: 2 slides fit 3 photos.
-    expect(screen.getByText(/^2 slides/)).toBeTruthy();
-    await fireEvent.press(screen.getByRole('radio', { name: 'Layout Panorama' }));
-    expect(screen.getByText(/^3 slides/)).toBeTruthy();
-    await fireEvent.press(screen.getByRole('radio', { name: 'Layout Film roll' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Save & share' }));
-    const [project] = listProjects(db, trip.id);
-    expect(project).toMatchObject({ title: 'Goa Monsoon Escape · 1' });
-    expect(mockReplace).toHaveBeenCalledWith(
-      `/trip/${trip.id}/studio/export?projectId=${project!.id}`,
-    );
   });
 });
 

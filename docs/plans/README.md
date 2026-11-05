@@ -26,3 +26,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 20 | [Time picker without a native package](20-time-sheet.md) | see git log |
 | 21 | [Empty trip tabs: every tab gets the trip id](21-tab-params.md) | see git log |
 | 22 | [Select photos, then make a collage](22-select-to-collage.md) | see git log |
+| 23 | [Edit collages directly: handles, frames, background, text](23-collage-editing.md) | see git log |

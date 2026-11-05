@@ -26,6 +26,9 @@ import {
   swapSlides,
   templatePhotoCount,
   transformLayer,
+  resizeLayer,
+  rotateWithHandle,
+  rotateHandlePosition,
   undo,
   updateLayer,
   type Layer,
@@ -370,5 +373,60 @@ describe('fitTemplate', () => {
     const doc = fitTemplate('bridge', 'post', ['a', 'b', 'c'], ids);
     expect(doc.slides).toBe(2);
     expect(photosInDoc(doc)).toEqual(['a', 'b', 'c']);
+  });
+});
+
+describe('handles', () => {
+  const box = sticker('s', 100, 100, 200, 100); // emoji sticker keeps aspect
+  const frame: Layer = {
+    id: 'f',
+    kind: 'photo',
+    photoId: 'p',
+    crop: { scale: 1, x: 0.5, y: 0.5 },
+    frame: { radius: 0, border: 0, borderColor: '#FFFFFF', shadow: false },
+    x: 100,
+    y: 100,
+    w: 200,
+    h: 100,
+    rotation: 0,
+  };
+
+  it('resizes a frame from a corner, keeping the opposite corner still', () => {
+    expect(resizeLayer(frame, 'br', 50, 20)).toEqual({ x: 100, y: 100, w: 250, h: 120 });
+    expect(resizeLayer(frame, 'tl', -50, -20)).toEqual({ x: 50, y: 80, w: 250, h: 120 });
+    expect(resizeLayer(frame, 'br', -500, -500)).toMatchObject({ w: 40, h: 40 });
+  });
+
+  it('keeps stickers and text in shape and scales the text size', () => {
+    const r = resizeLayer(box, 'br', 200, 0);
+    expect(r).toMatchObject({ w: 400, h: 200 });
+    const text: Layer = {
+      ...frame,
+      kind: 'text',
+      text: 'Hi',
+      font: 'sans',
+      size: 80,
+      color: '#000000',
+      align: 'center',
+      bold: false,
+      background: null,
+    } as Layer;
+    expect(resizeLayer(text, 'br', 200, 0)).toMatchObject({ w: 400, size: 160 });
+  });
+
+  it('follows the layer when it is rotated', () => {
+    const turned = { ...frame, rotation: 90 };
+    // Rotated 90°: dragging down grows the local width.
+    const r = resizeLayer(turned, 'br', 0, 50);
+    expect(r.w).toBeCloseTo(250);
+    expect(r.h).toBeCloseTo(100);
+  });
+
+  it('rotates with the handle and snaps to straight', () => {
+    expect(rotateWithHandle(frame, { x: 200, y: 0 })).toBe(0); // straight up
+    expect(rotateWithHandle(frame, { x: 400, y: 150 })).toBe(90); // to the right
+    expect(rotateWithHandle(frame, { x: 260, y: 50 })).toBeCloseTo(31, 0);
+    const h = rotateHandlePosition(frame, 40);
+    expect(h).toEqual({ x: 200, y: 60 });
   });
 });

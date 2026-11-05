@@ -10,7 +10,6 @@ export default function TripLayout() {
       <Stack.Screen name="poll" options={{ presentation: 'modal' }} />
       <Stack.Screen name="settle" options={{ presentation: 'modal' }} />
       <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="studio/compose" options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="studio/[projectId]" options={{ animation: 'fade' }} />
       <Stack.Screen name="studio/export" options={{ animation: 'slide_from_right' }} />
     </Stack>

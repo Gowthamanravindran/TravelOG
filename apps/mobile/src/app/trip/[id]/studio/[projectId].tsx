@@ -4,7 +4,7 @@ import {
   canvasSize,
   DEFAULT_CROP,
   DEFAULT_FRAME,
-  docFromTemplate,
+  fitTemplate,
   duplicateLayer,
   moveLayerZ,
   photosInDoc,
@@ -18,14 +18,14 @@ import {
   updateLayer,
   type Layer,
   type StudioDoc,
+  type StudioFormat,
   type StudioTemplateId,
 } from '@travelog/core';
 import { getTrip, listPhotos, newId, tripRecap, type Photo } from '@travelog/db';
 import { type } from '@travelog/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, Text, View, type LayoutChangeEvent } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { Alert, Pressable, ScrollView, Text, View, type LayoutChangeEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { type PhotoInfo, type StatItem } from '@/components/studio/layer-view';
@@ -41,9 +41,10 @@ import { StudioCanvas } from '@/components/studio/studio-canvas';
 import { useQuery } from '@/data/provider';
 import { money } from '@/lib/format';
 import { useStudioEditor } from '@/lib/studio-editor';
-import { Button, Chip, ChipRow } from '@/ui/kit';
+import { Button, Chip, ChipRow, Segmented } from '@/ui/kit';
 import { ModeProvider, useTheme } from '@/ui/theme';
 import { Icon, type IconName } from '@/ui/icon';
+import { LayoutStrip } from '@/components/studio/layout-strip';
 
 type Tool = 'photos' | 'text' | 'stickers' | 'background' | 'slides' | 'layout';
 const TOOLS: { id: Tool; label: string; icon: IconName }[] = [
@@ -65,7 +66,11 @@ export default function StudioEditorScreen() {
 }
 
 function Editor() {
-  const { id, projectId } = useLocalSearchParams<{ id: string; projectId: string }>();
+  const { id, projectId, start } = useLocalSearchParams<{
+    id: string;
+    projectId: string;
+    start?: string;
+  }>();
   const router = useRouter();
   const t = useTheme();
   const editor = useStudioEditor(projectId);
@@ -76,7 +81,8 @@ function Editor() {
 
   const [area, setArea] = useState({ width: 0, height: 0 });
   const [scrollX, setScrollX] = useState(0);
-  const [tool, setTool] = useState<Tool>('photos');
+  const [tool, setTool] = useState<Tool>(start === 'layouts' ? 'layout' : 'photos');
+  const [layoutId, setLayoutId] = useState<StudioTemplateId | null>(null);
   const [cropping, setCropping] = useState(false);
   const [replacing, setReplacing] = useState(false);
   const [live, setLive] = useState<{ id: string; patch: Partial<Layer> } | null>(null);
@@ -114,6 +120,7 @@ function Editor() {
   const shown: StudioDoc = live ? updateLayer(doc, live.id, live.patch) : doc;
   const selected = shown.layers.find((l) => l.id === selectedId) ?? null;
   const used = photosInDoc(doc);
+  const heading = trip.destination || trip.title;
 
   const stats: StatItem[] = recap
     ? [
@@ -170,29 +177,6 @@ function Editor() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: doIt },
     ]);
-  };
-
-  const applyTemplate = (template: StudioTemplateId) => {
-    const go = () => {
-      const next = docFromTemplate(
-        template,
-        doc.format,
-        doc.slides,
-        used,
-        newId,
-        editor.project?.title ?? '',
-      );
-      apply(() => next);
-      select(null);
-    };
-    Alert.alert(
-      'Use this layout?',
-      'Your photos are kept and placed into the new layout. You can undo.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Use layout', onPress: go },
-      ],
-    );
   };
 
   const close = () => {
@@ -255,6 +239,8 @@ function Editor() {
         {scale ? (
           <ScrollView
             horizontal
+            // While something is selected, fingers move it instead of scrolling.
+            scrollEnabled={!selected}
             showsHorizontalScrollIndicator={false}
             onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
             scrollEventThrottle={32}
@@ -475,16 +461,35 @@ function Editor() {
               />
             ) : null}
             {tool === 'layout' ? (
-              <ChipRow>
-                {STUDIO_TEMPLATES.filter((x) => x.id !== 'blank').map((x) => (
-                  <Chip
-                    key={x.id}
-                    label={x.name}
-                    icon={x.seamless ? 'seamless' : 'layout'}
-                    onPress={() => applyTemplate(x.id)}
-                  />
-                ))}
-              </ChipRow>
+              <View style={{ gap: 8 }}>
+                <Segmented<StudioFormat>
+                  value={doc.format}
+                  onChange={(format) => {
+                    const next = fitTemplate(layoutId ?? 'bridge', format, used, newId, heading);
+                    apply(() => next);
+                    select(null);
+                  }}
+                  options={[
+                    { value: 'post', label: '4:5' },
+                    { value: 'square', label: 'Square' },
+                    { value: 'story', label: '9:16' },
+                  ]}
+                />
+                <LayoutStrip
+                  photoIds={used}
+                  format={doc.format}
+                  current={layoutId}
+                  heading={heading}
+                  photos={photos}
+                  stats={stats}
+                  onPick={(template, next) => {
+                    // Applied straight away; Undo brings the previous layout back.
+                    setLayoutId(template);
+                    apply(() => next);
+                    select(null);
+                  }}
+                />
+              </View>
             ) : null}
           </>
         )}
