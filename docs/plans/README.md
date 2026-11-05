@@ -22,3 +22,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 16 | [Fixes from the phone test: icons, film error, trip setup, Instagram hand-off](16-phone-test-fixes.md) | see git log |
 | 17 | [`pnpm dev` installs new packages before starting](17-dev-script.md) | see git log |
 | 18 | [Blank tabs fix, floating bar, calendar dates, trip header and screens](18-tabs-nav-dates-redesign.md) | see git log |
+| 19 | [Test in Expo Go without building (`pnpm dev:go`)](19-expo-go.md) | see git log |

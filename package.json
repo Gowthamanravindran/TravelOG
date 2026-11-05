@@ -15,7 +15,8 @@
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local > packages/core/src/db.types.ts",
-    "dev": "pnpm install --frozen-lockfile --prefer-offline && pnpm --filter @travelog/mobile start --dev-client"
+    "dev": "pnpm install --frozen-lockfile --prefer-offline && pnpm --filter @travelog/mobile start --dev-client",
+    "dev:go": "pnpm install --frozen-lockfile --prefer-offline && pnpm --filter @travelog/mobile start --go"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

@@ -22,7 +22,8 @@ pnpm lint                    # expo lint
 pnpm typecheck               # tsc in every package
 pnpm test                    # Vitest (packages) + Jest/jest-expo (mobile)
 pnpm format                  # Prettier
-pnpm dev                     # installs anything new after a pull, then starts the dev server (development build only)
+pnpm dev:go                  # everyday testing: install anything new, start for Expo Go (scan the QR code)
+pnpm dev                     # same for the TravelOG development build (encryption, Instagram posting, native changes)
 pnpm --filter @travelog/mobile start          # dev server without the install step
 pnpm --filter @travelog/mobile export:android # production bundle → apps/mobile/dist
 node scripts/check-bundle-size.mjs            # bundle budget (docs/08)
@@ -37,7 +38,9 @@ In this cloud environment the Expo CLI cannot reach `api.expo.dev`; prefix Expo 
 - **Time:** store UTC; keep the trip's time zone alongside.
 - **Database:** every table gets RLS, policies, indexes for its policies and a pgTAP test in the same change.
   Never edit a merged migration — add a new one. Breaking changes use expand → migrate → contract (`docs/12`).
-- **Add native packages with `npx expo install`** (SDK-compatible versions), never plain `pnpm add`.
+- **Add native packages with `npx expo install`** (SDK-compatible versions), never plain `pnpm add`. Prefer packages
+  included in Expo Go; anything else must fall back gracefully there (`lib/runtime.ts` `isExpoGo`), and the plan
+  summary must tell the owner a new development build is needed.
 - **Secrets never go in the repo.** Public values only (Supabase URL/anon key, EAS project id).
   Secret stores: GitHub Actions, EAS environment variables, Supabase function secrets (`docs/14`).
 - **Placeholders** to change once the owner decides: bundle id `app.travelog.mobile`, scheme `travelog`,

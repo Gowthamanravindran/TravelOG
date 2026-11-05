@@ -6,8 +6,16 @@ import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import { openDatabaseSync } from 'expo-sqlite';
 
+import { isExpoGo } from '@/lib/runtime';
+
 const KEY_NAME = 'travelog.db.key';
 const DB_NAME = 'travelog.db';
+/** Expo Go can't encrypt, so it gets its own test database (Plan 19). */
+const EXPO_GO_DB_NAME = 'travelog-expo-go.db';
+
+export function databaseFile(expoGo: boolean): { name: string; encrypted: boolean } {
+  return expoGo ? { name: EXPO_GO_DB_NAME, encrypted: false } : { name: DB_NAME, encrypted: true };
+}
 
 // UUID v7 ids need crypto.getRandomValues, which React Native doesn't always provide.
 const g = globalThis as { crypto?: { getRandomValues?: unknown } };
@@ -27,11 +35,17 @@ async function databaseKey(): Promise<string> {
   return key;
 }
 
-/** Opens the encrypted on-device database and applies pending migrations. */
+/**
+ * Opens the encrypted on-device database (or, in Expo Go, an unencrypted test
+ * database) and applies pending migrations.
+ */
 export async function openAppDatabase(): Promise<Db> {
-  const key = await databaseKey();
-  const sqlite = openDatabaseSync(DB_NAME);
-  sqlite.execSync(`PRAGMA key = "x'${key}'";`);
+  const file = databaseFile(isExpoGo());
+  const sqlite = openDatabaseSync(file.name);
+  if (file.encrypted) {
+    const key = await databaseKey();
+    sqlite.execSync(`PRAGMA key = "x'${key}'";`);
+  }
   sqlite.execSync('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;');
   const db = drizzle(sqlite, { schema });
   await migrate(db, migrations);

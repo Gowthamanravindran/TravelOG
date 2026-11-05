@@ -5,6 +5,7 @@ import { Switch } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
 import { remindersEnabled, setRemindersEnabled } from '@/lib/reminders';
+import { isExpoGo } from '@/lib/runtime';
 import { sharingBuildLevel } from '@/lib/social-share';
 import { Between, Body, Button, Card, H1, Screen, Strong } from '@/ui/kit';
 
@@ -14,6 +15,7 @@ export default function ProfileScreen() {
   const trips = useQuery((db) => listTrips(db));
   const mutate = useMutate();
   const sharing = sharingBuildLevel();
+  const expoGo = isExpoGo();
   const reminders = useQuery((db) => remindersEnabled(db));
   const done = trips.filter((t) => t.state === 'completed' || t.state === 'archived').length;
 
@@ -55,11 +57,13 @@ export default function ProfileScreen() {
       <Card>
         <Strong>This app build</Strong>
         <Body muted small>
-          {sharing === 2
-            ? 'Up to date: posting carousels to Instagram and Facebook is included.'
-            : sharing === 1
-              ? 'Older build: install the latest build to open Instagram with your slides.'
-              : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}
+          {expoGo
+            ? "Running in Expo Go: test data is kept apart and isn't encrypted; Instagram posting uses the share sheet."
+            : sharing === 2
+              ? 'Up to date: posting carousels to Instagram and Facebook is included.'
+              : sharing === 1
+                ? 'Older build: install the latest build to open Instagram with your slides.'
+                : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}
         </Body>
       </Card>
       <Card>
