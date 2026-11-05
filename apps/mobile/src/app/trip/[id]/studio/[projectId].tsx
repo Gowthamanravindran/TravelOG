@@ -58,7 +58,7 @@ const TOOLS: { id: Tool; label: string; icon: IconName }[] = [
 /** The Studio editor (Plan 15): a wide canvas of slides; photos can cross the seams. */
 export default function StudioEditorScreen() {
   return (
-    <ModeProvider mode="trip">
+    <ModeProvider mode="trip" scheme="dark">
       <Editor />
     </ModeProvider>
   );

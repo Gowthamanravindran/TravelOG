@@ -1,13 +1,14 @@
-import { font, themeFor } from '@travelog/ui';
-import { Pressable, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { font } from '@travelog/ui';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Icon } from '@/ui/icon';
+import { useTheme } from '@/ui/theme';
 
 /**
  * Shown when a screen crashes (docs/08 app states). Data is safe in the local
  * database, so "Try again" re-renders the screen.
  */
 export function ErrorScreen({ error, retry }: { error: Error; retry: () => Promise<void> }) {
-  const t = themeFor('sunset', 'home', useColorScheme());
+  const t = useTheme('home');
   return (
     <View
       style={{

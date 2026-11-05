@@ -24,7 +24,7 @@ import { ModeProvider, useTheme } from '@/ui/theme';
 /** Preview, export every slide at exact size, and share (Plan 15). */
 export default function StudioExport() {
   return (
-    <ModeProvider mode="trip">
+    <ModeProvider mode="trip" scheme="dark">
       <ExportScreen />
     </ModeProvider>
   );

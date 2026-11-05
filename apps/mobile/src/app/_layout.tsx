@@ -9,14 +9,15 @@ import {
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ErrorScreen } from '@/components/error-screen';
 import { openAppDatabase } from '@/data/open';
 import { DataProvider } from '@/data/provider';
+import { AppearanceProvider } from '@/lib/appearance';
 import { FONT_ASSETS, FontGate } from '@/lib/fonts';
+import { useScheme } from '@/ui/theme';
 import { useReminders } from '@/lib/reminders';
 
 SplashScreen.preventAutoHideAsync();
@@ -26,6 +27,17 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
   return <ErrorScreen {...props} />;
 }
 
+/** Navigation colours and the status bar follow the saved light/dark choice. */
+function Themed({ children }: { children: ReactNode }) {
+  const scheme = useScheme();
+  return (
+    <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      {children}
+    </ThemeProvider>
+  );
+}
+
 /** Work that follows the data in the background (reminders). */
 function Background() {
   useReminders();
@@ -33,7 +45,6 @@ function Background() {
 }
 
 export default function RootLayout() {
-  const scheme = useColorScheme();
   const fonts = useFonts(FONT_ASSETS);
   const [db, setDb] = useState<Db | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,13 +78,14 @@ export default function RootLayout() {
     <FontGate fonts={fonts} dataReady>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <DataProvider db={db}>
-          <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <StatusBar style="auto" />
-            <Background />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
-            </Stack>
-          </ThemeProvider>
+          <AppearanceProvider>
+            <Themed>
+              <Background />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
+              </Stack>
+            </Themed>
+          </AppearanceProvider>
         </DataProvider>
       </GestureHandlerRootView>
     </FontGate>
