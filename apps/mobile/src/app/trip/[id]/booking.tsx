@@ -12,12 +12,19 @@ import {
   updateBooking,
   type BookingType,
 } from '@travelog/db';
-import { localDateIn, localTimeIn, localToUtcIso } from '@travelog/core';
+import {
+  localDateIn,
+  localTimeIn,
+  localToUtcIso,
+  type BookingDraft,
+  type DraftField,
+} from '@travelog/core';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
+import { clearImport, peekImport, type BookingImport } from '@/lib/booking-import';
 import { amountText, errorMessage, parseAmount } from '@/lib/format';
 import { openAttachment, pickAttachment } from '@/lib/files';
 import { BOOKING_LABELS } from '@/lib/labels';
@@ -31,23 +38,72 @@ import {
   ErrorText,
   Field,
   H1,
+  IconTile,
   Row,
-  Screen,
+  SheetScreen,
+  Strong,
+  WithIcon,
 } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
 import { DateField, TimeField } from '@/ui/date-field';
 
+/**
+ * Add or edit a booking, in a bottom sheet (Plan 31). Opened from an uploaded
+ * document, it starts filled in from it, one booking at a time ("1 of 2" for a
+ * return flight), with the document attached.
+ */
 export default function BookingEditor() {
-  const { id, bookingId } = useLocalSearchParams<{ id: string; bookingId?: string }>();
+  const { id, bookingId, importId } = useLocalSearchParams<{
+    id: string;
+    bookingId?: string;
+    importId?: string;
+  }>();
+  const router = useRouter();
+  const imported = peekImport(importId);
+  const [step, setStep] = useState(0);
+  const steps = imported?.drafts.length ?? 0;
+  const finish = () => {
+    clearImport(importId);
+    router.back();
+  };
   return (
     <ModeProvider mode="plan">
-      <BookingForm tripId={id} bookingId={bookingId} />
+      <BookingForm
+        key={step}
+        tripId={id}
+        bookingId={bookingId}
+        imported={imported}
+        draft={imported?.drafts[step]}
+        step={step}
+        steps={steps}
+        onDone={() => (step + 1 < steps ? setStep(step + 1) : finish())}
+        onCancel={finish}
+      />
     </ModeProvider>
   );
 }
 
-function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string }) {
-  const router = useRouter();
+const FROM_DOC = 'From your document';
+
+function BookingForm({
+  tripId,
+  bookingId,
+  imported,
+  draft,
+  step,
+  steps,
+  onDone,
+  onCancel,
+}: {
+  tripId: string;
+  bookingId?: string;
+  imported?: BookingImport;
+  draft?: BookingDraft;
+  step: number;
+  steps: number;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
   const mutate = useMutate();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
   const existing = useQuery(
@@ -60,23 +116,36 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
     iso
       ? { d: localDateIn(tz, new Date(iso)), t: localTimeIn(tz, new Date(iso)) }
       : { d: '', t: '' };
-  const [kind, setKind] = useState<BookingType>(existing?.type ?? 'train');
-  const [title, setTitle] = useState(existing?.title ?? '');
-  const [provider, setProvider] = useState(existing?.provider ?? '');
-  const [reference, setReference] = useState(existing?.reference ?? '');
-  const [start, setStart] = useState(split(existing?.startsAt));
-  const [end, setEnd] = useState(split(existing?.endsAt));
-  const [cost, setCost] = useState(amountText(existing?.costMinor, trip?.currency ?? 'INR'));
-  const [addAsExpense, setAddAsExpense] = useState(!existing);
+  const found = new Set<DraftField>(draft?.found ?? []);
+  const currency = existing?.currency ?? draft?.currency ?? trip?.currency ?? 'INR';
+  const [kind, setKind] = useState<BookingType>(
+    existing?.type ?? (draft && found.has('type') ? draft.type : 'train'),
+  );
+  const [title, setTitle] = useState(existing?.title ?? draft?.title ?? '');
+  const [provider, setProvider] = useState(existing?.provider ?? draft?.provider ?? '');
+  const [reference, setReference] = useState(existing?.reference ?? draft?.reference ?? '');
+  const [start, setStart] = useState(
+    existing ? split(existing.startsAt) : { d: draft?.startDate ?? '', t: draft?.startTime ?? '' },
+  );
+  const [end, setEnd] = useState(
+    existing ? split(existing.endsAt) : { d: draft?.endDate ?? '', t: draft?.endTime ?? '' },
+  );
+  const [cost, setCost] = useState(amountText(existing?.costMinor ?? draft?.costMinor, currency));
+  const [notes, setNotes] = useState(existing?.notes ?? draft?.notes ?? '');
+  const sameCurrency = currency === trip?.currency;
+  const [addAsExpense, setAddAsExpense] = useState(!existing && sameCurrency);
   const [error, setError] = useState<string | null>(null);
   if (!trip) return null;
 
+  const hint = (f: DraftField) => (found.has(f) ? FROM_DOC : undefined);
   const instant = (v: { d: string; t: string }) =>
     v.d ? localToUtcIso(v.d, v.t || '00:00', tz) : null;
+  const label = BOOKING_LABELS[kind];
+  const readable = !!imported?.readable;
 
   const save = () => {
     try {
-      const costMinor = parseAmount(cost, trip.currency);
+      const costMinor = parseAmount(cost, currency);
       const input = {
         tripId,
         type: kind,
@@ -86,12 +155,14 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         startsAt: instant(start),
         endsAt: instant(end),
         costMinor,
-        currency: trip.currency,
+        currency,
+        notes: notes.trim() || null,
       };
       mutate((db) => {
         if (existing) return updateBooking(db, existing.id, input);
         const b = addBooking(db, input);
-        if (addAsExpense && costMinor) {
+        if (imported) addAttachment(db, { tripId, bookingId: b.id, ...imported.file });
+        if (addAsExpense && sameCurrency && costMinor) {
           const members = listMembers(db, tripId);
           const me = members.find((m) => m.isMe) ?? members[0]!;
           addExpense(db, {
@@ -99,7 +170,7 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
             title: b.title,
             category: kind === 'stay' ? 'stay' : kind === 'event' ? 'activities' : 'travel',
             amountMinor: costMinor,
-            currency: trip.currency,
+            currency,
             paidByMemberId: me.id,
             splitMethod: 'equal',
             participants: members.map((m) => ({ memberId: m.id })),
@@ -108,7 +179,7 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         }
         return b;
       });
-      router.back();
+      onDone();
     } catch (e) {
       setError(errorMessage(e));
     }
@@ -124,12 +195,40 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
     }
   };
 
+  const heading = existing
+    ? 'Booking'
+    : readable
+      ? `${label.label} · Check the details`
+      : 'Add booking';
+  const last = step + 1 >= steps;
+
   return (
-    <Screen edges={['top', 'bottom']}>
+    <SheetScreen>
       <Between>
-        <H1>{existing ? 'Booking' : 'Add booking'}</H1>
-        <Button label="Cancel" variant="link" onPress={() => router.back()} />
+        <Row style={{ gap: 12, flex: 1 }}>
+          <IconTile icon={label.icon} family={label.family} />
+          <View style={{ flex: 1 }}>
+            <H1 eyebrow={steps > 1 ? `Booking ${step + 1} of ${steps}` : undefined}>{heading}</H1>
+          </View>
+        </Row>
+        <Button label="Cancel" variant="link" onPress={onCancel} />
       </Between>
+
+      {imported ? (
+        <Card>
+          <WithIcon icon="document" size={18}>
+            <Strong>{imported.file.name}</Strong>
+          </WithIcon>
+          <Body muted small>
+            {readable
+              ? steps > 1
+                ? `This document has ${steps} bookings. Filled in from it: check before saving.`
+                : 'Filled in from your document: check before saving.'
+              : "Couldn't read this file: enter the details below. Scans and photos can't be read on the phone yet. It will be attached to the booking."}
+          </Body>
+        </Card>
+      ) : null}
+
       <ChipRow>
         {BOOKING_TYPES.map((b) => (
           <Chip
@@ -146,10 +245,17 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         value={title}
         onChangeText={setTitle}
         placeholder="Delhi → Manali Volvo"
+        hint={hint('title')}
       />
       <Row>
         <View style={{ flex: 1 }}>
-          <Field label="Provider" value={provider} onChangeText={setProvider} placeholder="HRTC" />
+          <Field
+            label="Provider"
+            value={provider}
+            onChangeText={setProvider}
+            placeholder="HRTC"
+            hint={hint('provider')}
+          />
         </View>
         <View style={{ flex: 1 }}>
           <Field
@@ -157,12 +263,18 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
             value={reference}
             onChangeText={setReference}
             autoCapitalize="characters"
+            hint={hint('reference')}
           />
         </View>
       </Row>
       <Row>
         <View style={{ flex: 3 }}>
-          <DateField label="Starts" value={start.d} onChange={(d) => setStart({ ...start, d })} />
+          <DateField
+            label="Starts"
+            value={start.d}
+            onChange={(d) => setStart({ ...start, d })}
+            hint={hint('start')}
+          />
         </View>
         <View style={{ flex: 2 }}>
           <TimeField label="Time" value={start.t} onChange={(t) => setStart({ ...start, t })} />
@@ -170,7 +282,12 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
       </Row>
       <Row>
         <View style={{ flex: 3 }}>
-          <DateField label="Ends" value={end.d} onChange={(d) => setEnd({ ...end, d })} />
+          <DateField
+            label="Ends"
+            value={end.d}
+            onChange={(d) => setEnd({ ...end, d })}
+            hint={hint('end')}
+          />
         </View>
         <View style={{ flex: 2 }}>
           <TimeField label="Time" value={end.t} onChange={(t) => setEnd({ ...end, t })} />
@@ -180,18 +297,32 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         Times are in the trip&apos;s time zone ({tz}).
       </Body>
       <Field
-        label={`Total cost (${trip.currency})`}
+        label={`Total cost (${currency})`}
         value={cost}
         onChangeText={setCost}
         keyboardType="decimal-pad"
+        hint={hint('cost')}
       />
-      {!existing ? (
+      <Field
+        label="Notes"
+        value={notes}
+        onChangeText={setNotes}
+        placeholder="Seats, room, who's travelling"
+        multiline
+        hint={hint('notes')}
+      />
+      {!existing && sameCurrency ? (
         <Chip
           label="Also add to expenses, split equally"
           icon={addAsExpense ? 'check' : 'circle'}
           selected={addAsExpense}
           onPress={() => setAddAsExpense(!addAsExpense)}
         />
+      ) : null}
+      {!existing && !sameCurrency ? (
+        <Body muted small>
+          Paid in {currency}: add it under Budget to convert it to {trip.currency}.
+        </Body>
       ) : null}
       {existing ? (
         <Card>
@@ -225,7 +356,18 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
         </Card>
       ) : null}
       <ErrorText>{error}</ErrorText>
-      <Button label={existing ? 'Save' : 'Add booking'} onPress={save} disabled={!title.trim()} />
+      <Button
+        label={existing ? 'Save' : steps > 1 && !last ? 'Add and go to the next' : 'Add booking'}
+        onPress={save}
+        disabled={!title.trim()}
+      />
+      {steps > 1 && !existing ? (
+        <Button
+          label={last ? 'Skip this one' : 'Skip to the next'}
+          variant="link"
+          onPress={onDone}
+        />
+      ) : null}
       {existing ? (
         <Button
           label="Delete booking"
@@ -233,10 +375,10 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
           danger
           onPress={() => {
             mutate((db) => deleteBooking(db, existing.id));
-            router.back();
+            onDone();
           }}
         />
       ) : null}
-    </Screen>
+    </SheetScreen>
   );
 }

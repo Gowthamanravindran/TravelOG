@@ -6,6 +6,7 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import path from 'node:path';
 import type { ReactNode } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DataProvider } from '@/data/provider';
 import { AppearanceProvider } from '@/lib/appearance';
@@ -20,16 +21,23 @@ export function makeDb(): Db {
   return db as unknown as Db;
 }
 
+const METRICS = {
+  frame: { x: 0, y: 0, width: 390, height: 844 },
+  insets: { top: 47, left: 0, right: 0, bottom: 34 },
+};
+
 export function withData(db: Db, ui: ReactNode, mode: 'home' | 'plan' | 'trip' = 'home') {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <DataProvider db={db}>
-        <AppearanceProvider>
-          <CelebrationHost>
-            <ModeProvider mode={mode}>{ui}</ModeProvider>
-          </CelebrationHost>
-        </AppearanceProvider>
-      </DataProvider>
+      <SafeAreaProvider initialMetrics={METRICS}>
+        <DataProvider db={db}>
+          <AppearanceProvider>
+            <CelebrationHost>
+              <ModeProvider mode={mode}>{ui}</ModeProvider>
+            </CelebrationHost>
+          </AppearanceProvider>
+        </DataProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

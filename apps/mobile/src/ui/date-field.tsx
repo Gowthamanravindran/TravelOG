@@ -172,11 +172,13 @@ export function TimeField({
   value,
   onChange,
   placeholder = 'Add a time',
+  hint,
 }: {
   label: string;
   value: string;
   onChange: (time: string) => void;
   placeholder?: string;
+  hint?: string;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -188,6 +190,7 @@ export function TimeField({
         icon="today"
         onPress={() => setOpen(true)}
         onClear={() => onChange('')}
+        hint={hint}
       />
       <TimeSheet
         visible={open}

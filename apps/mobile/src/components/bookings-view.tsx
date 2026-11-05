@@ -1,17 +1,22 @@
 import { font } from '@travelog/ui';
 import { getTrip, listAttachments, listBookings } from '@travelog/db';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useQuery } from '@/data/provider';
-import { dateTimeIn, money } from '@/lib/format';
+import { readBookingDocument, stashImport } from '@/lib/booking-import';
+import { pickAttachment } from '@/lib/files';
+import { dateTimeIn, errorMessage, money } from '@/lib/format';
 import { BOOKING_LABELS } from '@/lib/labels';
+import { ChoiceSheet } from '@/ui/choice-sheet';
 import {
   Between,
   Body,
   Button,
   Card,
   Empty,
+  ErrorText,
   IconTile,
   Row,
   Section,
@@ -30,9 +35,36 @@ export function BookingsView({ tripId }: { tripId: string }) {
       listBookings(db, tripId).map((b) => ({ ...b, files: listAttachments(db, b.id).length })),
     [tripId],
   );
+  const [choosing, setChoosing] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   if (!trip) return null;
 
-  const add = () => router.push(`/trip/${tripId}/booking`);
+  // Add booking: upload the ticket (read on the phone, Plan 31) or type it in.
+  const add = () => {
+    setError(null);
+    setChoosing(true);
+  };
+  const upload = async () => {
+    try {
+      setBusy('Opening your files…');
+      const file = await pickAttachment();
+      if (!file) return;
+      setBusy('Reading your document…');
+      const read = await readBookingDocument(file, trip.currency);
+      setChoosing(false);
+      router.push(`/trip/${tripId}/booking?importId=${stashImport({ file, ...read })}`);
+    } catch (e) {
+      setChoosing(false);
+      setError(errorMessage(e));
+    } finally {
+      setBusy(null);
+    }
+  };
+  const manual = () => {
+    setChoosing(false);
+    router.push(`/trip/${tripId}/booking`);
+  };
   const next = bookings.find((b) => b.startsAt && new Date(b.startsAt) > new Date());
 
   return (
@@ -52,7 +84,29 @@ export function BookingsView({ tripId }: { tripId: string }) {
           </View>
         </Row>
         <Button label="Add booking" icon="add" onPress={add} />
+        <ErrorText>{error}</ErrorText>
       </Card>
+      <ChoiceSheet
+        visible={choosing}
+        title="Add a booking"
+        busy={busy}
+        onClose={() => setChoosing(false)}
+        choices={[
+          {
+            icon: 'upload',
+            label: 'Upload document',
+            body: 'PDF ticket or voucher: we fill in the details for you',
+            primary: true,
+            onPress: upload,
+          },
+          {
+            icon: 'edit',
+            label: 'Enter booking details',
+            body: 'Type in the dates, PNR and price yourself',
+            onPress: manual,
+          },
+        ]}
+      />
 
       {bookings.length ? (
         <Section title="All bookings">

@@ -89,6 +89,8 @@ export const ICONS = {
   lock: { ios: 'lock.fill', android: 'lock' },
   trophy: { ios: 'trophy', android: 'emoji_events' },
   attach: { ios: 'paperclip', android: 'attach_file' },
+  upload: { ios: 'doc.badge.arrow.up', android: 'upload_file' },
+  document: { ios: 'doc.text', android: 'description' },
   up: { ios: 'arrow.up', android: 'arrow_upward' },
   down: { ios: 'arrow.down', android: 'arrow_downward' },
   left: { ios: 'chevron.left', android: 'chevron_left' },
