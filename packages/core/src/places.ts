@@ -115,6 +115,8 @@ export function timeZoneLabel(
   } catch {
     // Unknown zone or no Intl time-zone data: name only.
   }
+  // Time-zone data differs between devices: some write "GMT+0" for Greenwich time.
+  if (/^(GMT|UTC)[+-]0(:00)?$/.test(offset)) offset = 'GMT';
   const name = `${countryName ?? city} time`;
   return offset ? `${name} (${offset})` : name;
 }
