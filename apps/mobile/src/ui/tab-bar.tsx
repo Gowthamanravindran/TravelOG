@@ -1,9 +1,12 @@
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import { font, type } from '@travelog/ui';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from './icon';
+import { haptic, MOTION, useMotionOk } from './motion';
 import { useTheme } from './theme';
 
 export interface TabSpec {
@@ -27,6 +30,18 @@ export function ModeTabBar({
   const t = useTheme();
   const insets = useSafeAreaInsets();
   const bar = t.tabBar;
+  const ok = useMotionOk();
+  // Where each tab sits in the bar, so one pill can slide to the active tab (Plan 28).
+  const [spots, setSpots] = useState<Record<string, { x: number; y: number; width: number }>>({});
+  const active = tabs.find((tab) => state.routes[state.index]?.name === tab.name)?.name;
+  const spot = active ? spots[active] : undefined;
+  const pillX = useSharedValue(0);
+  useEffect(() => {
+    if (!spot) return;
+    const target = spot.x + (spot.width - PILL_W) / 2;
+    pillX.set(ok ? withSpring(target, MOTION.spring) : target);
+  }, [spot, ok, pillX]);
+  const pillStyle = useAnimatedStyle(() => ({ transform: [{ translateX: pillX.get() }] }));
 
   const items = tabs.map((tab) => {
     const index = state.routes.findIndex((r) => r.name === tab.name);
@@ -39,11 +54,22 @@ export function ModeTabBar({
         accessibilityLabel={tab.label}
         onPress={() => {
           const route = state.routes[index];
-          if (route && !focused) navigateToTab(route.key);
+          if (route && !focused) {
+            haptic('select');
+            navigateToTab(route.key);
+          }
+        }}
+        onLayout={(e) => {
+          const { x, y, width } = e.nativeEvent.layout;
+          setSpots((s) =>
+            s[tab.name]?.x === x && s[tab.name]?.y === y && s[tab.name]?.width === width
+              ? s
+              : { ...s, [tab.name]: { x, y, width } },
+          );
         }}
         style={styles.item}
       >
-        <View style={[styles.pill, focused && { backgroundColor: bar.activeBg }]}>
+        <View style={styles.pill}>
           <Icon name={tab.icon} size={22} color={focused ? bar.activeFg : bar.fg} />
         </View>
         <Text
@@ -102,11 +128,22 @@ export function ModeTabBar({
           },
         ]}
       >
+        <Animated.View
+          testID="tab-pill"
+          pointerEvents="none"
+          style={[
+            styles.slidingPill,
+            { backgroundColor: bar.activeBg, opacity: spot ? 1 : 0, top: spot?.y ?? 8 },
+            pillStyle,
+          ]}
+        />
         {items}
       </View>
     </View>
   );
 }
+
+const PILL_W = 52;
 
 const styles = StyleSheet.create({
   outer: { paddingHorizontal: 16, paddingTop: 10 },
@@ -124,8 +161,15 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   item: { flex: 1, alignItems: 'center', gap: 3, minHeight: 48 },
+  slidingPill: {
+    position: 'absolute',
+    left: 0,
+    width: PILL_W,
+    height: 30,
+    borderRadius: 15,
+  },
   pill: {
-    width: 52,
+    width: PILL_W,
     height: 30,
     borderRadius: 15,
     alignItems: 'center',

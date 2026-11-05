@@ -1,7 +1,6 @@
 import { radius, spacing, type, type TileFamily } from '@travelog/ui';
 import { useEffect, useState, type ReactNode } from 'react';
 import {
-  AccessibilityInfo,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,7 +13,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+
 import { Icon, type IconName } from './icon';
+import { haptic, MOTION, useMotionOk } from './motion';
 import { useTheme } from './theme';
 
 export function Screen({
@@ -40,20 +47,24 @@ export function Screen({
   );
 }
 
-/** Press feedback (Plan 26): a small shrink and darken, none when reduce motion is on. */
-function usePressStyle() {
-  const [still, setStill] = useState(false);
-  useEffect(() => {
-    let live = true;
-    AccessibilityInfo.isReduceMotionEnabled?.()
-      .then((on) => live && setStill(on))
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, []);
-  return (pressed: boolean): ViewStyle =>
-    pressed ? (still ? { opacity: 0.85 } : { opacity: 0.9, transform: [{ scale: 0.97 }] }) : {};
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+/**
+ * Press feedback (Plans 26, 28): a small shrink and dim, run on the UI thread. With
+ * Reduce motion on, it only dims.
+ */
+function usePress() {
+  const ok = useMotionOk();
+  const pressed = useSharedValue(0);
+  const style = useAnimatedStyle(() => {
+    const p = pressed.get();
+    return { opacity: 1 - 0.1 * p, transform: [{ scale: ok ? 1 - 0.03 * p : 1 }] };
+  });
+  return {
+    style,
+    onPressIn: () => pressed.set(withTiming(1, { duration: 90 })),
+    onPressOut: () => pressed.set(withTiming(0, { duration: MOTION.fast })),
+  };
 }
 
 export function H1({ children, eyebrow }: { children: ReactNode; eyebrow?: string }) {
@@ -131,18 +142,20 @@ export function Card({
   accessibilityLabel?: string;
 }) {
   const t = useTheme();
-  const press = usePressStyle();
+  const press = usePress();
   const base = [styles.card, { backgroundColor: t.surface, borderColor: t.line }, style];
   if (!onPress) return <View style={base}>{children}</View>;
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
-      style={({ pressed }) => [...base, press(pressed)]}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[...base, press.style]}
     >
       {children}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -169,7 +182,7 @@ export function Button({
   accessibilityLabel?: string;
 }) {
   const t = useTheme();
-  const press = usePressStyle();
+  const press = usePress();
   if (variant === 'link') {
     return (
       <Pressable
@@ -194,20 +207,22 @@ export function Button({
   const bg = filled ? (danger ? t.danger : t.accent) : 'transparent';
   const fg = filled ? t.onAccent : danger ? t.danger : t.ink;
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled }}
       onPress={onPress}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
       disabled={disabled}
       // Small buttons are 36 pt tall; extend the touch area to the 44 pt minimum.
       hitSlop={small ? 4 : undefined}
-      style={({ pressed }) => [
+      style={[
         styles.button,
         small && styles.buttonSmall,
         { backgroundColor: bg },
         !filled && { borderWidth: 1, borderColor: danger ? t.danger : t.line },
-        disabled ? { opacity: 0.5 } : press(pressed),
+        disabled ? { opacity: 0.5 } : press.style,
       ]}
     >
       <View style={styles.inline}>
@@ -216,7 +231,7 @@ export function Button({
           <Text style={[small ? type.label : type.headline, { color: fg }]}>{label}</Text>
         ) : null}
       </View>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -277,8 +292,37 @@ export function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   const t = useTheme();
+  const ok = useMotionOk();
+  const [width, setWidth] = useState(0);
+  const index = Math.max(
+    0,
+    options.findIndex((o) => o.value === value),
+  );
+  // One pill slides behind the selected option (Plan 28).
+  const pad = 4;
+  const gap = 4;
+  const segment = width ? (width - 2 * pad - gap * (options.length - 1)) / options.length : 0;
+  const x = useSharedValue(index * (segment + gap));
+  useEffect(() => {
+    const target = index * (segment + gap);
+    x.set(ok && segment ? withSpring(target, MOTION.spring) : target);
+  }, [index, segment, ok, x]);
+  const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.get() }] }));
   return (
-    <View style={[styles.segmented, { backgroundColor: t.surface2 }]} accessibilityRole="tablist">
+    <View
+      style={[styles.segmented, { backgroundColor: t.surface2 }]}
+      accessibilityRole="tablist"
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+    >
+      <Animated.View
+        testID="segment-pill"
+        pointerEvents="none"
+        style={[
+          styles.segmentPill,
+          { width: segment, backgroundColor: t.surface, opacity: segment ? 1 : 0 },
+          pill,
+        ]}
+      />
       {options.map((o) => {
         const selected = o.value === value;
         return (
@@ -286,8 +330,11 @@ export function Segmented<T extends string>({
             key={o.value}
             accessibilityRole="tab"
             accessibilityState={{ selected }}
-            onPress={() => onChange(o.value)}
-            style={[styles.segment, selected && { backgroundColor: t.surface }]}
+            onPress={() => {
+              if (!selected) haptic('select');
+              onChange(o.value);
+            }}
+            style={styles.segment}
           >
             <Text style={[type.label, { color: selected ? t.ink : t.ink2 }]}>{o.label}</Text>
           </Pressable>
@@ -374,23 +421,38 @@ export function Divider() {
 }
 
 /** A thin progress bar; turns red when over 100 %. */
+/** A progress bar that fills smoothly (Plan 28); it slides a full-width fill with a transform. */
 export function Bar({ value, color }: { value: number; color?: string }) {
   const t = useTheme();
+  const ok = useMotionOk();
   const pct = Math.max(0, Math.min(1, value));
+  const [width, setWidth] = useState(0);
+  const offset = useSharedValue(-1);
+  const target = -(1 - pct);
+  useEffect(() => {
+    if (width) offset.set(ok ? withTiming(target, { duration: MOTION.slow * 2 }) : target);
+  }, [width, target, ok, offset]);
+  const fill = useAnimatedStyle(() => ({ transform: [{ translateX: offset.get() * width }] }));
   return (
     <View
       style={[styles.bar, { backgroundColor: t.surface2 }]}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       accessible
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: Math.round(value * 100) }}
     >
-      <View
-        style={{
-          width: `${pct * 100}%`,
-          height: '100%',
-          borderRadius: 99,
-          backgroundColor: value > 1 ? t.danger : (color ?? t.accent),
-        }}
+      <Animated.View
+        testID="bar-fill"
+        style={[
+          {
+            width: '100%',
+            height: '100%',
+            borderRadius: 99,
+            opacity: width ? 1 : 0,
+            backgroundColor: value > 1 ? t.danger : (color ?? t.accent),
+          },
+          fill,
+        ]}
       />
     </View>
   );
@@ -507,6 +569,7 @@ const styles = StyleSheet.create({
   },
   chipRow: { gap: spacing.sm, paddingVertical: 2 },
   segmented: { flexDirection: 'row', borderRadius: 14, padding: 4, gap: 4 },
+  segmentPill: { position: 'absolute', top: 4, bottom: 4, left: 4, borderRadius: 10 },
   segment: {
     flex: 1,
     minHeight: 36,
