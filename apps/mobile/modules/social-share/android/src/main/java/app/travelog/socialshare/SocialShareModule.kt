@@ -1,6 +1,7 @@
 package app.travelog.socialshare
 
 import android.content.ClipData
+import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -45,20 +46,7 @@ class SocialShareModule : Module() {
     }
 
     AsyncFunction("shareImages") { fileUris: List<String>, packageName: String? ->
-      val uris = ArrayList(fileUris.map { contentUriFor(it) })
-      val first = uris.firstOrNull() ?: throw ShareFailedException("Nothing to share")
-      val intent = if (uris.size == 1) {
-        Intent(Intent.ACTION_SEND).apply { putExtra(Intent.EXTRA_STREAM, first) }
-      } else {
-        Intent(Intent.ACTION_SEND_MULTIPLE).apply { putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris) }
-      }
-      intent.type = "image/jpeg"
-      intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-      // ClipData carries the read permission for every image, not just the first.
-      val clip = ClipData.newRawUri(null, first)
-      uris.drop(1).forEach { clip.addItem(ClipData.Item(it)) }
-      intent.clipData = clip
-
+      val (intent, uris) = imageIntent(fileUris)
       val activity = appContext.throwingActivity
       if (packageName != null) {
         intent.setPackage(packageName)
@@ -67,6 +55,48 @@ class SocialShareModule : Module() {
       } else {
         activity.startActivity(Intent.createChooser(intent, null))
       }
+      true
+    }
+
+    // Instagram's feed composer with every slide. Instagram has several share screens
+    // (feed, Story, Chats); handing the images to the package alone can land on its
+    // home screen, so the feed screen is picked explicitly when Instagram exposes it.
+    // Returns "feed", "chooser" (Android asks which Instagram screen) or "none".
+    AsyncFunction("openInstagramFeed") { fileUris: List<String> ->
+      val (intent, uris) = imageIntent(fileUris)
+      intent.setPackage(INSTAGRAM)
+      val pm = context.packageManager
+      val targets = if (Build.VERSION.SDK_INT >= 33) {
+        pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+      } else {
+        @Suppress("DEPRECATION")
+        pm.queryIntentActivities(intent, 0)
+      }
+      if (targets.isEmpty()) return@AsyncFunction "none"
+      uris.forEach { context.grantUriPermission(INSTAGRAM, it, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+      // Prefer the feed composer by its usual name, else any share screen that isn't
+      // Stories, Reels ("clips") or Chats ("direct").
+      val feed = targets.firstOrNull { it.activityInfo.name.endsWith(".ShareHandlerActivity") }
+        ?: targets.firstOrNull {
+          val name = it.activityInfo.name.lowercase()
+          name.contains("share") && listOf("story", "clips", "reel", "direct", "chat").none { word -> name.contains(word) }
+        }
+      val activity = appContext.throwingActivity
+      if (feed != null) {
+        intent.component = ComponentName(feed.activityInfo.packageName, feed.activityInfo.name)
+        activity.startActivity(intent)
+        "feed"
+      } else {
+        activity.startActivity(Intent.createChooser(intent, "Post with Instagram"))
+        "chooser"
+      }
+    }
+
+    // Opens an app's home screen (used after saving slides to the gallery).
+    Function("launchApp") { packageName: String ->
+      val launch = context.packageManager.getLaunchIntentForPackage(packageName) ?: return@Function false
+      launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      appContext.throwingActivity.startActivity(launch)
       true
     }
 
@@ -109,6 +139,24 @@ class SocialShareModule : Module() {
       }
       true
     }
+  }
+
+  /** One image → ACTION_SEND, several → ACTION_SEND_MULTIPLE, with read access to all of them. */
+  private fun imageIntent(fileUris: List<String>): Pair<Intent, ArrayList<Uri>> {
+    val uris = ArrayList(fileUris.map { contentUriFor(it) })
+    val first = uris.firstOrNull() ?: throw ShareFailedException("Nothing to share")
+    val intent = if (uris.size == 1) {
+      Intent(Intent.ACTION_SEND).apply { putExtra(Intent.EXTRA_STREAM, first) }
+    } else {
+      Intent(Intent.ACTION_SEND_MULTIPLE).apply { putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris) }
+    }
+    intent.type = "image/jpeg"
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    // ClipData carries the read permission for every image, not just the first.
+    val clip = ClipData.newRawUri(null, first)
+    uris.drop(1).forEach { clip.addItem(ClipData.Item(it)) }
+    intent.clipData = clip
+    return Pair(intent, uris)
   }
 
   private fun fileFor(fileUri: String): File {

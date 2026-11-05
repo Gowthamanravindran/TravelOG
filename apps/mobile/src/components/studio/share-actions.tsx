@@ -8,6 +8,7 @@ import {
   postStory,
   postToFacebook,
   postToInstagram,
+  saveAndOpenInstagram,
   saveAll,
   shareAll,
   shareTargets,
@@ -65,6 +66,15 @@ export function ShareActions({
   };
   const label = (key: string, text: string) => (busy === key ? 'Opening…' : text);
   const storyFile = files[current] ?? files[0];
+  const gallery = Platform.OS === 'ios' ? 'Photos' : 'your gallery';
+  const igMessage = (r: PostResult): string | null =>
+    r === 'opened'
+      ? `Instagram should show your ${n} slides, ready to post. If it opened without them, tap Save & open Instagram.`
+      : r === 'saved-and-opened'
+        ? `Slides saved to ${gallery} in order. In Instagram, tap +, choose Post, turn on multi-select and pick slides 1 to ${n}.`
+        : r === 'saved'
+          ? `Slides saved to ${gallery} in order. Open Instagram, start a post and pick slides 1 to ${n}.`
+          : null;
 
   return (
     <View style={{ gap: 10 }}>
@@ -82,18 +92,13 @@ export function ShareActions({
       <Button
         label={label('ig', '📷 Post to Instagram')}
         disabled={!!busy || (targets?.native === true && !targets.instagram)}
-        onPress={() =>
-          run(
-            'ig',
-            () => postToInstagram(files),
-            (r) =>
-              r === 'saved-and-opened'
-                ? `Slides saved to Photos in order. In Instagram, tap the stack icon and pick slides 1 to ${n}.`
-                : r === 'saved'
-                  ? `Slides saved to Photos in order. Open Instagram, start a post and pick slides 1 to ${n}.`
-                  : null,
-          )
-        }
+        onPress={() => run('ig', () => postToInstagram(files), igMessage)}
+      />
+      <Button
+        label={label('igsave', 'Save & open Instagram')}
+        variant="ghost"
+        disabled={!!busy || (targets?.native === true && !targets.instagram)}
+        onPress={() => run('igsave', () => saveAndOpenInstagram(files), igMessage)}
       />
       {targets?.native && !targets.instagram ? (
         <Text style={[type.caption, { color: t.ink2 }]}>

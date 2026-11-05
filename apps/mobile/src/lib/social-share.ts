@@ -16,6 +16,8 @@ interface SocialShareNative {
   // Android
   isInstalled?: (packageName: string) => boolean;
   saveToGallery?: (fileUris: string[]) => Promise<boolean>;
+  openInstagramFeed?: (fileUris: string[]) => Promise<'feed' | 'chooser' | 'none'>;
+  launchApp?: (packageName: string) => boolean;
   // iOS
   canOpen?: (scheme: string) => Promise<boolean>;
   saveToPhotos?: (fileUris: string[]) => Promise<string[]>;
@@ -78,8 +80,26 @@ async function fallbackShare(files: readonly string[]): Promise<PostResult> {
 export async function postToInstagram(files: readonly string[]): Promise<PostResult> {
   if (!native) return fallbackShare(files);
   if (Platform.OS === 'android') {
-    await native.shareImages([...files], INSTAGRAM);
-    return 'opened';
+    // Builds before Plan 16 only have the generic hand-off.
+    if (!native.openInstagramFeed) {
+      await native.shareImages([...files], INSTAGRAM);
+      return 'opened';
+    }
+    const how = await native.openInstagramFeed([...files]);
+    return how === 'none' ? saveAndOpenInstagram(files) : 'opened';
+  }
+  return saveAndOpenInstagram(files);
+}
+
+/**
+ * Works with every Instagram version: saves the slides to the gallery in order,
+ * then opens Instagram (on iPhone, straight at its library) so you pick them.
+ */
+export async function saveAndOpenInstagram(files: readonly string[]): Promise<PostResult> {
+  if (!native) return fallbackShare(files);
+  if (Platform.OS === 'android') {
+    if (!(await native.saveToGallery?.([...files]))) return shareAll(files);
+    return native.launchApp?.(INSTAGRAM) ? 'saved-and-opened' : 'saved';
   }
   const ids = (await native.saveToPhotos?.([...files])) ?? [];
   if (!ids.length) throw new Error('allow TravelOG to add photos in Settings, then try again');

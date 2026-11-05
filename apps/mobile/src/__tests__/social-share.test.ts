@@ -3,6 +3,8 @@ import { Platform } from 'react-native';
 const mockNative = {
   isInstalled: jest.fn((pkg: string) => pkg === 'com.instagram.android'),
   saveToGallery: jest.fn(async () => true),
+  openInstagramFeed: jest.fn(async (): Promise<'feed' | 'chooser' | 'none'> => 'feed'),
+  launchApp: jest.fn(() => true),
   canOpen: jest.fn(async (scheme: string) => scheme !== 'fb'),
   saveToPhotos: jest.fn(async (uris: string[]) => uris.map((_, i) => `asset-${i}`)),
   openInstagramLibrary: jest.fn(async () => true),
@@ -63,13 +65,20 @@ describe('Android', () => {
   it('opens Instagram and Facebook with every slide in order', async () => {
     const s = load();
     expect(await s.postToInstagram(files)).toBe('opened');
-    expect(mockNative.shareImages).toHaveBeenLastCalledWith(files, 'com.instagram.android');
+    expect(mockNative.openInstagramFeed).toHaveBeenLastCalledWith(files);
     await s.postToFacebook(files);
     expect(mockNative.shareImages).toHaveBeenLastCalledWith(files, 'com.facebook.katana');
     await s.postStory(files[1]!);
     expect(mockNative.shareToInstagramStory).toHaveBeenCalledWith(files[1], '1234');
     expect(await s.saveAll(files)).toBe('saved');
     expect(mockNative.saveToGallery).toHaveBeenCalledWith(files);
+  });
+
+  it('saves to the gallery and opens Instagram when it has no feed share screen', async () => {
+    mockNative.openInstagramFeed.mockResolvedValueOnce('none');
+    expect(await load().postToInstagram(files)).toBe('saved-and-opened');
+    expect(mockNative.saveToGallery).toHaveBeenCalledWith(files);
+    expect(mockNative.launchApp).toHaveBeenCalledWith('com.instagram.android');
   });
 
   it('falls back to the share sheet on old Android and old app builds', async () => {
