@@ -11,7 +11,7 @@ import {
 } from '@travelog/db';
 import { categoryColors } from '@travelog/ui';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
@@ -52,8 +52,11 @@ export function BudgetView({
   const budgets = useQuery((db) => listBudgets(db, tripId), [tripId]);
   const m = useQuery((db) => tripMoney(db, tripId), [tripId]);
   const expenses = useQuery((db) => listExpenses(db, tripId), [tripId]);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<Record<string, string>>({});
+  // Opening with startEditing shows the editor from the first render (no effect needed).
+  const [editing, setEditing] = useState(() => startEditing && !!trip);
+  const [draft, setDraft] = useState<Record<string, string>>(() =>
+    startEditing && trip ? budgetDraft(budgets, trip.currency) : {},
+  );
   const [error, setError] = useState<string | null>(null);
   if (!trip) return null;
 
@@ -65,17 +68,10 @@ export function BudgetView({
   const myNet = me ? (m.net.get(me.id) ?? 0) : 0;
 
   const startEdit = () => {
-    setDraft(
-      Object.fromEntries(BUDGET_CATEGORIES.map((c) => [c, amountText(budgets[c] || null, cur)])),
-    );
+    setDraft(budgetDraft(budgets, cur));
     setEditing(true);
   };
 
-  useEffect(() => {
-    if (startEditing && trip) startEdit();
-    // Only when the screen opens with the flag.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startEditing, !!trip]);
   const saveBudget = () => {
     try {
       mutate((db) => {
@@ -287,5 +283,14 @@ export function BudgetView({
         />
       )}
     </View>
+  );
+}
+
+function budgetDraft(
+  budgets: Record<BudgetCategory, number>,
+  currency: string,
+): Record<string, string> {
+  return Object.fromEntries(
+    BUDGET_CATEGORIES.map((c) => [c, amountText(budgets[c] || null, currency)]),
   );
 }
