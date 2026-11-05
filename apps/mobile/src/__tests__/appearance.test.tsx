@@ -1,9 +1,10 @@
 import { themeFor } from '@travelog/ui';
-import { createProject, createTrip, setSetting } from '@travelog/db';
+import { createProject, createTrip, saveLocalProfile, setSetting } from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Pressable, Text } from 'react-native';
 
 import StudioEditorScreen from '@/app/trip/[id]/studio/[projectId]';
+import ProfileScreen from '@/app/(home)/profile';
 import { ErrorScreen } from '@/components/error-screen';
 import { useMutate } from '@/data/provider';
 import {
@@ -22,6 +23,7 @@ jest.mock('expo-router', () => ({
   useGlobalSearchParams: () => mockParams,
 }));
 jest.mock('expo-linear-gradient', () => ({ LinearGradient: () => null }));
+jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 
 describe('appearance setting', () => {
   it('appearance falls back on bad stored values', () => {
@@ -106,5 +108,26 @@ describe('appearance setting', () => {
   it('error screen renders without AppearanceProvider', async () => {
     await render(<ErrorScreen error={new Error('x')} retry={async () => {}} />);
     expect(screen.getByText('Something went wrong')).toBeTruthy();
+  });
+});
+
+describe('Profile → Appearance', () => {
+  it('Profile switches theme and mode', async () => {
+    const db = makeDb();
+    saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
+    await render(withData(db, <ProfileScreen />));
+    expect(
+      screen.getByRole('radio', { name: 'Theme Sunset' }).props.accessibilityState,
+    ).toMatchObject({
+      selected: true,
+    });
+    await fireEvent.press(screen.getByRole('radio', { name: 'Theme Colour block' }));
+    await fireEvent.press(screen.getByRole('tab', { name: 'Dark' }));
+    expect(readAppearance(db)).toEqual({ theme: 'block', mode: 'dark' });
+    expect(
+      screen.getByRole('radio', { name: 'Theme Colour block' }).props.accessibilityState,
+    ).toMatchObject({ selected: true });
+    await fireEvent.press(screen.getByRole('tab', { name: 'Match phone' }));
+    expect(readAppearance(db).mode).toBe('system');
   });
 });

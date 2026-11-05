@@ -3,11 +3,12 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { Switch } from 'react-native';
 
+import { AppearanceCard } from '@/components/appearance-card';
 import { useMutate, useQuery } from '@/data/provider';
 import { remindersEnabled, setRemindersEnabled } from '@/lib/reminders';
 import { isExpoGo } from '@/lib/runtime';
 import { sharingBuildLevel } from '@/lib/social-share';
-import { Between, Body, Button, Card, H1, Screen, Strong } from '@/ui/kit';
+import { Between, Body, Button, Card, H1, Screen, Section, Strong } from '@/ui/kit';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -54,6 +55,9 @@ export default function ProfileScreen() {
           poll deadlines (1 h).
         </Body>
       </Card>
+      <Section title="Appearance">
+        <AppearanceCard />
+      </Section>
       <Card>
         <Strong>This app build</Strong>
         <Body muted small>
