@@ -105,7 +105,7 @@ export const THEMES: Record<ThemeName, ThemeData> = {
       },
     },
     accents: {
-      home: { light: ['#B4321A', '#FFE0D5', '#FFFFFF'], dark: ['#FF7A55', '#4A2016', '#141414'] },
+      home: { light: ['#A82C15', '#FFE0D5', '#FFFFFF'], dark: ['#FF7A55', '#4A2016', '#141414'] },
       plan: { light: ['#1F4FD1', '#DCE5FB', '#FFFFFF'], dark: ['#86AAFF', '#1A2B52', '#141414'] },
       trip: { light: ['#08705F', '#D2F3EE', '#FFFFFF'], dark: ['#2EE6C9', '#0F4A43', '#062420'] },
     },

@@ -1,3 +1,4 @@
+import { StatusBar } from 'expo-status-bar';
 import {
   addLayer,
   addSlide,
@@ -59,6 +60,8 @@ const TOOLS: { id: Tool; label: string; icon: IconName }[] = [
 export default function StudioEditorScreen() {
   return (
     <ModeProvider mode="trip" scheme="dark">
+      {/* The workspace is always dark, so the status bar icons are light. */}
+      <StatusBar style="light" />
       <Editor />
     </ModeProvider>
   );

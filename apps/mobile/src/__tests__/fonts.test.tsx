@@ -1,9 +1,9 @@
 import { font } from '@travelog/ui';
-import { render, screen } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { Text } from 'react-native';
 
-import { FONT_ASSETS, FontGate } from '@/lib/fonts';
+import { FONT_ASSETS, FONT_TIMEOUT_MS, FontGate } from '@/lib/fonts';
 
 jest.mock('expo-splash-screen', () => ({ hideAsync: jest.fn(), preventAutoHideAsync: jest.fn() }));
 
@@ -31,5 +31,23 @@ describe('fonts', () => {
       </FontGate>,
     );
     expect(screen.queryByText('App content')).toBeNull();
+  });
+
+  it('opens anyway if the fonts stall (no splash hang)', async () => {
+    jest.useFakeTimers();
+    try {
+      await render(
+        <FontGate fonts={[false, null]} dataReady>
+          <Text>App content</Text>
+        </FontGate>,
+      );
+      expect(screen.queryByText('App content')).toBeNull();
+      await act(async () => {
+        jest.advanceTimersByTime(FONT_TIMEOUT_MS);
+      });
+      expect(screen.getByText('App content')).toBeTruthy();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

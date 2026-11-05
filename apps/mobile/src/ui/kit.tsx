@@ -189,9 +189,10 @@ export function Button({
       </Pressable>
     );
   }
-  const filled = variant === 'primary' || danger;
-  const bg = danger ? t.danger : filled ? t.accent : 'transparent';
-  const fg = filled ? t.onAccent : t.ink;
+  // Only the primary is filled; a destructive secondary is outlined in red.
+  const filled = variant === 'primary';
+  const bg = filled ? (danger ? t.danger : t.accent) : 'transparent';
+  const fg = filled ? t.onAccent : danger ? t.danger : t.ink;
   return (
     <Pressable
       accessibilityRole="button"
@@ -205,7 +206,7 @@ export function Button({
         styles.button,
         small && styles.buttonSmall,
         { backgroundColor: bg },
-        !filled && { borderWidth: 1, borderColor: t.line },
+        !filled && { borderWidth: 1, borderColor: danger ? t.danger : t.line },
         disabled ? { opacity: 0.5 } : press(pressed),
       ]}
     >

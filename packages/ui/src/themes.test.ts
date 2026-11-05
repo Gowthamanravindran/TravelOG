@@ -19,7 +19,16 @@ function pairs(t: Theme): [string, string, string][] {
     ['active tab icon', t.tabBar.activeFg, t.tabBar.activeBg],
     ['active tab label', t.tabBar.activeLabel, t.tabBar.bg],
   );
-  out.push(['success on card', t.success, t.surface], ['danger on card', t.danger, t.surface]);
+  // Status and accent text also sit straight on the screen background (errors, links, eyebrows).
+  for (const [k, ground] of [
+    ['card', t.surface],
+    ['background', t.bg],
+  ] as const)
+    out.push(
+      [`success on ${k}`, t.success, ground],
+      [`danger on ${k}`, t.danger, ground],
+      [`accent on ${k}`, t.accent, ground],
+    );
   return out;
 }
 

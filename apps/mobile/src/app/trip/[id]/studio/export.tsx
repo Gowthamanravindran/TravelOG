@@ -1,3 +1,4 @@
+import { StatusBar } from 'expo-status-bar';
 import { layersOnSlide, slideSize } from '@travelog/core';
 import { getProject, listPhotos, markExported, tripRecap } from '@travelog/db';
 import { type } from '@travelog/ui';
@@ -25,6 +26,8 @@ import { ModeProvider, useTheme } from '@/ui/theme';
 export default function StudioExport() {
   return (
     <ModeProvider mode="trip" scheme="dark">
+      {/* The workspace is always dark, so the status bar icons are light. */}
+      <StatusBar style="light" />
       <ExportScreen />
     </ModeProvider>
   );

@@ -37,6 +37,16 @@ describe('kit', () => {
     expect(s.borderWidth).toBe(1);
   });
 
+  it('a destructive secondary button is outlined in red, not filled', async () => {
+    await inTheme(
+      'sunset',
+      <Button label="Delete trip" variant="secondary" danger onPress={() => {}} />,
+    );
+    const s = flat(screen.getByRole('button', { name: 'Delete trip' }));
+    expect(s.backgroundColor).toBe('transparent');
+    expect(s.borderColor).toBe(themeFor('sunset', 'home', 'light').danger);
+  });
+
   it('IconTile family uses theme tiles', async () => {
     await inTheme('block', <IconTile icon="flight" family="sea" />);
     expect(flat(screen.getByTestId('icon-tile')).backgroundColor).toBe('#0B6584');

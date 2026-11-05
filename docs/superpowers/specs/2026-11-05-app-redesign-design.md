@@ -73,7 +73,7 @@ The whole screen background is the mode colour, with white cards on top. Tiles a
 
 | Mode | Background (light / dark) | Light accent / tint / label | Dark accent / tint / label |
 |---|---|---|---|
-| Home | `#FFCDBD` / `#3E1B12` | `#B4321A` / `#FFE0D5` / `#FFFFFF` | `#FF7A55` / `#4A2016` / `#141414` |
+| Home | `#FFCDBD` / `#3E1B12` | `#A82C15` / `#FFE0D5` / `#FFFFFF` | `#FF7A55` / `#4A2016` / `#141414` |
 | Plan | `#C6D9FF` / `#15254A` | `#1F4FD1` / `#DCE5FB` / `#FFFFFF` | `#86AAFF` / `#1A2B52` / `#141414` |
 | Trip | `#BFEDE6` / `#0E3A36` | `#08705F` / `#D2F3EE` / `#FFFFFF` | `#2EE6C9` / `#0F4A43` / `#062420` |
 
@@ -97,7 +97,7 @@ Budget category colours use the same families: stay is clay, travel is sea, food
 
 ### 3.4 Status colours
 
-`success`, `danger` and `mango` stay theme-independent. Their dark-mode values are re-checked against the new surfaces by the contrast test.
+`success`, `danger` and `mango` stay theme-independent. Their dark-mode values are re-checked against the new surfaces by the contrast test. Final values after the contrast sweep (Plan 26 review): light success `#126A33` and danger `#A82020`, which pass 4.5:1 on cards and on every light background, including Colour block's mode colours. Dark values are unchanged.
 
 ## 4. Type
 

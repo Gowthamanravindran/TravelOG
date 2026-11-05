@@ -24,6 +24,13 @@ jest.mock('expo-router', () => ({
 }));
 jest.mock('expo-linear-gradient', () => ({ LinearGradient: () => null }));
 jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
+const mockStatusBars: (string | undefined)[] = [];
+jest.mock('expo-status-bar', () => ({
+  StatusBar: ({ style }: { style?: string }) => {
+    mockStatusBars.push(style);
+    return null;
+  },
+}));
 
 describe('appearance setting', () => {
   it('appearance falls back on bad stored values', () => {
@@ -103,6 +110,8 @@ describe('appearance setting', () => {
     walk(screen.toJSON());
     expect(backgrounds).toContain(themeFor('block', 'trip', 'dark').bg);
     expect(backgrounds).not.toContain(themeFor('block', 'trip', 'light').bg);
+    // Light status-bar icons over the dark editor, whatever the app setting.
+    expect(mockStatusBars.at(-1)).toBe('light');
   });
 
   it('error screen renders without AppearanceProvider', async () => {

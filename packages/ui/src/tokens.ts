@@ -51,7 +51,7 @@ export const THEME_NAMES: readonly ThemeName[] = ['sunset', 'block'];
 
 /** Status colours, the same in both themes (light values darkened for 4.5:1 in Plan 26). */
 const STATUS: Record<Scheme, { mango: string; success: string; danger: string }> = {
-  light: { mango: '#FFB020', success: '#15803D', danger: '#C62828' },
+  light: { mango: '#FFB020', success: '#126A33', danger: '#A82020' },
   dark: { mango: '#FFC24D', success: '#34D399', danger: '#FF6B6E' },
 };
 
