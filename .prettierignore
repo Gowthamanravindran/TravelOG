@@ -9,3 +9,4 @@ apps/mobile/dist
 apps/web/public/*.html
 apps/mobile/assets
 packages/db/drizzle
+apps/mobile/expo-env.d.ts
