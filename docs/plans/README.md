@@ -29,3 +29,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 23 | [Edit collages directly: handles, frames, background, text](23-collage-editing.md) | see git log |
 | 24 | [Layouts always visible while editing; smoother gestures](24-layouts-visible.md) | see git log |
 | 25 | [Crash fix: item returning to straight (transform null)](25-transform-crash.md) | see git log |
+| 26 | [App redesign: Sunset and Colour block themes (spec)](26-app-redesign.md) | see git log |
