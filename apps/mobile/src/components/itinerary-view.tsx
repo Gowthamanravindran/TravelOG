@@ -33,6 +33,7 @@ import {
   Strong,
   WithIcon,
 } from '@/ui/kit';
+import { Appear } from '@/ui/motion';
 import { useMode, useTheme } from '@/ui/theme';
 import { Icon, type IconName } from '@/ui/icon';
 
@@ -225,25 +226,26 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
             );
           })()}
           {items.map((item, index) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              currency={trip.currency}
-              editable={editable}
-              onPress={() =>
-                router.push(`/trip/${tripId}/item?variantId=${variant.id}&itemId=${item.id}`)
-              }
-              onUp={
-                index > 0
-                  ? () => run(() => mutate((db) => moveItem(db, item.id, index - 1)))
-                  : undefined
-              }
-              onDown={
-                index < items.length - 1
-                  ? () => run(() => mutate((db) => moveItem(db, item.id, index + 1)))
-                  : undefined
-              }
-            />
+            <Appear key={item.id} index={index}>
+              <ItemRow
+                item={item}
+                currency={trip.currency}
+                editable={editable}
+                onPress={() =>
+                  router.push(`/trip/${tripId}/item?variantId=${variant.id}&itemId=${item.id}`)
+                }
+                onUp={
+                  index > 0
+                    ? () => run(() => mutate((db) => moveItem(db, item.id, index - 1)))
+                    : undefined
+                }
+                onDown={
+                  index < items.length - 1
+                    ? () => run(() => mutate((db) => moveItem(db, item.id, index + 1)))
+                    : undefined
+                }
+              />
+            </Appear>
           ))}
           {editable ? (
             <Button

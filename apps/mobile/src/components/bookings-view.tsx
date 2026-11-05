@@ -18,6 +18,7 @@ import {
   Strong,
   WithIcon,
 } from '@/ui/kit';
+import { Appear } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
 export function BookingsView({ tripId }: { tripId: string }) {
@@ -55,53 +56,54 @@ export function BookingsView({ tripId }: { tripId: string }) {
 
       {bookings.length ? (
         <Section title="All bookings">
-          {bookings.map((b) => (
-            <Card
-              key={b.id}
-              onPress={() => router.push(`/trip/${tripId}/booking?bookingId=${b.id}`)}
-              accessibilityLabel={b.title}
-            >
-              <Row style={{ gap: 12, alignItems: 'flex-start' }}>
-                <IconTile
-                  icon={BOOKING_LABELS[b.type].icon}
-                  family={BOOKING_LABELS[b.type].family}
-                />
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Between>
-                    <Body small style={{ color: t.accent, ...font('text', 600) }}>
-                      {BOOKING_LABELS[b.type].label.toUpperCase()}
-                      {b.provider ? ` · ${b.provider}` : ''}
-                    </Body>
-                    {b.files ? (
-                      <WithIcon icon="attach" size={14}>
-                        <Body small muted>
-                          {b.files}
-                        </Body>
-                      </WithIcon>
-                    ) : null}
-                  </Between>
-                  <Strong>{b.title}</Strong>
-                  <Body muted small>
-                    {b.startsAt ? dateTimeIn(b.startsAt, trip.timeZone) : 'No date yet'}
-                    {b.endsAt ? ` → ${dateTimeIn(b.endsAt, trip.timeZone)}` : ''}
-                  </Body>
-                  {b.reference || b.costMinor ? (
+          {bookings.map((b, i) => (
+            <Appear key={b.id} index={i}>
+              <Card
+                onPress={() => router.push(`/trip/${tripId}/booking?bookingId=${b.id}`)}
+                accessibilityLabel={b.title}
+              >
+                <Row style={{ gap: 12, alignItems: 'flex-start' }}>
+                  <IconTile
+                    icon={BOOKING_LABELS[b.type].icon}
+                    family={BOOKING_LABELS[b.type].family}
+                  />
+                  <View style={{ flex: 1, gap: 2 }}>
                     <Between>
-                      {b.reference ? (
-                        <Strong style={{ fontSize: 14 }}>{b.reference}</Strong>
-                      ) : (
-                        <View />
-                      )}
-                      {b.costMinor ? (
-                        <Body muted small>
-                          {money(b.costMinor, b.currency ?? trip.currency)}
-                        </Body>
+                      <Body small style={{ color: t.accent, ...font('text', 600) }}>
+                        {BOOKING_LABELS[b.type].label.toUpperCase()}
+                        {b.provider ? ` · ${b.provider}` : ''}
+                      </Body>
+                      {b.files ? (
+                        <WithIcon icon="attach" size={14}>
+                          <Body small muted>
+                            {b.files}
+                          </Body>
+                        </WithIcon>
                       ) : null}
                     </Between>
-                  ) : null}
-                </View>
-              </Row>
-            </Card>
+                    <Strong>{b.title}</Strong>
+                    <Body muted small>
+                      {b.startsAt ? dateTimeIn(b.startsAt, trip.timeZone) : 'No date yet'}
+                      {b.endsAt ? ` → ${dateTimeIn(b.endsAt, trip.timeZone)}` : ''}
+                    </Body>
+                    {b.reference || b.costMinor ? (
+                      <Between>
+                        {b.reference ? (
+                          <Strong style={{ fontSize: 14 }}>{b.reference}</Strong>
+                        ) : (
+                          <View />
+                        )}
+                        {b.costMinor ? (
+                          <Body muted small>
+                            {money(b.costMinor, b.currency ?? trip.currency)}
+                          </Body>
+                        ) : null}
+                      </Between>
+                    ) : null}
+                  </View>
+                </Row>
+              </Card>
+            </Appear>
           ))}
         </Section>
       ) : (

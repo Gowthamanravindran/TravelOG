@@ -6,6 +6,7 @@ import { emptyTripForm, toTripInput, TripForm } from '@/components/trip-form';
 import { useMutate, useQuery } from '@/data/provider';
 import { errorMessage } from '@/lib/format';
 import { Between, Button, ErrorText, H1, Screen } from '@/ui/kit';
+import { useCelebrate } from '@/ui/motion';
 import { ModeProvider } from '@/ui/theme';
 
 export default function NewTrip() {
@@ -15,6 +16,8 @@ export default function NewTrip() {
   const [form, setForm] = useState(() => emptyTripForm(profile?.homeCurrency));
   const [error, setError] = useState<string | null>(null);
 
+  const celebrate = useCelebrate();
+
   const create = () => {
     try {
       const trip = mutate((db) =>
@@ -23,6 +26,7 @@ export default function NewTrip() {
           upiId: profile?.upiId,
         }),
       );
+      celebrate('Trip created');
       router.replace(`/trip/${trip.id}`);
     } catch (e) {
       setError(errorMessage(e));

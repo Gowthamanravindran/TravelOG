@@ -1,4 +1,4 @@
-import { font } from '@travelog/ui';
+import { font, type } from '@travelog/ui';
 import { formatRate } from '@travelog/core';
 import {
   BUDGET_CATEGORIES,
@@ -33,6 +33,7 @@ import {
   Strong,
   WithIcon,
 } from '@/ui/kit';
+import { Appear, CountUp } from '@/ui/motion';
 import { useMode, useTheme } from '@/ui/theme';
 
 import { PeopleCard } from './people-card';
@@ -98,7 +99,11 @@ export function BudgetView({
             <Body muted small>
               Group spent
             </Body>
-            <Strong style={{ fontSize: 28 }}>{money(m.spentMinor, cur)}</Strong>
+            <CountUp
+              value={m.spentMinor}
+              format={(n) => money(n, cur)}
+              style={[type.headline, { color: t.ink, fontSize: 28, lineHeight: 34 }]}
+            />
           </View>
         </Row>
         {groupBudget > 0 ? (
@@ -261,33 +266,37 @@ export function BudgetView({
             const mine = me ? (e.splits.find((s) => s.memberId === me.id)?.shareMinor ?? 0) : 0;
             const net = me && e.paidByMemberId === me.id ? e.tripAmountMinor - mine : -mine;
             return (
-              <View key={e.id}>
-                {i > 0 ? <Divider /> : null}
-                <View
-                  style={{ paddingVertical: 10 }}
-                  accessible
-                  accessibilityLabel={`${e.title}, ${money(e.tripAmountMinor, cur)}, paid by ${name(e.paidByMemberId)}`}
-                >
-                  <Between>
-                    <View style={{ flex: 1 }}>
-                      <WithIcon icon={CATEGORY_LABELS[e.category].icon}>
-                        <Strong>{e.title}</Strong>
-                      </WithIcon>
-                    </View>
-                    <Body style={{ color: net >= 0 ? t.success : t.danger, ...font('text', 600) }}>
-                      {net >= 0 ? '+' : '−'}
-                      {money(Math.abs(net), cur)}
+              <Appear key={e.id} index={i}>
+                <View>
+                  {i > 0 ? <Divider /> : null}
+                  <View
+                    style={{ paddingVertical: 10 }}
+                    accessible
+                    accessibilityLabel={`${e.title}, ${money(e.tripAmountMinor, cur)}, paid by ${name(e.paidByMemberId)}`}
+                  >
+                    <Between>
+                      <View style={{ flex: 1 }}>
+                        <WithIcon icon={CATEGORY_LABELS[e.category].icon}>
+                          <Strong>{e.title}</Strong>
+                        </WithIcon>
+                      </View>
+                      <Body
+                        style={{ color: net >= 0 ? t.success : t.danger, ...font('text', 600) }}
+                      >
+                        {net >= 0 ? '+' : '−'}
+                        {money(Math.abs(net), cur)}
+                      </Body>
+                    </Between>
+                    <Body muted small>
+                      {name(e.paidByMemberId)} paid {money(e.amountMinor, e.currency)}
+                      {e.currency !== cur
+                        ? ` (${money(e.tripAmountMinor, cur)}${e.fxRate ? ` @ ${formatRate(Number(e.fxRate))}` : ''})`
+                        : ''}{' '}
+                      · split {e.splits.length} ways
                     </Body>
-                  </Between>
-                  <Body muted small>
-                    {name(e.paidByMemberId)} paid {money(e.amountMinor, e.currency)}
-                    {e.currency !== cur
-                      ? ` (${money(e.tripAmountMinor, cur)}${e.fxRate ? ` @ ${formatRate(Number(e.fxRate))}` : ''})`
-                      : ''}{' '}
-                    · split {e.splits.length} ways
-                  </Body>
+                  </View>
                 </View>
-              </View>
+              </Appear>
             );
           })}
         </Card>

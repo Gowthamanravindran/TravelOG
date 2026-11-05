@@ -1,3 +1,9 @@
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 import {
   addLayer,
@@ -43,6 +49,7 @@ import { useQuery } from '@/data/provider';
 import { money } from '@/lib/format';
 import { useStudioEditor } from '@/lib/studio-editor';
 import { Button, Chip, ChipRow, Segmented } from '@/ui/kit';
+import { haptic, useMotionOk } from '@/ui/motion';
 import { ModeProvider, useTheme } from '@/ui/theme';
 import { Icon, type IconName } from '@/ui/icon';
 import { LayoutStrip } from '@/components/studio/layout-strip';
@@ -89,6 +96,18 @@ function Editor() {
     vertical: [],
     horizontal: [],
   });
+
+  // A layout or format change cross-fades the canvas instead of jumping (Plan 28).
+  const motionOk = useMotionOk();
+  const canvasOpacity = useSharedValue(1);
+  const canvasFade = useAnimatedStyle(() => ({ opacity: canvasOpacity.get() }));
+  const fadeCanvas = () => {
+    haptic('select');
+    if (motionOk)
+      canvasOpacity.set(
+        withSequence(withTiming(0.35, { duration: 80 }), withTiming(1, { duration: 220 })),
+      );
+  };
 
   const photos = useMemo(() => {
     const out: Record<string, PhotoInfo> = {};
@@ -244,67 +263,69 @@ function Editor() {
         onLayout={(e: LayoutChangeEvent) => setArea(e.nativeEvent.layout)}
       >
         {scale ? (
-          <ScrollView
-            horizontal
-            // While something is selected, fingers move it instead of scrolling.
-            scrollEnabled={!selected}
-            showsHorizontalScrollIndicator={false}
-            onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
-            scrollEventThrottle={32}
-            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 8 }}
-          >
-            <StudioCanvas
-              doc={shown}
-              scale={scale}
-              photos={photos}
-              stats={stats}
-              seams
-              onBackgroundPress={() => {
-                select(null);
-                setCropping(false);
-                setReplacing(false);
-              }}
-              onLayerPress={(l) => {
-                select(l.id);
-                setCropping(false);
-                setReplacing(false);
-              }}
-              overlay={
-                <>
-                  <Guides
-                    guides={guides}
-                    scale={scale}
-                    width={canvasW}
-                    height={canvasH}
-                    color={t.accent}
-                  />
-                  {selected ? (
-                    <Selection
-                      key={selected.id + (cropping ? ':crop' : '')}
-                      doc={doc}
-                      layer={selected}
+          <Animated.View style={[{ flex: 1 }, canvasFade]}>
+            <ScrollView
+              horizontal
+              // While something is selected, fingers move it instead of scrolling.
+              scrollEnabled={!selected}
+              showsHorizontalScrollIndicator={false}
+              onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
+              scrollEventThrottle={32}
+              contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 8 }}
+            >
+              <StudioCanvas
+                doc={shown}
+                scale={scale}
+                photos={photos}
+                stats={stats}
+                seams
+                onBackgroundPress={() => {
+                  select(null);
+                  setCropping(false);
+                  setReplacing(false);
+                }}
+                onLayerPress={(l) => {
+                  select(l.id);
+                  setCropping(false);
+                  setReplacing(false);
+                }}
+                overlay={
+                  <>
+                    <Guides
+                      guides={guides}
                       scale={scale}
-                      mode={cropping ? 'crop' : 'move'}
-                      accent={t.accent}
-                      photoSize={
-                        selected.kind === 'photo' && selected.photoId
-                          ? {
-                              w: photos[selected.photoId]?.width ?? 0,
-                              h: photos[selected.photoId]?.height ?? 0,
-                            }
-                          : undefined
-                      }
-                      onLive={(patch, g) => {
-                        setLive(patch ? { id: selected.id, patch } : null);
-                        setGuides(g);
-                      }}
-                      onCommit={(patch) => apply((d) => updateLayer(d, selected.id, patch))}
+                      width={canvasW}
+                      height={canvasH}
+                      color={t.accent}
                     />
-                  ) : null}
-                </>
-              }
-            />
-          </ScrollView>
+                    {selected ? (
+                      <Selection
+                        key={selected.id + (cropping ? ':crop' : '')}
+                        doc={doc}
+                        layer={selected}
+                        scale={scale}
+                        mode={cropping ? 'crop' : 'move'}
+                        accent={t.accent}
+                        photoSize={
+                          selected.kind === 'photo' && selected.photoId
+                            ? {
+                                w: photos[selected.photoId]?.width ?? 0,
+                                h: photos[selected.photoId]?.height ?? 0,
+                              }
+                            : undefined
+                        }
+                        onLive={(patch, g) => {
+                          setLive(patch ? { id: selected.id, patch } : null);
+                          setGuides(g);
+                        }}
+                        onCommit={(patch) => apply((d) => updateLayer(d, selected.id, patch))}
+                      />
+                    ) : null}
+                  </>
+                }
+              />
+            </ScrollView>
+          </Animated.View>
         ) : null}
       </View>
 
@@ -319,6 +340,7 @@ function Editor() {
                 value={doc.format}
                 onChange={(format) => {
                   const next = fitTemplate(layoutId ?? 'bridge', format, used, newId, heading);
+                  fadeCanvas();
                   apply(() => next);
                   deselect();
                 }}
@@ -341,6 +363,7 @@ function Editor() {
             onPick={(template, next) => {
               // Applied straight away; Undo brings the previous layout back.
               setLayoutId(template);
+              fadeCanvas();
               apply(() => next);
               deselect();
             }}

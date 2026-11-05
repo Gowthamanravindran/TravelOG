@@ -20,6 +20,7 @@ import {
   nextFrames,
 } from '@/lib/studio-export';
 import { Button, ErrorText } from '@/ui/kit';
+import { useCelebrate } from '@/ui/motion';
 import { ModeProvider, useTheme } from '@/ui/theme';
 
 /** Preview, export every slide at exact size, and share (Plan 15). */
@@ -37,6 +38,7 @@ function ExportScreen() {
   const { id, projectId } = useLocalSearchParams<{ id: string; projectId: string }>();
   const router = useRouter();
   const mutate = useMutate();
+  const celebrate = useCelebrate();
   const t = useTheme();
   const { width: screenW } = useWindowDimensions();
   const loaded = useQuery((db) => getProject(db, projectId), [projectId]);
@@ -106,6 +108,7 @@ function ExportScreen() {
       const kept = await keepSlides(projectId, tmp);
       mutate((db) => markExported(db, projectId, kept[0] ?? null));
       setFiles(kept);
+      celebrate(`${kept.length} ${kept.length === 1 ? 'slide' : 'slides'} ready`);
     } catch (e) {
       setCapturing(null);
       setError(errorMessage(e));

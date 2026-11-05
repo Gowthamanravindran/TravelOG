@@ -17,6 +17,7 @@ import { openAppDatabase } from '@/data/open';
 import { DataProvider } from '@/data/provider';
 import { AppearanceProvider } from '@/lib/appearance';
 import { FONT_ASSETS, FontGate } from '@/lib/fonts';
+import { CelebrationHost } from '@/ui/motion';
 import { useScheme } from '@/ui/theme';
 import { useReminders } from '@/lib/reminders';
 
@@ -80,10 +81,15 @@ export default function RootLayout() {
         <DataProvider db={db}>
           <AppearanceProvider>
             <Themed>
-              <Background />
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
-              </Stack>
+              <CelebrationHost>
+                <Background />
+                <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+                  <Stack.Screen
+                    name="new-trip"
+                    options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+                  />
+                </Stack>
+              </CelebrationHost>
             </Themed>
           </AppearanceProvider>
         </DataProvider>

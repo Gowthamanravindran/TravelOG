@@ -7,6 +7,7 @@ import { View } from 'react-native';
 import { TripCard } from '@/components/trip-card';
 import { useQuery } from '@/data/provider';
 import { Body, Button, Card, Empty, H1, Screen, Segmented, Strong, WithIcon } from '@/ui/kit';
+import { Appear } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 import { tripDayNumber } from '@travelog/core';
 import { tripIcon } from '@/lib/labels';
@@ -81,7 +82,11 @@ export default function TripsScreen() {
             ]}
           />
           {shown.length ? (
-            shown.map((trip) => <TripCard key={trip.id} trip={trip} onPress={() => open(trip)} />)
+            shown.map((trip, i) => (
+              <Appear key={trip.id} index={i}>
+                <TripCard trip={trip} onPress={() => open(trip)} />
+              </Appear>
+            ))
           ) : (
             <Body muted>No {filter} trips.</Body>
           )}

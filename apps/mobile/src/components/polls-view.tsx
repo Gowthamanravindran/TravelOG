@@ -8,6 +8,7 @@ import { useMutate, useQuery } from '@/data/provider';
 import { errorMessage } from '@/lib/format';
 import { POLL_LABELS } from '@/lib/labels';
 import { Between, Body, Button, Card, Chip, ChipRow, Empty, ErrorText, Strong } from '@/ui/kit';
+import { Appear } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
 export function PollsView({ tripId }: { tripId: string }) {
@@ -51,67 +52,69 @@ export function PollsView({ tripId }: { tripId: string }) {
       ) : null}
       <ErrorText>{error}</ErrorText>
       {polls.length ? (
-        polls.map(({ poll, results }) => {
+        polls.map(({ poll, results }, i) => {
           const max = Math.max(...results.options.map((o) => o.count));
           return (
-            <Card key={poll.id}>
-              <Between>
-                <Chip label={POLL_LABELS[poll.type]} />
-                <Body small muted>
-                  {poll.lockedOptionId
-                    ? 'Decided'
-                    : `${results.totalVoters} voted · ${poll.style === 'multi' ? 'pick any' : 'pick one'}`}
-                </Body>
-              </Between>
-              <Strong style={{ fontSize: 17 }}>{poll.question}</Strong>
-              {results.options.map((o) => {
-                const mine = o.voterIds.includes(voter);
-                const won = poll.lockedOptionId === o.id;
-                return (
-                  <Pressable
-                    key={o.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${o.label}, ${o.count} votes`}
-                    accessibilityState={{ selected: mine, disabled: !!poll.lockedOptionId }}
-                    disabled={!!poll.lockedOptionId || !voter}
-                    onPress={() => run(() => mutate((db) => castVote(db, poll.id, o.id, voter)))}
-                    style={[styles.option, { borderColor: mine ? t.mango : t.line }]}
-                  >
-                    <View
-                      style={[
-                        styles.fill,
-                        {
-                          width: `${Math.round(o.share * 100)}%`,
-                          backgroundColor: t.mango,
-                          opacity: 0.28,
-                        },
-                      ]}
-                    />
-                    <Text style={[type.label, { color: t.ink, flex: 1 }]}>
-                      {won ? 'Winner · ' : ''}
-                      {o.label}
-                      {mine ? ' · your vote' : ''}
-                    </Text>
-                    <Text style={[type.label, { color: t.ink }]}>{o.count}</Text>
-                  </Pressable>
-                );
-              })}
-              {!poll.lockedOptionId ? (
+            <Appear key={poll.id} index={i}>
+              <Card>
                 <Between>
-                  <Button
-                    label="Delete"
-                    variant="link"
-                    danger
-                    onPress={() => run(() => mutate((db) => deletePoll(db, poll.id)))}
-                  />
-                  <Button
-                    label={max > 0 ? 'Lock in the winner' : 'Lock in'}
-                    variant="link"
-                    onPress={() => run(() => mutate((db) => lockPoll(db, poll.id)))}
-                  />
+                  <Chip label={POLL_LABELS[poll.type]} />
+                  <Body small muted>
+                    {poll.lockedOptionId
+                      ? 'Decided'
+                      : `${results.totalVoters} voted · ${poll.style === 'multi' ? 'pick any' : 'pick one'}`}
+                  </Body>
                 </Between>
-              ) : null}
-            </Card>
+                <Strong style={{ fontSize: 17 }}>{poll.question}</Strong>
+                {results.options.map((o) => {
+                  const mine = o.voterIds.includes(voter);
+                  const won = poll.lockedOptionId === o.id;
+                  return (
+                    <Pressable
+                      key={o.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${o.label}, ${o.count} votes`}
+                      accessibilityState={{ selected: mine, disabled: !!poll.lockedOptionId }}
+                      disabled={!!poll.lockedOptionId || !voter}
+                      onPress={() => run(() => mutate((db) => castVote(db, poll.id, o.id, voter)))}
+                      style={[styles.option, { borderColor: mine ? t.mango : t.line }]}
+                    >
+                      <View
+                        style={[
+                          styles.fill,
+                          {
+                            width: `${Math.round(o.share * 100)}%`,
+                            backgroundColor: t.mango,
+                            opacity: 0.28,
+                          },
+                        ]}
+                      />
+                      <Text style={[type.label, { color: t.ink, flex: 1 }]}>
+                        {won ? 'Winner · ' : ''}
+                        {o.label}
+                        {mine ? ' · your vote' : ''}
+                      </Text>
+                      <Text style={[type.label, { color: t.ink }]}>{o.count}</Text>
+                    </Pressable>
+                  );
+                })}
+                {!poll.lockedOptionId ? (
+                  <Between>
+                    <Button
+                      label="Delete"
+                      variant="link"
+                      danger
+                      onPress={() => run(() => mutate((db) => deletePoll(db, poll.id)))}
+                    />
+                    <Button
+                      label={max > 0 ? 'Lock in the winner' : 'Lock in'}
+                      variant="link"
+                      onPress={() => run(() => mutate((db) => lockPoll(db, poll.id)))}
+                    />
+                  </Between>
+                ) : null}
+              </Card>
+            </Appear>
           );
         })
       ) : (

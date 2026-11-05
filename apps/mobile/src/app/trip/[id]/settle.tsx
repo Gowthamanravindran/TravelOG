@@ -7,12 +7,14 @@ import { Linking } from 'react-native';
 import { useMutate, useQuery } from '@/data/provider';
 import { errorMessage, money } from '@/lib/format';
 import { Between, Body, Button, Card, Empty, ErrorText, H1, Row, Screen, Strong } from '@/ui/kit';
+import { useCelebrate } from '@/ui/motion';
 import { ModeProvider } from '@/ui/theme';
 
 export default function Settle() {
   const { id, mode } = useLocalSearchParams<{ id: string; mode?: 'trip' }>();
   const router = useRouter();
   const mutate = useMutate();
+  const celebrate = useCelebrate();
   const trip = useQuery((db) => getTrip(db, id), [id]);
   const members = useQuery((db) => listMembers(db, id), [id]);
   const { transfers } = useQuery((db) => tripMoney(db, id), [id]);
@@ -31,6 +33,7 @@ export default function Settle() {
           method,
         }),
       );
+      celebrate('Marked as paid');
     } catch (e) {
       setError(errorMessage(e));
     }

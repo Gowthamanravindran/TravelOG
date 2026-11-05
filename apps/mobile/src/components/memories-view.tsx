@@ -1,3 +1,4 @@
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import { daysBetween, fitTemplate, parseDoc, photosInDoc, tripState } from '@travelog/core';
 import {
   addPhotos,
@@ -22,6 +23,7 @@ import { errorMessage, shortDate } from '@/lib/format';
 import { deletePhotoFile, pickPhotos } from '@/lib/photos';
 import { Icon } from '@/ui/icon';
 import { Body, Button, Card, Empty, ErrorText, H2, IconTile, Row, Strong } from '@/ui/kit';
+import { Appear, useMotionOk } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
 const FORMAT_LABEL = { post: '4:5', square: '1:1', story: '9:16' } as const;
@@ -35,6 +37,7 @@ export function MemoriesView({ tripId }: { tripId: string }) {
   const router = useRouter();
   const mutate = useMutate();
   const t = useTheme();
+  const motionOk = useMotionOk();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
   const photos = useQuery((db) => listPhotos(db, tripId), [tripId]);
   const projects = useQuery((db) => listProjects(db, tripId), [tripId]);
@@ -162,37 +165,38 @@ export function MemoriesView({ tripId }: { tripId: string }) {
           <>
             <H2>Collages</H2>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-              {projects.map((p) => {
+              {projects.map((p, i) => {
                 const doc = parseDoc(p.doc, p.format, p.slides);
                 const cover = p.thumbnailUri ?? uriOf(photosInDoc(doc)[0]);
                 return (
-                  <Pressable
-                    key={p.id}
-                    onPress={() => router.push(`/trip/${tripId}/studio/${p.id}`)}
-                    onLongPress={() => projectMenu(p)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${p.title}, ${p.slides} slides. Long-press for more.`}
-                    style={{ width: cardW, gap: 4 }}
-                  >
-                    <View
-                      style={{
-                        width: cardW,
-                        height: Math.round(cardW * 0.62),
-                        borderRadius: 14,
-                        overflow: 'hidden',
-                        backgroundColor: t.surface2,
-                      }}
+                  <Appear key={p.id} index={i}>
+                    <Pressable
+                      onPress={() => router.push(`/trip/${tripId}/studio/${p.id}`)}
+                      onLongPress={() => projectMenu(p)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${p.title}, ${p.slides} slides. Long-press for more.`}
+                      style={{ width: cardW, gap: 4 }}
                     >
-                      {cover ? (
-                        <Image source={{ uri: cover }} style={{ flex: 1 }} resizeMode="cover" />
-                      ) : null}
-                    </View>
-                    <Strong>{p.title}</Strong>
-                    <Body muted small>
-                      {p.slides} {p.slides === 1 ? 'slide' : 'slides'} · {FORMAT_LABEL[p.format]}
-                      {p.exportedAt ? ' · shared' : ''}
-                    </Body>
-                  </Pressable>
+                      <View
+                        style={{
+                          width: cardW,
+                          height: Math.round(cardW * 0.62),
+                          borderRadius: 14,
+                          overflow: 'hidden',
+                          backgroundColor: t.surface2,
+                        }}
+                      >
+                        {cover ? (
+                          <Image source={{ uri: cover }} style={{ flex: 1 }} resizeMode="cover" />
+                        ) : null}
+                      </View>
+                      <Strong>{p.title}</Strong>
+                      <Body muted small>
+                        {p.slides} {p.slides === 1 ? 'slide' : 'slides'} · {FORMAT_LABEL[p.format]}
+                        {p.exportedAt ? ' · shared' : ''}
+                      </Body>
+                    </Pressable>
+                  </Appear>
                 );
               })}
             </View>
@@ -274,14 +278,18 @@ export function MemoriesView({ tripId }: { tripId: string }) {
                             }}
                           >
                             {on ? (
-                              <Text
-                                style={[
-                                  type.caption,
-                                  { color: t.onAccent, ...font('display', 800) },
-                                ]}
+                              <Animated.View
+                                entering={motionOk ? ZoomIn.springify().damping(14) : undefined}
                               >
-                                {order}
-                              </Text>
+                                <Text
+                                  style={[
+                                    type.caption,
+                                    { color: t.onAccent, ...font('display', 800) },
+                                  ]}
+                                >
+                                  {order}
+                                </Text>
+                              </Animated.View>
                             ) : null}
                           </View>
                         </Pressable>

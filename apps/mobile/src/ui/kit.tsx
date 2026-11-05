@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Animated, {
+  FadeIn,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -34,15 +35,19 @@ export function Screen({
   edges?: ('top' | 'bottom')[];
 }) {
   const t = useTheme();
+  const ok = useMotionOk();
   return (
     <SafeAreaView edges={edges} style={[styles.fill, { backgroundColor: t.bg }]}>
-      {scroll ? (
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          {children}
-        </ScrollView>
-      ) : (
-        <View style={[styles.fill, styles.content]}>{children}</View>
-      )}
+      {/* A screen or tab fades in when it first opens (Plan 28). */}
+      <Animated.View style={styles.fill} entering={ok ? FadeIn.duration(MOTION.base) : undefined}>
+        {scroll ? (
+          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+            {children}
+          </ScrollView>
+        ) : (
+          <View style={[styles.fill, styles.content]}>{children}</View>
+        )}
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -261,7 +266,10 @@ export function Chip({
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      onPress={onPress}
+      onPress={() => {
+        if (!selected) haptic('select');
+        onPress();
+      }}
       hitSlop={6}
       style={style}
     >

@@ -1,3 +1,4 @@
+import Animated, { SlideInDown } from 'react-native-reanimated';
 import {
   localDateIn,
   monthGrid,
@@ -19,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shortDate } from '@/lib/format';
 
+import { useMotionOk } from './motion';
 import { Icon } from './icon';
 import { Button } from './kit';
 import { useTheme } from './theme';
@@ -220,6 +222,8 @@ export function TimeSheet({
 }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  // The sheet springs up while the backdrop fades (Plan 28).
+  const sheetIn = useMotionOk() ? SlideInDown.springify().damping(22).stiffness(240) : undefined;
   const initial = () => splitTime(value) ?? { hour: 9, minute: 0 };
   const [picked, setPicked] = useState(initial);
   const [wasVisible, setWasVisible] = useState(visible);
@@ -254,9 +258,10 @@ export function TimeSheet({
     });
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close time picker" />
-      <View
+      <Animated.View
+        entering={sheetIn}
         style={[
           styles.sheet,
           { backgroundColor: t.surface, paddingBottom: Math.max(insets.bottom, 16) },
@@ -314,7 +319,7 @@ export function TimeSheet({
             <Button label="Done" onPress={() => onDone(joinTime(picked.hour, picked.minute))} />
           </View>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
@@ -337,6 +342,8 @@ export function CalendarSheet({
 }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  // The sheet springs up while the backdrop fades (Plan 28).
+  const sheetIn = useMotionOk() ? SlideInDown.springify().damping(22).stiffness(240) : undefined;
   const today = localDateIn(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata');
   const [picked, setPicked] = useState<DateRange>(range);
   const [month, setMonth] = useState(() => monthOf(range.start ?? today));
@@ -365,9 +372,10 @@ export function CalendarSheet({
         : 'Tap a day';
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close calendar" />
-      <View
+      <Animated.View
+        entering={sheetIn}
         style={[
           styles.sheet,
           { backgroundColor: t.surface, paddingBottom: Math.max(insets.bottom, 16) },
@@ -467,7 +475,7 @@ export function CalendarSheet({
             <Button label="Done" onPress={() => onDone(picked)} disabled={!ready} />
           </View>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }

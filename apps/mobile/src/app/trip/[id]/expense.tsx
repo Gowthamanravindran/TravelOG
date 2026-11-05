@@ -28,6 +28,7 @@ import {
   Screen,
   Segmented,
 } from '@/ui/kit';
+import { useCelebrate } from '@/ui/motion';
 import { ModeProvider } from '@/ui/theme';
 
 export default function ExpenseEditor() {
@@ -42,6 +43,7 @@ export default function ExpenseEditor() {
 function ExpenseForm({ tripId }: { tripId: string }) {
   const router = useRouter();
   const mutate = useMutate();
+  const celebrate = useCelebrate();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
   const members = useQuery((db) => listMembers(db, tripId), [tripId]);
   const [title, setTitle] = useState('');
@@ -113,6 +115,7 @@ function ExpenseForm({ tripId }: { tripId: string }) {
           participants: people.map((p) => ({ memberId: p.id, weight: weightFor(p.id) })),
         }),
       );
+      celebrate('Expense added');
       router.back();
     } catch (e) {
       setError(errorMessage(e));

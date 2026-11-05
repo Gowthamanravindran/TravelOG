@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { DataProvider } from '@/data/provider';
 import { AppearanceProvider } from '@/lib/appearance';
+import { CelebrationHost } from '@/ui/motion';
 import { ModeProvider } from '@/ui/theme';
 
 /** A real in-memory SQLite database with the app's migrations. */
@@ -24,7 +25,9 @@ export function withData(db: Db, ui: ReactNode, mode: 'home' | 'plan' | 'trip' =
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DataProvider db={db}>
         <AppearanceProvider>
-          <ModeProvider mode={mode}>{ui}</ModeProvider>
+          <CelebrationHost>
+            <ModeProvider mode={mode}>{ui}</ModeProvider>
+          </CelebrationHost>
         </AppearanceProvider>
       </DataProvider>
     </GestureHandlerRootView>
