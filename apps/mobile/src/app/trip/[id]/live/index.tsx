@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 
 import { useDb, useMutate, useQuery } from '@/data/provider';
+import { TripSetupCard } from '@/components/trip-setup';
 import { checkInNow } from '@/lib/check-in';
 import { dateTimeIn, errorMessage, money } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
@@ -105,6 +106,7 @@ export default function TodayTab() {
 
   return (
     <Screen edges={[]}>
+      <TripSetupCard tripId={id} />
       {focus ? (
         <View style={{ backgroundColor: t.accent, borderRadius: 24, padding: 18, gap: 8 }}>
           <Between>

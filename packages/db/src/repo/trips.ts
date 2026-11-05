@@ -2,7 +2,7 @@ import { asc, eq } from 'drizzle-orm';
 import { isLocalDate, tripState, type TripState } from '@travelog/core';
 
 import { deleteRow, getRow, insertRow, liveRows, now, tx, updateRow, type Db } from '../db';
-import { trips, tripMembers } from '../schema';
+import { bookings, budgets, itineraryItems, trips, tripMembers } from '../schema';
 
 export type Trip = typeof trips.$inferSelect;
 export type Member = typeof tripMembers.$inferSelect;
@@ -151,4 +151,24 @@ export function removeMember(db: Db, id: string): void {
 
 export function myMember(db: Db, tripId: string): Member | undefined {
   return listMembers(db, tripId).find((m) => m.isMe);
+}
+
+// Setup ------------------------------------------------------------------------
+
+export interface TripSetupStatus {
+  /** More than just you on the trip. */
+  people: boolean;
+  budget: boolean;
+  bookings: boolean;
+  /** At least one stop in any day's plan (or Ideas). */
+  plan: boolean;
+}
+
+/** What's been set up so far, for the "Set up your trip" card (Plan 16). */
+export function tripSetupStatus(db: Db, tripId: string): TripSetupStatus {
+  const people = liveRows(db, 'trip_members', eq(tripMembers.tripId, tripId)).length > 1;
+  const budget = liveRows(db, 'budgets', eq(budgets.tripId, tripId)).some((b) => b.amountMinor > 0);
+  const hasBookings = liveRows(db, 'bookings', eq(bookings.tripId, tripId)).length > 0;
+  const plan = liveRows(db, 'itinerary_items', eq(itineraryItems.tripId, tripId)).length > 0;
+  return { people, budget, bookings: hasBookings, plan };
 }

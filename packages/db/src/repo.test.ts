@@ -51,6 +51,7 @@ import {
   duplicateProject,
   deleteProject,
   renameProject,
+  tripSetupStatus,
 } from './index';
 import * as schema from './schema';
 import { outbox } from './schema';
@@ -549,5 +550,27 @@ describe('studio projects', () => {
     const p = createProject(db, { tripId: t.id, format: 'story', slides: 2, template: 'blank' });
     db.update(schema.studioProjects).set({ doc: '{broken' }).run();
     expect(getProject(db, p.id)?.doc).toMatchObject({ format: 'story', slides: 2, layers: [] });
+  });
+});
+
+describe('trip setup status', () => {
+  it('ticks people, budget, bookings and plan as they are added', () => {
+    const t = goa();
+    expect(tripSetupStatus(db, t.id)).toEqual({
+      people: false,
+      budget: false,
+      bookings: false,
+      plan: false,
+    });
+    addMember(db, t.id, 'Riya');
+    setBudget(db, t.id, 'food', 50000);
+    addBooking(db, { tripId: t.id, type: 'flight', title: '6E 501' });
+    addItem(db, ensureMainVariant(db, t.id, '2026-11-12').id, { type: 'place', title: 'Fort' });
+    expect(tripSetupStatus(db, t.id)).toEqual({
+      people: true,
+      budget: true,
+      bookings: true,
+      plan: true,
+    });
   });
 });

@@ -11,7 +11,7 @@ import {
 } from '@travelog/db';
 import { categoryColors } from '@travelog/ui';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
@@ -32,11 +32,19 @@ import {
   Strong,
   WithIcon,
 } from '@/ui/kit';
-import { useMode, useTheme } from '@/ui/theme';
+import { useTheme } from '@/ui/theme';
 
-export function BudgetView({ tripId }: { tripId: string }) {
+import { PeopleCard } from './people-card';
+
+export function BudgetView({
+  tripId,
+  startEditing = false,
+}: {
+  tripId: string;
+  /** Open with the budget editor showing (from "Set a budget" in trip setup). */
+  startEditing?: boolean;
+}) {
   const t = useTheme();
-  const mode = useMode();
   const router = useRouter();
   const mutate = useMutate();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
@@ -62,6 +70,12 @@ export function BudgetView({ tripId }: { tripId: string }) {
     );
     setEditing(true);
   };
+
+  useEffect(() => {
+    if (startEditing && trip) startEdit();
+    // Only when the screen opens with the flag.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startEditing, !!trip]);
   const saveBudget = () => {
     try {
       mutate((db) => {
@@ -79,6 +93,7 @@ export function BudgetView({ tripId }: { tripId: string }) {
 
   return (
     <View style={{ gap: 16 }}>
+      <PeopleCard tripId={tripId} />
       <Card>
         <Body muted small>
           Group spent
@@ -92,11 +107,14 @@ export function BudgetView({ tripId }: { tripId: string }) {
               {members.length})
             </Body>
           </>
-        ) : (
-          <Body muted small>
-            No budget set yet.
-          </Body>
-        )}
+        ) : !editing ? (
+          <View style={{ gap: 8 }}>
+            <Body muted small>
+              No budget set yet.
+            </Body>
+            <Button label="Set budget" icon="budget" small onPress={startEdit} />
+          </View>
+        ) : null}
         {me ? (
           <Body
             style={{
@@ -115,8 +133,8 @@ export function BudgetView({ tripId }: { tripId: string }) {
 
       <H2
         right={
-          mode === 'plan' && !editing ? (
-            <Button label="Edit" variant="link" onPress={startEdit} />
+          !editing ? (
+            <Button label="Edit budget" icon="edit" variant="link" onPress={startEdit} />
           ) : null
         }
       >
