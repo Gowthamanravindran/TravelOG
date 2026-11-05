@@ -59,5 +59,7 @@ jobs:
           node-version: 22
           # Plain Node scripts; no pnpm here, so don't let setup-node look for it.
           package-manager-cache: false
+      - name: Install the Postgres client
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
       - name: Load the full places list into Supabase
         run: node scripts/places/seed-server.mjs

@@ -8,14 +8,12 @@ import { useEffect, useState } from 'react';
 import { useDb } from '@/data/provider';
 
 /**
- * Destination search (Plan 29): the phone's own places table first (seeded from
- * the app's basic list, works offline), then our server's places table, which
- * fills itself from OpenStreetMap on a miss. Places from the server are saved on
- * the phone so they work offline next time.
+ * Destination search (Plans 29, 30): the phone holds countries and continents
+ * (instant, offline) and every place you've picked or seen; cities and regions
+ * come from our server's places table, which fills itself from OpenStreetMap on a
+ * miss. Places from the server are saved on the phone so they work offline next time.
  */
 
-/** Below this many phone results, also ask the server. */
-const ENOUGH = 3;
 const DEBOUNCE_MS = 300;
 
 /** Loads the basic list into the phone's table once per data version. */
@@ -79,7 +77,7 @@ export async function searchServer(
 
 /**
  * Results for what's typed: the phone's matches at once, then the server's after a
- * short pause in typing when the phone has fewer than three.
+ * short pause in typing.
  */
 export function usePlaceSearch(
   query: string,
@@ -97,7 +95,8 @@ export function usePlaceSearch(
     attribution: null,
   });
   const [searching, setSearching] = useState(false);
-  const needServer = query.trim().length >= 2 && local.length < ENOUGH && !!placesServer();
+  // Cities and regions live on our server (Plan 30); always ask it when it's set up.
+  const needServer = query.trim().length >= 2 && !!placesServer();
 
   useEffect(() => {
     if (!needServer) return;

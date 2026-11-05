@@ -39,4 +39,4 @@ jobs:
           supabase db push
       - name: Deploy functions to staging
         if: steps.secrets.outputs.ready == 'true'
-        run: supabase functions deploy place-search --project-ref "$PROJECT_REF"
+        run: supabase functions deploy place-search --no-verify-jwt --project-ref "$PROJECT_REF"

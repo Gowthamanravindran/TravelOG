@@ -249,6 +249,14 @@ export function buildPlaces({
   return out;
 }
 
+/**
+ * What the phone ships with (Plan 30): continents and countries only, a few KB.
+ * Cities and regions come from our Supabase places table as you type.
+ */
+export function phoneList(places) {
+  return places.filter((p) => p.kind === 'continent' || p.kind === 'country');
+}
+
 /** Problems that must stop a release; empty when the data looks right. */
 export function checkPlaces(places, { known = [], minCities, minCountries, previousCount }) {
   const errors = [];

@@ -47,14 +47,23 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 5. Account → Access Tokens → Generate token → GitHub secret `SUPABASE_ACCESS_TOKEN`.
 6. Authentication → URL configuration: add `travelog://*` and `https://<domain>/*` to redirect URLs.
 7. The service-role key stays in Supabase only — never in the app or GitHub.
-8. **Places autocomplete (Plan 29):**
-   - **App settings for local testing:** put the staging Project URL and anon key in `apps/mobile/.env` as `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Both are public values. The file isn't committed.
-   - **Database connection for seeding:** in Project Settings → Database → Connection string, choose the **Session pooler** (it works from GitHub). Copy the URI with your database password filled in, and add it as the GitHub secret `STAGING_DB_URL`.
-   - **Geoapify:**
-     1. Create a free account at geoapify.com and create an API key. In its Places API terms, confirm that results may be stored and reused with OpenStreetMap credit.
-     2. In Supabase, go to Edge Functions → Secrets and add `PLACES_API_KEY` with that key. It never goes in the app or GitHub.
-   - **Deploy:** Actions → **Deploy database and functions (staging)** → Run workflow. This creates the `places` table and the `place-search` function.
-   - **Seed:** Actions → **Places data** → Run workflow, with "Also load the full list into Supabase" ticked. This also rebuilds the phone's basic list and commits it.
+8. **Places autocomplete (Plans 29–30).** Do these in order. Nothing secret ever goes in chat or in the repo.
+   1. **Supabase API values.** Project Settings → API (or **Connect** → App frameworks):
+      - copy the **Project URL** and the **anon** (or **publishable**) key; both are public;
+      - create `apps/mobile/.env` with `EXPO_PUBLIC_SUPABASE_URL=<Project URL>` and `EXPO_PUBLIC_SUPABASE_ANON_KEY=<key>`. The file is ignored by git;
+      - add the same two values as EAS environment variables (expo.dev → project → Environment variables), so builds have them too.
+   2. **Deploy secrets in GitHub** (repo → Settings → Secrets and variables → Actions → New repository secret):
+      - `SUPABASE_ACCESS_TOKEN`: supabase.com → Account → Access Tokens → Generate new token;
+      - `STAGING_PROJECT_REF`: the ID in your project's URL (`supabase.com/dashboard/project/<ref>`);
+      - `STAGING_DB_PASSWORD`: the database password you set when creating the project (Project Settings → Database → Reset database password if it's lost);
+      - `STAGING_DB_URL`: click **Connect** at the top of the dashboard → **Session pooler** → copy the URI and replace `[YOUR-PASSWORD]` with the database password.
+   3. **Geoapify** (OpenStreetMap lookups for places we don't have yet):
+      - sign up free at myprojects.geoapify.com → create a project → copy its API key;
+      - check their terms page says results may be stored with OpenStreetMap credit;
+      - in Supabase, go to Edge Functions → Secrets (or Project Settings → Edge Functions) → add `PLACES_API_KEY` with that key. It never goes in GitHub or the app.
+   4. **Create the table and the function:** GitHub → Actions → **Deploy database and functions (staging)** → Run workflow → branch `claude/kind-allen-2woote`. It should go green. Supabase then shows a `places` table (Table Editor) and a `place-search` function (Edge Functions).
+   5. **Load the places:** Actions → **Places data** → Run workflow → branch `claude/kind-allen-2woote` → tick **Also load the full list into Supabase**. This takes a few minutes and loads about 200,000 places. The `places` table should then have rows.
+   6. **Try it:** `git pull && pnpm dev:go`, then in the app New trip → Where, type "Man", "Hampi", "Japan", "Europe". Cities appear after a moment; countries and continents appear at once. To test a lookup, type a small place you know (it's saved for everyone after).
 
 ## §5 Expo / EAS — Phase 0 · free tier to start
 **Done:** organisation **TravelOGApp** (account name `travelogapp`) with project **travelog** (`c1fca343-1181-4e23-a750-137c4ca9447d`), linked in `apps/mobile/app.config.ts`. You don't need `eas init` or `create-expo-app` — the app already lives in `apps/mobile`.

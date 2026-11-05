@@ -10,6 +10,7 @@ import {
   parseCities,
   parseCountries,
   parseTimeZones,
+  phoneList,
   toCompact,
 } from './lib.mjs';
 
@@ -100,4 +101,11 @@ test('checks catch a broken build', () => {
 test('compact form round-trips', () => {
   const ps = buildPlaces({ ...inputs(), minPopulation: 15000 });
   assert.deepEqual(fromCompact(JSON.parse(JSON.stringify(toCompact(ps, 'v1')))).places, ps);
+});
+
+test('the phone list keeps only continents and countries (cities come from our server)', () => {
+  const phone = phoneList(buildPlaces({ ...inputs(), minPopulation: 15000 }));
+  assert.deepEqual([...new Set(phone.map((p) => p.kind))].sort(), ['continent', 'country']);
+  assert.equal(phone.length, 7 + 4);
+  assert.ok(JSON.stringify(toCompact(phone, 'v')).length < 5000);
 });

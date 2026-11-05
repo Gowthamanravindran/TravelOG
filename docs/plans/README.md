@@ -33,3 +33,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 27 | [Exported collage photos came out half see-through (Android fade-in)](27-export-fade.md) | see git log |
 | 28 | [Lively animations, plus the React Native skill](28-animations.md) | see git log |
 | 29 | [Places autocomplete: our own places database](29-places.md) | see git log |
+| 30 | [Cities come from our server, not the app](30-places-from-server.md) | see git log |

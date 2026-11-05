@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Builds the phone's basic places seed (Plan 29) from GeoNames and our corrections:
+ * Builds the phone's basic places list (Plans 29, 30) from GeoNames and our corrections:
  *   node scripts/places/build.mjs
- * Writes apps/mobile/assets/places/basic.places only if every check passes.
+ * Checks the full build, then writes only continents and countries to
+ * apps/mobile/assets/places/basic.places (cities come from our server).
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
@@ -16,6 +17,7 @@ import {
   parseCities,
   parseCountries,
   parseTimeZones,
+  phoneList,
   toCompact,
 } from './lib.mjs';
 
@@ -36,21 +38,20 @@ const places = buildPlaces({
 const previous = existsSync(OUT)
   ? fromCompact(JSON.parse(readFileSync(OUT, 'utf8'))).places.length
   : 0;
-const errors = checkPlaces(places, {
-  known: KNOWN,
-  minCities: 20000,
-  minCountries: 240,
-  previousCount: previous > 100 ? previous : undefined,
-});
+// The full build is checked (the same data goes to Supabase); the phone keeps a slice.
+const errors = checkPlaces(places, { known: KNOWN, minCities: 20000, minCountries: 240 });
+const phone = phoneList(places);
+const text = JSON.stringify(toCompact(phone, new Date().toISOString().slice(0, 10)));
+if (text.length > 200_000)
+  errors.push(`the phone list is ${text.length} bytes; keep it under 200 KB`);
 if (errors.length) {
   console.error(`Places build stopped:\n- ${errors.join('\n- ')}`);
   process.exit(1);
 }
-const version = new Date().toISOString().slice(0, 10);
-writeFileSync(OUT, JSON.stringify(toCompact(places, version)));
-const kinds = Object.groupBy(places, (p) => p.kind);
+writeFileSync(OUT, text);
+const kinds = Object.groupBy(phone, (p) => p.kind);
 console.log(
-  `places ${version}: ${places.length} rows (previously ${previous}) — ` +
+  `phone places: ${phone.length} rows, ${text.length} bytes (previously ${previous} rows) — ` +
     Object.entries(kinds)
       .map(([k, v]) => `${v.length} ${k}`)
       .join(', '),

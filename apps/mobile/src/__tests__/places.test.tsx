@@ -1,5 +1,5 @@
 import type { Place } from '@travelog/core';
-import { getPlace, listTrips, saveLocalProfile, seedPlaces } from '@travelog/db';
+import { getPlace, listTrips, saveLocalProfile, savePlaces, seedPlaces } from '@travelog/db';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -150,5 +150,34 @@ describe('destination autocomplete (Plan 29)', () => {
     );
     expect(screen.getByText('Place data © OpenStreetMap contributors')).toBeTruthy();
     expect(getPlace(db, 'osm:N245678')?.name).toBe('Hampi');
+  });
+
+  it('asks our server for cities even when the phone has matches of its own', async () => {
+    mockExtra = { supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'public-anon-key' };
+    const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({ attribution: null, places: [] }),
+    } as Response);
+    const db = await openNewTrip();
+    // Three phone matches used to be enough to skip the server.
+    savePlaces(db, [
+      place({
+        id: 'ours:j1',
+        name: 'Japan Alps',
+        kind: 'region',
+        countryCode: 'JP',
+        countryName: 'Japan',
+      }),
+      place({
+        id: 'ours:j2',
+        name: 'Japanese Garden',
+        kind: 'city',
+        countryCode: 'JP',
+        countryName: 'Japan',
+      }),
+    ]);
+    await fireEvent.changeText(screen.getByLabelText('Where'), 'japan');
+    expect(screen.getByRole('button', { name: 'Japan, Asia' })).toBeTruthy();
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
   });
 });
