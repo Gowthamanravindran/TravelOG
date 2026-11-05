@@ -1,6 +1,6 @@
 import { getTrip, listMembers } from '@travelog/db';
 import { daysUntilStart, tripDayNumber, tripState } from '@travelog/core';
-import { type } from '@travelog/ui';
+import { font, type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -79,7 +79,7 @@ export function TripHeader() {
       }}
     >
       <Icon name={icon} size={14} color={strong ? t.accent : t.ink2} />
-      <Text style={[type.caption, { color: strong ? t.accent : t.ink2, fontWeight: '700' }]}>
+      <Text style={[type.caption, { color: strong ? t.accent : t.ink2, ...font('text', 600) }]}>
         {text}
       </Text>
     </View>

@@ -12,7 +12,7 @@ import {
   roundTo5,
   splitTime,
 } from '@travelog/core';
-import { radius, type } from '@travelog/ui';
+import { font, radius, type } from '@travelog/ui';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -240,7 +240,7 @@ export function TimeSheet({
       <Text
         style={[
           type.body,
-          { color: selected ? t.onAccent : t.ink, fontWeight: selected ? '700' : '400' },
+          { color: selected ? t.onAccent : t.ink, ...font('text', selected ? 600 : 400) },
         ]}
       >
         {label}
@@ -446,7 +446,7 @@ export function CalendarSheet({
                         {
                           color: edge ? t.onAccent : inMonth ? t.ink : t.ink2,
                           opacity: inMonth || edge ? 1 : 0.45,
-                          fontWeight: edge ? '700' : '400',
+                          ...font('text', edge ? 600 : 400),
                         },
                       ]}
                     >

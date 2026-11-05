@@ -1,3 +1,4 @@
+import { font } from '@travelog/ui';
 import { getTrip, listAttachments, listBookings } from '@travelog/db';
 import { useRouter } from 'expo-router';
 import { View } from 'react-native';
@@ -64,7 +65,7 @@ export function BookingsView({ tripId }: { tripId: string }) {
                 <IconTile icon={BOOKING_LABELS[b.type].icon} />
                 <View style={{ flex: 1, gap: 2 }}>
                   <Between>
-                    <Body small style={{ color: t.accent, fontWeight: '700' }}>
+                    <Body small style={{ color: t.accent, ...font('text', 600) }}>
                       {BOOKING_LABELS[b.type].label.toUpperCase()}
                       {b.provider ? ` · ${b.provider}` : ''}
                     </Body>

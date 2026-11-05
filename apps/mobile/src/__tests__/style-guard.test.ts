@@ -36,3 +36,17 @@ it('rotationStyle is always an array with a finite angle', () => {
   expect(rotationStyle(Number.POSITIVE_INFINITY)).toEqual([{ rotate: '0deg' }]);
   expect(rotationStyle(undefined)).toEqual([{ rotate: '0deg' }]);
 });
+
+it('no fontWeight outside collage content (Android ignores it with custom fonts)', () => {
+  const offenders = files(path.join(__dirname, '..'))
+    .filter((f) => !f.includes(`${path.sep}components${path.sep}studio${path.sep}`))
+    .flatMap((f) =>
+      fs
+        .readFileSync(f, 'utf8')
+        .split('\n')
+        .map((line, i) => ({ line, at: `${path.basename(f)}:${i + 1}` }))
+        .filter(({ line }) => /fontWeight/.test(line))
+        .map(({ at }) => at),
+    );
+  expect(offenders).toEqual([]);
+});

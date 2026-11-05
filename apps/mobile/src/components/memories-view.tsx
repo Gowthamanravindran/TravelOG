@@ -12,7 +12,7 @@ import {
   type Photo,
   type StudioProject,
 } from '@travelog/db';
-import { spacing, type } from '@travelog/ui';
+import { font, spacing, type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
@@ -274,7 +274,10 @@ export function MemoriesView({ tripId }: { tripId: string }) {
                           >
                             {on ? (
                               <Text
-                                style={[type.caption, { color: t.onAccent, fontWeight: '800' }]}
+                                style={[
+                                  type.caption,
+                                  { color: t.onAccent, ...font('display', 800) },
+                                ]}
                               >
                                 {order}
                               </Text>

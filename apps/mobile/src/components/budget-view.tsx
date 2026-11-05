@@ -1,3 +1,4 @@
+import { font } from '@travelog/ui';
 import { formatRate } from '@travelog/core';
 import {
   BUDGET_CATEGORIES,
@@ -117,7 +118,7 @@ export function BudgetView({
           <Body
             style={{
               color: myNet > 0 ? t.success : myNet < 0 ? t.danger : t.ink2,
-              fontWeight: '700',
+              ...font('text', 600),
             }}
           >
             {myNet > 0
@@ -225,7 +226,10 @@ export function BudgetView({
             <Between key={x.id}>
               <Body>{x.isMe ? `${x.displayName} (you)` : x.displayName}</Body>
               <Body
-                style={{ color: v > 0 ? t.success : v < 0 ? t.danger : t.ink2, fontWeight: '700' }}
+                style={{
+                  color: v > 0 ? t.success : v < 0 ? t.danger : t.ink2,
+                  ...font('text', 600),
+                }}
               >
                 {v > 0 ? `gets ${money(v, cur)}` : v < 0 ? `owes ${money(-v, cur)}` : 'settled'}
               </Body>
@@ -270,7 +274,7 @@ export function BudgetView({
                         <Strong>{e.title}</Strong>
                       </WithIcon>
                     </View>
-                    <Body style={{ color: net >= 0 ? t.success : t.danger, fontWeight: '700' }}>
+                    <Body style={{ color: net >= 0 ? t.success : t.danger, ...font('text', 600) }}>
                       {net >= 0 ? '+' : '−'}
                       {money(Math.abs(net), cur)}
                     </Body>

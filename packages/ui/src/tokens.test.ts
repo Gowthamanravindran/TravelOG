@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { THEME_NAMES, themeFor, type Mode } from './tokens';
+import { font, THEME_NAMES, themeFor, type, type Mode } from './tokens';
 
 describe('themeFor', () => {
   it('uses each theme’s background', () => {
@@ -29,5 +29,23 @@ describe('themeFor', () => {
 
   it('draws Colour block’s tab bar in black', () => {
     expect(themeFor('block', 'home', 'dark').tabBar.bg).toBe('#141414');
+  });
+});
+
+describe('fonts', () => {
+  it('names one family per weight', () => {
+    expect(font('display', 800).fontFamily).toBe('PlusJakartaSans_800ExtraBold');
+    expect(font('display', 700).fontFamily).toBe('PlusJakartaSans_700Bold');
+    expect(font('text', 600).fontFamily).toBe('Figtree_600SemiBold');
+    expect(font('text', 400).fontFamily).toBe('Figtree_400Regular');
+  });
+
+  it('snaps to the nearest loaded weight', () => {
+    expect(font('display', 400).fontFamily).toBe('PlusJakartaSans_700Bold');
+    expect(font('text', 800).fontFamily).toBe('Figtree_600SemiBold');
+  });
+
+  it('never sets fontWeight in type styles (Android ignores it with custom fonts)', () => {
+    for (const style of Object.values(type)) expect(style).not.toHaveProperty('fontWeight');
   });
 });

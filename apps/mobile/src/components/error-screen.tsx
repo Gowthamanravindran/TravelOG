@@ -1,4 +1,4 @@
-import { themeFor } from '@travelog/ui';
+import { font, themeFor } from '@travelog/ui';
 import { Pressable, ScrollView, Text, useColorScheme, View } from 'react-native';
 import { Icon } from '@/ui/icon';
 
@@ -19,7 +19,10 @@ export function ErrorScreen({ error, retry }: { error: Error; retry: () => Promi
       }}
     >
       <Icon name="error" size={44} color={t.accent} />
-      <Text accessibilityRole="header" style={{ color: t.ink, fontSize: 24, fontWeight: '800' }}>
+      <Text
+        accessibilityRole="header"
+        style={{ color: t.ink, fontSize: 24, ...font('display', 800) }}
+      >
         Something went wrong
       </Text>
       <Text style={{ color: t.ink2, fontSize: 16 }}>
@@ -36,7 +39,7 @@ export function ErrorScreen({ error, retry }: { error: Error; retry: () => Promi
           justifyContent: 'center',
         }}
       >
-        <Text style={{ color: t.onAccent, fontSize: 17, fontWeight: '700' }}>Try again</Text>
+        <Text style={{ color: t.onAccent, fontSize: 17, ...font('display', 700) }}>Try again</Text>
       </Pressable>
       <ScrollView style={{ maxHeight: 120 }}>
         <Text selectable style={{ color: t.ink2, fontSize: 12 }}>

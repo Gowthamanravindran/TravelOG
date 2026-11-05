@@ -1,5 +1,5 @@
 import type { BottomTabBarProps } from 'expo-router/tabs';
-import { type } from '@travelog/ui';
+import { font, type } from '@travelog/ui';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -50,7 +50,7 @@ export function ModeTabBar({
           numberOfLines={1}
           style={[
             type.caption,
-            { color: focused ? t.accent : t.ink2, fontWeight: focused ? '700' : '500' },
+            { color: focused ? t.accent : t.ink2, ...font('text', focused ? 600 : 500) },
           ]}
         >
           {tab.label}
@@ -80,7 +80,7 @@ export function ModeTabBar({
         >
           <Icon name="add" size={28} color={t.onAccent} />
         </Pressable>
-        <Text numberOfLines={1} style={[type.caption, { color: t.ink2, fontWeight: '600' }]}>
+        <Text numberOfLines={1} style={[type.caption, { color: t.ink2, ...font('text', 600) }]}>
           {center.label}
         </Text>
       </View>,

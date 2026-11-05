@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   type ErrorBoundaryProps,
 } from 'expo-router';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -15,6 +16,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ErrorScreen } from '@/components/error-screen';
 import { openAppDatabase } from '@/data/open';
 import { DataProvider } from '@/data/provider';
+import { FONT_ASSETS, FontGate } from '@/lib/fonts';
 import { useReminders } from '@/lib/reminders';
 
 SplashScreen.preventAutoHideAsync();
@@ -32,43 +34,48 @@ function Background() {
 
 export default function RootLayout() {
   const scheme = useColorScheme();
+  const fonts = useFonts(FONT_ASSETS);
   const [db, setDb] = useState<Db | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    // Keep the splash screen up until the database is open and migrated (docs/08: no network at startup).
+    // The splash screen stays up until the database is open and migrated and the fonts
+    // are loaded (FontGate; docs/08: no network at startup).
     openAppDatabase()
       .then(setDb)
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
-      .finally(() => SplashScreen.hideAsync());
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
   }, [attempt]);
 
   if (error) {
     return (
-      <ErrorScreen
-        error={new Error(`TravelOG couldn't open its storage on this phone. ${error}`)}
-        retry={async () => {
-          setError(null);
-          setAttempt((n) => n + 1);
-        }}
-      />
+      <FontGate fonts={fonts} dataReady>
+        <ErrorScreen
+          error={new Error(`TravelOG couldn't open its storage on this phone. ${error}`)}
+          retry={async () => {
+            setError(null);
+            setAttempt((n) => n + 1);
+          }}
+        />
+      </FontGate>
     );
   }
   if (!db) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <DataProvider db={db}>
-        <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <StatusBar style="auto" />
-          <Background />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
-          </Stack>
-        </ThemeProvider>
-      </DataProvider>
-    </GestureHandlerRootView>
+    <FontGate fonts={fonts} dataReady>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <DataProvider db={db}>
+          <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <StatusBar style="auto" />
+            <Background />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="new-trip" options={{ presentation: 'modal' }} />
+            </Stack>
+          </ThemeProvider>
+        </DataProvider>
+      </GestureHandlerRootView>
+    </FontGate>
   );
 }

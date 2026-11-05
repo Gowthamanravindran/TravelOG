@@ -97,18 +97,31 @@ export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, xxxl: 48
 
 export const radius = { chip: 999, button: 14, card: 20, sheet: 28 } as const;
 
+/** Loaded font faces (Plan 26). Android ignores fontWeight on custom fonts, so each weight is its own family. */
 export const fonts = {
-  display: 'PlusJakartaSans',
-  body: 'Figtree',
+  display: { 700: 'PlusJakartaSans_700Bold', 800: 'PlusJakartaSans_800ExtraBold' },
+  text: { 400: 'Figtree_400Regular', 500: 'Figtree_500Medium', 600: 'Figtree_600SemiBold' },
 } as const;
 
+export type FontRole = keyof typeof fonts;
+export type FontWeight = 400 | 500 | 600 | 700 | 800;
+
+/** The font family for a role and weight, snapped to the nearest loaded face. */
+export function font(role: FontRole, weight: FontWeight): { fontFamily: string } {
+  const faces = fonts[role] as Record<number, string>;
+  const nearest = Object.keys(faces)
+    .map(Number)
+    .reduce((best, w) => (Math.abs(w - weight) < Math.abs(best - weight) ? w : best));
+  return { fontFamily: faces[nearest]! };
+}
+
 export const type = {
-  display: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, fontWeight: '800' },
-  title: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26, fontWeight: '700' },
-  headline: { fontFamily: fonts.display, fontSize: 16, lineHeight: 22, fontWeight: '700' },
-  body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, fontWeight: '400' },
-  label: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, fontWeight: '600' },
-  caption: { fontFamily: fonts.body, fontSize: 12, lineHeight: 16, fontWeight: '500' },
+  display: { ...font('display', 800), fontSize: 28, lineHeight: 34 },
+  title: { ...font('display', 700), fontSize: 20, lineHeight: 26 },
+  headline: { ...font('display', 700), fontSize: 16, lineHeight: 22 },
+  body: { ...font('text', 400), fontSize: 15, lineHeight: 22 },
+  label: { ...font('text', 600), fontSize: 13, lineHeight: 18 },
+  caption: { ...font('text', 500), fontSize: 12, lineHeight: 16 },
 } as const;
 
 /** Minimum touch target in points. */
