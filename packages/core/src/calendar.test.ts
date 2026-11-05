@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { monthGrid, monthTitle, rangeRole, shiftMonth, tapRange } from './calendar';
+import {
+  joinTime,
+  monthGrid,
+  monthTitle,
+  rangeRole,
+  roundTo5,
+  shiftMonth,
+  splitTime,
+  tapRange,
+} from './calendar';
 
 describe('calendar', () => {
   it('lays out a month in Monday-first weeks', () => {
@@ -56,5 +65,18 @@ describe('calendar', () => {
       null,
     ]);
     expect(rangeRole({ start: '2026-11-15', end: null }, '2026-11-15')).toBe('single');
+  });
+});
+
+describe('times', () => {
+  it('reads, writes and rounds times', () => {
+    expect(splitTime('09:05')).toEqual({ hour: 9, minute: 5 });
+    expect(splitTime('24:00')).toBeNull();
+    expect(splitTime('')).toBeNull();
+    expect(joinTime(7, 3)).toBe('07:03');
+    expect(joinTime(23, 61)).toBe('23:01');
+    expect(joinTime(0, -1)).toBe('00:59');
+    expect(roundTo5(37)).toBe(35);
+    expect(roundTo5(59)).toBe(55);
   });
 });

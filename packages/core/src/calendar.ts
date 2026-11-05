@@ -93,3 +93,23 @@ export function rangeRole(
   if (date === end) return 'end';
   return date > start && date < end ? 'between' : null;
 }
+
+// Times ('HH:MM', 24-hour) for the time picker -------------------------------
+
+export function splitTime(
+  time: string | null | undefined,
+): { hour: number; minute: number } | null {
+  const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(time ?? '');
+  return m ? { hour: Number(m[1]), minute: Number(m[2]) } : null;
+}
+
+export function joinTime(hour: number, minute: number): string {
+  const h = ((Math.round(hour) % 24) + 24) % 24;
+  const m = ((Math.round(minute) % 60) + 60) % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+/** Nearest 5-minute mark at or below (for highlighting the minute grid). */
+export function roundTo5(minute: number): number {
+  return Math.floor(Math.max(0, Math.min(59, minute)) / 5) * 5;
+}

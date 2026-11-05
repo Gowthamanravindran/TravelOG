@@ -8,11 +8,13 @@ import {
   tapRange,
   WEEKDAYS,
   type DateRange,
+  joinTime,
+  roundTo5,
+  splitTime,
 } from '@travelog/core';
-import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { radius, type } from '@travelog/ui';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shortDate } from '@/lib/format';
@@ -162,7 +164,7 @@ export function DateRangeField({
   );
 }
 
-/** A time 'HH:MM' using the phone's own clock picker. */
+/** A time 'HH:MM' picked on our own time sheet (works in every build and in Expo Go). */
 export function TimeField({
   label,
   value,
@@ -174,29 +176,7 @@ export function TimeField({
   onChange: (time: string) => void;
   placeholder?: string;
 }) {
-  const [iosOpen, setIosOpen] = useState(false);
-  const current = () => {
-    const d = new Date();
-    const [h, m] = (value || '09:00').split(':').map(Number);
-    d.setHours(h ?? 9, m ?? 0, 0, 0);
-    return d;
-  };
-  const fmt = (d: Date) =>
-    `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  const open = () => {
-    if (Platform.OS === 'android') {
-      DateTimePickerAndroid.open({
-        value: current(),
-        mode: 'time',
-        is24Hour: true,
-        onChange: (e, d) => {
-          if (e.type === 'set' && d) onChange(fmt(d));
-        },
-      });
-    } else {
-      setIosOpen(true);
-    }
-  };
+  const [open, setOpen] = useState(false);
   return (
     <>
       <FieldShell
@@ -204,20 +184,138 @@ export function TimeField({
         value={value || null}
         placeholder={placeholder}
         icon="today"
-        onPress={open}
+        onPress={() => setOpen(true)}
         onClear={() => onChange('')}
       />
-      {Platform.OS === 'ios' && iosOpen ? (
-        <DateTimePicker
-          value={current()}
-          mode="time"
-          display="spinner"
-          onChange={(_e, d) => {
-            if (d) onChange(fmt(d));
-          }}
-        />
-      ) : null}
+      <TimeSheet
+        visible={open}
+        title={label}
+        value={value}
+        onClose={() => setOpen(false)}
+        onDone={(time) => {
+          onChange(time);
+          setOpen(false);
+        }}
+      />
     </>
+  );
+}
+
+const HOURS = Array.from({ length: 24 }, (_, h) => h);
+const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5);
+
+/** Bottom sheet: tap an hour, tap the minutes (5-minute steps, − / + for exact). */
+export function TimeSheet({
+  visible,
+  title,
+  value,
+  onClose,
+  onDone,
+}: {
+  visible: boolean;
+  title: string;
+  value: string;
+  onClose: () => void;
+  onDone: (time: string) => void;
+}) {
+  const t = useTheme();
+  const insets = useSafeAreaInsets();
+  const initial = () => splitTime(value) ?? { hour: 9, minute: 0 };
+  const [picked, setPicked] = useState(initial);
+  const [wasVisible, setWasVisible] = useState(visible);
+  if (visible !== wasVisible) {
+    setWasVisible(visible);
+    if (visible) setPicked(initial());
+  }
+
+  const cell = (selected: boolean, label: string, a11y: string, onPress: () => void) => (
+    <Pressable
+      key={a11y}
+      accessibilityRole="button"
+      accessibilityLabel={a11y}
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={[styles.timeCell, { backgroundColor: selected ? t.accent : t.surface2 }]}
+    >
+      <Text
+        style={[
+          type.body,
+          { color: selected ? t.onAccent : t.ink, fontWeight: selected ? '700' : '400' },
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+  const step = (by: number) =>
+    setPicked((p) => {
+      const total = (p.hour * 60 + p.minute + by + 1440) % 1440;
+      return { hour: Math.floor(total / 60), minute: total % 60 };
+    });
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close time picker" />
+      <View
+        style={[
+          styles.sheet,
+          { backgroundColor: t.surface, paddingBottom: Math.max(insets.bottom, 16) },
+        ]}
+      >
+        <View style={[styles.grabber, { backgroundColor: t.line }]} />
+        <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{title}</Text>
+        <View style={styles.monthRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="One minute earlier"
+            onPress={() => step(-1)}
+            hitSlop={10}
+            style={[styles.navBtn, { backgroundColor: t.surface2 }]}
+          >
+            <Icon name="remove" size={20} color={t.ink} />
+          </Pressable>
+          <Text style={[type.display, { color: t.ink, fontSize: 40, lineHeight: 46 }]}>
+            {joinTime(picked.hour, picked.minute)}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="One minute later"
+            onPress={() => step(1)}
+            hitSlop={10}
+            style={[styles.navBtn, { backgroundColor: t.surface2 }]}
+          >
+            <Icon name="add" size={20} color={t.ink} />
+          </Pressable>
+        </View>
+        <Text style={[type.caption, { color: t.ink2 }]}>Hour</Text>
+        <View style={styles.timeGrid}>
+          {HOURS.map((h) =>
+            cell(picked.hour === h, String(h).padStart(2, '0'), `Hour ${h}`, () =>
+              setPicked((p) => ({ ...p, hour: h })),
+            ),
+          )}
+        </View>
+        <Text style={[type.caption, { color: t.ink2 }]}>Minutes</Text>
+        <View style={styles.timeGrid}>
+          {MINUTES.map((m) =>
+            cell(
+              roundTo5(picked.minute) === m,
+              `:${String(m).padStart(2, '0')}`,
+              `Minute ${m}`,
+              () => setPicked((p) => ({ ...p, minute: m })),
+            ),
+          )}
+        </View>
+        <View style={styles.actions}>
+          <View style={{ flex: 1 }}>
+            <Button label="Cancel" variant="ghost" onPress={onClose} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button label="Done" onPress={() => onDone(joinTime(picked.hour, picked.minute))} />
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -413,4 +511,13 @@ const styles = StyleSheet.create({
   cell: { flex: 1, alignItems: 'center', paddingVertical: 2 },
   day: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 8 },
+  timeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  timeCell: {
+    width: '14.6%',
+    minWidth: 44,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

@@ -4,7 +4,6 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/ui": "~58.0.27",
-    "@react-native-community/datetimepicker": "9.2.1",
     "@travelog/core": "workspace:*",
     "@travelog/db": "workspace:*",
     "@travelog/ui": "workspace:*",

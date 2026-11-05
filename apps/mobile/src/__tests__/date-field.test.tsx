@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { DateField, DateRangeField } from '@/ui/date-field';
+import { DateField, DateRangeField, TimeField } from '@/ui/date-field';
 import { ModeProvider as Mode } from '@/ui/theme';
 
 const metrics = {
@@ -18,12 +18,6 @@ function ModeProvider({ mode, children }: { mode: 'home'; children: React.ReactN
     </SafeAreaProvider>
   );
 }
-
-jest.mock('@react-native-community/datetimepicker', () => ({
-  __esModule: true,
-  default: () => null,
-  DateTimePickerAndroid: { open: jest.fn() },
-}));
 
 function RangeHarness() {
   const [r, setR] = useState({ start: '2026-11-15', end: '2026-11-16' });
@@ -66,5 +60,21 @@ describe('date fields', () => {
     await fireEvent.press(screen.getByRole('button', { name: '2 Jan 2027' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Done' }));
     expect(onChange).toHaveBeenCalledWith('2027-01-02');
+  });
+
+  it('picks a time on the time sheet, with exact minutes', async () => {
+    const onChange = jest.fn();
+    await render(
+      <ModeProvider mode="home">
+        <TimeField label="Time" value="" onChange={onChange} />
+      </ModeProvider>,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: /^Time:/ }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Hour 18' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Minute 35' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'One minute later' }));
+    expect(screen.getByText('18:36')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Done' }));
+    expect(onChange).toHaveBeenCalledWith('18:36');
   });
 });
