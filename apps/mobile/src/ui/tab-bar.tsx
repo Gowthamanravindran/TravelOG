@@ -26,7 +26,7 @@ export function ModeTabBar({
 }: BottomTabBarProps & { tabs: TabSpec[]; center?: { label: string; onPress: () => void } }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
-  const dark = t.scheme === 'dark' || t.mode === 'trip';
+  const bar = t.tabBar;
 
   const items = tabs.map((tab) => {
     const index = state.routes.findIndex((r) => r.name === tab.name);
@@ -43,14 +43,14 @@ export function ModeTabBar({
         }}
         style={styles.item}
       >
-        <View style={[styles.pill, focused && { backgroundColor: t.accentSoft }]}>
-          <Icon name={tab.icon} size={22} color={focused ? t.accent : t.ink2} />
+        <View style={[styles.pill, focused && { backgroundColor: bar.activeBg }]}>
+          <Icon name={tab.icon} size={22} color={focused ? bar.activeFg : bar.fg} />
         </View>
         <Text
           numberOfLines={1}
           style={[
             type.caption,
-            { color: focused ? t.accent : t.ink2, ...font('text', focused ? 600 : 500) },
+            { color: focused ? bar.activeLabel : bar.fg, ...font('text', focused ? 600 : 500) },
           ]}
         >
           {tab.label}
@@ -80,7 +80,7 @@ export function ModeTabBar({
         >
           <Icon name="add" size={28} color={t.onAccent} />
         </Pressable>
-        <Text numberOfLines={1} style={[type.caption, { color: t.ink2, ...font('text', 600) }]}>
+        <Text numberOfLines={1} style={[type.caption, { color: bar.fg, ...font('text', 600) }]}>
           {center.label}
         </Text>
       </View>,
@@ -92,12 +92,13 @@ export function ModeTabBar({
       style={[styles.outer, { backgroundColor: t.bg, paddingBottom: Math.max(insets.bottom, 12) }]}
     >
       <View
+        testID="tab-bar"
         style={[
           styles.bar,
           {
-            backgroundColor: t.surface,
-            borderColor: t.line,
-            shadowOpacity: dark ? 0.45 : 0.12,
+            backgroundColor: bar.bg,
+            borderColor: bar.line ?? bar.bg,
+            shadowOpacity: t.scheme === 'dark' ? 0.3 : 0.08,
           },
         ]}
       >
@@ -118,8 +119,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 8,
     shadowColor: '#000',
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
     elevation: 12,
   },
   item: { flex: 1, alignItems: 'center', gap: 3, minHeight: 48 },
@@ -137,10 +138,10 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -34,
+    marginTop: -26,
     marginBottom: -2,
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 10,
   },

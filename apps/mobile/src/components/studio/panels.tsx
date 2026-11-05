@@ -237,7 +237,7 @@ export function SlidesPanel({
         <Button
           label="Remove this slide"
           small
-          variant="ghost"
+          variant="secondary"
           danger
           onPress={onRemove}
           disabled={doc.slides <= 1}
@@ -248,7 +248,7 @@ export function SlidesPanel({
           label="Move left"
           icon="left"
           small
-          variant="ghost"
+          variant="secondary"
           onPress={() => onMove(current - 1)}
           disabled={current === 0}
         />
@@ -256,7 +256,7 @@ export function SlidesPanel({
           label="Move right"
           icon="right"
           small
-          variant="ghost"
+          variant="secondary"
           onPress={() => onMove(current + 1)}
           disabled={current >= doc.slides - 1}
         />
@@ -298,7 +298,7 @@ export function LayerPanel({
                 <Button
                   label="Zoom out"
                   icon="remove"
-                  variant="ghost"
+                  variant="secondary"
                   small
                   onPress={() =>
                     onPatch({
@@ -309,7 +309,7 @@ export function LayerPanel({
                 <Button
                   label="Zoom in"
                   icon="add"
-                  variant="ghost"
+                  variant="secondary"
                   small
                   onPress={() =>
                     onPatch({
@@ -323,7 +323,7 @@ export function LayerPanel({
               label={cropping ? 'Done cropping' : 'Crop'}
               icon={cropping ? 'check' : 'crop'}
               small
-              variant={cropping ? 'primary' : 'ghost'}
+              variant={cropping ? 'primary' : 'secondary'}
               onPress={onToggleCrop}
               disabled={!layer.photoId}
             />

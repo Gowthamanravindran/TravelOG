@@ -104,7 +104,7 @@ export function ShareActions({
       />
       <Button
         label={label('igsave', 'Save & open Instagram')}
-        variant="ghost"
+        variant="secondary"
         disabled={!!busy || (targets?.native === true && !targets.instagram)}
         onPress={() => run('igsave', () => saveAndOpenInstagram(files), igMessage)}
       />
@@ -117,7 +117,7 @@ export function ShareActions({
       {targets?.story ? (
         <Button
           label={label('story', `Instagram Story · slide ${current + 1}`)}
-          variant="ghost"
+          variant="secondary"
           disabled={!!busy || !storyFile}
           onPress={() =>
             run(
@@ -137,7 +137,7 @@ export function ShareActions({
       <Button
         label={label('fb', 'Share to Facebook')}
         icon="share"
-        variant="ghost"
+        variant="secondary"
         disabled={
           !!busy || (targets?.native === true && Platform.OS === 'android' && !targets.facebook)
         }
@@ -152,7 +152,7 @@ export function ShareActions({
       <Button
         label={label('save', 'Save all to gallery')}
         icon="download"
-        variant="ghost"
+        variant="secondary"
         disabled={!!busy}
         onPress={() =>
           run(
@@ -165,7 +165,7 @@ export function ShareActions({
       <Button
         label={label('more', 'More apps…')}
         icon="share"
-        variant="ghost"
+        variant="secondary"
         disabled={!!busy}
         onPress={() =>
           run(

@@ -87,7 +87,7 @@ export default function Settle() {
                   ) : null}
                   <Button
                     label="Mark as paid"
-                    variant="ghost"
+                    variant="secondary"
                     small
                     onPress={() => markPaid(x.fromMemberId, x.toMemberId, x.amountMinor, 'cash')}
                   />

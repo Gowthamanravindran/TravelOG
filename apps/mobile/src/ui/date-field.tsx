@@ -308,7 +308,7 @@ export function TimeSheet({
         </View>
         <View style={styles.actions}>
           <View style={{ flex: 1 }}>
-            <Button label="Cancel" variant="ghost" onPress={onClose} />
+            <Button label="Cancel" variant="secondary" onPress={onClose} />
           </View>
           <View style={{ flex: 1 }}>
             <Button label="Done" onPress={() => onDone(joinTime(picked.hour, picked.minute))} />
@@ -461,7 +461,7 @@ export function CalendarSheet({
 
         <View style={styles.actions}>
           <View style={{ flex: 1 }}>
-            <Button label="Cancel" variant="ghost" onPress={onClose} />
+            <Button label="Cancel" variant="secondary" onPress={onClose} />
           </View>
           <View style={{ flex: 1 }}>
             <Button label="Done" onPress={() => onDone(picked)} disabled={!ready} />

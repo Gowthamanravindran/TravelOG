@@ -249,7 +249,7 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
             <Button
               label="Add stop"
               icon="add"
-              variant="ghost"
+              variant="secondary"
               onPress={() => router.push(`/trip/${tripId}/item?variantId=${variant.id}`)}
             />
           ) : null}

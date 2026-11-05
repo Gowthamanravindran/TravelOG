@@ -28,7 +28,7 @@ export default function ProfileScreen() {
           Home currency {profile?.homeCurrency}
           {profile?.upiId ? ` · UPI ${profile.upiId}` : ''}
         </Body>
-        <Button label="Edit" variant="ghost" small onPress={() => router.push('/welcome')} />
+        <Button label="Edit" variant="secondary" small onPress={() => router.push('/welcome')} />
       </Card>
       <Card>
         <Between>

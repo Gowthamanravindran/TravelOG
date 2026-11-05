@@ -16,7 +16,8 @@ function pairs(t: Theme): [string, string, string][] {
   for (const [k, v] of Object.entries(t.tiles)) out.push([`tile ${k}`, v.fg, v.bg]);
   out.push(
     ['tab icon', t.tabBar.fg, t.tabBar.bg],
-    ['active tab', t.tabBar.activeFg, t.tabBar.activeBg],
+    ['active tab icon', t.tabBar.activeFg, t.tabBar.activeBg],
+    ['active tab label', t.tabBar.activeLabel, t.tabBar.bg],
   );
   out.push(['success on card', t.success, t.surface], ['danger on card', t.danger, t.surface]);
   return out;

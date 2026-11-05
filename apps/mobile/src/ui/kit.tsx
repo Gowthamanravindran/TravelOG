@@ -1,6 +1,7 @@
-import { radius, spacing, type } from '@travelog/ui';
-import type { ReactNode } from 'react';
+import { radius, spacing, type, type TileFamily } from '@travelog/ui';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
+  AccessibilityInfo,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -39,6 +40,22 @@ export function Screen({
   );
 }
 
+/** Press feedback (Plan 26): a small shrink and darken, none when reduce motion is on. */
+function usePressStyle() {
+  const [still, setStill] = useState(false);
+  useEffect(() => {
+    let live = true;
+    AccessibilityInfo.isReduceMotionEnabled?.()
+      .then((on) => live && setStill(on))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  return (pressed: boolean): ViewStyle =>
+    pressed ? (still ? { opacity: 0.85 } : { opacity: 0.9, transform: [{ scale: 0.97 }] }) : {};
+}
+
 export function H1({ children, eyebrow }: { children: ReactNode; eyebrow?: string }) {
   const t = useTheme();
   return (
@@ -48,7 +65,13 @@ export function H1({ children, eyebrow }: { children: ReactNode; eyebrow?: strin
           {eyebrow}
         </Text>
       ) : null}
-      <Text accessibilityRole="header" style={[type.display, { color: t.ink }]}>
+      <Text
+        accessibilityRole="header"
+        style={[
+          type.display,
+          { color: t.ink, fontSize: t.displaySize, lineHeight: t.displaySize + 6 },
+        ]}
+      >
         {children}
       </Text>
     </View>
@@ -108,6 +131,7 @@ export function Card({
   accessibilityLabel?: string;
 }) {
   const t = useTheme();
+  const press = usePressStyle();
   const base = [styles.card, { backgroundColor: t.surface, borderColor: t.line }, style];
   if (!onPress) return <View style={base}>{children}</View>;
   return (
@@ -115,7 +139,7 @@ export function Card({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
-      style={({ pressed }) => [...base, pressed && { opacity: 0.85 }]}
+      style={({ pressed }) => [...base, press(pressed)]}
     >
       {children}
     </Pressable>
@@ -136,7 +160,8 @@ export function Button({
   /** Icon before the label (or alone when the label is empty). */
   icon?: IconName;
   onPress: () => void;
-  variant?: 'primary' | 'ghost' | 'link';
+  /** One filled button per view marks the main action; everything else is secondary. */
+  variant?: 'primary' | 'secondary' | 'link';
   disabled?: boolean;
   small?: boolean;
   danger?: boolean;
@@ -144,6 +169,7 @@ export function Button({
   accessibilityLabel?: string;
 }) {
   const t = useTheme();
+  const press = usePressStyle();
   if (variant === 'link') {
     return (
       <Pressable
@@ -163,9 +189,9 @@ export function Button({
       </Pressable>
     );
   }
-  const primary = variant === 'primary';
-  const bg = danger ? t.danger : primary ? t.accent : t.surface2;
-  const fg = primary || danger ? t.onAccent : t.ink;
+  const filled = variant === 'primary' || danger;
+  const bg = danger ? t.danger : filled ? t.accent : 'transparent';
+  const fg = filled ? t.onAccent : t.ink;
   return (
     <Pressable
       accessibilityRole="button"
@@ -178,7 +204,9 @@ export function Button({
       style={({ pressed }) => [
         styles.button,
         small && styles.buttonSmall,
-        { backgroundColor: bg, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 },
+        { backgroundColor: bg },
+        !filled && { borderWidth: 1, borderColor: t.line },
+        disabled ? { opacity: 0.5 } : press(pressed),
       ]}
     >
       <View style={styles.inline}>
@@ -205,13 +233,13 @@ export function Chip({
   const t = useTheme();
   const content = (
     <View style={styles.inline}>
-      {icon ? <Icon name={icon} size={16} color={selected ? t.onAccent : t.ink2} /> : null}
-      <Text style={[type.label, { color: selected ? t.onAccent : t.ink }]} numberOfLines={1}>
+      {icon ? <Icon name={icon} size={16} color={selected ? t.accent : t.ink2} /> : null}
+      <Text style={[type.label, { color: selected ? t.accent : t.ink }]} numberOfLines={1}>
         {label}
       </Text>
     </View>
   );
-  const style = [styles.chip, { backgroundColor: selected ? t.accent : t.surface2 }];
+  const style = [styles.chip, { backgroundColor: selected ? t.accentSoft : t.surface2 }];
   if (!onPress) return <View style={style}>{content}</View>;
   return (
     <Pressable
@@ -372,25 +400,30 @@ export function IconTile({
   icon,
   size = 40,
   tint,
+  family,
 }: {
   icon: IconName;
   size?: number;
   /** Icon colour; the tile uses the mode's soft accent behind it. */
   tint?: string;
+  /** Colours the tile by what it shows (flights sea, stays clay…), from the theme. */
+  family?: TileFamily;
 }) {
   const t = useTheme();
+  const colours = family ? t.tiles[family] : { bg: t.accentSoft, fg: tint ?? t.accent };
   return (
     <View
+      testID="icon-tile"
       style={{
         width: size,
         height: size,
-        borderRadius: size * 0.32,
-        backgroundColor: t.accentSoft,
+        borderRadius: radius.tile,
+        backgroundColor: colours.bg,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Icon name={icon} size={size * 0.52} color={tint ?? t.accent} />
+      <Icon name={icon} size={size * 0.52} color={colours.fg} />
     </View>
   );
 }
@@ -458,7 +491,7 @@ const styles = StyleSheet.create({
   eyebrow: { textTransform: 'uppercase', letterSpacing: 0.8 },
   card: { borderWidth: 1, borderRadius: radius.card, padding: spacing.lg, gap: spacing.sm },
   button: {
-    minHeight: 48,
+    minHeight: 44,
     borderRadius: radius.button,
     alignItems: 'center',
     justifyContent: 'center',

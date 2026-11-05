@@ -337,7 +337,7 @@ export function MemoriesView({ tripId }: { tripId: string }) {
               <Button
                 label="Delete"
                 icon="remove"
-                variant="ghost"
+                variant="secondary"
                 danger
                 onPress={removeSelected}
               />

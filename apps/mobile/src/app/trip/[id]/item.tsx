@@ -120,7 +120,7 @@ export default function ItemEditor() {
         {existing ? (
           <Button
             label="Remove from plan"
-            variant="ghost"
+            variant="secondary"
             danger
             onPress={() => {
               mutate((db) => deleteItem(db, existing.id));

@@ -158,7 +158,7 @@ export default function TodayTab() {
           <Button
             label="Check in"
             icon="checkIn"
-            variant="ghost"
+            variant="secondary"
             onPress={() => router.push(`/trip/${id}/check-in`)}
           />
         </View>
@@ -166,7 +166,7 @@ export default function TodayTab() {
           <Button
             label="Tickets"
             icon="bookings"
-            variant="ghost"
+            variant="secondary"
             onPress={() => router.push(`/trip/${id}/plan/bookings`)}
           />
         </View>
@@ -222,7 +222,7 @@ export default function TodayTab() {
               <Button
                 label={checkingIn === item.id ? 'Checking in…' : "I'm here"}
                 icon="checkIn"
-                variant="ghost"
+                variant="secondary"
                 small
                 disabled={checkingIn !== null}
                 onPress={() => imHere(item.id, item.title)}

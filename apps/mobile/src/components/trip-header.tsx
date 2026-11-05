@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useQuery } from '@/data/provider';
 import { dateRange } from '@/lib/format';
-import { tripIcon } from '@/lib/labels';
+import { tripIcon, tripIconFamily } from '@/lib/labels';
 import { useTripId } from '@/lib/use-trip-id';
 import { Icon, type IconName } from '@/ui/icon';
 import { useMode, useTheme } from '@/ui/theme';
@@ -44,6 +44,12 @@ export function TripHeader() {
     .filter(Boolean)
     .join(' · ');
 
+  // Sunset draws the header on a band of the mode tint; chips and the tile then sit on the card colour.
+  const ground = t.band ?? t.bg;
+  const chipBg = t.band ? t.surface : t.surface2;
+  const icon = tripIcon(trip.emoji);
+  const tile = t.tiles[tripIconFamily(icon)];
+
   const roundButton = (icon: IconName, label: string, onPress: () => void) => (
     <Pressable
       accessibilityRole="button"
@@ -55,7 +61,7 @@ export function TripHeader() {
         height: 40,
         borderRadius: 20,
         backgroundColor: t.surface,
-        borderWidth: 1,
+        borderWidth: t.band ? 0 : 1,
         borderColor: t.line,
         alignItems: 'center',
         justifyContent: 'center',
@@ -75,7 +81,7 @@ export function TripHeader() {
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 999,
-        backgroundColor: strong ? t.accentSoft : t.surface2,
+        backgroundColor: strong && !t.band ? t.accentSoft : chipBg,
       }}
     >
       <Icon name={icon} size={14} color={strong ? t.accent : t.ink2} />
@@ -97,8 +103,18 @@ export function TripHeader() {
         : null;
 
   return (
-    <SafeAreaView edges={['top']} style={{ backgroundColor: t.bg }}>
-      <View style={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: 12, gap: 12 }}>
+    <SafeAreaView
+      edges={['top']}
+      testID="trip-header"
+      style={{
+        backgroundColor: ground,
+        borderBottomLeftRadius: t.band ? 26 : 0,
+        borderBottomRightRadius: t.band ? 26 : 0,
+      }}
+    >
+      <View
+        style={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: t.band ? 18 : 12, gap: 12 }}
+      >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           {roundButton('back', mode === 'trip' ? 'Exit trip mode' : 'Back to trips', () =>
             router.navigate('/'),
@@ -133,12 +149,16 @@ export function TripHeader() {
               width: 60,
               height: 60,
               borderRadius: 20,
-              backgroundColor: t.accentSoft,
+              backgroundColor: t.band ? t.surface : tile.bg,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Icon name={tripIcon(trip.emoji)} size={32} color={t.accent} />
+            <Icon
+              name={icon}
+              size={32}
+              color={tile.fg === '#FFFFFF' && t.band ? tile.bg : tile.fg}
+            />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={[type.display, { color: t.ink }]} numberOfLines={1}>

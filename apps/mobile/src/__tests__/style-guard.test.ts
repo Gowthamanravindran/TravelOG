@@ -50,3 +50,10 @@ it('no fontWeight outside collage content (Android ignores it with custom fonts)
     );
   expect(offenders).toEqual([]);
 });
+
+it('no ghost buttons (one outlined secondary style, Plan 26)', () => {
+  const offenders = files(path.join(__dirname, '..')).filter((f) =>
+    fs.readFileSync(f, 'utf8').includes('variant="ghost"'),
+  );
+  expect(offenders.map((f) => path.basename(f))).toEqual([]);
+});

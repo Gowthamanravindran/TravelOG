@@ -143,7 +143,7 @@ export function BudgetView({
               <Button
                 label={groupBudget > 0 ? 'Edit budget' : 'Set budget'}
                 icon="budget"
-                variant="ghost"
+                variant="secondary"
                 onPress={startEdit}
               />
             </View>
@@ -172,7 +172,7 @@ export function BudgetView({
           <ErrorText>{error}</ErrorText>
           <Row>
             <View style={{ flex: 1 }}>
-              <Button label="Cancel" variant="ghost" onPress={() => setEditing(false)} />
+              <Button label="Cancel" variant="secondary" onPress={() => setEditing(false)} />
             </View>
             <View style={{ flex: 1 }}>
               <Button label="Save budget" onPress={saveBudget} />

@@ -229,7 +229,7 @@ function BookingForm({ tripId, bookingId }: { tripId: string; bookingId?: string
       {existing ? (
         <Button
           label="Delete booking"
-          variant="ghost"
+          variant="secondary"
           danger
           onPress={() => {
             mutate((db) => deleteBooking(db, existing.id));

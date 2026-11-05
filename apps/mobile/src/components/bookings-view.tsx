@@ -62,7 +62,10 @@ export function BookingsView({ tripId }: { tripId: string }) {
               accessibilityLabel={b.title}
             >
               <Row style={{ gap: 12, alignItems: 'flex-start' }}>
-                <IconTile icon={BOOKING_LABELS[b.type].icon} />
+                <IconTile
+                  icon={BOOKING_LABELS[b.type].icon}
+                  family={BOOKING_LABELS[b.type].family}
+                />
                 <View style={{ flex: 1, gap: 2 }}>
                   <Between>
                     <Body small style={{ color: t.accent, ...font('text', 600) }}>

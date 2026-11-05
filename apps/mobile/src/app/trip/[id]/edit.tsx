@@ -127,7 +127,7 @@ export default function EditTrip() {
           <Button
             label="Add person"
             icon="personAdd"
-            variant="ghost"
+            variant="secondary"
             disabled={!newName.trim()}
             onPress={() =>
               run(() => {
@@ -144,14 +144,14 @@ export default function EditTrip() {
         {tripState(trip) === 'live' ? (
           <Button
             label="End trip now"
-            variant="ghost"
+            variant="secondary"
             onPress={() => run(() => mutate((db) => endTrip(db, id)))}
           />
         ) : null}
         {confirmDelete ? (
           <Row>
             <View style={{ flex: 1 }}>
-              <Button label="Keep it" variant="ghost" onPress={() => setConfirmDelete(false)} />
+              <Button label="Keep it" variant="secondary" onPress={() => setConfirmDelete(false)} />
             </View>
             <View style={{ flex: 1 }}>
               <Button
@@ -169,7 +169,7 @@ export default function EditTrip() {
         ) : (
           <Button
             label="Delete trip"
-            variant="ghost"
+            variant="secondary"
             danger
             onPress={() => setConfirmDelete(true)}
           />

@@ -65,7 +65,7 @@ export function PeopleCard({ tripId, startOpen = false }: { tripId: string; star
           <ErrorText>{error}</ErrorText>
           <Row>
             <View style={{ flex: 1 }}>
-              <Button label="Done" variant="ghost" onPress={() => setAdding(false)} />
+              <Button label="Done" variant="secondary" onPress={() => setAdding(false)} />
             </View>
             <View style={{ flex: 1 }}>
               <Button label="Add" onPress={add} disabled={!name.trim()} />

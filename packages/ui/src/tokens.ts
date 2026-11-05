@@ -32,7 +32,15 @@ export interface Theme {
   onAccent: string;
   /** Header band fill behind the trip header, or null for none. */
   band: string | null;
-  tabBar: { bg: string; fg: string; activeBg: string; activeFg: string; line: string | null };
+  /** activeFg sits on the active pill; activeLabel is the active tab's label on the bar. */
+  tabBar: {
+    bg: string;
+    fg: string;
+    activeBg: string;
+    activeFg: string;
+    activeLabel: string;
+    line: string | null;
+  };
   tiles: Record<TileFamily, { bg: string; fg: string }>;
   categories: Record<CategoryKey, string>;
   /** Size of screen titles (display style). */
@@ -78,8 +86,22 @@ export function themeFor(
     onAccent,
     band: data.band ? accentSoft : null,
     tabBar: data.inkTabBar
-      ? { bg: '#141414', fg: '#C9C9C4', activeBg: accent, activeFg: onAccent, line: null }
-      : { bg: n.surface, fg: n.ink2, activeBg: accentSoft, activeFg: accent, line: n.line },
+      ? {
+          bg: '#141414',
+          fg: '#C9C9C4',
+          activeBg: accent,
+          activeFg: onAccent,
+          activeLabel: '#FFFFFF',
+          line: null,
+        }
+      : {
+          bg: n.surface,
+          fg: n.ink2,
+          activeBg: accentSoft,
+          activeFg: accent,
+          activeLabel: accent,
+          line: n.line,
+        },
     tiles,
     categories: {
       stay: strong(tiles.clay),
@@ -95,7 +117,7 @@ export function themeFor(
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, xxxl: 48 } as const;
 
-export const radius = { chip: 999, button: 14, card: 20, sheet: 28 } as const;
+export const radius = { chip: 999, button: 999, card: 16, tile: 12, sheet: 28 } as const;
 
 /** Loaded font faces (Plan 26). Android ignores fontWeight on custom fonts, so each weight is its own family. */
 export const fonts = {

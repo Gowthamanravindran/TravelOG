@@ -217,7 +217,7 @@ function Editor() {
           label=""
           icon="undo"
           accessibilityLabel="Undo"
-          variant="ghost"
+          variant="secondary"
           small
           onPress={editor.undo}
           disabled={!editor.canUndo}
@@ -226,7 +226,7 @@ function Editor() {
           label=""
           icon="redo"
           accessibilityLabel="Redo"
-          variant="ghost"
+          variant="secondary"
           small
           onPress={editor.redo}
           disabled={!editor.canRedo}
@@ -477,7 +477,7 @@ function Editor() {
                     label="Trip stats card"
                     icon="stats"
                     small
-                    variant="ghost"
+                    variant="secondary"
                     onPress={() =>
                       place((cx, cy) => ({
                         id: newId(),

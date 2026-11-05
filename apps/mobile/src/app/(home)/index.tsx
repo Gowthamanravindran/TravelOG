@@ -1,6 +1,8 @@
 import { getLocalProfile, listTrips, type TripWithState } from '@travelog/db';
 import { useRouter } from 'expo-router';
+import { spacing } from '@travelog/ui';
 import { useState } from 'react';
+import { View } from 'react-native';
 
 import { TripCard } from '@/components/trip-card';
 import { useQuery } from '@/data/provider';
@@ -31,7 +33,22 @@ export default function TripsScreen() {
 
   return (
     <Screen>
-      <H1 eyebrow={`Hi ${profile?.displayName ?? 'there'}`}>Your trips</H1>
+      <View
+        style={
+          t.band
+            ? {
+                backgroundColor: t.band,
+                marginHorizontal: -spacing.lg,
+                marginTop: -spacing.lg,
+                padding: spacing.lg,
+                borderBottomLeftRadius: 26,
+                borderBottomRightRadius: 26,
+              }
+            : undefined
+        }
+      >
+        <H1 eyebrow={`Hi ${profile?.displayName ?? 'there'}`}>Your trips</H1>
+      </View>
       {live ? (
         <Card
           onPress={() => open(live)}
