@@ -37,3 +37,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 31 | [Add bookings from a document, read on the phone](31-booking-documents.md) | see git log |
 | 32 | [No bounce; the booking form scrolls again](32-no-bounce.md) | see git log |
 | 33 | [Slide-ins land smoothly (no jump at the end)](33-smooth-slide-in.md) | see git log |
+| 34 | [Attachments open again](34-open-attachments.md) | see git log |

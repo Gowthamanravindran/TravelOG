@@ -337,7 +337,12 @@ function BookingForm({
                 icon="attach"
                 variant="link"
                 onPress={() =>
-                  f.localUri && openAttachment(f.localUri).catch((e) => setError(errorMessage(e)))
+                  f.localUri &&
+                  openAttachment({
+                    localUri: f.localUri,
+                    mimeType: f.mimeType,
+                    name: f.name,
+                  }).catch((e) => setError(errorMessage(e)))
                 }
               />
               <Button
