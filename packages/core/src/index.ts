@@ -14,3 +14,4 @@ export * from './places';
 export * from './pdf';
 export * from './booking-parse';
 export * from './whereabouts';
+export * from './booking-tables';

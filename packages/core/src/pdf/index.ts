@@ -1,1 +1,1 @@
-export { extractPdfText, isPdf } from './text';
+export { extractPdfLayout, extractPdfText, isPdf, type PdfCell, type PdfLine } from './text';

@@ -5,7 +5,7 @@ import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { describe, expect, it } from 'vitest';
 
-import { extractPdfText, isPdf } from './index';
+import { extractPdfLayout, extractPdfText, isPdf } from './index';
 
 const require = createRequire(import.meta.url);
 
@@ -138,4 +138,58 @@ describe('extractPdfText', () => {
       extractPdfText(Uint8Array.from('%PDF-1.7\n1 0 obj << /Type', (c) => c.charCodeAt(0))),
     ).toEqual([]);
   });
+
+  it('spaces words in Type 3 fonts, whose widths use the font’s own units (Plan 38)', () => {
+    // 1100 units at 1/2048 is about half an em: "AB" ends near x=62.9, so "BA" at x=67
+    // is one word space away. Read as thousandths, "AB" would wrongly reach x=76.
+    const content = 'BT /F1 12 Tf 50 800 Td (AB) Tj 17 0 Td (BA) Tj ET';
+    expect(extractPdfText(type3Pdf(content))).toEqual(['AB BA']);
+  });
+
+  it('turns ligatures into plain letters ("conﬁrmation" → "confirmation")', () => {
+    // Code 66 is drawn with the "ﬁ" ligature glyph (U+FB01).
+    const content = 'BT /F1 12 Tf 50 800 Td (AB) Tj ET';
+    expect(extractPdfText(type3Pdf(content, '/Encoding << /Differences [66 /uniFB01] >>'))).toEqual(
+      ['Afi'],
+    );
+  });
+
+  it('keeps each column as a cell with its position', async () => {
+    const bytes = await make([
+      {
+        lines: [
+          ['CHECK-IN', 300, 700],
+          ['CHECK-OUT', 400, 700],
+          ['20', 302, 680],
+          ['24', 402, 680],
+        ],
+      },
+    ]);
+    const [page] = extractPdfLayout(bytes);
+    expect(page!.map((l) => l.cells.map((c) => [Math.round(c.x), c.text]))).toEqual([
+      [
+        [300, 'CHECK-IN'],
+        [400, 'CHECK-OUT'],
+      ],
+      [
+        [302, '20'],
+        [402, '24'],
+      ],
+    ]);
+  });
 });
+
+/** A one-page PDF using a Type 3 font with a 1/2048 FontMatrix. */
+function type3Pdf(content: string, extra = ''): Uint8Array {
+  const objs = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+    `<< /Length ${content.length} >>\nstream\n${content}\nendstream`,
+    `<< /Type /Font /Subtype /Type3 /FontMatrix [0.000488 0 0 -0.000488 0 0] /FontBBox [0 0 1000 1000] /CharProcs << >> /FirstChar 65 /LastChar 66 /Widths [1100 1100] ${extra}>>`,
+  ];
+  let out = '%PDF-1.4\n';
+  objs.forEach((o, i) => (out += `${i + 1} 0 obj\n${o}\nendobj\n`));
+  out += 'trailer\n<< /Root 1 0 R >>\n%%EOF\n';
+  return Uint8Array.from(out, (c) => c.charCodeAt(0));
+}

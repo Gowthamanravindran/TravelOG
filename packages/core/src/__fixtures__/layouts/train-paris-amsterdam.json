@@ -1,0 +1,1349 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      { "y": 785.6, "size": 8.3, "cells": [{ "x": 26.1, "end": 71.5, "text": "PASSENGER" }] },
+      { "y": 768.8, "size": 9, "cells": [{ "x": 26.1, "end": 115.1, "text": "VIKRAM SHAH" }] },
+      {
+        "y": 750.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 212.6, "end": 278.6, "text": "TICKET ISSUE DATE" },
+          { "x": 368.5, "end": 415.2, "text": "TRAVEL DATE" },
+          { "x": 490.4, "end": 548.3, "text": "REFERENCE/PNR" }
+        ]
+      },
+      {
+        "y": 740.8,
+        "size": 6.8,
+        "cells": [
+          { "x": 26.1, "end": 115, "text": "YOUR TRIP" },
+          { "x": 212.6, "end": 248, "text": "26/10/2024" },
+          { "x": 368.5, "end": 415.2, "text": "24/12/2024" },
+          { "x": 490.4, "end": 528.8, "text": "ZB5KWN" }
+        ]
+      },
+      {
+        "y": 708.1,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 460.2, "text": "PRICE INCL. VAT" }]
+      },
+      {
+        "y": 704.3,
+        "size": 9.8,
+        "cells": [
+          { "x": 39.1, "end": 95.8, "text": "PARIS NORD" },
+          { "x": 219.7, "end": 332.9, "text": "AMSTERDAM CENTRAAL" }
+        ]
+      },
+      { "y": 697.8, "size": 9, "cells": [{ "x": 405.4, "end": 435.4, "text": "93 EUR" }] },
+      {
+        "y": 677.7,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 91.7, "text": "DEPARTURE AT" },
+          { "x": 219.7, "end": 259.6, "text": "ARRIVAL AT" },
+          { "x": 405.4, "end": 423.2, "text": "FARE" }
+        ]
+      },
+      {
+        "y": 663.2,
+        "size": 8.3,
+        "cells": [
+          { "x": 39.1, "end": 69.6, "text": "12:22" },
+          { "x": 219.7, "end": 250.8, "text": "15:50" },
+          { "x": 405.4, "end": 449, "text": "STANDARD" }
+        ]
+      },
+      {
+        "y": 640.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 69.8, "text": "TRAIN N°" },
+          { "x": 141.7, "end": 163.6, "text": "CLASS" },
+          { "x": 219.7, "end": 244.6, "text": "COACH" },
+          { "x": 300.5, "end": 318.1, "text": "SEAT" },
+          { "x": 405.4, "end": 551.4, "text": "Exchange without a fee 1 hour before original" }
+        ]
+      },
+      {
+        "y": 635,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 523.3, "text": "departure time. If new ticket is more" }]
+      },
+      {
+        "y": 626.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 69.5, "text": "9439" },
+          { "x": 141.7, "end": 149.1, "text": "2" },
+          { "x": 219.7, "end": 227.2, "text": "8" },
+          { "x": 300.5, "end": 313, "text": "21" },
+          { "x": 405.4, "end": 542, "text": "expensive, you’ll pay the difference. If new" }
+        ]
+      },
+      {
+        "y": 617.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 542.6, "text": "ticket is cheaper, the difference will not be" }
+        ]
+      },
+      {
+        "y": 609.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 554.8, "text": "refunded. Refundable with a €25/£25/$40 fee" }
+        ]
+      },
+      {
+        "y": 599.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 90.3, "text": "CARRIER CODE" },
+          { "x": 141.7, "end": 188.1, "text": "DISTRIBUTOR" },
+          { "x": 219.7, "end": 234.2, "text": "TCN" },
+          { "x": 300.5, "end": 352.1, "text": "TRAIN COLOUR" },
+          { "x": 405.4, "end": 540.6, "text": "per person per leg up to 7 days before the" }
+        ]
+      },
+      {
+        "y": 588.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 78, "text": "0018, 1184" },
+          { "x": 141.7, "end": 160.1, "text": "1088" },
+          { "x": 219.7, "end": 260.6, "text": "000000000" },
+          { "x": 300.5, "end": 316.6, "text": "RED" },
+          { "x": 405.4, "end": 555.3, "text": "departure date. Tickets exchanged less than 7" }
+        ]
+      },
+      {
+        "y": 583.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 547.1, "text": "days before the departure date will become" }
+        ]
+      },
+      {
+        "y": 574.7,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 457.3, "text": "non-refundable." }]
+      },
+      {
+        "y": 548.5,
+        "size": 10.5,
+        "cells": [
+          { "x": 40.8, "end": 216.2, "text": "ACCESS CONDITIONS TO THE TRAIN" },
+          { "x": 403.9, "end": 481.5, "text": "YOUR LUGGAGE" }
+        ]
+      },
+      {
+        "y": 529.1,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 368.2,
+            "text": "At stations in the Netherlands, you will need to scan your ticket's barcode in order to open"
+          }
+        ]
+      },
+      {
+        "y": 525.5,
+        "size": 6.8,
+        "cells": [{ "x": 432.3, "end": 502, "text": "2 PIECES OF LUGGAGE" }]
+      },
+      {
+        "y": 520.5,
+        "size": 6.8,
+        "cells": [
+          { "x": 65.5, "end": 99.5, "text": "the gates." },
+          { "x": 432.3, "end": 497.7, "text": "MAX. 75 X 53 X 30 CM" }
+        ]
+      },
+      {
+        "y": 498.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 370.6,
+            "text": "For safety reasons and to ensure the timely departure of trains, Eurostar travellers must be on"
+          }
+        ]
+      },
+      {
+        "y": 489.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 350.7,
+            "text": "the platform and ready to board their train no later than 5 minutes before the scheduled"
+          },
+          { "x": 432.3, "end": 517.1, "text": "1 PIECE OF HAND LUGGAGE" }
+        ]
+      },
+      {
+        "y": 481.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 374.8,
+            "text": "departure time. After that time, access to the train may be refused. Please also note that safety"
+          }
+        ]
+      },
+      {
+        "y": 472.6,
+        "size": 7.5,
+        "cells": [{ "x": 65.5, "end": 152.2, "text": "checks may be conducted." }]
+      },
+      {
+        "y": 457.6,
+        "size": 6.8,
+        "cells": [{ "x": 432.3, "end": 537.4, "text": "YOU MUST BE ABLE TO CARRY ALL" }]
+      },
+      {
+        "y": 452,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 374.4,
+            "text": "You will need to show a legible version of the barcode either on your mobile phone or on a print-"
+          },
+          { "x": 432.3, "end": 514.5, "text": "YOUR LUGGAGE YOURSELF" }
+        ]
+      },
+      {
+        "y": 443.4,
+        "size": 7.5,
+        "cells": [
+          { "x": 65.5, "end": 199.3, "text": "out in order for your ticket to be checked." }
+        ]
+      },
+      { "y": 404.2, "size": 10.5, "cells": [{ "x": 39.1, "end": 99.9, "text": "IMPORTANT" }] },
+      {
+        "y": 390.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 536.4,
+            "text": "This e-Ticket is personal and non-transferable. The Train Manager may ask you for a valid photo ID. Failure to comply with the conditions of carriage may, amongst others,"
+          }
+        ]
+      },
+      {
+        "y": 383.1,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 538.1,
+            "text": "result in the Train Manager asking you to buy a ticket or pay the difference. If you are using a digital ticket for travel in the Netherlands, please disable contactless payment"
+          }
+        ]
+      },
+      {
+        "y": 375.4,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 408.8,
+            "text": "(NFC) on your phone (for Android only) when passing through the gates at stations in order to avoid being charged by accident."
+          }
+        ]
+      },
+      {
+        "y": 352.1,
+        "size": 10.5,
+        "cells": [{ "x": 39.1, "end": 140, "text": "ONBOARD SERVICES" }]
+      },
+      {
+        "y": 288.4,
+        "size": 10.5,
+        "cells": [
+          { "x": 65.5, "end": 158.8, "text": "STAY CONNECTED!" },
+          { "x": 254.3, "end": 336.7, "text": "EUROSTAR CAFÉ" },
+          { "x": 430.2, "end": 527.1, "text": "ELECTRIC SOCKETS" }
+        ]
+      },
+      {
+        "y": 266.2,
+        "size": 6.8,
+        "cells": [
+          { "x": 43.7, "end": 184.8, "text": "Hook up to our onboard Wi-Fi to ensure you stay" },
+          { "x": 226.9, "end": 368.4, "text": "Discover our new range with tasty biological and" },
+          { "x": 411.6, "end": 549.9, "text": "With individual electric sockets, you can charge" }
+        ]
+      },
+      {
+        "y": 258.4,
+        "size": 6.8,
+        "cells": [
+          { "x": 75.1, "end": 153.3, "text": "connected while travelling." },
+          { "x": 245.7, "end": 349.6, "text": "local products. A range that is more" },
+          { "x": 417.2, "end": 544.3, "text": "your electronic devices during your journey." }
+        ]
+      },
+      {
+        "y": 250.6,
+        "size": 6.8,
+        "cells": [{ "x": 239.4, "end": 355.9, "text": "environmentally friendly with more eco-" }]
+      },
+      {
+        "y": 242.9,
+        "size": 6.8,
+        "cells": [{ "x": 243.8, "end": 351.5, "text": "responsible products and packaging." }]
+      },
+      {
+        "y": 198.7,
+        "size": 9.8,
+        "cells": [
+          { "x": 38.8, "end": 58.9, "text": "VAT" },
+          { "x": 405.6, "end": 543.6, "text": "CONDITIONS FOR EXCHANGES" }
+        ]
+      },
+      { "y": 187.7, "size": 9.8, "cells": [{ "x": 405.6, "end": 471.7, "text": "AND REFUNDS" }] },
+      {
+        "y": 179.5,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 281.7,
+            "text": "Head Office: THI Factory sa - Place Marcel Broodthaers 4 - 1060 Brussels - Belgium"
+          }
+        ]
+      },
+      {
+        "y": 174.6,
+        "size": 6.8,
+        "cells": [
+          { "x": 405.6, "end": 539.9, "text": "If your ticket's fare conditions allow it, you can" }
+        ]
+      },
+      {
+        "y": 163.8,
+        "size": 6.8,
+        "cells": [
+          { "x": 153.8, "end": 181, "text": "Excl. VAT" },
+          { "x": 200.7, "end": 226.4, "text": "VAT rate" },
+          { "x": 261.4, "end": 273.7, "text": "VAT" },
+          { "x": 316, "end": 355.9, "text": "Fare incl. VAT" },
+          { "x": 405.6, "end": 551.2, "text": "always change your booking through your original" }
+        ]
+      },
+      {
+        "y": 159.1,
+        "size": 6.8,
+        "cells": [{ "x": 405.6, "end": 442.8, "text": "point of sale." }]
+      },
+      { "y": 149.5, "size": 6.8, "cells": [{ "x": 42.1, "end": 66.3, "text": "Belgium" }] },
+      {
+        "y": 145.7,
+        "size": 6.8,
+        "cells": [
+          { "x": 156.6, "end": 178.3, "text": "28,54€" },
+          { "x": 208.5, "end": 218.5, "text": "6%" },
+          { "x": 260.1, "end": 275, "text": "1,71€" },
+          { "x": 325, "end": 346.9, "text": "30,25€" },
+          {
+            "x": 405.6,
+            "end": 557.1,
+            "text": "For the other options available to you as a customer"
+          }
+        ]
+      },
+      {
+        "y": 141.8,
+        "size": 6.8,
+        "cells": [{ "x": 42.1, "end": 110.9, "text": "VAT n°: BE0541696005" }]
+      },
+      {
+        "y": 135.8,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 405.6,
+            "end": 554.8,
+            "text": "of SNCB International, please follow the indications"
+          }
+        ]
+      },
+      {
+        "y": 128,
+        "size": 6.8,
+        "cells": [
+          { "x": 405.6, "end": 546.7, "text": "in the confirmation email that you received after" }
+        ]
+      },
+      {
+        "y": 123.6,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 308.7,
+            "text": "Head Office: NS Internationaal BV - Stationsplein 25 - 1012 AB Amsterdam - The Netherlands"
+          },
+          { "x": 405.6, "end": 468.3, "text": "your original booking." }
+        ]
+      },
+      {
+        "y": 108.5,
+        "size": 6.8,
+        "cells": [
+          { "x": 153.8, "end": 181, "text": "Excl. VAT" },
+          { "x": 200.7, "end": 226.4, "text": "VAT rate" },
+          { "x": 261.4, "end": 273.7, "text": "VAT" },
+          { "x": 316, "end": 355.9, "text": "Fare incl. VAT" }
+        ]
+      },
+      { "y": 94.3, "size": 6.8, "cells": [{ "x": 42.1, "end": 90.9, "text": "The Netherlands" }] },
+      {
+        "y": 90.4,
+        "size": 6.8,
+        "cells": [
+          { "x": 156.9, "end": 178, "text": "22,27€" },
+          { "x": 208.5, "end": 218.5, "text": "9%" },
+          { "x": 258.3, "end": 276.8, "text": "2,00€" },
+          { "x": 325.4, "end": 346.6, "text": "24,27€" }
+        ]
+      },
+      {
+        "y": 86.5,
+        "size": 6.8,
+        "cells": [{ "x": 42.1, "end": 119.4, "text": "VAT n°: NL 809507572B01" }]
+      },
+      {
+        "y": 65.7,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 241.2,
+            "text": "In France, international rail passenger transport is not subject to VAT."
+          }
+        ]
+      },
+      {
+        "y": 57.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 278,
+            "text": "VAT amount cannot be recovered in case of ticket cancellation.DNR: WRNLMPD"
+          }
+        ]
+      },
+      {
+        "y": 1.2,
+        "size": 1,
+        "cells": [{ "x": 0, "end": 14.2, "text": "Powered by PDF Generator API" }]
+      }
+    ],
+    [
+      { "y": 785.6, "size": 8.3, "cells": [{ "x": 26.1, "end": 71.5, "text": "PASSENGER" }] },
+      { "y": 768.8, "size": 9, "cells": [{ "x": 26.1, "end": 113.9, "text": "MEERA IYER" }] },
+      {
+        "y": 750.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 212.6, "end": 278.6, "text": "TICKET ISSUE DATE" },
+          { "x": 368.5, "end": 415.2, "text": "TRAVEL DATE" },
+          { "x": 490.4, "end": 548.3, "text": "REFERENCE/PNR" }
+        ]
+      },
+      {
+        "y": 740.8,
+        "size": 6.8,
+        "cells": [
+          { "x": 26.1, "end": 115, "text": "YOUR TRIP" },
+          { "x": 212.6, "end": 248, "text": "26/10/2024" },
+          { "x": 368.5, "end": 415.2, "text": "24/12/2024" },
+          { "x": 490.4, "end": 528.8, "text": "ZB5KWN" }
+        ]
+      },
+      {
+        "y": 708.1,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 460.2, "text": "PRICE INCL. VAT" }]
+      },
+      {
+        "y": 704.3,
+        "size": 9.8,
+        "cells": [
+          { "x": 39.1, "end": 95.8, "text": "PARIS NORD" },
+          { "x": 219.7, "end": 332.9, "text": "AMSTERDAM CENTRAAL" }
+        ]
+      },
+      { "y": 697.8, "size": 9, "cells": [{ "x": 405.4, "end": 435.4, "text": "93 EUR" }] },
+      {
+        "y": 677.7,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 91.7, "text": "DEPARTURE AT" },
+          { "x": 219.7, "end": 259.6, "text": "ARRIVAL AT" },
+          { "x": 405.4, "end": 423.2, "text": "FARE" }
+        ]
+      },
+      {
+        "y": 663.2,
+        "size": 8.3,
+        "cells": [
+          { "x": 39.1, "end": 69.6, "text": "12:22" },
+          { "x": 219.7, "end": 250.8, "text": "15:50" },
+          { "x": 405.4, "end": 449, "text": "STANDARD" }
+        ]
+      },
+      {
+        "y": 640.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 69.8, "text": "TRAIN N°" },
+          { "x": 141.7, "end": 163.6, "text": "CLASS" },
+          { "x": 219.7, "end": 244.6, "text": "COACH" },
+          { "x": 300.5, "end": 318.1, "text": "SEAT" },
+          { "x": 405.4, "end": 551.4, "text": "Exchange without a fee 1 hour before original" }
+        ]
+      },
+      {
+        "y": 635,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 523.3, "text": "departure time. If new ticket is more" }]
+      },
+      {
+        "y": 626.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 69.5, "text": "9439" },
+          { "x": 141.7, "end": 149.1, "text": "2" },
+          { "x": 219.7, "end": 227.2, "text": "8" },
+          { "x": 300.5, "end": 315.2, "text": "22" },
+          { "x": 405.4, "end": 542, "text": "expensive, you’ll pay the difference. If new" }
+        ]
+      },
+      {
+        "y": 617.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 542.6, "text": "ticket is cheaper, the difference will not be" }
+        ]
+      },
+      {
+        "y": 609.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 554.8, "text": "refunded. Refundable with a €25/£25/$40 fee" }
+        ]
+      },
+      {
+        "y": 599.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 90.3, "text": "CARRIER CODE" },
+          { "x": 141.7, "end": 188.1, "text": "DISTRIBUTOR" },
+          { "x": 219.7, "end": 234.2, "text": "TCN" },
+          { "x": 300.5, "end": 352.1, "text": "TRAIN COLOUR" },
+          { "x": 405.4, "end": 540.6, "text": "per person per leg up to 7 days before the" }
+        ]
+      },
+      {
+        "y": 588.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 78, "text": "0018, 1184" },
+          { "x": 141.7, "end": 160.1, "text": "1088" },
+          { "x": 219.7, "end": 261.1, "text": "000000000" },
+          { "x": 300.5, "end": 316.6, "text": "RED" },
+          { "x": 405.4, "end": 555.3, "text": "departure date. Tickets exchanged less than 7" }
+        ]
+      },
+      {
+        "y": 583.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 547.1, "text": "days before the departure date will become" }
+        ]
+      },
+      {
+        "y": 574.7,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 457.3, "text": "non-refundable." }]
+      },
+      {
+        "y": 548.5,
+        "size": 10.5,
+        "cells": [
+          { "x": 40.8, "end": 216.2, "text": "ACCESS CONDITIONS TO THE TRAIN" },
+          { "x": 403.9, "end": 481.5, "text": "YOUR LUGGAGE" }
+        ]
+      },
+      {
+        "y": 529.1,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 368.2,
+            "text": "At stations in the Netherlands, you will need to scan your ticket's barcode in order to open"
+          }
+        ]
+      },
+      {
+        "y": 525.5,
+        "size": 6.8,
+        "cells": [{ "x": 432.3, "end": 502, "text": "2 PIECES OF LUGGAGE" }]
+      },
+      {
+        "y": 520.5,
+        "size": 6.8,
+        "cells": [
+          { "x": 65.5, "end": 99.5, "text": "the gates." },
+          { "x": 432.3, "end": 497.7, "text": "MAX. 75 X 53 X 30 CM" }
+        ]
+      },
+      {
+        "y": 498.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 370.6,
+            "text": "For safety reasons and to ensure the timely departure of trains, Eurostar travellers must be on"
+          }
+        ]
+      },
+      {
+        "y": 489.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 350.7,
+            "text": "the platform and ready to board their train no later than 5 minutes before the scheduled"
+          },
+          { "x": 432.3, "end": 517.1, "text": "1 PIECE OF HAND LUGGAGE" }
+        ]
+      },
+      {
+        "y": 481.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 374.8,
+            "text": "departure time. After that time, access to the train may be refused. Please also note that safety"
+          }
+        ]
+      },
+      {
+        "y": 472.6,
+        "size": 7.5,
+        "cells": [{ "x": 65.5, "end": 152.2, "text": "checks may be conducted." }]
+      },
+      {
+        "y": 457.6,
+        "size": 6.8,
+        "cells": [{ "x": 432.3, "end": 537.4, "text": "YOU MUST BE ABLE TO CARRY ALL" }]
+      },
+      {
+        "y": 452,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 374.4,
+            "text": "You will need to show a legible version of the barcode either on your mobile phone or on a print-"
+          },
+          { "x": 432.3, "end": 514.5, "text": "YOUR LUGGAGE YOURSELF" }
+        ]
+      },
+      {
+        "y": 443.4,
+        "size": 7.5,
+        "cells": [
+          { "x": 65.5, "end": 199.3, "text": "out in order for your ticket to be checked." }
+        ]
+      },
+      { "y": 404.2, "size": 10.5, "cells": [{ "x": 39.1, "end": 99.9, "text": "IMPORTANT" }] },
+      {
+        "y": 390.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 536.4,
+            "text": "This e-Ticket is personal and non-transferable. The Train Manager may ask you for a valid photo ID. Failure to comply with the conditions of carriage may, amongst others,"
+          }
+        ]
+      },
+      {
+        "y": 383.1,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 538.1,
+            "text": "result in the Train Manager asking you to buy a ticket or pay the difference. If you are using a digital ticket for travel in the Netherlands, please disable contactless payment"
+          }
+        ]
+      },
+      {
+        "y": 375.4,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 408.8,
+            "text": "(NFC) on your phone (for Android only) when passing through the gates at stations in order to avoid being charged by accident."
+          }
+        ]
+      },
+      {
+        "y": 352.1,
+        "size": 10.5,
+        "cells": [{ "x": 39.1, "end": 140, "text": "ONBOARD SERVICES" }]
+      },
+      {
+        "y": 288.4,
+        "size": 10.5,
+        "cells": [
+          { "x": 65.5, "end": 158.8, "text": "STAY CONNECTED!" },
+          { "x": 254.3, "end": 336.7, "text": "EUROSTAR CAFÉ" },
+          { "x": 430.2, "end": 527.1, "text": "ELECTRIC SOCKETS" }
+        ]
+      },
+      {
+        "y": 266.2,
+        "size": 6.8,
+        "cells": [
+          { "x": 43.7, "end": 184.8, "text": "Hook up to our onboard Wi-Fi to ensure you stay" },
+          { "x": 226.9, "end": 368.4, "text": "Discover our new range with tasty biological and" },
+          { "x": 411.6, "end": 549.9, "text": "With individual electric sockets, you can charge" }
+        ]
+      },
+      {
+        "y": 258.4,
+        "size": 6.8,
+        "cells": [
+          { "x": 75.1, "end": 153.3, "text": "connected while travelling." },
+          { "x": 245.7, "end": 349.6, "text": "local products. A range that is more" },
+          { "x": 417.2, "end": 544.3, "text": "your electronic devices during your journey." }
+        ]
+      },
+      {
+        "y": 250.6,
+        "size": 6.8,
+        "cells": [{ "x": 239.4, "end": 355.9, "text": "environmentally friendly with more eco-" }]
+      },
+      {
+        "y": 242.9,
+        "size": 6.8,
+        "cells": [{ "x": 243.8, "end": 351.5, "text": "responsible products and packaging." }]
+      },
+      {
+        "y": 198.7,
+        "size": 9.8,
+        "cells": [
+          { "x": 38.8, "end": 58.9, "text": "VAT" },
+          { "x": 405.6, "end": 543.6, "text": "CONDITIONS FOR EXCHANGES" }
+        ]
+      },
+      { "y": 187.7, "size": 9.8, "cells": [{ "x": 405.6, "end": 471.7, "text": "AND REFUNDS" }] },
+      {
+        "y": 179.5,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 281.7,
+            "text": "Head Office: THI Factory sa - Place Marcel Broodthaers 4 - 1060 Brussels - Belgium"
+          }
+        ]
+      },
+      {
+        "y": 174.6,
+        "size": 6.8,
+        "cells": [
+          { "x": 405.6, "end": 539.9, "text": "If your ticket's fare conditions allow it, you can" }
+        ]
+      },
+      {
+        "y": 163.8,
+        "size": 6.8,
+        "cells": [
+          { "x": 153.8, "end": 181, "text": "Excl. VAT" },
+          { "x": 200.7, "end": 226.4, "text": "VAT rate" },
+          { "x": 261.4, "end": 273.7, "text": "VAT" },
+          { "x": 316, "end": 355.9, "text": "Fare incl. VAT" },
+          { "x": 405.6, "end": 551.2, "text": "always change your booking through your original" }
+        ]
+      },
+      {
+        "y": 159.1,
+        "size": 6.8,
+        "cells": [{ "x": 405.6, "end": 442.8, "text": "point of sale." }]
+      },
+      { "y": 149.5, "size": 6.8, "cells": [{ "x": 42.1, "end": 66.3, "text": "Belgium" }] },
+      {
+        "y": 145.7,
+        "size": 6.8,
+        "cells": [
+          { "x": 156.6, "end": 178.3, "text": "28,54€" },
+          { "x": 208.5, "end": 218.5, "text": "6%" },
+          { "x": 260.1, "end": 275, "text": "1,71€" },
+          { "x": 325, "end": 346.9, "text": "30,25€" },
+          {
+            "x": 405.6,
+            "end": 557.1,
+            "text": "For the other options available to you as a customer"
+          }
+        ]
+      },
+      {
+        "y": 141.8,
+        "size": 6.8,
+        "cells": [{ "x": 42.1, "end": 110.9, "text": "VAT n°: BE0541696005" }]
+      },
+      {
+        "y": 135.8,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 405.6,
+            "end": 554.8,
+            "text": "of SNCB International, please follow the indications"
+          }
+        ]
+      },
+      {
+        "y": 128,
+        "size": 6.8,
+        "cells": [
+          { "x": 405.6, "end": 546.7, "text": "in the confirmation email that you received after" }
+        ]
+      },
+      {
+        "y": 123.6,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 308.7,
+            "text": "Head Office: NS Internationaal BV - Stationsplein 25 - 1012 AB Amsterdam - The Netherlands"
+          },
+          { "x": 405.6, "end": 468.3, "text": "your original booking." }
+        ]
+      },
+      {
+        "y": 108.5,
+        "size": 6.8,
+        "cells": [
+          { "x": 153.8, "end": 181, "text": "Excl. VAT" },
+          { "x": 200.7, "end": 226.4, "text": "VAT rate" },
+          { "x": 261.4, "end": 273.7, "text": "VAT" },
+          { "x": 316, "end": 355.9, "text": "Fare incl. VAT" }
+        ]
+      },
+      { "y": 94.3, "size": 6.8, "cells": [{ "x": 42.1, "end": 90.9, "text": "The Netherlands" }] },
+      {
+        "y": 90.4,
+        "size": 6.8,
+        "cells": [
+          { "x": 156.9, "end": 178, "text": "22,27€" },
+          { "x": 208.5, "end": 218.5, "text": "9%" },
+          { "x": 258.3, "end": 276.8, "text": "2,00€" },
+          { "x": 325.4, "end": 346.6, "text": "24,27€" }
+        ]
+      },
+      {
+        "y": 86.5,
+        "size": 6.8,
+        "cells": [{ "x": 42.1, "end": 119.4, "text": "VAT n°: NL 809507572B01" }]
+      },
+      {
+        "y": 65.7,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 241.2,
+            "text": "In France, international rail passenger transport is not subject to VAT."
+          }
+        ]
+      },
+      {
+        "y": 57.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 278,
+            "text": "VAT amount cannot be recovered in case of ticket cancellation.DNR: WRNLMPD"
+          }
+        ]
+      },
+      {
+        "y": 1.2,
+        "size": 1,
+        "cells": [{ "x": 0, "end": 14.2, "text": "Powered by PDF Generator API" }]
+      }
+    ],
+    [
+      { "y": 785.6, "size": 8.3, "cells": [{ "x": 26.1, "end": 71.5, "text": "PASSENGER" }] },
+      { "y": 768.8, "size": 9, "cells": [{ "x": 26.1, "end": 138.8, "text": "ARJUN RAO" }] },
+      {
+        "y": 750.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 212.6, "end": 278.6, "text": "TICKET ISSUE DATE" },
+          { "x": 368.5, "end": 415.2, "text": "TRAVEL DATE" },
+          { "x": 490.4, "end": 548.3, "text": "REFERENCE/PNR" }
+        ]
+      },
+      {
+        "y": 740.8,
+        "size": 6.8,
+        "cells": [
+          { "x": 26.1, "end": 115, "text": "YOUR TRIP" },
+          { "x": 212.6, "end": 248, "text": "26/10/2024" },
+          { "x": 368.5, "end": 415.2, "text": "24/12/2024" },
+          { "x": 490.4, "end": 528.8, "text": "ZB5KWN" }
+        ]
+      },
+      {
+        "y": 708.1,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 460.2, "text": "PRICE INCL. VAT" }]
+      },
+      {
+        "y": 704.3,
+        "size": 9.8,
+        "cells": [
+          { "x": 39.1, "end": 95.8, "text": "PARIS NORD" },
+          { "x": 219.7, "end": 332.9, "text": "AMSTERDAM CENTRAAL" }
+        ]
+      },
+      { "y": 697.8, "size": 9, "cells": [{ "x": 405.4, "end": 435.4, "text": "93 EUR" }] },
+      {
+        "y": 677.7,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 91.7, "text": "DEPARTURE AT" },
+          { "x": 219.7, "end": 259.6, "text": "ARRIVAL AT" },
+          { "x": 405.4, "end": 423.2, "text": "FARE" }
+        ]
+      },
+      {
+        "y": 663.2,
+        "size": 8.3,
+        "cells": [
+          { "x": 39.1, "end": 69.6, "text": "12:22" },
+          { "x": 219.7, "end": 250.8, "text": "15:50" },
+          { "x": 405.4, "end": 449, "text": "STANDARD" }
+        ]
+      },
+      {
+        "y": 640.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 69.8, "text": "TRAIN N°" },
+          { "x": 141.7, "end": 163.6, "text": "CLASS" },
+          { "x": 219.7, "end": 244.6, "text": "COACH" },
+          { "x": 300.5, "end": 318.1, "text": "SEAT" },
+          { "x": 405.4, "end": 551.4, "text": "Exchange without a fee 1 hour before original" }
+        ]
+      },
+      {
+        "y": 635,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 523.3, "text": "departure time. If new ticket is more" }]
+      },
+      {
+        "y": 626.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 69.5, "text": "9439" },
+          { "x": 141.7, "end": 149.1, "text": "2" },
+          { "x": 219.7, "end": 227.2, "text": "8" },
+          { "x": 300.5, "end": 315.5, "text": "26" },
+          { "x": 405.4, "end": 542, "text": "expensive, you’ll pay the difference. If new" }
+        ]
+      },
+      {
+        "y": 617.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 542.6, "text": "ticket is cheaper, the difference will not be" }
+        ]
+      },
+      {
+        "y": 609.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 554.8, "text": "refunded. Refundable with a €25/£25/$40 fee" }
+        ]
+      },
+      {
+        "y": 599.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 90.3, "text": "CARRIER CODE" },
+          { "x": 141.7, "end": 188.1, "text": "DISTRIBUTOR" },
+          { "x": 219.7, "end": 234.2, "text": "TCN" },
+          { "x": 300.5, "end": 352.1, "text": "TRAIN COLOUR" },
+          { "x": 405.4, "end": 540.6, "text": "per person per leg up to 7 days before the" }
+        ]
+      },
+      {
+        "y": 588.2,
+        "size": 7.5,
+        "cells": [
+          { "x": 39.1, "end": 78, "text": "0018, 1184" },
+          { "x": 141.7, "end": 160.1, "text": "1088" },
+          { "x": 219.7, "end": 264.5, "text": "000000000" },
+          { "x": 300.5, "end": 316.6, "text": "RED" },
+          { "x": 405.4, "end": 555.3, "text": "departure date. Tickets exchanged less than 7" }
+        ]
+      },
+      {
+        "y": 583.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 405.4, "end": 547.1, "text": "days before the departure date will become" }
+        ]
+      },
+      {
+        "y": 574.7,
+        "size": 7.5,
+        "cells": [{ "x": 405.4, "end": 457.3, "text": "non-refundable." }]
+      },
+      {
+        "y": 548.5,
+        "size": 10.5,
+        "cells": [
+          { "x": 40.8, "end": 216.2, "text": "ACCESS CONDITIONS TO THE TRAIN" },
+          { "x": 403.9, "end": 481.5, "text": "YOUR LUGGAGE" }
+        ]
+      },
+      {
+        "y": 529.1,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 368.2,
+            "text": "At stations in the Netherlands, you will need to scan your ticket's barcode in order to open"
+          }
+        ]
+      },
+      {
+        "y": 525.5,
+        "size": 6.8,
+        "cells": [{ "x": 432.3, "end": 502, "text": "2 PIECES OF LUGGAGE" }]
+      },
+      {
+        "y": 520.5,
+        "size": 6.8,
+        "cells": [
+          { "x": 65.5, "end": 99.5, "text": "the gates." },
+          { "x": 432.3, "end": 497.7, "text": "MAX. 75 X 53 X 30 CM" }
+        ]
+      },
+      {
+        "y": 498.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 370.6,
+            "text": "For safety reasons and to ensure the timely departure of trains, Eurostar travellers must be on"
+          }
+        ]
+      },
+      {
+        "y": 489.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 350.7,
+            "text": "the platform and ready to board their train no later than 5 minutes before the scheduled"
+          },
+          { "x": 432.3, "end": 517.1, "text": "1 PIECE OF HAND LUGGAGE" }
+        ]
+      },
+      {
+        "y": 481.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 374.8,
+            "text": "departure time. After that time, access to the train may be refused. Please also note that safety"
+          }
+        ]
+      },
+      {
+        "y": 472.6,
+        "size": 7.5,
+        "cells": [{ "x": 65.5, "end": 152.2, "text": "checks may be conducted." }]
+      },
+      {
+        "y": 457.6,
+        "size": 6.8,
+        "cells": [{ "x": 432.3, "end": 537.4, "text": "YOU MUST BE ABLE TO CARRY ALL" }]
+      },
+      {
+        "y": 452,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 65.5,
+            "end": 374.4,
+            "text": "You will need to show a legible version of the barcode either on your mobile phone or on a print-"
+          },
+          { "x": 432.3, "end": 514.5, "text": "YOUR LUGGAGE YOURSELF" }
+        ]
+      },
+      {
+        "y": 443.4,
+        "size": 7.5,
+        "cells": [
+          { "x": 65.5, "end": 199.3, "text": "out in order for your ticket to be checked." }
+        ]
+      },
+      { "y": 404.2, "size": 10.5, "cells": [{ "x": 39.1, "end": 99.9, "text": "IMPORTANT" }] },
+      {
+        "y": 390.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 536.4,
+            "text": "This e-Ticket is personal and non-transferable. The Train Manager may ask you for a valid photo ID. Failure to comply with the conditions of carriage may, amongst others,"
+          }
+        ]
+      },
+      {
+        "y": 383.1,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 538.1,
+            "text": "result in the Train Manager asking you to buy a ticket or pay the difference. If you are using a digital ticket for travel in the Netherlands, please disable contactless payment"
+          }
+        ]
+      },
+      {
+        "y": 375.4,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 39.1,
+            "end": 408.8,
+            "text": "(NFC) on your phone (for Android only) when passing through the gates at stations in order to avoid being charged by accident."
+          }
+        ]
+      },
+      {
+        "y": 352.1,
+        "size": 10.5,
+        "cells": [{ "x": 39.1, "end": 140, "text": "ONBOARD SERVICES" }]
+      },
+      {
+        "y": 288.4,
+        "size": 10.5,
+        "cells": [
+          { "x": 65.5, "end": 158.8, "text": "STAY CONNECTED!" },
+          { "x": 254.3, "end": 336.7, "text": "EUROSTAR CAFÉ" },
+          { "x": 430.2, "end": 527.1, "text": "ELECTRIC SOCKETS" }
+        ]
+      },
+      {
+        "y": 266.2,
+        "size": 6.8,
+        "cells": [
+          { "x": 43.7, "end": 184.8, "text": "Hook up to our onboard Wi-Fi to ensure you stay" },
+          { "x": 226.9, "end": 368.4, "text": "Discover our new range with tasty biological and" },
+          { "x": 411.6, "end": 549.9, "text": "With individual electric sockets, you can charge" }
+        ]
+      },
+      {
+        "y": 258.4,
+        "size": 6.8,
+        "cells": [
+          { "x": 75.1, "end": 153.3, "text": "connected while travelling." },
+          { "x": 245.7, "end": 349.6, "text": "local products. A range that is more" },
+          { "x": 417.2, "end": 544.3, "text": "your electronic devices during your journey." }
+        ]
+      },
+      {
+        "y": 250.6,
+        "size": 6.8,
+        "cells": [{ "x": 239.4, "end": 355.9, "text": "environmentally friendly with more eco-" }]
+      },
+      {
+        "y": 242.9,
+        "size": 6.8,
+        "cells": [{ "x": 243.8, "end": 351.5, "text": "responsible products and packaging." }]
+      },
+      {
+        "y": 198.7,
+        "size": 9.8,
+        "cells": [
+          { "x": 38.8, "end": 58.9, "text": "VAT" },
+          { "x": 405.6, "end": 543.6, "text": "CONDITIONS FOR EXCHANGES" }
+        ]
+      },
+      { "y": 187.7, "size": 9.8, "cells": [{ "x": 405.6, "end": 471.7, "text": "AND REFUNDS" }] },
+      {
+        "y": 179.5,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 281.7,
+            "text": "Head Office: THI Factory sa - Place Marcel Broodthaers 4 - 1060 Brussels - Belgium"
+          }
+        ]
+      },
+      {
+        "y": 174.6,
+        "size": 6.8,
+        "cells": [
+          { "x": 405.6, "end": 539.9, "text": "If your ticket's fare conditions allow it, you can" }
+        ]
+      },
+      {
+        "y": 163.8,
+        "size": 6.8,
+        "cells": [
+          { "x": 153.8, "end": 181, "text": "Excl. VAT" },
+          { "x": 200.7, "end": 226.4, "text": "VAT rate" },
+          { "x": 261.4, "end": 273.7, "text": "VAT" },
+          { "x": 316, "end": 355.9, "text": "Fare incl. VAT" },
+          { "x": 405.6, "end": 551.2, "text": "always change your booking through your original" }
+        ]
+      },
+      {
+        "y": 159.1,
+        "size": 6.8,
+        "cells": [{ "x": 405.6, "end": 442.8, "text": "point of sale." }]
+      },
+      { "y": 149.5, "size": 6.8, "cells": [{ "x": 42.1, "end": 66.3, "text": "Belgium" }] },
+      {
+        "y": 145.7,
+        "size": 6.8,
+        "cells": [
+          { "x": 156.6, "end": 178.3, "text": "28,54€" },
+          { "x": 208.5, "end": 218.5, "text": "6%" },
+          { "x": 260.1, "end": 275, "text": "1,71€" },
+          { "x": 325, "end": 346.9, "text": "30,25€" },
+          {
+            "x": 405.6,
+            "end": 557.1,
+            "text": "For the other options available to you as a customer"
+          }
+        ]
+      },
+      {
+        "y": 141.8,
+        "size": 6.8,
+        "cells": [{ "x": 42.1, "end": 110.9, "text": "VAT n°: BE0541696005" }]
+      },
+      {
+        "y": 135.8,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 405.6,
+            "end": 554.8,
+            "text": "of SNCB International, please follow the indications"
+          }
+        ]
+      },
+      {
+        "y": 128,
+        "size": 6.8,
+        "cells": [
+          { "x": 405.6, "end": 546.7, "text": "in the confirmation email that you received after" }
+        ]
+      },
+      {
+        "y": 123.6,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 308.7,
+            "text": "Head Office: NS Internationaal BV - Stationsplein 25 - 1012 AB Amsterdam - The Netherlands"
+          },
+          { "x": 405.6, "end": 468.3, "text": "your original booking." }
+        ]
+      },
+      {
+        "y": 108.5,
+        "size": 6.8,
+        "cells": [
+          { "x": 153.8, "end": 181, "text": "Excl. VAT" },
+          { "x": 200.7, "end": 226.4, "text": "VAT rate" },
+          { "x": 261.4, "end": 273.7, "text": "VAT" },
+          { "x": 316, "end": 355.9, "text": "Fare incl. VAT" }
+        ]
+      },
+      { "y": 94.3, "size": 6.8, "cells": [{ "x": 42.1, "end": 90.9, "text": "The Netherlands" }] },
+      {
+        "y": 90.4,
+        "size": 6.8,
+        "cells": [
+          { "x": 156.9, "end": 178, "text": "22,27€" },
+          { "x": 208.5, "end": 218.5, "text": "9%" },
+          { "x": 258.3, "end": 276.8, "text": "2,00€" },
+          { "x": 325.4, "end": 346.6, "text": "24,27€" }
+        ]
+      },
+      {
+        "y": 86.5,
+        "size": 6.8,
+        "cells": [{ "x": 42.1, "end": 119.4, "text": "VAT n°: NL 809507572B01" }]
+      },
+      {
+        "y": 65.7,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 241.2,
+            "text": "In France, international rail passenger transport is not subject to VAT."
+          }
+        ]
+      },
+      {
+        "y": 57.9,
+        "size": 6.8,
+        "cells": [
+          {
+            "x": 38.8,
+            "end": 278,
+            "text": "VAT amount cannot be recovered in case of ticket cancellation.DNR: WRNLMPD"
+          }
+        ]
+      },
+      {
+        "y": 1.2,
+        "size": 1,
+        "cells": [{ "x": 0, "end": 14.2, "text": "Powered by PDF Generator API" }]
+      }
+    ]
+  ]
+}

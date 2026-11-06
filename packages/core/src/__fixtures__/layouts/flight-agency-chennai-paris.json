@@ -1,0 +1,634 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 729.9,
+        "size": 8.3,
+        "cells": [{ "x": 431.2, "end": 516, "text": "Flight Ticket (One way)" }]
+      },
+      {
+        "y": 715.7,
+        "size": 8.3,
+        "cells": [
+          {
+            "x": 263.8,
+            "end": 515.9,
+            "text": "Booking ID: NN2AAQF100000000001, (Booked on 23 October 2024)"
+          }
+        ]
+      },
+      {
+        "y": 672.7,
+        "size": 9,
+        "cells": [
+          {
+            "x": 89.3,
+            "end": 325.9,
+            "text": "Barcode(s) for your journey Chennai-Mumbai on AIR INDIA"
+          }
+        ]
+      },
+      { "y": 615.3, "size": 9, "cells": [{ "x": 89.3, "end": 158.2, "text": "Meera Iyer" }] },
+      { "y": 549.3, "size": 9, "cells": [{ "x": 89.3, "end": 166.7, "text": "Vikram Shah" }] },
+      { "y": 483.3, "size": 9, "cells": [{ "x": 89.3, "end": 181.3, "text": "Arjun Rao" }] },
+      {
+        "y": 415.5,
+        "size": 9,
+        "cells": [
+          {
+            "x": 89.3,
+            "end": 394.9,
+            "text": "Barcode(s) for your journey Mumbai-Paris (Charles De Gaulle) on AIR INDIA"
+          }
+        ]
+      },
+      { "y": 358.1, "size": 9, "cells": [{ "x": 89.3, "end": 158.2, "text": "Meera Iyer" }] },
+      { "y": 292.1, "size": 9, "cells": [{ "x": 89.3, "end": 166.7, "text": "Vikram Shah" }] },
+      { "y": 226.1, "size": 9, "cells": [{ "x": 89.3, "end": 181.3, "text": "Arjun Rao" }] },
+      {
+        "y": 136.4,
+        "size": 15,
+        "cells": [{ "x": 96.8, "end": 336.7, "text": "Chennai - Paris (Charles De Gaulle)" }]
+      },
+      {
+        "y": 118.7,
+        "size": 9,
+        "cells": [{ "x": 96.8, "end": 274, "text": "Fri, 20 Dec 2024 • 1 stop • 14h 25m duration" }]
+      },
+      { "y": 76.7, "size": 9, "cells": [{ "x": 126.8, "end": 168.2, "text": "AIR INDIA" }] },
+      {
+        "y": 64,
+        "size": 8.3,
+        "cells": [
+          { "x": 126.8, "end": 153.2, "text": "AI-571" },
+          { "x": 232.1, "end": 271.2, "text": "Chennai" },
+          { "x": 362.2, "end": 385.1, "text": "2h 5m" },
+          { "x": 477.9, "end": 515.2, "text": "Mumbai" }
+        ]
+      },
+      {
+        "y": 43.4,
+        "size": 12,
+        "cells": [
+          { "x": 232.1, "end": 311.4, "text": "MAA 08:00 hrs" },
+          { "x": 434.5, "end": 515.2, "text": "10:05 hrs BOM" }
+        ]
+      }
+    ],
+    [
+      {
+        "y": 746.4,
+        "size": 8.3,
+        "cells": [
+          { "x": 232.1, "end": 272.4, "text": "Fri, 20 Dec" },
+          { "x": 474.9, "end": 515.2, "text": "Fri, 20 Dec" }
+        ]
+      },
+      {
+        "y": 736.7,
+        "size": 10.5,
+        "cells": [
+          { "x": 105.2, "end": 127.3, "text": "PNR" },
+          { "x": 148.3, "end": 188.5, "text": "QW7RTA" }
+        ]
+      },
+      {
+        "y": 722.4,
+        "size": 8.3,
+        "cells": [
+          { "x": 232.1, "end": 339.3, "text": "Chennai International Airport" },
+          { "x": 443.7, "end": 515.2, "text": "Chhatrapati Shivaji" }
+        ]
+      },
+      {
+        "y": 711.9,
+        "size": 8.3,
+        "cells": [
+          { "x": 232.1, "end": 271, "text": "Terminal 4" },
+          { "x": 406.6, "end": 515.2, "text": "International Airport Terminal" }
+        ]
+      },
+      { "y": 701.4, "size": 8.3, "cells": [{ "x": 510.6, "end": 515.2, "text": "2" }] },
+      {
+        "y": 663,
+        "size": 9,
+        "cells": [
+          { "x": 108.8, "end": 160.2, "text": "ECO VALUE" },
+          { "x": 261.3, "end": 298.8, "text": "Economy" },
+          { "x": 376.4, "end": 428.9, "text": "Regular Fare" }
+        ]
+      },
+      {
+        "y": 638.2,
+        "size": 9,
+        "cells": [
+          { "x": 113.3, "end": 294.3, "text": "Check-in: 23 Kg(1 PC x 23Kg each) per Adult" },
+          { "x": 330, "end": 476.5, "text": "Cabin: 7 Kgs (1 piece only) per Adult" }
+        ]
+      },
+      {
+        "y": 598.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 89.3, "end": 133, "text": "TRAVELLER" },
+          { "x": 288.9, "end": 308.5, "text": "SEAT" },
+          { "x": 332.3, "end": 352.7, "text": "MEAL" },
+          { "x": 427.2, "end": 474.6, "text": "E-TICKET NO" }
+        ]
+      },
+      {
+        "y": 578.7,
+        "size": 9.8,
+        "cells": [
+          { "x": 89.3, "end": 232.7, "text": "MS. MEERA IYER Adult" },
+          { "x": 288.9, "end": 306.2, "text": "26E" },
+          { "x": 332.3, "end": 410.3, "text": "Vegetarian Hindu" },
+          { "x": 427.2, "end": 500.9, "text": "000-0000000000" }
+        ]
+      },
+      { "y": 565.7, "size": 9.8, "cells": [{ "x": 332.3, "end": 353.4, "text": "Meal" }] },
+      {
+        "y": 541.5,
+        "size": 9.8,
+        "cells": [
+          { "x": 89.3, "end": 232.2, "text": "MR. VIKRAM SHAH Adult" },
+          { "x": 288.9, "end": 305.7, "text": "26F" },
+          { "x": 332.3, "end": 384.3, "text": "Hindu (Non" },
+          { "x": 427.2, "end": 500.9, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 528.5,
+        "size": 9.8,
+        "cells": [{ "x": 332.3, "end": 406.5, "text": "Vegetarian) Meal" }]
+      },
+      {
+        "y": 504.3,
+        "size": 9.8,
+        "cells": [
+          { "x": 89.3, "end": 260.4, "text": "MR. ARJUN RAO Adult" },
+          { "x": 288.9, "end": 306.8, "text": "26D" },
+          { "x": 332.3, "end": 410.3, "text": "Vegetarian Hindu" },
+          { "x": 427.2, "end": 500.9, "text": "000-0000000000" }
+        ]
+      },
+      { "y": 491.3, "size": 9.8, "cells": [{ "x": 332.3, "end": 353.4, "text": "Meal" }] },
+      {
+        "y": 451.4,
+        "size": 9,
+        "cells": [{ "x": 135.8, "end": 241.7, "text": "2h 40m layover at Mumbai" }]
+      },
+      {
+        "y": 430.4,
+        "size": 9,
+        "cells": [{ "x": 152.3, "end": 227.7, "text": "Change in FLIGHT" }]
+      },
+      { "y": 384.6, "size": 9, "cells": [{ "x": 126.8, "end": 168.2, "text": "AIR INDIA" }] },
+      {
+        "y": 371.9,
+        "size": 8.3,
+        "cells": [
+          { "x": 126.8, "end": 158.3, "text": "AI-2023" },
+          { "x": 232.1, "end": 269.4, "text": "Mumbai" },
+          { "x": 359.9, "end": 387.4, "text": "9h 40m" },
+          { "x": 429.5, "end": 515.2, "text": "Paris (Charles De" }
+        ]
+      },
+      {
+        "y": 351.3,
+        "size": 10.5,
+        "cells": [
+          { "x": 232.1, "end": 312.7, "text": "BOM 12:45 hrs" },
+          { "x": 481.4, "end": 515.2, "text": "Gaulle)" }
+        ]
+      },
+      {
+        "y": 336.8,
+        "size": 8.3,
+        "cells": [
+          { "x": 232.1, "end": 272.4, "text": "Fri, 20 Dec" },
+          { "x": 435.2, "end": 515.2, "text": "17:55 hrs CDG" }
+        ]
+      },
+      {
+        "y": 324.6,
+        "size": 8.3,
+        "cells": [
+          { "x": 105.2, "end": 127.3, "text": "PNR" },
+          { "x": 148.3, "end": 188.5, "text": "QW7RTA" },
+          { "x": 474.9, "end": 515.2, "text": "Fri, 20 Dec" }
+        ]
+      },
+      {
+        "y": 312.8,
+        "size": 8.3,
+        "cells": [{ "x": 232.1, "end": 303.5, "text": "Chhatrapati Shivaji" }]
+      },
+      {
+        "y": 302.3,
+        "size": 8.3,
+        "cells": [
+          { "x": 232.1, "end": 340.6, "text": "International Airport Terminal" },
+          { "x": 416.1, "end": 515.1, "text": "Ch. De Gaulle Terminal 2C" }
+        ]
+      },
+      { "y": 291.8, "size": 8.3, "cells": [{ "x": 232.1, "end": 236.6, "text": "2" }] },
+      {
+        "y": 253.4,
+        "size": 9,
+        "cells": [
+          { "x": 108.8, "end": 160.2, "text": "ECO VALUE" },
+          { "x": 261.3, "end": 298.8, "text": "Economy" },
+          { "x": 376.4, "end": 428.9, "text": "Regular Fare" }
+        ]
+      },
+      {
+        "y": 228.6,
+        "size": 9,
+        "cells": [
+          { "x": 113.3, "end": 294.3, "text": "Check-in: 23 Kg(1 PC x 23Kg each) per Adult" },
+          { "x": 330, "end": 476.5, "text": "Cabin: 7 Kgs (1 piece only) per Adult" }
+        ]
+      },
+      {
+        "y": 188.9,
+        "size": 7.5,
+        "cells": [
+          { "x": 89.3, "end": 133, "text": "TRAVELLER" },
+          { "x": 288.9, "end": 308.5, "text": "SEAT" },
+          { "x": 332.3, "end": 352.7, "text": "MEAL" },
+          { "x": 427.2, "end": 474.6, "text": "E-TICKET NO" }
+        ]
+      },
+      {
+        "y": 169.1,
+        "size": 9.8,
+        "cells": [
+          { "x": 89.3, "end": 232.7, "text": "MS. MEERA IYER Adult" },
+          { "x": 288.9, "end": 304.6, "text": "53J" },
+          { "x": 332.3, "end": 410.3, "text": "Vegetarian Hindu" },
+          { "x": 427.2, "end": 500.9, "text": "000-0000000000" }
+        ]
+      },
+      { "y": 156.1, "size": 9.8, "cells": [{ "x": 332.3, "end": 353.4, "text": "Meal" }] },
+      {
+        "y": 131.9,
+        "size": 9.8,
+        "cells": [
+          { "x": 89.3, "end": 232.2, "text": "MR. VIKRAM SHAH Adult" },
+          { "x": 288.9, "end": 306.2, "text": "53K" },
+          { "x": 332.3, "end": 410.3, "text": "Vegetarian Hindu" },
+          { "x": 427.2, "end": 500.9, "text": "000-0000000000" }
+        ]
+      },
+      { "y": 118.9, "size": 9.8, "cells": [{ "x": 332.3, "end": 353.4, "text": "Meal" }] },
+      {
+        "y": 94.7,
+        "size": 9.8,
+        "cells": [
+          { "x": 89.3, "end": 260.4, "text": "MR. ARJUN RAO Adult" },
+          { "x": 288.9, "end": 306.8, "text": "53H" },
+          { "x": 332.3, "end": 384.3, "text": "Hindu (Non" },
+          { "x": 427.2, "end": 500.9, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 81.7,
+        "size": 9.8,
+        "cells": [{ "x": 332.3, "end": 406.5, "text": "Vegetarian) Meal" }]
+      }
+    ],
+    [
+      {
+        "y": 745.4,
+        "size": 8.3,
+        "cells": [
+          { "x": 93, "end": 213.2, "text": "You have paid INR 67136" },
+          { "x": 228.2, "end": 304.3, "text": "You saved INR 4000" }
+        ]
+      },
+      {
+        "y": 454.2,
+        "size": 9.8,
+        "cells": [{ "x": 97.5, "end": 225.7, "text": "IMPORTANT INFORMATION" }]
+      },
+      {
+        "y": 430.1,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 484.9,
+            "text": "Check-in Time : We advise you to reach the airport atleast 4 hours before departure. Check-in"
+          }
+        ]
+      },
+      {
+        "y": 419.2,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 504.8,
+            "text": "counter generally closes 120 minutes before scheduled departure. It may vary from airline to airline"
+          }
+        ]
+      },
+      {
+        "y": 407.9,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 312.9,
+            "text": "and so it is advisable to check with the airline once."
+          }
+        ]
+      },
+      {
+        "y": 384.3,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 417.1,
+            "text": "DGCA passenger charter : Please refer to passenger charter by clicking Here"
+          }
+        ]
+      },
+      {
+        "y": 361.1,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 483.9,
+            "text": "Transit Visa Requirement : Please note that travellers are solely responsible for ensuring their"
+          }
+        ]
+      },
+      {
+        "y": 350.2,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 492.3,
+            "text": "eligibility to enter the destination or transit countries. We accept no liability in this regard. Please"
+          }
+        ]
+      },
+      {
+        "y": 338.9,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 455.4,
+            "text": "check the travel rules of all regulatory websites before booking and commencing travel."
+          }
+        ]
+      },
+      {
+        "y": 315.3,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 513.9,
+            "text": "A Note on Guidelines : Please note that travellers are solely responsible for ensuring their eligibility to"
+          }
+        ]
+      },
+      {
+        "y": 304.4,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 511.3,
+            "text": "enter the destination or transit countries. We accept no liability in this regard. Please check the travel"
+          }
+        ]
+      },
+      {
+        "y": 293.2,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 389.9,
+            "text": "rules of all regulatory websites before booking and commencing travel."
+          }
+        ]
+      },
+      {
+        "y": 269.6,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 495.9,
+            "text": "Passengers travelling to France, please note : Who can travel? Travel is open for all visa holders."
+          }
+        ]
+      },
+      {
+        "y": 258.7,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 504.3,
+            "text": "Points to Note: Travellers will be subject to random thermal screening.Please check all the detailed"
+          }
+        ]
+      },
+      {
+        "y": 247.4,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 472.9,
+            "text": "guidelines for both your chosen destination and airline by visiting our guidelines page here -"
+          }
+        ]
+      },
+      {
+        "y": 223.8,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 500.8,
+            "text": "Please Note : Passengers travelling on a tourist visa or visit visa are not allowed to travel with one-"
+          }
+        ]
+      },
+      {
+        "y": 212.9,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 510.8,
+            "text": "way ticket. They must show a confirmed return ticket else they may not be allowed to board the flight."
+          }
+        ]
+      },
+      {
+        "y": 201.7,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 504.8,
+            "text": "Passengers must also carry proof of accommodation/hotel reservation and sufficient funds to cover"
+          }
+        ]
+      },
+      {
+        "y": 190.4,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 493.4,
+            "text": "the expenses in the destination country.Passengers must adhere to baggage dimension (length,"
+          }
+        ]
+      },
+      {
+        "y": 179.2,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 512.3,
+            "text": "breadth, width etc.) guidelines of the airline, else they may have to pay additional charges or be even"
+          }
+        ]
+      },
+      {
+        "y": 167.9,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 512.8,
+            "text": "denied boarding. Kindly refer to the airline website for more details.For travellers departing from India"
+          }
+        ]
+      },
+      {
+        "y": 156.7,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 492.9,
+            "text": "or arriving in India: Fast Track Immigration - Trusted Travellers' Programme (FTI-TTP) has been"
+          }
+        ]
+      },
+      {
+        "y": 145.4,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 511.3,
+            "text": "initiated to speed up the Immigration clearance process for eligible persons from these categories: 1."
+          }
+        ]
+      },
+      {
+        "y": 134.2,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 447.8,
+            "text": "Indian Nationals 2. Foreign Nationals holding OCI Card. For more details please visit:"
+          }
+        ]
+      },
+      {
+        "y": 110.6,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 500.3,
+            "text": "Visa Requirements : Passport should be valid for minimum 6 months from the day of departure.All"
+          }
+        ]
+      },
+      {
+        "y": 99.7,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 481.3,
+            "text": "travellers must present hard copies of their foreign visa (soft copies won’t be accepted) at the"
+          }
+        ]
+      },
+      {
+        "y": 88.4,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 509.8,
+            "text": "immigration counters during departure.MakeMyTrip holds no liability with respect to visa information."
+          }
+        ]
+      },
+      {
+        "y": 77.2,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 463.3,
+            "text": "To get further details on visa and passport requirements, before booking your travel, click"
+          }
+        ]
+      },
+      {
+        "y": 53.6,
+        "size": 9,
+        "cells": [
+          { "x": 97.5, "end": 100.7, "text": "•" },
+          {
+            "x": 108.9,
+            "end": 502.4,
+            "text": "Valid ID proof needed : Please carry a valid Passport and Visa (mandatory for international travel)."
+          }
+        ]
+      },
+      {
+        "y": 42.7,
+        "size": 9,
+        "cells": [
+          {
+            "x": 108.9,
+            "end": 385.3,
+            "text": "Passport should have at least 6 months of validity at the time of travel"
+          }
+        ]
+      }
+    ]
+  ]
+}

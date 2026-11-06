@@ -1,0 +1,243 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 819.4,
+        "size": 8,
+        "cells": [
+          { "x": 24, "end": 82.3, "text": "01/11/2024, 12:43" },
+          { "x": 319.1, "end": 364.3, "text": "GoToGate/FB" }
+        ]
+      },
+      {
+        "y": 791.9,
+        "size": 8.1,
+        "cells": [{ "x": 27.7, "end": 193.2, "text": "Problems seeing this e-mail? Click here" }]
+      },
+      {
+        "y": 772.9,
+        "size": 13.5,
+        "cells": [{ "x": 422.9, "end": 557.5, "text": "TRAVEL DOCUMENT" }]
+      },
+      {
+        "y": 759.4,
+        "size": 9.5,
+        "cells": [{ "x": 456, "end": 557.5, "text": "Order no: 1000-200-300" }]
+      },
+      {
+        "y": 747.3,
+        "size": 8.1,
+        "cells": [
+          { "x": 31.8, "end": 127.5, "text": "www.gotogate.in/contact" },
+          { "x": 476, "end": 557.5, "text": "Issued: 2024-10-26" }
+        ]
+      },
+      { "y": 706, "size": 13.5, "cells": [{ "x": 71, "end": 161.9, "text": "Tromso - Oslo" }] },
+      {
+        "y": 661.5,
+        "size": 9.5,
+        "cells": [
+          { "x": 38.6, "end": 46.8, "text": "1" },
+          { "x": 71.7, "end": 210.1, "text": "Your airline check-in reference(s)" },
+          { "x": 323.7, "end": 415.4, "text": "TF6YUH(SK)" }
+        ]
+      },
+      {
+        "y": 616.9,
+        "size": 9.5,
+        "cells": [
+          { "x": 38.6, "end": 46.8, "text": "2" },
+          { "x": 71.7, "end": 161.3, "text": "Your booking number" },
+          { "x": 315.6, "end": 351.4, "text": "GP2LRS" }
+        ]
+      },
+      {
+        "y": 572.9,
+        "size": 9.5,
+        "cells": [
+          {
+            "x": 40.8,
+            "end": 548.6,
+            "text": "IMPORTANT: PRINT OUT THIS TRAVEL DOCUMENT AND BRING IT WITH YOU ON YOUR TRIP ALONG WITH YOUR"
+          }
+        ]
+      },
+      {
+        "y": 562.1,
+        "size": 9.5,
+        "cells": [{ "x": 253.9, "end": 335.4, "text": "VALID PASSPORT." }]
+      },
+      {
+        "y": 544.5,
+        "size": 8.1,
+        "cells": [
+          {
+            "x": 33.2,
+            "end": 539.7,
+            "text": "Stay up to date on any schedule changes by checking www.checkmytrip.com or directly via the carrier. It is the passenger's responsibility to"
+          }
+        ]
+      },
+      {
+        "y": 535.1,
+        "size": 8.1,
+        "cells": [{ "x": 33.2, "end": 176.1, "text": "stay updated on changes of flight times." }]
+      },
+      {
+        "y": 516.2,
+        "size": 8.1,
+        "cells": [
+          {
+            "x": 33.2,
+            "end": 534.4,
+            "text": "If you have a return ticket it is not possible to not use the first part and only use the return. Flight tickets must be used in chronological order,"
+          }
+        ]
+      },
+      {
+        "y": 506.7,
+        "size": 8.1,
+        "cells": [
+          {
+            "x": 33.2,
+            "end": 251.7,
+            "text": "otherwise the carrier will cancel the remaining part of the trip."
+          }
+        ]
+      },
+      {
+        "y": 464.8,
+        "size": 12.2,
+        "cells": [
+          { "x": 31.8, "end": 75.1, "text": "FLIGHT" },
+          { "x": 145.3, "end": 219.2, "text": "DEPARTURE" },
+          { "x": 506.4, "end": 557.5, "text": "ARRIVAL" }
+        ]
+      },
+      {
+        "y": 449.3,
+        "size": 8.1,
+        "cells": [
+          { "x": 145.3, "end": 161.9, "text": "TOS" },
+          { "x": 541.3, "end": 557.5, "text": "OSL" }
+        ]
+      },
+      {
+        "y": 437.8,
+        "size": 12.2,
+        "cells": [
+          { "x": 31.8, "end": 79.1, "text": "SK 4433" },
+          { "x": 145.3, "end": 189.3, "text": "Tromso" },
+          { "x": 530.5, "end": 557.5, "text": "Oslo" }
+        ]
+      },
+      {
+        "y": 427.6,
+        "size": 8.1,
+        "cells": [
+          { "x": 31.8, "end": 108.9, "text": "Scandinavian Airlines" },
+          { "x": 145.3, "end": 202.3, "text": "Tromso Norway" },
+          { "x": 485.4, "end": 557.5, "text": "Oslo Airport Norway" }
+        ]
+      },
+      {
+        "y": 408,
+        "size": 8.1,
+        "cells": [
+          { "x": 31.8, "end": 78.7, "text": "Operated by:" },
+          { "x": 156.1, "end": 197.1, "text": "THU 2 JAN" },
+          { "x": 515.2, "end": 556.2, "text": "THU 2 JAN" }
+        ]
+      },
+      {
+        "y": 398.6,
+        "size": 8.1,
+        "cells": [{ "x": 31.8, "end": 108.9, "text": "Scandinavian Airlines" }]
+      },
+      {
+        "y": 388.4,
+        "size": 13.5,
+        "cells": [
+          { "x": 156.1, "end": 190.7, "text": "18:00" },
+          { "x": 521.6, "end": 556.2, "text": "20:00" }
+        ]
+      },
+      {
+        "y": 351.3,
+        "size": 8.1,
+        "cells": [
+          { "x": 31.1, "end": 92.4, "text": "Passenger name" },
+          { "x": 205.7, "end": 226, "text": "Class" },
+          { "x": 234.1, "end": 338.2, "text": "Checked baggage allowance" },
+          { "x": 470.8, "end": 535.4, "text": "e-Ticket receipt(s)" }
+        ]
+      },
+      {
+        "y": 338.4,
+        "size": 9.5,
+        "cells": [{ "x": 233.4, "end": 301.2, "text": "1 bag(s) x 23kg." }]
+      },
+      {
+        "y": 333,
+        "size": 9.5,
+        "cells": [
+          { "x": 30.5, "end": 169, "text": "RAO/ARJUN MR" },
+          { "x": 205, "end": 211.9, "text": "H" },
+          { "x": 470.1, "end": 541.1, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 327.6,
+        "size": 9.5,
+        "cells": [{ "x": 233.4, "end": 421.7, "text": "1 Hand baggage included 8kg (55x40x23cm)" }]
+      },
+      {
+        "y": 315.5,
+        "size": 9.5,
+        "cells": [{ "x": 233.4, "end": 301.2, "text": "1 bag(s) x 23kg." }]
+      },
+      {
+        "y": 310.1,
+        "size": 9.5,
+        "cells": [
+          { "x": 30.5, "end": 141, "text": "IYER/MEERA MS" },
+          { "x": 205, "end": 211.9, "text": "H" },
+          { "x": 470.1, "end": 541.1, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 304.7,
+        "size": 9.5,
+        "cells": [{ "x": 233.4, "end": 421.7, "text": "1 Hand baggage included 8kg (55x40x23cm)" }]
+      },
+      {
+        "y": 292.5,
+        "size": 9.5,
+        "cells": [{ "x": 233.4, "end": 301.2, "text": "1 bag(s) x 23kg." }]
+      },
+      {
+        "y": 287.1,
+        "size": 9.5,
+        "cells": [
+          { "x": 30.5, "end": 142.4, "text": "SHAH/VIKRAM MR" },
+          { "x": 205, "end": 211.9, "text": "H" },
+          { "x": 470.1, "end": 541.1, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 281.7,
+        "size": 9.5,
+        "cells": [{ "x": 233.4, "end": 421.7, "text": "1 Hand baggage included 8kg (55x40x23cm)" }]
+      },
+      {
+        "y": 16.9,
+        "size": 8,
+        "cells": [
+          { "x": 24, "end": 546.5, "text": "https://example.com/ticket" },
+          { "x": 560.8, "end": 571, "text": "1/1" }
+        ]
+      }
+    ]
+  ]
+}

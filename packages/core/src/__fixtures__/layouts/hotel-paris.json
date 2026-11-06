@@ -1,0 +1,578 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 761.3,
+        "size": 12,
+        "cells": [{ "x": 434.5, "end": 548.9, "text": "Booking confirmation" }]
+      },
+      {
+        "y": 750,
+        "size": 6.7,
+        "cells": [{ "x": 434.5, "end": 577.2, "text": "CONFIRMATION NUMBER: 4100.200.301" }]
+      },
+      { "y": 738, "size": 6.7, "cells": [{ "x": 434.5, "end": 490.1, "text": "PIN CODE: 0000" }] },
+      {
+        "y": 718.5,
+        "size": 6,
+        "cells": [
+          { "x": 361.8, "end": 388.5, "text": "CHECK-IN" },
+          { "x": 441, "end": 473.3, "text": "CHECK-OUT" },
+          { "x": 510.4, "end": 531.2, "text": "ROOMS" },
+          { "x": 543.9, "end": 565.2, "text": "NIGHTS" }
+        ]
+      },
+      {
+        "y": 714.8,
+        "size": 9.7,
+        "cells": [{ "x": 118.8, "end": 206.6, "text": "Garden Saint Martin" }]
+      },
+      {
+        "y": 699.8,
+        "size": 8.2,
+        "cells": [
+          {
+            "x": 118.8,
+            "end": 308.5,
+            "text": "Address: 35 Rue Yves Toudic, 10th arr., 75010 Paris,"
+          },
+          { "x": 364, "end": 386.3, "text": "20" },
+          { "x": 446, "end": 468.3, "text": "24" },
+          { "x": 515.2, "end": 560.1, "text": "2 / 4" }
+        ]
+      },
+      { "y": 690, "size": 8.2, "cells": [{ "x": 118.8, "end": 143.6, "text": "France" }] },
+      {
+        "y": 685.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 355.9, "end": 394.5, "text": "DECEMBER" },
+          { "x": 437.9, "end": 476.5, "text": "DECEMBER" }
+        ]
+      },
+      {
+        "y": 678.8,
+        "size": 6,
+        "cells": [
+          { "x": 118.8, "end": 212.7, "text": "Phone: +00 0000 0000" },
+          { "x": 520.8, "end": 557.1, "text": "YOUR GROUP" }
+        ]
+      },
+      {
+        "y": 674.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 363.8, "end": 386.5, "text": "Friday" },
+          { "x": 442.8, "end": 471.5, "text": "Tuesday" }
+        ]
+      },
+      {
+        "y": 666.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 118.8, "end": 287.6, "text": "GPS coordinates: N 048° 52.274, E 02° 21.748" },
+          { "x": 525.7, "end": 552.3, "text": "3 adults" }
+        ]
+      },
+      {
+        "y": 663,
+        "size": 7.5,
+        "cells": [
+          { "x": 361.6, "end": 398.1, "text": "from 15:00" },
+          { "x": 444.4, "end": 479.3, "text": "until 11:30" }
+        ]
+      },
+      { "y": 628.5, "size": 12, "cells": [{ "x": 43.8, "end": 77.3, "text": "PRICE" }] },
+      {
+        "y": 616.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 71.3, "text": "2 rooms" },
+          { "x": 530.1, "end": 569, "text": "THB 23,487" }
+        ]
+      },
+      {
+        "y": 607.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 74.8, "text": "10 % VAT" },
+          { "x": 534.3, "end": 569, "text": "THB 2,348" }
+        ]
+      },
+      {
+        "y": 588.8,
+        "size": 10.5,
+        "cells": [
+          { "x": 43.8, "end": 77.8, "text": "Price" },
+          { "x": 448.1, "end": 569, "text": "approx. THB 25,835" }
+        ]
+      },
+      {
+        "y": 577.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 88.8, "text": "(for 4 guests)" },
+          { "x": 550.3, "end": 569, "text": "€ 720" }
+        ]
+      },
+      {
+        "y": 568.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 105.2, "text": "Booking.com pays" },
+          { "x": 537.9, "end": 569, "text": "− € 57.60" }
+        ]
+      },
+      {
+        "y": 559.5,
+        "size": 7.5,
+        "cells": [{ "x": 43.8, "end": 106.1, "text": "Additional charges" }]
+      },
+      {
+        "y": 550.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 547.8,
+            "text": "The price you see below is an approximate that may include fees based on the maximum occupancy. This can include taxes set by local governments or"
+          }
+        ]
+      },
+      {
+        "y": 541.5,
+        "size": 7.5,
+        "cells": [{ "x": 43.8, "end": 135.9, "text": "charges set by the property." }]
+      },
+      {
+        "y": 529.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 183.4, "text": "City tax (THB 116.62 × 4 guests × nights)" },
+          { "x": 534.3, "end": 569, "text": "THB 1,399" }
+        ]
+      },
+      {
+        "y": 520.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 78.1, "text": "Final price" },
+          { "x": 480.5, "end": 569, "text": "approx. THB 25,167.85" }
+        ]
+      },
+      {
+        "y": 511.5,
+        "size": 7.5,
+        "cells": [{ "x": 43.8, "end": 97.1, "text": "(taxes included)" }]
+      },
+      {
+        "y": 505.5,
+        "size": 10.5,
+        "cells": [{ "x": 454.7, "end": 569, "text": "You'll pay 701.40 in EUR." }]
+      },
+      {
+        "y": 488.3,
+        "size": 10.5,
+        "cells": [{ "x": 43.8, "end": 149.6, "text": "Additional information" }]
+      },
+      {
+        "y": 478.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 318.3,
+            "text": "Please note that additional supplements (e.g. extra bed) are not added in this total."
+          }
+        ]
+      },
+      {
+        "y": 469.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 321.8,
+            "text": "If you don't show up or cancel, applicable taxes may still be charged by the property."
+          }
+        ]
+      },
+      {
+        "y": 460.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 433.1,
+            "text": "Please remember to read the Important information below, as this may contain important details not mentioned here."
+          }
+        ]
+      },
+      {
+        "y": 434.3,
+        "size": 7.5,
+        "cells": [{ "x": 56.5, "end": 191.6, "text": "About Booking.com pays in your invoice" }]
+      },
+      {
+        "y": 425.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 56.5,
+            "end": 540.5,
+            "text": "Booking.com paid THB 2,066.82 of this booking. If you get an invoice from the property it won't show this amount. You'll see THB 25,835.26 as the"
+          }
+        ]
+      },
+      { "y": 416.3, "size": 7.5, "cells": [{ "x": 56.5, "end": 91.8, "text": "total price." }] },
+      {
+        "y": 405,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 56.5,
+            "end": 432.2,
+            "text": "You can use the property invoice and the booking confirmation from Booking.com for tax and business purposes."
+          }
+        ]
+      },
+      { "y": 364.5, "size": 9.7, "cells": [{ "x": 43.8, "end": 102.5, "text": "Double Room" }] },
+      {
+        "y": 351,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 163.6, "text": "Guest name: Arjun Rao" },
+          { "x": 381.5, "end": 474, "text": "THB 12,918 € 360" }
+        ]
+      },
+      {
+        "y": 342,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 134.8, "text": "Number of guests: 2 adults" },
+          { "x": 381.5, "end": 399.3, "text": "Room" },
+          { "x": 513.2, "end": 539.4, "text": "€ 327.27" }
+        ]
+      },
+      {
+        "y": 333,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 210.8, "text": "Meal Plan: There is no meal option with this room." },
+          { "x": 381.5, "end": 445, "text": "10 % VAT is included." },
+          { "x": 513.2, "end": 535.6, "text": "€ 32.73" }
+        ]
+      },
+      {
+        "y": 327.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 381.5, "end": 523.2, "text": "€ 3.25 City tax per person per night is excluded." }
+        ]
+      },
+      {
+        "y": 321,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 339.5,
+            "text": "Private bathroom • City view • Free toiletries • Shower • Safety deposit box • Toilet • Soundproofing •"
+          }
+        ]
+      },
+      {
+        "y": 316.5,
+        "size": 6.7,
+        "cells": [{ "x": 381.5, "end": 441, "text": "Cancellation policy:" }]
+      },
+      {
+        "y": 312.8,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 364.8,
+            "text": "Telephone • Coffee machine • Iron • Heating • Flat-screen TV • Hairdryer • Carpeted • Cable channels • Wake-"
+          }
+        ]
+      },
+      {
+        "y": 305.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 177.9, "text": "up service • Wardrobe or closet • Toilet paper" },
+          {
+            "x": 381.5,
+            "end": 567.6,
+            "text": "If you cancel, modify the booking, or don't show up, the fee will"
+          }
+        ]
+      },
+      {
+        "y": 300,
+        "size": 6.7,
+        "cells": [{ "x": 381.5, "end": 487.8, "text": "be the total price of the reservation." }]
+      },
+      {
+        "y": 293.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 178.5, "text": "Bed Size(s): 1 double bed (131-150 cm wide)" }
+        ]
+      },
+      { "y": 266.3, "size": 9.7, "cells": [{ "x": 43.8, "end": 102.5, "text": "Double Room" }] },
+      {
+        "y": 252.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 163.6, "text": "Guest name: Arjun Rao" },
+          { "x": 381.5, "end": 474, "text": "THB 12,918 € 360" }
+        ]
+      },
+      {
+        "y": 243.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 131, "text": "Number of guests: 1 adult" },
+          { "x": 381.5, "end": 399.3, "text": "Room" },
+          { "x": 513.2, "end": 539.4, "text": "€ 327.27" }
+        ]
+      },
+      {
+        "y": 234.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 210.8, "text": "Meal Plan: There is no meal option with this room." },
+          { "x": 381.5, "end": 445, "text": "10 % VAT is included." },
+          { "x": 513.2, "end": 535.6, "text": "€ 32.73" }
+        ]
+      },
+      {
+        "y": 230.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 381.5, "end": 523.2, "text": "€ 3.25 City tax per person per night is excluded." }
+        ]
+      },
+      {
+        "y": 222.8,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 339.5,
+            "text": "Private bathroom • City view • Free toiletries • Shower • Safety deposit box • Toilet • Soundproofing •"
+          }
+        ]
+      },
+      {
+        "y": 215.3,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 364.8,
+            "text": "Telephone • Coffee machine • Iron • Heating • Flat-screen TV • Hairdryer • Carpeted • Cable channels • Wake-"
+          },
+          { "x": 381.5, "end": 441, "text": "Cancellation policy:" }
+        ]
+      },
+      {
+        "y": 207,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 177.9, "text": "up service • Wardrobe or closet • Toilet paper" },
+          {
+            "x": 381.5,
+            "end": 567.6,
+            "text": "If you cancel, modify the booking, or don't show up, the fee will"
+          }
+        ]
+      },
+      {
+        "y": 201.8,
+        "size": 6.7,
+        "cells": [{ "x": 381.5, "end": 487.8, "text": "be the total price of the reservation." }]
+      },
+      {
+        "y": 195,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 178.5, "text": "Bed Size(s): 1 double bed (131-150 cm wide)" }
+        ]
+      },
+      {
+        "y": 162.4,
+        "size": 9.7,
+        "cells": [
+          { "x": 56.7, "end": 153.6, "text": "Important information" },
+          { "x": 338, "end": 398.7, "text": "Hotel Policies" }
+        ]
+      },
+      { "y": 151.5, "size": 7.5, "cells": [{ "x": 335.5, "end": 382.6, "text": "Guest parking" }] },
+      {
+        "y": 143.3,
+        "size": 7.5,
+        "cells": [{ "x": 350.5, "end": 420.1, "text": "No parking available." }]
+      },
+      {
+        "y": 132.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 350.5,
+            "end": 513.7,
+            "text": "WiFi is available in all areas and is free of charge."
+          }
+        ]
+      }
+    ],
+    [
+      { "y": 754.5, "size": 7.5, "cells": [{ "x": 54.3, "end": 91.3, "text": "Need help?" }] },
+      {
+        "y": 746.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 262.8,
+            "text": "You can always view, change or cancel your booking online at:"
+          }
+        ]
+      },
+      { "y": 738, "size": 7.5, "cells": [{ "x": 54.3, "end": 113.7, "text": "your.booking.com" }] },
+      {
+        "y": 726,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 289.6,
+            "text": "For any questions related to the property, you can contact Garden Saint"
+          }
+        ]
+      },
+      {
+        "y": 717.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 176, "text": "Martin directly on: +00 0000 0000" }]
+      },
+      {
+        "y": 705.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 241.2,
+            "text": "Or contact us by phone - we're available 24 hours a day:"
+          }
+        ]
+      },
+      {
+        "y": 697.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 163.9, "text": "Local number: 0008 000 016 075" }]
+      },
+      {
+        "y": 689.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 213.4, "text": "When abroad or from France: +00 0000 0000" }]
+      },
+      {
+        "y": 680.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 139.6, "text": "Travel with peace of mind" }]
+      },
+      {
+        "y": 672,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 223.8,
+            "text": "Find more information about travelling safely in our"
+          }
+        ]
+      },
+      {
+        "y": 663.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 130.7, "text": "Safety resource centre" }]
+      },
+      {
+        "y": 652.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 270.1,
+            "text": "Your safety is our top concern. In case of an emergency while on"
+          }
+        ]
+      },
+      {
+        "y": 643.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.8,
+            "text": "holiday, dial 112 to reach police, the fire brigade, or emergency medical"
+          }
+        ]
+      },
+      {
+        "y": 635.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.1,
+            "text": "services. This number works in most European countries and is free of"
+          }
+        ]
+      },
+      { "y": 627, "size": 7.5, "cells": [{ "x": 54.3, "end": 79, "text": "charge." }] },
+      {
+        "y": 616.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 286.3,
+            "text": "Find more local emergency phone numbers to help give you complete"
+          }
+        ]
+      },
+      {
+        "y": 607.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 191, "text": "peace of mind during your stay in France." }]
+      },
+      {
+        "y": 575,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 47,
+            "end": 576.3,
+            "text": "This print version of your confirmation contains the most important information about your booking. It can be used to check in when you arrive at Garden Saint Martin. For further"
+          }
+        ]
+      },
+      {
+        "y": 567,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 179.9,
+            "end": 432.9,
+            "text": "details please refer to your confirmation email sent to traveller@example.com."
+          }
+        ]
+      }
+    ]
+  ]
+}

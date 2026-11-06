@@ -45,24 +45,36 @@ export function setAirports(map: Map<string, Airport>): void {
 const SERVER_WAIT_MS = 4000;
 const KINDS = new Set(['city', 'region']);
 
-/** "KSR Bengaluru (SBC)" → ["KSR Bengaluru", "Bengaluru"]; "Goa 403515" → ["Goa"]. */
+/**
+ * Names to try for printed text: the whole name, then its last words, then its
+ * first words. "KSR Bengaluru (SBC)" → Bengaluru; "Goa 403515" → Goa;
+ * "Paris Nord" (a station) → Paris; "1094 CC Amsterdam" → Amsterdam.
+ */
 function variants(text: string): string[] {
   const clean = text
-    .replace(/\([^)]*\)/g, ' ')
-    .replace(/\d+/g, ' ')
+    .replace(/\([^)]*\)?/g, ' ')
+    .replace(/\b\w*\d\w*\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  const words = clean.split(' ').filter(Boolean);
-  const out: string[] = [];
-  for (let i = 0; i < words.length && i < 4; i++) {
-    const v = words.slice(i).join(' ');
-    if (v.length >= 3) out.push(v);
-  }
-  return out;
+  const words = clean.split(' ').filter(Boolean).slice(0, 6);
+  const out = new Set<string>();
+  for (let i = 0; i < words.length; i++) out.add(words.slice(i).join(' '));
+  for (let k = words.length - 1; k >= 1; k--) out.add(words.slice(0, k).join(' '));
+  return [...out].filter((v) => v.length >= 3);
 }
 
-const matches = (p: Place, text: string, country?: string | null) =>
-  KINDS.has(p.kind) &&
+/** "France" → "FR", from the countries kept on the phone; null when it isn't a country. */
+function countryCodeOf(db: Db, text: string): string | null {
+  const name = normalizePlace(text);
+  if (!name) return null;
+  const hit = searchPlaces(db, text, { limit: 8 }).find(
+    (p) => p.kind === 'country' && [p.name, ...p.aliases].some((n) => normalizePlace(n) === name),
+  );
+  return hit?.countryCode ?? null;
+}
+
+const matches = (p: Place, text: string, country?: string | null, kinds: Set<string> = KINDS) =>
+  kinds.has(p.kind) &&
   (!country || p.countryCode === country) &&
   [p.name, ...p.aliases].some((n) => normalizePlace(n) === normalizePlace(text));
 
@@ -81,16 +93,17 @@ export async function findPlace(
   db: Db,
   text: string | null | undefined,
   country?: string | null,
+  kinds: Set<string> = KINDS,
 ): Promise<Place | undefined> {
   if (!text) return undefined;
   const tries = variants(text);
   for (const v of tries) {
-    const local = searchPlaces(db, v, { limit: 8 }).find((p) => matches(p, v, country));
+    const local = searchPlaces(db, v, { limit: 8 }).find((p) => matches(p, v, country, kinds));
     if (local) return local;
   }
   for (const v of tries) {
     const found = await fromServer(v);
-    const hit = found.find((p) => matches(p, v, country));
+    const hit = found.find((p) => matches(p, v, country, kinds));
     if (hit) {
       savePlaces(db, [hit]);
       return hit;
@@ -99,16 +112,25 @@ export async function findPlace(
   return undefined;
 }
 
-/** A hotel's or venue's address → its town: the parts are tried in order, most specific first. */
+/**
+ * A hotel's or venue's address → its town. An address ends with its country
+ * ("…, 75010 Paris, France"), and the town must be in that country (Plan 38: a
+ * Paris hotel matched a Paris in another country before). The other parts are
+ * tried from the end, nearest the country first, so the street is tried last.
+ */
 async function placeFromAddress(db: Db, address: string): Promise<Place | undefined> {
   const parts = address
     .split(',')
     .map((s) => s.trim())
-    .filter((s) => /[A-Za-z]{3}/.test(s));
-  for (const part of parts) {
-    const p = await findPlace(db, part);
-    if (p) return p;
-  }
+    .filter((s) => /\p{L}{3}/u.test(s));
+  const country = parts.length > 1 ? countryCodeOf(db, parts[parts.length - 1]!) : null;
+  const rest = country ? parts.slice(0, -1) : parts;
+  // Towns first (Candolim before the state of Goa), then regions.
+  for (const kinds of [new Set(['city']), new Set(['region'])])
+    for (const part of [...rest].reverse()) {
+      const p = await findPlace(db, part, country, kinds);
+      if (p) return p;
+    }
   return undefined;
 }
 

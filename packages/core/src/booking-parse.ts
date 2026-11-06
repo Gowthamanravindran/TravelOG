@@ -52,10 +52,12 @@ export interface BookingDraft {
 }
 
 export interface ParseOptions {
-  /** Used when a price has no currency marked. */
+  /** Used when a price has no currency marked, and preferred when a ticket shows several. */
   currency: string;
   /** For dates printed without a year; defaults to now. */
   today?: string;
+  /** The trip's first day, for dates printed without a year when the ticket has no booking date. */
+  tripStart?: string | null;
 }
 
 // ---------------------------------------------------------------- providers
@@ -101,6 +103,24 @@ const AIRLINES: [string, string][] = [
   ['EW', 'Eurowings'],
   ['FR', 'Ryanair'],
   ['U2', 'easyJet'],
+  ['SK', 'Scandinavian Airlines'],
+  ['DY', 'Norwegian'],
+  ['D8', 'Norwegian'],
+  ['AY', 'Finnair'],
+  ['OS', 'Austrian'],
+  ['SN', 'Brussels Airlines'],
+  ['IB', 'Iberia'],
+  ['VY', 'Vueling'],
+  ['AZ', 'ITA Airways'],
+  ['TP', 'TAP Air Portugal'],
+  ['W6', 'Wizz Air'],
+  ['EI', 'Aer Lingus'],
+  ['VS', 'Virgin Atlantic'],
+  ['AC', 'Air Canada'],
+  ['WY', 'Oman Air'],
+  ['GF', 'Gulf Air'],
+  ['SV', 'Saudia'],
+  ['ET', 'Ethiopian Airlines'],
 ];
 const AIRLINE_BY_CODE = new Map(AIRLINES);
 
@@ -134,13 +154,19 @@ const SITES = [
   'KSRTC',
   'MSRTC',
   'HRTC',
+  'Eurostar',
+  'SNCF',
+  'Trenitalia',
+  'Deutsche Bahn',
+  'Gotogate',
+  'Kiwi.com',
 ];
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const findName = (text: string, names: string[]) => {
   let best: { name: string; at: number } | null = null;
   for (const name of names) {
-    const m = new RegExp(`(?<![\\w.])${esc(name)}(?![\\w])`, 'i').exec(text);
+    const m = new RegExp(`(?<![\\w])${esc(name)}(?![\\w])`, 'i').exec(text);
     if (m && (!best || m.index < best.at)) best = { name, at: m.index };
   }
   return best?.name ?? null;
@@ -177,7 +203,7 @@ const TYPE_SIGNALS: [DraftType, RegExp, number][] = [
 
 const SITE_TYPES: [RegExp, DraftType][] = [
   [/^(redBus|AbhiBus|KSRTC|MSRTC|HRTC)$/, 'bus'],
-  [/^IRCTC$/, 'train'],
+  [/^(IRCTC|Eurostar|SNCF|Trenitalia|Deutsche Bahn)$/, 'train'],
   [/^(Booking\.com|Agoda|Airbnb|Hotels\.com|OYO|Treebo|FabHotels|Zostel)$/, 'stay'],
   [/^(BookMyShow|Klook|GetYourGuide|Viator)$/, 'event'],
   [/^(Zoomcar|Savaari)$/, 'rental'],
@@ -276,6 +302,7 @@ function matchStart(text: string, shape: RegExp): string | null {
 
 const REF_LABELS: RegExp[] = [
   /\b(?:airline\s+)?PNR(?:\s*(?:No\.?|Number|Code))?\b/i,
+  /\b(?:airline\s+)?check-?in\s+reference(?:\(s\)|s)?/i,
   /\b(?:booking|confirmation|reservation)\s*(?:id|ref(?:erence)?|no\.?|number|code|#)/i,
   /\b(?:itinerary|trip)\s*(?:id|no\.?|number)/i,
   /\bticket\s*(?:no\.?|number)/i,
@@ -490,8 +517,15 @@ const CURRENCY_SIGNS: [RegExp, string][] = [
   [/^sgd$/i, 'SGD'],
   [/^thb$/i, 'THB'],
   [/^(¥|jpy)$/i, 'JPY'],
+  [/^nok$/i, 'NOK'],
+  [/^sek$/i, 'SEK'],
+  [/^dkk$/i, 'DKK'],
+  [/^chf$/i, 'CHF'],
+  [/^(kr|kr\.)$/i, 'NOK'],
+  [/^(myr|rm)$/i, 'MYR'],
+  [/^(lkr)$/i, 'LKR'],
 ];
-const CUR = '₹|Rs\\.?|INR|US\\$|\\$|USD|€|EUR|£|GBP|AED|SGD|THB|¥|JPY';
+const CUR = '₹|Rs\\.?|INR|US\\$|\\$|USD|€|EUR|£|GBP|AED|SGD|THB|¥|JPY|NOK|SEK|DKK|CHF|MYR|LKR';
 const AMOUNT = new RegExp(
   `(?:(${CUR})\\s*)?(\\d{1,3}(?:,\\d{2,3})+(?:\\.\\d{1,2})?|\\d+(?:\\.\\d{1,2})?)(?![\\d:/%])(?:\\s*(${CUR})(?![A-Za-z]))?`,
   'i',
@@ -712,6 +746,9 @@ function findNotes(
     );
   if (cls) notes.push(`Class ${cls[1]}`);
   if (type === 'stay') {
+    // The PIN some booking sites give with the confirmation number (Plan 38).
+    const pin = /\bPIN\s*(?:CODE)?\s*:?\s*(\d{4,6})\b/i.exec(text);
+    if (pin) notes.push(`PIN ${pin[1]}`);
     const room = valueAfter(lines, /\broom\s*(?:type|category)?\s*:/i, /[^\s].{1,50}/);
     if (room) notes.push(`Room: ${room.split(COL)[0]!.trim()}`);
     const people = /\b(\d{1,2})\s*(adults?|guests?)\b/i.exec(text);
@@ -936,4 +973,33 @@ export function emptyDraft(): BookingDraft {
     notes: null,
     found: [],
   };
+}
+
+// ---------------------------------------------------------------- helpers for table reading (Plan 38)
+
+/**
+ * The first date in a piece of text, and the time printed next to it. A date
+ * without a year is placed on or after `ref` (about two months of slack).
+ */
+export function readDate(text: string, ref: string): { date: string; time: string | null } | null {
+  const hit = findDates(text, linesOf(text), ref).find((h) => h.role !== 'ignore');
+  return hit ? { date: hit.date, time: hit.time } : null;
+}
+
+/** Every time in a piece of text, as 'HH:MM' ("from 15:00", "15:00-23:30", "6:45 PM"). */
+export function readTimes(text: string): string[] {
+  const re = new RegExp(TIME_RE.source, 'gi');
+  const out: string[] = [];
+  for (let m = re.exec(text); m; m = re.exec(text)) out.push(toTime(m[1]!, m[2]!, m[3]));
+  return out;
+}
+
+/** "SK" → "Scandinavian Airlines", or undefined for codes we don't know. */
+export function airlineName(code: string): string | undefined {
+  return AIRLINE_BY_CODE.get(code);
+}
+
+/** "₹", "Rs.", "EUR", "€"… → ISO code, or null. */
+export function currencyCode(sign: string | undefined): string | null {
+  return currencyOf(sign);
 }

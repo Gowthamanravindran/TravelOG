@@ -30,8 +30,39 @@ function setup() {
     place({ id: 'adm1:goa', name: 'Goa', kind: 'region' }),
     place({ id: 'gn:vasco', name: 'Vasco da Gama' }),
     place({ id: 'gn:candolim', name: 'Candolim' }),
+    // Every country is on the phone (seeded), so an address's country is always known.
+    place({ id: 'ctry:IN', name: 'India', kind: 'country' }),
     place({ id: 'gn:goa-ph', name: 'Goa', countryCode: 'PH', countryName: 'Philippines' }),
     place({ id: 'gn:tokyo', name: 'Tokyo', countryCode: 'JP', timeZone: 'Asia/Tokyo' }),
+    place({
+      id: 'ctry:FR',
+      name: 'France',
+      kind: 'country',
+      countryCode: 'FR',
+      countryName: 'France',
+    }),
+    place({
+      id: 'ctry:US',
+      name: 'United States',
+      kind: 'country',
+      countryCode: 'US',
+      countryName: 'United States',
+    }),
+    place({
+      id: 'gn:paris-us',
+      name: 'Paris',
+      countryCode: 'US',
+      countryName: 'United States',
+      population: 25_000,
+    }),
+    place({
+      id: 'gn:paris',
+      name: 'Paris',
+      countryCode: 'FR',
+      countryName: 'France',
+      population: 2_100_000,
+    }),
+    place({ id: 'gn:amsterdam', name: 'Amsterdam', countryCode: 'NL', countryName: 'Netherlands' }),
   ]);
   setAirports(
     new Map([
@@ -91,5 +122,29 @@ describe('finding a ticket’s places (Plan 35)', () => {
     });
     expect(d.placeId).toBe('gn:candolim');
     expect(getPlace(db, d.placeId!)?.name).toBe('Candolim');
+  });
+
+  it('an address’s country decides which Paris it is (Plan 38)', async () => {
+    const db = setup();
+    const d = await resolveDraftPlaces(db, {
+      ...emptyDraft(),
+      type: 'stay',
+      address: '35 Rue Yves Toudic, 10th arr., 75010 Paris, France',
+    });
+    expect(d.placeId).toBe('gn:paris');
+    // Without a country in our list, a same-named town abroad is never picked by its country.
+    expect((await findPlace(db, 'Paris', 'FR'))?.id).toBe('gn:paris');
+    expect((await findPlace(db, 'Paris', 'US'))?.id).toBe('gn:paris-us');
+  });
+
+  it('station names find their city ("Amsterdam Centraal" → Amsterdam)', async () => {
+    const db = setup();
+    const d = await resolveDraftPlaces(db, {
+      ...emptyDraft(),
+      type: 'train',
+      fromText: 'Paris Nord',
+      toText: 'Amsterdam Centraal',
+    });
+    expect([d.fromPlaceId, d.toPlaceId]).toEqual(['gn:paris', 'gn:amsterdam']);
   });
 });

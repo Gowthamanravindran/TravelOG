@@ -104,10 +104,10 @@ describe('adding a booking from a document (Plan 31)', () => {
     expect(screen.getByText('Flight · Check the details')).toBeTruthy();
     expect(screen.getByText('Filled in from your document: check before saving.')).toBeTruthy();
     expect(screen.getByLabelText('Name').props.value).toBe('Bengaluru → Goa · 6E 2134');
-    expect(screen.getByLabelText('PNR / ref').props.value).toBe('X7K2QP');
+    expect(screen.getByLabelText('PNR').props.value).toBe('X7K2QP');
     expect(screen.getByLabelText('Provider').props.value).toBe('IndiGo');
     expect(screen.getByLabelText('Total cost (INR)').props.value).toBe('4567');
-    expect(screen.getAllByText('From your document').length).toBeGreaterThan(3);
+    expect(screen.queryByText('From your document')).toBeNull();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
     const [b] = listBookings(db, tripId);
@@ -164,7 +164,7 @@ describe('adding a booking from a document (Plan 31)', () => {
     // The heading and the save button.
     expect(screen.getAllByText('Add booking')).toHaveLength(2);
     expect(screen.queryByText(/Filled in from/)).toBeNull();
-    expect(screen.getByLabelText('PNR / ref').props.value).toBe('');
+    expect(screen.getByLabelText('PNR').props.value).toBe('');
   });
 
   it('a return trip is added one leg at a time, both with the ticket attached', async () => {

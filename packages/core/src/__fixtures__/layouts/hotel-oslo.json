@@ -1,0 +1,768 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 761.3,
+        "size": 12,
+        "cells": [{ "x": 434.5, "end": 548.9, "text": "Booking confirmation" }]
+      },
+      {
+        "y": 750,
+        "size": 6.7,
+        "cells": [{ "x": 434.5, "end": 577.2, "text": "CONFIRMATION NUMBER: 4100.200.303" }]
+      },
+      { "y": 738, "size": 6.7, "cells": [{ "x": 434.5, "end": 490.1, "text": "PIN CODE: 0000" }] },
+      {
+        "y": 520.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 321.1, "end": 351.1, "text": "CHECK-IN" },
+          { "x": 413.1, "end": 449.5, "text": "CHECK-OUT" },
+          { "x": 493.8, "end": 512.7, "text": "UNITS" },
+          { "x": 531.5, "end": 555.5, "text": "NIGHTS" }
+        ]
+      },
+      {
+        "y": 516.8,
+        "size": 9.7,
+        "cells": [{ "x": 44.5, "end": 213.8, "text": "The Apartments Company - The Sweet" }]
+      },
+      {
+        "y": 501.8,
+        "size": 8.2,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 249.8,
+            "text": "Address: 30 Josefines Gate, Frogner, 0351 Oslo, Norway"
+          },
+          { "x": 330.5, "end": 341.7, "text": "2" },
+          { "x": 425.7, "end": 436.9, "text": "5" },
+          { "x": 497.7, "end": 549.1, "text": "2 / 3" }
+        ]
+      },
+      {
+        "y": 490.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 131.8, "text": "Phone: +00 0000 0000" },
+          { "x": 319.3, "end": 352.9, "text": "JANUARY" },
+          { "x": 414.5, "end": 448.1, "text": "JANUARY" }
+        ]
+      },
+      {
+        "y": 479.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 213.4, "text": "GPS coordinates: N 059° 55.330, E 10° 43.468" },
+          { "x": 504.5, "end": 545.4, "text": "YOUR GROUP" }
+        ]
+      },
+      {
+        "y": 476.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 319.6, "end": 352.6, "text": "Thursday" },
+          { "x": 418.5, "end": 444, "text": "Sunday" }
+        ]
+      },
+      { "y": 471, "size": 7.5, "cells": [{ "x": 511.6, "end": 538.3, "text": "3 adults" }] },
+      {
+        "y": 465,
+        "size": 7.5,
+        "cells": [
+          { "x": 319.2, "end": 362.4, "text": "15:00 - 19:00" },
+          { "x": 414.4, "end": 457.5, "text": "00:00 - 11:00" }
+        ]
+      },
+      { "y": 435, "size": 12, "cells": [{ "x": 44.5, "end": 78, "text": "PRICE" }] },
+      {
+        "y": 423,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 67, "text": "2 units" },
+          { "x": 529.3, "end": 568.2, "text": "THB 22,823" }
+        ]
+      },
+      {
+        "y": 414,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 75.5, "text": "12 % VAT" },
+          { "x": 533.5, "end": 568.2, "text": "THB 2,739" }
+        ]
+      },
+      {
+        "y": 395.3,
+        "size": 10.5,
+        "cells": [
+          { "x": 44.5, "end": 78.5, "text": "Price" },
+          { "x": 447.4, "end": 568.2, "text": "approx. THB 25,562" }
+        ]
+      },
+      {
+        "y": 384,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 89.6, "text": "(for 4 guests)" },
+          { "x": 522.4, "end": 568.2, "text": "NOK 8,387.60" }
+        ]
+      },
+      {
+        "y": 375,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 106, "text": "Booking.com pays" },
+          { "x": 522, "end": 568.2, "text": "− NOK 671.01" }
+        ]
+      },
+      {
+        "y": 358.5,
+        "size": 10.5,
+        "cells": [{ "x": 44.5, "end": 150.4, "text": "Additional information" }]
+      },
+      {
+        "y": 348.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 319.1,
+            "text": "Please note that additional supplements (e.g. extra bed) are not added in this total."
+          }
+        ]
+      },
+      {
+        "y": 339.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 322.5,
+            "text": "If you don't show up or cancel, applicable taxes may still be charged by the property."
+          }
+        ]
+      },
+      {
+        "y": 330.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 433.9,
+            "text": "Please remember to read the Important information below, as this may contain important details not mentioned here."
+          }
+        ]
+      },
+      {
+        "y": 304.5,
+        "size": 7.5,
+        "cells": [{ "x": 57.3, "end": 192.4, "text": "About Booking.com pays in your invoice" }]
+      },
+      {
+        "y": 295.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 57.3,
+            "end": 541.2,
+            "text": "Booking.com paid THB 2,044.94 of this booking. If you get an invoice from the property it won't show this amount. You'll see THB 25,561.65 as the"
+          }
+        ]
+      },
+      { "y": 286.5, "size": 7.5, "cells": [{ "x": 57.3, "end": 92.6, "text": "total price." }] },
+      {
+        "y": 275.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 57.3,
+            "end": 433,
+            "text": "You can use the property invoice and the booking confirmation from Booking.com for tax and business purposes."
+          }
+        ]
+      },
+      {
+        "y": 235.5,
+        "size": 9.7,
+        "cells": [{ "x": 44.5, "end": 161.8, "text": "Superior Studio Apartment" }]
+      },
+      {
+        "y": 222.8,
+        "size": 7.5,
+        "cells": [{ "x": 44.5, "end": 164.3, "text": "Guest name: Arjun Rao" }]
+      },
+      {
+        "y": 213.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 135.6, "text": "Number of guests: 2 adults" },
+          { "x": 380.7, "end": 497.6, "text": "THB 12,781 NOK 4,193.80" }
+        ]
+      },
+      {
+        "y": 204.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 211.6, "text": "Meal Plan: There is no meal option with this room." },
+          { "x": 380.7, "end": 430.7, "text": "Accommodation" },
+          { "x": 494.3, "end": 535.5, "text": "NOK 3,744.46" }
+        ]
+      },
+      {
+        "y": 199.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 380.7, "end": 444.3, "text": "12 % VAT is included." },
+          { "x": 494.3, "end": 530.4, "text": "NOK 449.34" }
+        ]
+      },
+      {
+        "y": 192.8,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 353.4,
+            "text": "Private bathroom • Free toiletries • Shower • Kitchen • Toilet • Towels • Linen • Socket near the bed • TV •"
+          }
+        ]
+      },
+      {
+        "y": 184.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 354.6,
+            "text": "Refrigerator • Tea/Coffee maker • Flat-screen TV • Hairdryer • Kitchenware • Kitchenette • Electric kettle •"
+          },
+          { "x": 380.7, "end": 440.2, "text": "Cancellation policy:" }
+        ]
+      },
+      {
+        "y": 176.3,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 350.5,
+            "text": "Dishwasher • Oven • Stovetop • Dining table • Upper floors accessible by elevator • Private apartment in"
+          },
+          {
+            "x": 380.7,
+            "end": 566.9,
+            "text": "If you cancel, modify the booking, or don't show up, the fee will"
+          }
+        ]
+      },
+      {
+        "y": 171.8,
+        "size": 6.7,
+        "cells": [{ "x": 380.7, "end": 487, "text": "be the total price of the reservation." }]
+      },
+      {
+        "y": 168,
+        "size": 6.7,
+        "cells": [{ "x": 44.5, "end": 152.3, "text": "building • Clothes rack • Toilet paper" }]
+      },
+      {
+        "y": 156.8,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 194.2, "text": "Bed Size(s): 1 large double bed (151-180cm wide)" }
+        ]
+      },
+      {
+        "y": 129.8,
+        "size": 9.7,
+        "cells": [{ "x": 44.5, "end": 161.8, "text": "Superior Studio Apartment" }]
+      },
+      {
+        "y": 116.3,
+        "size": 7.5,
+        "cells": [{ "x": 44.5, "end": 152.5, "text": "Guest name: Vikram Shah" }]
+      },
+      {
+        "y": 107.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 131.7, "text": "Number of guests: 1 adult" },
+          { "x": 380.7, "end": 497.6, "text": "THB 12,781 NOK 4,193.80" }
+        ]
+      },
+      {
+        "y": 98.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 211.6, "text": "Meal Plan: There is no meal option with this room." },
+          { "x": 380.7, "end": 430.7, "text": "Accommodation" },
+          { "x": 494.3, "end": 535.5, "text": "NOK 3,744.46" }
+        ]
+      },
+      {
+        "y": 93,
+        "size": 6.7,
+        "cells": [
+          { "x": 380.7, "end": 444.3, "text": "12 % VAT is included." },
+          { "x": 494.3, "end": 530.4, "text": "NOK 449.34" }
+        ]
+      },
+      {
+        "y": 86.3,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 353.4,
+            "text": "Private bathroom • Free toiletries • Shower • Kitchen • Toilet • Towels • Linen • Socket near the bed • TV •"
+          }
+        ]
+      },
+      {
+        "y": 81.8,
+        "size": 6.7,
+        "cells": [{ "x": 380.7, "end": 440.2, "text": "Cancellation policy:" }]
+      },
+      {
+        "y": 78,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 354.6,
+            "text": "Refrigerator • Tea/Coffee maker • Flat-screen TV • Hairdryer • Kitchenware • Kitchenette • Electric kettle •"
+          }
+        ]
+      },
+      {
+        "y": 70.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 350.5,
+            "text": "Dishwasher • Oven • Stovetop • Dining table • Upper floors accessible by elevator • Private apartment in"
+          },
+          {
+            "x": 380.7,
+            "end": 566.9,
+            "text": "If you cancel, modify the booking, or don't show up, the fee will"
+          }
+        ]
+      },
+      {
+        "y": 62.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 152.3, "text": "building • Clothes rack • Toilet paper" },
+          { "x": 380.7, "end": 487, "text": "be the total price of the reservation." }
+        ]
+      },
+      {
+        "y": 50.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 194.2, "text": "Bed Size(s): 1 large double bed (151-180cm wide)" }
+        ]
+      }
+    ],
+    [
+      {
+        "y": 751.2,
+        "size": 9.7,
+        "cells": [
+          { "x": 56.7, "end": 153.6, "text": "Important information" },
+          { "x": 338, "end": 398.7, "text": "Hotel Policies" }
+        ]
+      },
+      {
+        "y": 740.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 290.7,
+            "text": "In response to Coronavirus (COVID-19), additional safety and sanitation"
+          },
+          { "x": 335.5, "end": 382.6, "text": "Guest parking" }
+        ]
+      },
+      {
+        "y": 732,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 182.6, "text": "measures are in effect at this property." },
+          {
+            "x": 350.5,
+            "end": 568.4,
+            "text": "Public parking is possible on site (reservation is not possible) and"
+          }
+        ]
+      },
+      {
+        "y": 721.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 266.4,
+            "text": "This property will not accommodate hen, stag or similar parties."
+          },
+          { "x": 350.5, "end": 428.4, "text": "costs NOK 250 per day." }
+        ]
+      },
+      {
+        "y": 711,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 293,
+            "text": "Please inform The Apartments Company - The Sweet in advance of your"
+          },
+          {
+            "x": 350.5,
+            "end": 519.5,
+            "text": "WiFi is available in the rooms and is free of charge."
+          }
+        ]
+      },
+      {
+        "y": 702.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 273.5,
+            "text": "expected arrival time. You can use the Special Requests box when"
+          }
+        ]
+      },
+      {
+        "y": 694.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 266.1,
+            "text": "booking, or contact the property directly with the contact details"
+          }
+        ]
+      },
+      {
+        "y": 686.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 153.4, "text": "provided in your confirmation." }]
+      },
+      {
+        "y": 675.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 290.1,
+            "text": "Guests are required to show a photo identification and credit card upon"
+          }
+        ]
+      },
+      {
+        "y": 667.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 292.9,
+            "text": "check-in. Please note that all Special Requests are subject to availability"
+          }
+        ]
+      },
+      {
+        "y": 659.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 167.4, "text": "and additional charges may apply." }]
+      },
+      {
+        "y": 648.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 289.2,
+            "text": "Payment before arrival is required. Your host will charge the credit card"
+          }
+        ]
+      },
+      {
+        "y": 640.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 121, "text": "you provided earlier." }]
+      },
+      {
+        "y": 630,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 269.6,
+            "text": "Guests will receive a rental agreement which must be signed and"
+          }
+        ]
+      },
+      {
+        "y": 621.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 274.9,
+            "text": "returned to the property prior to arrival. If guests do not receive the"
+          }
+        ]
+      },
+      {
+        "y": 613.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 274.2,
+            "text": "agreement on time, they should contact the property management"
+          }
+        ]
+      },
+      {
+        "y": 605.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 230.8, "text": "company at the number on the booking confirmation." }
+        ]
+      },
+      {
+        "y": 594.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 293.9,
+            "text": "A damage deposit of NOK 10000 is required on arrival. That's about THB"
+          }
+        ]
+      },
+      {
+        "y": 586.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 286.1,
+            "text": "30475. This will be collected by credit card. You should be reimbursed"
+          }
+        ]
+      },
+      {
+        "y": 578.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 277.3,
+            "text": "within 14 days of check-out. Your deposit will be refunded in full via"
+          }
+        ]
+      },
+      {
+        "y": 570,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 225,
+            "text": "credit card, subject to an inspection of the property."
+          }
+        ]
+      },
+      {
+        "y": 534.2,
+        "size": 9.7,
+        "cells": [{ "x": 56.7, "end": 132.4, "text": "Special Requests" }]
+      },
+      {
+        "y": 522.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 234.3,
+            "text": "“Approximate time of arrival: between 20:00 and 21:00"
+          }
+        ]
+      },
+      {
+        "y": 514.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 318.9,
+            "text": "This guest would like the rooms in this booking to be close together if possible.”"
+          }
+        ]
+      },
+      { "y": 482.3, "size": 7.5, "cells": [{ "x": 54.3, "end": 91.3, "text": "Need help?" }] },
+      {
+        "y": 474,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 262.8,
+            "text": "You can always view, change or cancel your booking online at:"
+          }
+        ]
+      },
+      {
+        "y": 465.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 113.7, "text": "your.booking.com" }]
+      },
+      {
+        "y": 453.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 259.3,
+            "text": "For any questions related to the property, you can contact The"
+          }
+        ]
+      },
+      {
+        "y": 445.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 261.7,
+            "text": "Apartments Company - The Sweet directly on: +00 0000 0000"
+          }
+        ]
+      },
+      {
+        "y": 433.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 241.2,
+            "text": "Or contact us by phone - we're available 24 hours a day:"
+          }
+        ]
+      },
+      {
+        "y": 425.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 163.9, "text": "Local number: 0008 000 016 075" }]
+      },
+      {
+        "y": 417,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 216.2, "text": "When abroad or from Norway: +00 0000 0000" }]
+      },
+      {
+        "y": 408,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 139.6, "text": "Travel with peace of mind" }]
+      },
+      {
+        "y": 399.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 223.8,
+            "text": "Find more information about travelling safely in our"
+          }
+        ]
+      },
+      {
+        "y": 391.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 130.7, "text": "Safety resource centre" }]
+      },
+      {
+        "y": 380.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 270.1,
+            "text": "Your safety is our top concern. In case of an emergency while on"
+          }
+        ]
+      },
+      {
+        "y": 371.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.8,
+            "text": "holiday, dial 112 to reach police, the fire brigade, or emergency medical"
+          }
+        ]
+      },
+      {
+        "y": 363,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.1,
+            "text": "services. This number works in most European countries and is free of"
+          }
+        ]
+      },
+      { "y": 354.8, "size": 7.5, "cells": [{ "x": 54.3, "end": 79, "text": "charge." }] },
+      {
+        "y": 344.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 286.3,
+            "text": "Find more local emergency phone numbers to help give you complete"
+          }
+        ]
+      },
+      {
+        "y": 335.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 193.5, "text": "peace of mind during your stay in Norway." }]
+      },
+      {
+        "y": 302.7,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 47,
+            "end": 576.2,
+            "text": "This print version of your confirmation contains the most important information about your booking. It can be used to check in when you arrive at The Apartments Company - The"
+          }
+        ]
+      },
+      {
+        "y": 294.8,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 157.9,
+            "end": 454.9,
+            "text": "Sweet. For further details please refer to your confirmation email sent to traveller@example.com."
+          }
+        ]
+      }
+    ]
+  ]
+}

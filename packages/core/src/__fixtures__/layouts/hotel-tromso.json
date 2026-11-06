@@ -1,0 +1,553 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 761.3,
+        "size": 12,
+        "cells": [{ "x": 434.5, "end": 548.9, "text": "Booking confirmation" }]
+      },
+      {
+        "y": 750,
+        "size": 6.7,
+        "cells": [{ "x": 434.5, "end": 577.2, "text": "CONFIRMATION NUMBER: 4100.200.302" }]
+      },
+      { "y": 738, "size": 6.7, "cells": [{ "x": 434.5, "end": 490.1, "text": "PIN CODE: 0000" }] },
+      {
+        "y": 520.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 315.4, "end": 345.3, "text": "CHECK-IN" },
+          { "x": 409.8, "end": 446.2, "text": "CHECK-OUT" },
+          { "x": 492.1, "end": 511, "text": "UNITS" },
+          { "x": 531, "end": 555, "text": "NIGHTS" }
+        ]
+      },
+      {
+        "y": 516.8,
+        "size": 9.7,
+        "cells": [{ "x": 44.5, "end": 161.8, "text": "TA Stakkevollvegen Studio" }]
+      },
+      {
+        "y": 501.8,
+        "size": 8.2,
+        "cells": [
+          { "x": 44.5, "end": 238.7, "text": "Address: 303 Stakkevollvegen, 9019 Tromsø, Norway" },
+          { "x": 319.2, "end": 341.5, "text": "29" },
+          { "x": 422.4, "end": 433.6, "text": "2" },
+          { "x": 496, "end": 548.6, "text": "2 / 4" }
+        ]
+      },
+      {
+        "y": 490.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 131.8, "text": "Phone: +00 0000 0000" },
+          { "x": 311.1, "end": 349.7, "text": "DECEMBER" },
+          { "x": 411.2, "end": 444.8, "text": "JANUARY" }
+        ]
+      },
+      {
+        "y": 479.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 208.7, "text": "GPS coordinates: N 069° 41.038, E 19° 0.031" },
+          { "x": 503.5, "end": 544.3, "text": "YOUR GROUP" }
+        ]
+      },
+      {
+        "y": 476.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 317.6, "end": 343.1, "text": "Sunday" },
+          { "x": 411.5, "end": 444.5, "text": "Thursday" }
+        ]
+      },
+      { "y": 471, "size": 7.5, "cells": [{ "x": 510.6, "end": 537.2, "text": "3 adults" }] },
+      {
+        "y": 465,
+        "size": 7.5,
+        "cells": [
+          { "x": 313.5, "end": 356.6, "text": "15:00 - 23:30" },
+          { "x": 411.1, "end": 454.2, "text": "00:00 - 11:00" }
+        ]
+      },
+      { "y": 435, "size": 12, "cells": [{ "x": 44.5, "end": 78, "text": "PRICE" }] },
+      {
+        "y": 423,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 89.2, "text": "2 apartments" },
+          { "x": 529.3, "end": 568.2, "text": "THB 43,682" }
+        ]
+      },
+      {
+        "y": 414,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 71.3, "text": "8 % VAT" },
+          { "x": 533.5, "end": 568.2, "text": "THB 3,494" }
+        ]
+      },
+      {
+        "y": 395.3,
+        "size": 10.5,
+        "cells": [
+          { "x": 44.5, "end": 78.5, "text": "Price" },
+          { "x": 447.4, "end": 568.2, "text": "approx. THB 47,176" }
+        ]
+      },
+      {
+        "y": 384,
+        "size": 7.5,
+        "cells": [
+          { "x": 44.5, "end": 89.6, "text": "(for 4 guests)" },
+          { "x": 528.6, "end": 568.2, "text": "NOK 15,480" }
+        ]
+      },
+      {
+        "y": 367.5,
+        "size": 10.5,
+        "cells": [{ "x": 44.5, "end": 150.4, "text": "Additional information" }]
+      },
+      {
+        "y": 357.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 319.1,
+            "text": "Please note that additional supplements (e.g. extra bed) are not added in this total."
+          }
+        ]
+      },
+      {
+        "y": 348.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 322.5,
+            "text": "If you don't show up or cancel, applicable taxes may still be charged by the property."
+          }
+        ]
+      },
+      {
+        "y": 339.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 433.9,
+            "text": "Please remember to read the Important information below, as this may contain important details not mentioned here."
+          }
+        ]
+      },
+      {
+        "y": 308.3,
+        "size": 9.7,
+        "cells": [
+          { "x": 44.5, "end": 121.9, "text": "Studio Apartment" },
+          { "x": 380.7, "end": 450.8, "text": "THB 23,588" }
+        ]
+      },
+      { "y": 304.5, "size": 6.7, "cells": [{ "x": 456.4, "end": 488.3, "text": "NOK 7,740" }] },
+      {
+        "y": 295.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 164.3, "text": "Guest name: Arjun Rao" },
+          { "x": 380.7, "end": 412.7, "text": "Apartment" },
+          { "x": 491.5, "end": 532.7, "text": "NOK 7,166.67" }
+        ]
+      },
+      {
+        "y": 286.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 135.6, "text": "Number of guests: 2 adults" },
+          { "x": 380.7, "end": 440.5, "text": "8 % VAT is included." },
+          { "x": 491.5, "end": 527.6, "text": "NOK 573.33" }
+        ]
+      },
+      {
+        "y": 277.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 266.2,
+            "text": "Meal Plan: There is no meal included in the rate for this apartment."
+          },
+          { "x": 380.7, "end": 440.2, "text": "Cancellation policy:" }
+        ]
+      },
+      {
+        "y": 265.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 359.9,
+            "text": "Private bathroom • View • Shower • Air conditioning • Kitchen • Washing machine • Toilet • Towels • Linen •"
+          },
+          { "x": 380.7, "end": 428.4, "text": "Non-refundable" }
+        ]
+      },
+      {
+        "y": 257.3,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 342,
+            "text": "Soundproofing • Refrigerator • Heating • Kitchenware • Dressing room • Electric kettle • Dishwasher •"
+          },
+          { "x": 380.7, "end": 435.2, "text": "Cancellation cost:" }
+        ]
+      },
+      {
+        "y": 249,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 349.2,
+            "text": "Wardrobe or closet • Stovetop • Dining table • Detached • Clothes rack • Drying rack for clothing • Toilet"
+          },
+          { "x": 380.7, "end": 521.9, "text": "from 24 October 2024 21:48 [CEST]: NOK 7,740" }
+        ]
+      },
+      {
+        "y": 240.8,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 230.9,
+            "text": "paper • Single-room air conditioning for guest accommodation"
+          },
+          {
+            "x": 380.7,
+            "end": 564.2,
+            "text": "This is a non-refundable reservation. If you choose to cancel"
+          }
+        ]
+      },
+      {
+        "y": 231,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 380.7,
+            "end": 560,
+            "text": "you will not be refunded. Changing the dates of your stay is"
+          }
+        ]
+      },
+      { "y": 222.8, "size": 6.7, "cells": [{ "x": 380.7, "end": 419.8, "text": "not possible." }] },
+      {
+        "y": 196.5,
+        "size": 9.7,
+        "cells": [
+          { "x": 44.5, "end": 121.9, "text": "Studio Apartment" },
+          { "x": 380.7, "end": 450.8, "text": "THB 23,588" }
+        ]
+      },
+      { "y": 192.8, "size": 6.7, "cells": [{ "x": 456.4, "end": 488.3, "text": "NOK 7,740" }] },
+      {
+        "y": 183,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 152.5, "text": "Guest name: Vikram Shah" },
+          { "x": 380.7, "end": 412.7, "text": "Apartment" },
+          { "x": 491.5, "end": 532.7, "text": "NOK 7,166.67" }
+        ]
+      },
+      {
+        "y": 174,
+        "size": 6.7,
+        "cells": [
+          { "x": 44.5, "end": 131.7, "text": "Number of guests: 1 adult" },
+          { "x": 380.7, "end": 440.5, "text": "8 % VAT is included." },
+          { "x": 491.5, "end": 527.6, "text": "NOK 573.33" }
+        ]
+      },
+      {
+        "y": 165,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 266.2,
+            "text": "Meal Plan: There is no meal included in the rate for this apartment."
+          },
+          { "x": 380.7, "end": 440.2, "text": "Cancellation policy:" }
+        ]
+      },
+      {
+        "y": 153,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 359.9,
+            "text": "Private bathroom • View • Shower • Air conditioning • Kitchen • Washing machine • Toilet • Towels • Linen •"
+          },
+          { "x": 380.7, "end": 428.4, "text": "Non-refundable" }
+        ]
+      },
+      {
+        "y": 144.8,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 342,
+            "text": "Soundproofing • Refrigerator • Heating • Kitchenware • Dressing room • Electric kettle • Dishwasher •"
+          },
+          { "x": 380.7, "end": 435.2, "text": "Cancellation cost:" }
+        ]
+      },
+      {
+        "y": 136.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 349.2,
+            "text": "Wardrobe or closet • Stovetop • Dining table • Detached • Clothes rack • Drying rack for clothing • Toilet"
+          },
+          { "x": 380.7, "end": 521.9, "text": "from 24 October 2024 21:48 [CEST]: NOK 7,740" }
+        ]
+      },
+      {
+        "y": 129,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 44.5,
+            "end": 230.9,
+            "text": "paper • Single-room air conditioning for guest accommodation"
+          },
+          {
+            "x": 380.7,
+            "end": 564.2,
+            "text": "This is a non-refundable reservation. If you choose to cancel"
+          }
+        ]
+      },
+      {
+        "y": 118.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 380.7,
+            "end": 560,
+            "text": "you will not be refunded. Changing the dates of your stay is"
+          }
+        ]
+      },
+      { "y": 111, "size": 6.7, "cells": [{ "x": 380.7, "end": 419.8, "text": "not possible." }] },
+      {
+        "y": 78.4,
+        "size": 9.7,
+        "cells": [
+          { "x": 56.7, "end": 153.6, "text": "Important information" },
+          { "x": 338, "end": 398.7, "text": "Hotel Policies" }
+        ]
+      },
+      {
+        "y": 67.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 266.4,
+            "text": "This property will not accommodate hen, stag or similar parties."
+          },
+          { "x": 335.5, "end": 382.6, "text": "Guest parking" }
+        ]
+      },
+      {
+        "y": 59.3,
+        "size": 7.5,
+        "cells": [{ "x": 350.5, "end": 420.1, "text": "No parking available." }]
+      },
+      {
+        "y": 48.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 350.5,
+            "end": 519.5,
+            "text": "WiFi is available in the rooms and is free of charge."
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "y": 750.2,
+        "size": 9.7,
+        "cells": [{ "x": 56.7, "end": 132.4, "text": "Special Requests" }]
+      },
+      {
+        "y": 738.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 237,
+            "text": "“Approximate time of arrival: between 12:00 and 13:00”"
+          }
+        ]
+      },
+      { "y": 706.5, "size": 7.5, "cells": [{ "x": 54.3, "end": 91.3, "text": "Need help?" }] },
+      {
+        "y": 698.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 262.8,
+            "text": "You can always view, change or cancel your booking online at:"
+          }
+        ]
+      },
+      { "y": 690, "size": 7.5, "cells": [{ "x": 54.3, "end": 113.7, "text": "your.booking.com" }] },
+      {
+        "y": 678,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 255.8,
+            "text": "For any questions related to the property, you can contact TA"
+          }
+        ]
+      },
+      {
+        "y": 669.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 225.3, "text": "Stakkevollvegen Studio directly on: +00 0000 0000" }
+        ]
+      },
+      {
+        "y": 657.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 241.2,
+            "text": "Or contact us by phone - we're available 24 hours a day:"
+          }
+        ]
+      },
+      {
+        "y": 649.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 163.9, "text": "Local number: 0008 000 016 075" }]
+      },
+      {
+        "y": 641.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 216.2, "text": "When abroad or from Norway: +00 0000 0000" }]
+      },
+      {
+        "y": 632.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 139.6, "text": "Travel with peace of mind" }]
+      },
+      {
+        "y": 624,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 223.8,
+            "text": "Find more information about travelling safely in our"
+          }
+        ]
+      },
+      {
+        "y": 615.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 130.7, "text": "Safety resource centre" }]
+      },
+      {
+        "y": 604.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 270.1,
+            "text": "Your safety is our top concern. In case of an emergency while on"
+          }
+        ]
+      },
+      {
+        "y": 595.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.8,
+            "text": "holiday, dial 112 to reach police, the fire brigade, or emergency medical"
+          }
+        ]
+      },
+      {
+        "y": 587.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.1,
+            "text": "services. This number works in most European countries and is free of"
+          }
+        ]
+      },
+      { "y": 579, "size": 7.5, "cells": [{ "x": 54.3, "end": 79, "text": "charge." }] },
+      {
+        "y": 568.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 286.3,
+            "text": "Find more local emergency phone numbers to help give you complete"
+          }
+        ]
+      },
+      {
+        "y": 559.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 193.5, "text": "peace of mind during your stay in Norway." }]
+      },
+      {
+        "y": 527,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 48.3,
+            "end": 574.9,
+            "text": "This print version of your confirmation contains the most important information about your booking. It can be used to check in when you arrive at TA Stakkevollvegen Studio. For"
+          }
+        ]
+      },
+      {
+        "y": 519,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 168.9,
+            "end": 443.9,
+            "text": "further details please refer to your confirmation email sent to traveller@example.com."
+          }
+        ]
+      }
+    ]
+  ]
+}

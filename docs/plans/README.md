@@ -41,3 +41,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 35 | [Where you'll be: route strip, city per day, Check your plan](35-whereabouts.md) | see git log |
 | 36 | [Open a trip without the blank page](36-open-trip.md) | see git log |
 | 37 | ["Check your plan" designed properly](37-check-your-plan-design.md) | see git log |
+| 38 | [Bookings from real PDFs: places, dates and times read properly; a simpler form](38-real-booking-pdfs.md) | see git log |

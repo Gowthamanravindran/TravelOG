@@ -53,7 +53,7 @@ export function BookingsView({ tripId }: { tripId: string }) {
       const file = await pickAttachment();
       if (!file) return;
       setBusy('Reading your document…');
-      const read = await readBookingDocument(file, trip.currency);
+      const read = await readBookingDocument(file, trip);
       if (read.readable) {
         setBusy('Finding the places…');
         read.drafts = await Promise.all(read.drafts.map((d) => resolveDraftPlaces(db, d)));

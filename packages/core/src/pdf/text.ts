@@ -19,6 +19,31 @@ import {
  * ("PNR   X7K2QP"). Returns [] for encrypted files and for scans (no text inside).
  */
 export function extractPdfText(bytes: Uint8Array): string[] {
+  return extractPdfLayout(bytes).map((page) => page.map((l) => l.text).join('\n'));
+}
+
+/** A piece of text on a line, with where it starts and ends across the page (points). */
+export interface PdfCell {
+  x: number;
+  end: number;
+  text: string;
+}
+
+/** One line of a page: its cells left to right, split where a wide gap separates columns. */
+export interface PdfLine {
+  y: number;
+  size: number;
+  cells: PdfCell[];
+  /** The cells joined with three spaces, as extractPdfText returns it. */
+  text: string;
+}
+
+/**
+ * The text of each page as lines of positioned cells (Plan 38), so tables can be
+ * read by column: a value sits under its header when their positions overlap.
+ * Returns [] for encrypted files and for scans.
+ */
+export function extractPdfLayout(bytes: Uint8Array): PdfLine[][] {
   if (!isPdf(bytes)) return [];
   let doc: PdfDocument;
   try {
@@ -29,12 +54,12 @@ export function extractPdfText(bytes: Uint8Array): string[] {
   if (doc.encrypted) return [];
   const pages = findPages(doc).map((p) => {
     try {
-      return pageText(doc, p);
+      return pageLines(doc, p);
     } catch {
-      return '';
+      return [];
     }
   });
-  return pages.some((p) => p.trim()) ? pages : [];
+  return pages.some((p) => p.length) ? pages : [];
 }
 
 /** True when the bytes start like a PDF (allowing junk before the header). */
@@ -110,7 +135,7 @@ interface State {
   rise: number;
 }
 
-function pageText(doc: PdfDocument, page: Page): string {
+function pageLines(doc: PdfDocument, page: Page): PdfLine[] {
   const contents = doc.resolve(page.dict.get('Contents'));
   const streams = (
     Array.isArray(contents) ? contents.map((c) => doc.resolve(c)) : [contents]
@@ -173,28 +198,38 @@ function run(
   const show = (items: Value[]) => {
     if (!s.font) return;
     const m = mul(tm, s.ctm);
-    const [x, y] = apply(m, 0, s.rise);
-    const size = s.size * Math.hypot(m[2], m[3]) || s.size;
+    const size = Math.abs(s.size * Math.hypot(m[2], m[3]) || s.size);
     let text = '';
-    let advance = 0; // in text space units
+    let from = 0; // where the current piece starts, in text space units
+    let advance = 0;
+    const flush = () => {
+      const [x, y] = apply(m, from, s.rise);
+      const [endX] = apply(m, advance, s.rise);
+      // NFKC turns ligatures and compatibility forms into plain letters ("ﬁ" → "fi").
+      if (text.trim()) pieces.push({ x, y, end: endX, size, text: text.normalize('NFKC') });
+      text = '';
+    };
     for (const it of items) {
       if (typeof it === 'number') {
-        const shift = (-it / 1000) * s.size * s.scale;
-        // A large gap inside one run separates words or columns.
-        if (it < -250 && text && !text.endsWith(' ')) text += it < -1500 ? '   ' : ' ';
-        advance += shift;
+        // A very large gap inside one run is a column break: start a new piece there.
+        if (it < -1500) {
+          flush();
+          advance += (-it / 1000) * s.size * s.scale;
+          from = advance;
+          continue;
+        }
+        if (it < -250 && text && !text.endsWith(' ')) text += ' ';
+        advance += (-it / 1000) * s.size * s.scale;
         continue;
       }
       if (!(it instanceof Str)) continue;
       for (const g of s.font.glyphs(it.bytes)) {
         text += g.text;
-        advance +=
-          ((g.width / 1000) * s.size + s.charSpace + (g.space ? s.wordSpace : 0)) * s.scale;
+        advance += (g.width * s.size + s.charSpace + (g.space ? s.wordSpace : 0)) * s.scale;
       }
     }
-    const [endX] = apply(m, advance, s.rise);
+    flush();
     tm = mul([1, 0, 0, 1, advance, 0], tm);
-    if (text.trim()) pieces.push({ x, y, end: endX, size: Math.abs(size), text });
   };
 
   for (;;) {
@@ -315,8 +350,8 @@ function skipInlineImage(lex: Lexer) {
   lex.pos = b.length;
 }
 
-/** Pieces → lines, top to bottom, left to right. */
-function layout(pieces: Piece[]): string {
+/** Pieces → lines of cells, top to bottom, left to right. */
+function layout(pieces: Piece[]): PdfLine[] {
   const sorted = pieces.filter((p) => p.text.trim()).sort((a, b) => b.y - a.y || a.x - b.x);
   const lines: Piece[][] = [];
   for (const p of sorted) {
@@ -325,21 +360,31 @@ function layout(pieces: Piece[]): string {
     if (line && Math.abs(line[0]!.y - p.y) <= tol) line.push(p);
     else lines.push([p]);
   }
-  return lines
-    .map((line) => {
-      line.sort((a, b) => a.x - b.x);
-      let out = '';
-      let end = -Infinity;
-      for (const p of line) {
-        if (out) {
-          const gap = p.x - end;
-          if (gap > p.size * 0.9) out += '   ';
-          else if (gap > p.size * 0.15 && !out.endsWith(' ') && !p.text.startsWith(' ')) out += ' ';
-        }
-        out += p.text;
-        end = Math.max(end, p.end);
+  return lines.map((line) => {
+    line.sort((a, b) => a.x - b.x);
+    const cells: PdfCell[] = [];
+    let cell: PdfCell | null = null;
+    for (const p of line) {
+      const gap = cell ? p.x - cell.end : Infinity;
+      if (!cell || gap > p.size * 0.9) {
+        // A wide gap starts a new column.
+        cell = { x: p.x, end: p.end, text: p.text };
+        cells.push(cell);
+        continue;
       }
-      return out.replace(/\s+$/, '').replace(/^\s+/, '');
-    })
-    .join('\n');
+      if (gap > p.size * 0.15 && !cell.text.endsWith(' ') && !p.text.startsWith(' '))
+        cell.text += ' ';
+      cell.text += p.text;
+      cell.end = Math.max(cell.end, p.end);
+    }
+    const clean = cells
+      .map((c) => ({ ...c, text: c.text.replace(/\s+/g, ' ').trim() }))
+      .filter((c) => c.text);
+    return {
+      y: line[0]!.y,
+      size: Math.min(...line.map((p) => p.size)),
+      cells: clean,
+      text: clean.map((c) => c.text).join('   '),
+    };
+  });
 }

@@ -50,7 +50,7 @@ import {
   WithIcon,
 } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
-import { DateField, TimeField } from '@/ui/date-field';
+import { DateRangeField, TimeField } from '@/ui/date-field';
 import { PlaceField } from '@/ui/place-field';
 
 /**
@@ -95,7 +95,13 @@ export default function BookingEditor() {
   );
 }
 
-const FROM_DOC = 'From your document';
+const STAY_IN = '12:00';
+const STAY_OUT = '13:00';
+const TEXTS = {
+  stay: { range: 'Check-in – check-out', startTime: 'Check-in', endTime: 'Check-out' },
+  journey: { range: 'Departs – arrives', startTime: 'Departs', endTime: 'Arrives' },
+  other: { range: 'Dates', startTime: 'Starts', endTime: 'Ends' },
+};
 const JOURNEYS = new Set<BookingType>(['flight', 'train', 'bus']);
 
 /** A place as typed in the form: picked from our list (id), or just text. */
@@ -174,21 +180,27 @@ function BookingForm({
       ? { d: localDateIn(zone, new Date(iso)), t: localTimeIn(zone, new Date(iso)) }
       : { d: '', t: '' };
   const currency = existing?.currency ?? draft?.currency ?? trip?.currency ?? 'INR';
-  const [kind, setKind] = useState<BookingType>(
+  const [kind, setKindState] = useState<BookingType>(
     existing?.type ?? (draft && found.has('type') ? draft.type : (preset?.type ?? 'train')),
   );
+  // Stays start at 12:00 and end at 13:00 unless the document says otherwise (Plan 38).
+  const stayTimes = (k: BookingType, which: 'start' | 'end', read?: string | null) =>
+    read || (k === 'stay' && !existing ? (which === 'start' ? STAY_IN : STAY_OUT) : '');
   const [title, setTitle] = useState(existing?.title ?? draft?.title ?? '');
   const [provider, setProvider] = useState(existing?.provider ?? draft?.provider ?? '');
   const [reference, setReference] = useState(existing?.reference ?? draft?.reference ?? '');
   const [start, setStart] = useState(
     existing
       ? split(existing.startsAt, firstZones.start)
-      : { d: draft?.startDate ?? preset?.start ?? '', t: draft?.startTime ?? '' },
+      : {
+          d: draft?.startDate ?? preset?.start ?? '',
+          t: stayTimes(kind, 'start', draft?.startTime),
+        },
   );
   const [end, setEnd] = useState(
     existing
       ? split(existing.endsAt, firstZones.end)
-      : { d: draft?.endDate ?? preset?.end ?? '', t: draft?.endTime ?? '' },
+      : { d: draft?.endDate ?? preset?.end ?? '', t: stayTimes(kind, 'end', draft?.endTime) },
   );
   const [cost, setCost] = useState(amountText(existing?.costMinor ?? draft?.costMinor, currency));
   const [notes, setNotes] = useState(existing?.notes ?? draft?.notes ?? '');
@@ -197,7 +209,13 @@ function BookingForm({
   const [error, setError] = useState<string | null>(null);
   if (!trip) return null;
 
-  const hint = (f: DraftField) => (found.has(f) ? FROM_DOC : undefined);
+  const setKind = (k: BookingType) => {
+    setKindState(k);
+    if (k === 'stay' && !existing) {
+      setStart((v) => ({ ...v, t: v.t || STAY_IN }));
+      setEnd((v) => ({ ...v, t: v.t || STAY_OUT }));
+    }
+  };
   const zone = zones(kind, from, to, city);
   const instant = (v: { d: string; t: string }, z: string) =>
     v.d ? localToUtcIso(v.d, v.t || '00:00', z) : null;
@@ -205,6 +223,17 @@ function BookingForm({
   const journey = JOURNEYS.has(kind);
   const sameZones = zone.start === tz && zone.end === tz;
   const readable = !!imported?.readable;
+  // The name fills itself in when left empty (Plan 38): "Paris stay", "Oslo → Istanbul".
+  const short = (t: string) => t.split(',')[0]!.trim();
+  const autoTitle =
+    kind === 'stay' && city.text.trim()
+      ? `${short(city.text)} stay`
+      : journey && from.text.trim() && to.text.trim()
+        ? `${short(from.text)} → ${short(to.text)}`
+        : !journey && city.text.trim()
+          ? `${label.label} in ${short(city.text)}`
+          : label.label;
+  const texts = TEXTS[journey ? 'journey' : kind === 'stay' ? 'stay' : 'other'];
 
   const save = () => {
     try {
@@ -212,8 +241,8 @@ function BookingForm({
       const input = {
         tripId,
         type: kind,
-        title,
-        provider: provider || null,
+        title: title.trim() || autoTitle,
+        provider: journey ? provider || null : null,
         reference: reference || null,
         startsAt: instant(start, zone.start),
         endsAt: instant(end, zone.end),
@@ -314,29 +343,36 @@ function BookingForm({
         label="Name"
         value={title}
         onChangeText={setTitle}
-        placeholder="Delhi → Manali Volvo"
-        hint={hint('title')}
+        placeholder={autoTitle}
+        hint={title.trim() ? undefined : 'Optional: filled in for you'}
       />
-      <Row>
-        <View style={{ flex: 1 }}>
-          <Field
-            label="Provider"
-            value={provider}
-            onChangeText={setProvider}
-            placeholder="HRTC"
-            hint={hint('provider')}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Field
-            label="PNR / ref"
-            value={reference}
-            onChangeText={setReference}
-            autoCapitalize="characters"
-            hint={hint('reference')}
-          />
-        </View>
-      </Row>
+      {journey ? (
+        <Row>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Provider"
+              value={provider}
+              onChangeText={setProvider}
+              placeholder="IndiGo"
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="PNR"
+              value={reference}
+              onChangeText={setReference}
+              autoCapitalize="characters"
+            />
+          </View>
+        </Row>
+      ) : (
+        <Field
+          label={kind === 'stay' ? 'Confirmation no.' : 'Booking ref'}
+          value={reference}
+          onChangeText={setReference}
+          autoCapitalize="characters"
+        />
+      )}
       {journey ? (
         <Row>
           <View style={{ flex: 1 }}>
@@ -346,7 +382,6 @@ function BookingForm({
               onChangeText={(text) => setFrom({ text, id: null, timeZone: null })}
               onPick={(p) => setFrom(placeInput(p))}
               placeholder="Bengaluru"
-              hint={hint('where')}
             />
           </View>
           <View style={{ flex: 1 }}>
@@ -356,7 +391,6 @@ function BookingForm({
               onChangeText={(text) => setTo({ text, id: null, timeZone: null })}
               onPick={(p) => setTo(placeInput(p))}
               placeholder="Goa"
-              hint={hint('where')}
             />
           </View>
         </Row>
@@ -368,14 +402,12 @@ function BookingForm({
             onChangeText={(text) => setCity({ text, id: null, timeZone: null })}
             onPick={(p) => setCity(placeInput(p))}
             placeholder="Goa"
-            hint={hint('where')}
           />
           <Field
             label="Address"
             value={address}
             onChangeText={setAddress}
             placeholder="Candolim Beach Road, Goa"
-            hint={hint('address')}
           />
           {address.trim() || city.text.trim() ? (
             <Button
@@ -391,30 +423,26 @@ function BookingForm({
           ) : null}
         </>
       )}
+      {/* Both days on one calendar, as when creating a trip (Plan 38). */}
+      <DateRangeField
+        label={texts.range}
+        start={start.d}
+        end={end.d}
+        onChange={(d1, d2) => {
+          setStart({ ...start, d: d1 });
+          setEnd({ ...end, d: d2 });
+        }}
+      />
       <Row>
-        <View style={{ flex: 3 }}>
-          <DateField
-            label="Starts"
-            value={start.d}
-            onChange={(d) => setStart({ ...start, d })}
-            hint={hint('start')}
+        <View style={{ flex: 1 }}>
+          <TimeField
+            label={texts.startTime}
+            value={start.t}
+            onChange={(t) => setStart({ ...start, t })}
           />
         </View>
-        <View style={{ flex: 2 }}>
-          <TimeField label="Time" value={start.t} onChange={(t) => setStart({ ...start, t })} />
-        </View>
-      </Row>
-      <Row>
-        <View style={{ flex: 3 }}>
-          <DateField
-            label="Ends"
-            value={end.d}
-            onChange={(d) => setEnd({ ...end, d })}
-            hint={hint('end')}
-          />
-        </View>
-        <View style={{ flex: 2 }}>
-          <TimeField label="Time" value={end.t} onChange={(t) => setEnd({ ...end, t })} />
+        <View style={{ flex: 1 }}>
+          <TimeField label={texts.endTime} value={end.t} onChange={(t) => setEnd({ ...end, t })} />
         </View>
       </Row>
       <Body muted small>
@@ -427,7 +455,6 @@ function BookingForm({
         value={cost}
         onChangeText={setCost}
         keyboardType="decimal-pad"
-        hint={hint('cost')}
       />
       <Field
         label="Notes"
@@ -435,7 +462,6 @@ function BookingForm({
         onChangeText={setNotes}
         placeholder="Seats, room, who's travelling"
         multiline
-        hint={hint('notes')}
       />
       {!existing && sameCurrency ? (
         <Chip
@@ -490,7 +516,6 @@ function BookingForm({
       <Button
         label={existing ? 'Save' : steps > 1 && !last ? 'Add and go to the next' : 'Add booking'}
         onPress={save}
-        disabled={!title.trim()}
       />
       {steps > 1 && !existing ? (
         <Button

@@ -1,0 +1,401 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 729.9,
+        "size": 8.3,
+        "cells": [{ "x": 452.2, "end": 537, "text": "Flight Ticket (One way)" }]
+      },
+      {
+        "y": 715.7,
+        "size": 8.3,
+        "cells": [
+          {
+            "x": 283.4,
+            "end": 536.9,
+            "text": "Booking ID: NN2AASGV10000000002, (Booked on 26 October 2024)"
+          }
+        ]
+      },
+      {
+        "y": 672.7,
+        "size": 9,
+        "cells": [
+          { "x": 50.3, "end": 256.4, "text": "Barcode(s) for your journey Oslo-Istanbul on IndiGo" }
+        ]
+      },
+      { "y": 615.3, "size": 9, "cells": [{ "x": 50.3, "end": 142.3, "text": "Arjun Rao" }] },
+      { "y": 549.3, "size": 9, "cells": [{ "x": 50.3, "end": 119.2, "text": "Meera Iyer" }] },
+      { "y": 483.3, "size": 9, "cells": [{ "x": 50.3, "end": 127.7, "text": "Vikram Shah" }] },
+      {
+        "y": 415.5,
+        "size": 9,
+        "cells": [
+          {
+            "x": 50.3,
+            "end": 258.4,
+            "text": "Barcode(s) for your journey Istanbul-Delhi on IndiGo"
+          }
+        ]
+      },
+      { "y": 358.1, "size": 9, "cells": [{ "x": 50.3, "end": 142.3, "text": "Arjun Rao" }] },
+      { "y": 292.1, "size": 9, "cells": [{ "x": 50.3, "end": 119.2, "text": "Meera Iyer" }] },
+      { "y": 226.1, "size": 9, "cells": [{ "x": 50.3, "end": 127.7, "text": "Vikram Shah" }] },
+      {
+        "y": 158.2,
+        "size": 9,
+        "cells": [
+          { "x": 50.3, "end": 260.4, "text": "Barcode(s) for your journey Delhi-Chennai on IndiGo" }
+        ]
+      },
+      { "y": 100.8, "size": 9, "cells": [{ "x": 50.3, "end": 142.3, "text": "Arjun Rao" }] }
+    ],
+    [
+      { "y": 740.2, "size": 9, "cells": [{ "x": 50.3, "end": 119.2, "text": "Meera Iyer" }] },
+      { "y": 659.6, "size": 9, "cells": [{ "x": 50.3, "end": 127.7, "text": "Vikram Shah" }] },
+      { "y": 569.9, "size": 15, "cells": [{ "x": 57.8, "end": 157.7, "text": "Oslo - Chennai" }] },
+      {
+        "y": 552.2,
+        "size": 9,
+        "cells": [
+          { "x": 57.8, "end": 243.5, "text": "Sun, 05 Jan 2025 • 2 stops • 17h 30m duration" }
+        ]
+      },
+      { "y": 510.2, "size": 9, "cells": [{ "x": 87.8, "end": 114.2, "text": "IndiGo" }] },
+      {
+        "y": 497.5,
+        "size": 8.3,
+        "cells": [
+          { "x": 87.8, "end": 121.8, "text": "6E-4283" },
+          { "x": 211.1, "end": 232.6, "text": "Oslo" },
+          { "x": 359.9, "end": 387.4, "text": "4h 10m" },
+          { "x": 499.5, "end": 536.3, "text": "Istanbul" }
+        ]
+      },
+      { "y": 487, "size": 9, "cells": [{ "x": 87.8, "end": 139.7, "text": "Operated by" }] },
+      {
+        "y": 476.5,
+        "size": 9,
+        "cells": [
+          { "x": 87.8, "end": 129.7, "text": "TURKISH" },
+          { "x": 211.1, "end": 288.4, "text": "OSL 12:00 hrs" },
+          { "x": 464.2, "end": 536.2, "text": "18:10 hrs IST" }
+        ]
+      },
+      {
+        "y": 466,
+        "size": 8.3,
+        "cells": [
+          { "x": 87.8, "end": 146.7, "text": "AIRLINES INC" },
+          { "x": 211.1, "end": 255, "text": "Sun, 05 Jan" },
+          { "x": 492.2, "end": 536.2, "text": "Sun, 05 Jan" }
+        ]
+      },
+      {
+        "y": 438.5,
+        "size": 8.3,
+        "cells": [
+          { "x": 211.1, "end": 254.6, "text": "Oslo Airport" },
+          { "x": 480.8, "end": 536.2, "text": "Istanbul Airport" }
+        ]
+      },
+      {
+        "y": 419.4,
+        "size": 10.5,
+        "cells": [
+          { "x": 66.2, "end": 88.3, "text": "PNR" },
+          { "x": 109, "end": 149.8, "text": "KD4MZP" }
+        ]
+      },
+      {
+        "y": 377.5,
+        "size": 9,
+        "cells": [
+          { "x": 69.8, "end": 100.2, "text": "SAVER" },
+          { "x": 195.3, "end": 232.8, "text": "Economy" },
+          { "x": 346.6, "end": 399.1, "text": "Regular Fare" }
+        ]
+      },
+      {
+        "y": 352.7,
+        "size": 9,
+        "cells": [
+          { "x": 74.3, "end": 181.3, "text": "Check-in: 30 Kgs per Adult" },
+          { "x": 321, "end": 411, "text": "Cabin: 7 Kgs per Adult" }
+        ]
+      },
+      {
+        "y": 313,
+        "size": 7.5,
+        "cells": [
+          { "x": 50.3, "end": 94, "text": "TRAVELLER" },
+          { "x": 281.9, "end": 301.5, "text": "SEAT" },
+          { "x": 332.2, "end": 352.6, "text": "MEAL" },
+          { "x": 432.9, "end": 480.4, "text": "E-TICKET NO" }
+        ]
+      },
+      {
+        "y": 293.2,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 221.4, "text": "MR. ARJUN RAO Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 269,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 193.7, "text": "MS. MEERA IYER Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 244.7,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 193.2, "text": "MR. VIKRAM SHAH Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 204.8,
+        "size": 9,
+        "cells": [{ "x": 101.3, "end": 201.7, "text": "2h 5m layover at Istanbul" }]
+      },
+      {
+        "y": 183.8,
+        "size": 9,
+        "cells": [{ "x": 117.8, "end": 193.2, "text": "Change in FLIGHT" }]
+      },
+      { "y": 138, "size": 9, "cells": [{ "x": 87.8, "end": 114.2, "text": "IndiGo" }] },
+      {
+        "y": 125.3,
+        "size": 8.3,
+        "cells": [
+          { "x": 87.8, "end": 111.8, "text": "6E-12" },
+          { "x": 211.1, "end": 247.8, "text": "Istanbul" },
+          { "x": 359.9, "end": 387.4, "text": "5h 55m" },
+          { "x": 512.3, "end": 536.2, "text": "Delhi" }
+        ]
+      },
+      {
+        "y": 104.7,
+        "size": 12,
+        "cells": [
+          { "x": 211.1, "end": 283, "text": "IST 20:15 hrs" },
+          { "x": 459.5, "end": 536.2, "text": "04:40 hrs DEL" }
+        ]
+      },
+      {
+        "y": 90.3,
+        "size": 8.3,
+        "cells": [
+          { "x": 211.1, "end": 255, "text": "Sun, 05 Jan" },
+          { "x": 490.8, "end": 536.2, "text": "Mon, 06 Jan" }
+        ]
+      },
+      {
+        "y": 78,
+        "size": 10.5,
+        "cells": [
+          { "x": 66.2, "end": 88.3, "text": "PNR" },
+          { "x": 110.4, "end": 148.3, "text": "HX9BNE" }
+        ]
+      },
+      {
+        "y": 66.3,
+        "size": 8.3,
+        "cells": [
+          { "x": 211.1, "end": 266.5, "text": "Istanbul Airport" },
+          { "x": 410.2, "end": 536.2, "text": "Indira Gandhi International Airport" }
+        ]
+      },
+      { "y": 55.8, "size": 8.3, "cells": [{ "x": 497.3, "end": 536.2, "text": "Terminal 3" }] }
+    ],
+    [
+      {
+        "y": 737.3,
+        "size": 9,
+        "cells": [
+          { "x": 69.8, "end": 100.2, "text": "SAVER" },
+          { "x": 195.3, "end": 232.8, "text": "Economy" },
+          { "x": 346.6, "end": 399.1, "text": "Regular Fare" }
+        ]
+      },
+      {
+        "y": 712.5,
+        "size": 9,
+        "cells": [
+          { "x": 74.3, "end": 181.3, "text": "Check-in: 30 Kgs per Adult" },
+          { "x": 321, "end": 411, "text": "Cabin: 7 Kgs per Adult" }
+        ]
+      },
+      {
+        "y": 672.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 50.3, "end": 94, "text": "TRAVELLER" },
+          { "x": 281.9, "end": 301.5, "text": "SEAT" },
+          { "x": 332.2, "end": 352.6, "text": "MEAL" },
+          { "x": 432.9, "end": 480.4, "text": "E-TICKET NO" }
+        ]
+      },
+      {
+        "y": 653,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 221.4, "text": "MR. ARJUN RAO Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 628.8,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 193.7, "text": "MS. MEERA IYER Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 604.5,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 193.2, "text": "MR. VIKRAM SHAH Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 564.6,
+        "size": 9,
+        "cells": [{ "x": 101.3, "end": 195.7, "text": "2h 35m layover at Delhi" }]
+      },
+      {
+        "y": 543.6,
+        "size": 9,
+        "cells": [{ "x": 117.8, "end": 193.2, "text": "Change in FLIGHT" }]
+      },
+      {
+        "y": 527.9,
+        "size": 9,
+        "cells": [{ "x": 117.8, "end": 198.8, "text": "Change the terminal" }]
+      },
+      { "y": 482.1, "size": 9, "cells": [{ "x": 87.8, "end": 114.2, "text": "IndiGo" }] },
+      {
+        "y": 469.4,
+        "size": 8.3,
+        "cells": [
+          { "x": 87.8, "end": 121.8, "text": "6E-2281" },
+          { "x": 211.1, "end": 235, "text": "Delhi" },
+          { "x": 359.9, "end": 387.4, "text": "2h 45m" },
+          { "x": 497.1, "end": 536.2, "text": "Chennai" }
+        ]
+      },
+      {
+        "y": 448.8,
+        "size": 12,
+        "cells": [
+          { "x": 211.1, "end": 287.7, "text": "DEL 07:15 hrs" },
+          { "x": 456.9, "end": 536.2, "text": "10:00 hrs MAA" }
+        ]
+      },
+      {
+        "y": 434.3,
+        "size": 8.3,
+        "cells": [
+          { "x": 211.1, "end": 256.4, "text": "Mon, 06 Jan" },
+          { "x": 490.8, "end": 536.2, "text": "Mon, 06 Jan" }
+        ]
+      },
+      {
+        "y": 422.1,
+        "size": 10.5,
+        "cells": [
+          { "x": 66.2, "end": 88.3, "text": "PNR" },
+          { "x": 110.4, "end": 148.3, "text": "HX9BNE" }
+        ]
+      },
+      {
+        "y": 410.3,
+        "size": 8.3,
+        "cells": [
+          { "x": 211.1, "end": 337.1, "text": "Indira Gandhi International Airport" },
+          { "x": 429, "end": 536.2, "text": "Chennai International Airport" }
+        ]
+      },
+      {
+        "y": 399.8,
+        "size": 8.3,
+        "cells": [
+          { "x": 211.1, "end": 250, "text": "Terminal 2" },
+          { "x": 497.3, "end": 536.2, "text": "Terminal 1" }
+        ]
+      },
+      {
+        "y": 361.4,
+        "size": 9,
+        "cells": [
+          { "x": 69.8, "end": 100.2, "text": "SAVER" },
+          { "x": 195.3, "end": 232.8, "text": "Economy" },
+          { "x": 346.6, "end": 399.1, "text": "Regular Fare" }
+        ]
+      },
+      {
+        "y": 336.6,
+        "size": 9,
+        "cells": [
+          { "x": 74.3, "end": 181.3, "text": "Check-in: 30 Kgs per Adult" },
+          { "x": 321, "end": 411, "text": "Cabin: 7 Kgs per Adult" }
+        ]
+      },
+      {
+        "y": 296.9,
+        "size": 7.5,
+        "cells": [
+          { "x": 50.3, "end": 94, "text": "TRAVELLER" },
+          { "x": 281.9, "end": 301.5, "text": "SEAT" },
+          { "x": 332.2, "end": 352.6, "text": "MEAL" },
+          { "x": 432.9, "end": 480.4, "text": "E-TICKET NO" }
+        ]
+      },
+      {
+        "y": 277.1,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 221.4, "text": "MR. ARJUN RAO Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 252.8,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 193.7, "text": "MS. MEERA IYER Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 228.6,
+        "size": 9.8,
+        "cells": [
+          { "x": 50.3, "end": 193.2, "text": "MR. VIKRAM SHAH Adult" },
+          { "x": 432.9, "end": 501.2, "text": "000-0000000000" }
+        ]
+      },
+      {
+        "y": 176.6,
+        "size": 8.3,
+        "cells": [
+          { "x": 54, "end": 180, "text": "You have paid INR 128577" },
+          { "x": 195.1, "end": 271.2, "text": "You saved INR 1651" }
+        ]
+      },
+      {
+        "y": 137.2,
+        "size": 9,
+        "cells": [{ "x": 455.4, "end": 551.9, "text": "Click here to know more" }]
+      }
+    ]
+  ]
+}

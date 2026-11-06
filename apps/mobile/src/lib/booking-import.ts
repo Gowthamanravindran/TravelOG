@@ -1,4 +1,4 @@
-import { emptyDraft, extractPdfText, parseBookingText, type BookingDraft } from '@travelog/core';
+import { emptyDraft, extractPdfLayout, parseBookingPages, type BookingDraft } from '@travelog/core';
 import { File } from 'expo-file-system';
 
 import type { pickAttachment } from './files';
@@ -24,15 +24,16 @@ const looksLikePdf = (file: PickedFile) =>
 /** Reads a picked file's booking details; never throws. */
 export async function readBookingDocument(
   file: PickedFile,
-  currency: string,
+  trip: { currency: string; startDate?: string | null },
 ): Promise<Omit<BookingImport, 'file'>> {
   const unreadable = { drafts: [emptyDraft()], readable: false };
   if (!looksLikePdf(file)) return unreadable;
   try {
     const bytes = await new File(file.localUri).bytes();
-    const pages = extractPdfText(bytes);
+    // Tables are read by position (Plan 38); the trip's dates place years the ticket leaves out.
+    const pages = extractPdfLayout(bytes);
     if (!pages.length) return unreadable;
-    const drafts = parseBookingText(pages.join('\n'), { currency });
+    const drafts = parseBookingPages(pages, { currency: trip.currency, tripStart: trip.startDate });
     return drafts.some((d) => d.found.length) ? { drafts, readable: true } : unreadable;
   } catch {
     return unreadable;

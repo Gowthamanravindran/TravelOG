@@ -1,0 +1,864 @@
+{
+  "note": "Redacted layout of a real ticket (Plan 38): names, references, PINs, phone and ticket numbers replaced.",
+  "pages": [
+    [
+      {
+        "y": 761.3,
+        "size": 12,
+        "cells": [{ "x": 434.5, "end": 548.9, "text": "Booking confirmation" }]
+      },
+      {
+        "y": 750,
+        "size": 6.7,
+        "cells": [{ "x": 434.5, "end": 577.2, "text": "CONFIRMATION NUMBER: 4100.200.304" }]
+      },
+      { "y": 738, "size": 6.7, "cells": [{ "x": 434.5, "end": 490.1, "text": "PIN CODE: 0000" }] },
+      {
+        "y": 718.5,
+        "size": 6,
+        "cells": [
+          { "x": 361.8, "end": 388.5, "text": "CHECK-IN" },
+          { "x": 441, "end": 473.3, "text": "CHECK-OUT" },
+          { "x": 512.4, "end": 529.2, "text": "UNITS" },
+          { "x": 543.9, "end": 565.2, "text": "NIGHTS" }
+        ]
+      },
+      {
+        "y": 714.8,
+        "size": 9.7,
+        "cells": [{ "x": 118.8, "end": 266.2, "text": "Stayokay Hostel Amsterdam Oost" }]
+      },
+      {
+        "y": 699.8,
+        "size": 8.2,
+        "cells": [
+          {
+            "x": 118.8,
+            "end": 319.8,
+            "text": "Address: Timorplein 21, Zeeburg, 1094 CC Amsterdam,"
+          },
+          { "x": 364, "end": 386.3, "text": "24" },
+          { "x": 446, "end": 468.3, "text": "26" },
+          { "x": 515.2, "end": 560.1, "text": "2 / 2" }
+        ]
+      },
+      { "y": 690, "size": 8.2, "cells": [{ "x": 118.8, "end": 163.4, "text": "Netherlands" }] },
+      {
+        "y": 685.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 355.9, "end": 394.5, "text": "DECEMBER" },
+          { "x": 437.9, "end": 476.5, "text": "DECEMBER" }
+        ]
+      },
+      {
+        "y": 678.8,
+        "size": 6,
+        "cells": [
+          { "x": 118.8, "end": 208.6, "text": "Phone: +00 0000 0000" },
+          { "x": 520.8, "end": 557.1, "text": "YOUR GROUP" }
+        ]
+      },
+      {
+        "y": 674.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 360.8, "end": 389.5, "text": "Tuesday" },
+          { "x": 440.6, "end": 473.7, "text": "Thursday" }
+        ]
+      },
+      {
+        "y": 666.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 118.8, "end": 287.6, "text": "GPS coordinates: N 052° 21.911, E 04° 56.126" },
+          { "x": 525.7, "end": 552.3, "text": "3 adults" }
+        ]
+      },
+      {
+        "y": 663,
+        "size": 7.5,
+        "cells": [
+          { "x": 358.3, "end": 401.4, "text": "15:00 - 00:00" },
+          { "x": 440.3, "end": 483.4, "text": "07:00 - 10:30" }
+        ]
+      },
+      { "y": 628.5, "size": 12, "cells": [{ "x": 43.8, "end": 77.3, "text": "PRICE" }] },
+      {
+        "y": 616.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 66.3, "text": "2 units" },
+          { "x": 530.1, "end": 569, "text": "THB 10,321" }
+        ]
+      },
+      {
+        "y": 607.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 70.6, "text": "9 % VAT" },
+          { "x": 540, "end": 569, "text": "THB 929" }
+        ]
+      },
+      {
+        "y": 598.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 96.6, "text": "12.50 % City tax" },
+          { "x": 534.3, "end": 569, "text": "THB 1,290" }
+        ]
+      },
+      {
+        "y": 579.8,
+        "size": 10.5,
+        "cells": [
+          { "x": 43.8, "end": 77.8, "text": "Price" },
+          { "x": 448.1, "end": 569, "text": "approx. THB 12,540" }
+        ]
+      },
+      {
+        "y": 568.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 88.8, "text": "(for 4 guests)" },
+          { "x": 539.9, "end": 569, "text": "€ 349.47" }
+        ]
+      },
+      {
+        "y": 559.5,
+        "size": 7.5,
+        "cells": [
+          { "x": 43.8, "end": 105.2, "text": "Booking.com pays" },
+          { "x": 537.9, "end": 569, "text": "− € 27.96" }
+        ]
+      },
+      {
+        "y": 543,
+        "size": 10.5,
+        "cells": [{ "x": 43.8, "end": 149.6, "text": "Additional information" }]
+      },
+      {
+        "y": 533.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 318.3,
+            "text": "Please note that additional supplements (e.g. extra bed) are not added in this total."
+          }
+        ]
+      },
+      {
+        "y": 524.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 321.8,
+            "text": "If you don't show up or cancel, applicable taxes may still be charged by the property."
+          }
+        ]
+      },
+      {
+        "y": 515.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 433.1,
+            "text": "Please remember to read the Important information below, as this may contain important details not mentioned here."
+          }
+        ]
+      },
+      {
+        "y": 489,
+        "size": 7.5,
+        "cells": [{ "x": 56.5, "end": 191.6, "text": "About Booking.com pays in your invoice" }]
+      },
+      {
+        "y": 480,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 56.5,
+            "end": 540.5,
+            "text": "Booking.com paid THB 1,003.27 of this booking. If you get an invoice from the property it won't show this amount. You'll see THB 12,540.15 as the"
+          }
+        ]
+      },
+      { "y": 471, "size": 7.5, "cells": [{ "x": 56.5, "end": 91.8, "text": "total price." }] },
+      {
+        "y": 459.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 56.5,
+            "end": 432.2,
+            "text": "You can use the property invoice and the booking confirmation from Booking.com for tax and business purposes."
+          }
+        ]
+      },
+      {
+        "y": 419.3,
+        "size": 9.7,
+        "cells": [{ "x": 43.8, "end": 241.3, "text": "Comfort Double Room with Private Bathroom" }]
+      },
+      {
+        "y": 413.3,
+        "size": 6.7,
+        "cells": [{ "x": 381.5, "end": 475.8, "text": "THB 6,270 € 174.74" }]
+      },
+      {
+        "y": 406.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 151.7, "text": "Guest name: Vikram Shah" },
+          { "x": 381.5, "end": 431.4, "text": "Accommodation" }
+        ]
+      },
+      {
+        "y": 397.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 134.8, "text": "Number of guests: 2 adults" },
+          { "x": 381.5, "end": 441.2, "text": "9 % VAT is included." }
+        ]
+      },
+      {
+        "y": 388.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 210.8, "text": "Meal Plan: There is no meal option with this room." },
+          { "x": 381.5, "end": 464.8, "text": "12.50 % City tax is included." }
+        ]
+      },
+      {
+        "y": 376.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 365.1,
+            "text": "Private bathroom • Shower • Toilet • Towels • Linen • Socket near the bed • Heating • Upper floors accessible"
+          },
+          { "x": 381.5, "end": 441, "text": "Cancellation policy:" }
+        ]
+      },
+      {
+        "y": 368.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 76.3, "text": "by elevator" },
+          {
+            "x": 381.5,
+            "end": 567.6,
+            "text": "If you cancel, modify the booking, or don't show up, the fee will"
+          }
+        ]
+      },
+      {
+        "y": 356.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 175.7, "text": "Bed Size(s): 2 single beds (90-130 cm wide)" },
+          { "x": 381.5, "end": 487.8, "text": "be the total price of the reservation." }
+        ]
+      },
+      {
+        "y": 329.3,
+        "size": 9.7,
+        "cells": [{ "x": 43.8, "end": 241.3, "text": "Comfort Double Room with Private Bathroom" }]
+      },
+      {
+        "y": 323.3,
+        "size": 6.7,
+        "cells": [{ "x": 381.5, "end": 475.8, "text": "THB 6,270 € 174.74" }]
+      },
+      {
+        "y": 316.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 163.6, "text": "Guest name: Arjun Rao" },
+          { "x": 381.5, "end": 431.4, "text": "Accommodation" }
+        ]
+      },
+      {
+        "y": 307.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 131, "text": "Number of guests: 1 adult" },
+          { "x": 381.5, "end": 441.2, "text": "9 % VAT is included." }
+        ]
+      },
+      {
+        "y": 298.5,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 210.8, "text": "Meal Plan: There is no meal option with this room." },
+          { "x": 381.5, "end": 464.8, "text": "12.50 % City tax is included." }
+        ]
+      },
+      {
+        "y": 286.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 43.8,
+            "end": 365.1,
+            "text": "Private bathroom • Shower • Toilet • Towels • Linen • Socket near the bed • Heating • Upper floors accessible"
+          },
+          { "x": 381.5, "end": 441, "text": "Cancellation policy:" }
+        ]
+      },
+      {
+        "y": 278.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 76.3, "text": "by elevator" },
+          {
+            "x": 381.5,
+            "end": 567.6,
+            "text": "If you cancel, modify the booking, or don't show up, the fee will"
+          }
+        ]
+      },
+      {
+        "y": 266.3,
+        "size": 6.7,
+        "cells": [
+          { "x": 43.8, "end": 175.7, "text": "Bed Size(s): 2 single beds (90-130 cm wide)" },
+          { "x": 381.5, "end": 487.8, "text": "be the total price of the reservation." }
+        ]
+      }
+    ],
+    [
+      {
+        "y": 751.2,
+        "size": 9.7,
+        "cells": [
+          { "x": 56.7, "end": 153.6, "text": "Important information" },
+          { "x": 338, "end": 398.7, "text": "Hotel Policies" }
+        ]
+      },
+      {
+        "y": 740.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 61.2, "text": "ID" },
+          { "x": 335.5, "end": 382.6, "text": "Guest parking" }
+        ]
+      },
+      {
+        "y": 732,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 272,
+            "text": "Please note that all guests must have a valid photo ID at check in."
+          },
+          { "x": 350.5, "end": 420.1, "text": "No parking available." }
+        ]
+      },
+      {
+        "y": 721.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 350.5,
+            "end": 513.7,
+            "text": "WiFi is available in all areas and is free of charge."
+          }
+        ]
+      },
+      {
+        "y": 715.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 116.4, "text": "AGE RESTICTIONS" }]
+      },
+      {
+        "y": 707.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 287.1,
+            "text": "Guests are requested to inform the property when children are coming"
+          }
+        ]
+      },
+      {
+        "y": 699,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 278.1,
+            "text": "along. Guests under the age of 18 can only stay in private room and"
+          }
+        ]
+      },
+      {
+        "y": 690.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 188.4, "text": "must be accompanied by an adult (18+)." }]
+      },
+      {
+        "y": 674.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 285.5,
+            "text": "Guests aged 16 or 17 may also stay in a private room without being in"
+          }
+        ]
+      },
+      {
+        "y": 666,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 284.2,
+            "text": "the company of an adult, provided they can present a filled in consent"
+          }
+        ]
+      },
+      {
+        "y": 657.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 274.6,
+            "text": "form by their caretakers upon arrival at the hostel. Please send the"
+          }
+        ]
+      },
+      {
+        "y": 649.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 177.2, "text": "hostel an email for the consent form." }]
+      },
+      { "y": 633, "size": 7.5, "cells": [{ "x": 54.3, "end": 80.2, "text": "ROOMS" }] },
+      {
+        "y": 624.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 287.3,
+            "text": "Please note when booking a Double/Twin Room, it is possible that you"
+          }
+        ]
+      },
+      {
+        "y": 616.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.1,
+            "text": "will be staying in a 4 to 6 bed dorm. The remaining (bunk) beds will not"
+          }
+        ]
+      },
+      {
+        "y": 608.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 150.6, "text": "be available for other guests." }]
+      },
+      { "y": 591.8, "size": 7.5, "cells": [{ "x": 54.3, "end": 92.5, "text": "AMENITIES" }] },
+      {
+        "y": 583.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 276.5,
+            "text": "Please note that the beds are not made, except for Comfort Double"
+          }
+        ]
+      },
+      {
+        "y": 575.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 286.8,
+            "text": "Rooms, but bed linen will be provided and guests are required to make"
+          }
+        ]
+      },
+      {
+        "y": 567,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 142.3, "text": "their own bed upon arrival." }]
+      },
+      {
+        "y": 550.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 289.8,
+            "text": "Towels are only included in Comfort Double Rooms and Family Rooms."
+          }
+        ]
+      },
+      {
+        "y": 542.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 283.4,
+            "text": "Guests can bring their own towels or rent them at a surcharge of EUR"
+          }
+        ]
+      },
+      { "y": 534, "size": 7.5, "cells": [{ "x": 54.3, "end": 103.4, "text": "3.50 per towel." }] },
+      {
+        "y": 517.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 167.4, "text": "GROUP TERMS AND CONDITIONS" }]
+      },
+      {
+        "y": 509.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 275.5,
+            "text": "Reservations (1 or more reservations under the same name) for 21"
+          }
+        ]
+      },
+      {
+        "y": 501,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 267.5,
+            "text": "people or more per night are considered a group reservation and"
+          }
+        ]
+      },
+      {
+        "y": 492.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 276.5,
+            "text": "different conditions apply. Contact the hostel for more information."
+          }
+        ]
+      },
+      {
+        "y": 484.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 255.7,
+            "text": "Stayokay reserves the right to cancel reservations (1 or more"
+          }
+        ]
+      },
+      {
+        "y": 476.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 279.3,
+            "text": "reservations under the same name) for 21 people or more per night."
+          }
+        ]
+      },
+      {
+        "y": 459.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 151.6, "text": "MAXIMUM LENGTH OF STAY" }]
+      },
+      {
+        "y": 451.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 282.4,
+            "text": "The maximum length of stay is 7 nights. This also applies to multiple"
+          }
+        ]
+      },
+      {
+        "y": 443.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 188.8, "text": "reservations totaling more than 7 nights." }]
+      },
+      { "y": 426.8, "size": 7.5, "cells": [{ "x": 54.3, "end": 91, "text": "CASHLESS" }] },
+      {
+        "y": 418.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.7,
+            "text": "This is cashless accommodation. You can pay contactless and with all"
+          }
+        ]
+      },
+      {
+        "y": 410.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 282.2,
+            "text": "major bank and credit cards. It is not possible to pay with cash in our"
+          }
+        ]
+      },
+      { "y": 402, "size": 7.5, "cells": [{ "x": 54.3, "end": 110.9, "text": "accommodation." }] },
+      {
+        "y": 391.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 277.5,
+            "text": "Please inform Stayokay Hostel Amsterdam Oost in advance of your"
+          }
+        ]
+      },
+      {
+        "y": 383.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 273.5,
+            "text": "expected arrival time. You can use the Special Requests box when"
+          }
+        ]
+      },
+      {
+        "y": 375,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 266.1,
+            "text": "booking, or contact the property directly with the contact details"
+          }
+        ]
+      },
+      {
+        "y": 366.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 153.4, "text": "provided in your confirmation." }]
+      },
+      {
+        "y": 356.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 290.1,
+            "text": "Guests are required to show a photo identification and credit card upon"
+          }
+        ]
+      },
+      {
+        "y": 348,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 292.9,
+            "text": "check-in. Please note that all Special Requests are subject to availability"
+          }
+        ]
+      },
+      {
+        "y": 339.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 167.4, "text": "and additional charges may apply." }]
+      },
+      {
+        "y": 301.7,
+        "size": 9.7,
+        "cells": [{ "x": 56.7, "end": 132.4, "text": "Special Requests" }]
+      },
+      {
+        "y": 290.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 237,
+            "text": "“Approximate time of arrival: between 15:00 and 16:00”"
+          }
+        ]
+      },
+      { "y": 258, "size": 7.5, "cells": [{ "x": 54.3, "end": 91.3, "text": "Need help?" }] },
+      {
+        "y": 249.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 262.8,
+            "text": "You can always view, change or cancel your booking online at:"
+          }
+        ]
+      },
+      {
+        "y": 241.5,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 113.7, "text": "your.booking.com" }]
+      },
+      {
+        "y": 229.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 276.9,
+            "text": "For any questions related to the property, you can contact Stayokay"
+          }
+        ]
+      },
+      {
+        "y": 221.3,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 230.9, "text": "Hostel Amsterdam Oost directly on: +00 0000 0000" }
+        ]
+      },
+      {
+        "y": 209.3,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 241.2,
+            "text": "Or contact us by phone - we're available 24 hours a day:"
+          }
+        ]
+      },
+      {
+        "y": 201,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 163.9, "text": "Local number: 0008 000 016 075" }]
+      },
+      {
+        "y": 192.8,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 231.4, "text": "When abroad or from Netherlands: +00 0000 0000" }
+        ]
+      },
+      {
+        "y": 183.8,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 139.6, "text": "Travel with peace of mind" }]
+      },
+      {
+        "y": 175.5,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 223.8,
+            "text": "Find more information about travelling safely in our"
+          }
+        ]
+      },
+      {
+        "y": 167.3,
+        "size": 7.5,
+        "cells": [{ "x": 54.3, "end": 130.7, "text": "Safety resource centre" }]
+      },
+      {
+        "y": 156,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 270.1,
+            "text": "Your safety is our top concern. In case of an emergency while on"
+          }
+        ]
+      },
+      {
+        "y": 147,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.8,
+            "text": "holiday, dial 112 to reach police, the fire brigade, or emergency medical"
+          }
+        ]
+      },
+      {
+        "y": 138.8,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 288.1,
+            "text": "services. This number works in most European countries and is free of"
+          }
+        ]
+      },
+      { "y": 130.5, "size": 7.5, "cells": [{ "x": 54.3, "end": 79, "text": "charge." }] },
+      {
+        "y": 120,
+        "size": 7.5,
+        "cells": [
+          {
+            "x": 54.3,
+            "end": 286.3,
+            "text": "Find more local emergency phone numbers to help give you complete"
+          }
+        ]
+      },
+      {
+        "y": 111,
+        "size": 7.5,
+        "cells": [
+          { "x": 54.3, "end": 209.1, "text": "peace of mind during your stay in Netherlands." }
+        ]
+      },
+      {
+        "y": 78.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 51.9,
+            "end": 571.4,
+            "text": "This print version of your confirmation contains the most important information about your booking. It can be used to check in when you arrive at Stayokay Hostel Amsterdam"
+          }
+        ]
+      },
+      {
+        "y": 70.5,
+        "size": 6.7,
+        "cells": [
+          {
+            "x": 154.3,
+            "end": 458.4,
+            "text": "Oost. For further details please refer to your confirmation email sent to traveller@example.com."
+          }
+        ]
+      }
+    ]
+  ]
+}

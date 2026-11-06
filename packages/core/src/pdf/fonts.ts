@@ -217,7 +217,7 @@ export function parseCMap(data: Uint8Array): CMap {
 export interface Glyph {
   code: number;
   text: string;
-  /** Width in thousandths of the font size. */
+  /** Advance width as a fraction of the font size (0.5 = half an em). */
   width: number;
   /** True for the single-byte space, where word spacing applies. */
   space: boolean;
@@ -229,6 +229,8 @@ export class Font {
   private widths = new Map<number, number>();
   private defaultWidth = 500;
   private composite = false;
+  /** Glyph space → text space: 1/1000 for most fonts; Type 3 fonts set their own (Plan 38). */
+  private widthScale = 0.001;
 
   constructor(doc: PdfDocument, dict: Dict | null) {
     if (!dict) return;
@@ -262,6 +264,12 @@ export class Font {
       doc
         .array(dict.get('Widths'))
         .forEach((x, i) => this.widths.set(firstChar + i, doc.number(x)));
+      if (nameOf(doc.resolve(dict.get('Subtype'))) === 'Type3') {
+        // Widths are in the font's own units, scaled by its FontMatrix (often 1/2048).
+        const scale = Math.abs(doc.number(doc.array(dict.get('FontMatrix'))[0], 0.001));
+        if (scale > 0) this.widthScale = scale;
+        this.defaultWidth = 0;
+      }
       const desc = doc.dict(dict.get('FontDescriptor'));
       if (desc?.has('MissingWidth')) this.defaultWidth = doc.number(desc.get('MissingWidth'));
       this.encoding = simpleEncoding(doc, doc.resolve(dict.get('Encoding')));
@@ -283,7 +291,7 @@ export class Font {
       out.push({
         code,
         text,
-        width: this.widths.get(code) ?? this.defaultWidth,
+        width: (this.widths.get(code) ?? this.defaultWidth) * this.widthScale,
         space: len === 1 && code === 32,
       });
     }
