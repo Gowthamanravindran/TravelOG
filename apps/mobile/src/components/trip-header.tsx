@@ -3,7 +3,7 @@ import { daysUntilStart, tripDayNumber, tripState } from '@travelog/core';
 import { font, type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { InsetView } from '@/ui/inset-view';
 
 import { useQuery } from '@/data/provider';
 import { dateRange } from '@/lib/format';
@@ -103,7 +103,7 @@ export function TripHeader() {
         : null;
 
   return (
-    <SafeAreaView
+    <InsetView
       edges={['top']}
       testID="trip-header"
       style={{
@@ -174,6 +174,6 @@ export function TripHeader() {
           {chip('budget', trip.currency)}
         </View>
       </View>
-    </SafeAreaView>
+    </InsetView>
   );
 }

@@ -11,7 +11,7 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { InsetView } from './inset-view';
 
 import Animated, {
   FadeIn,
@@ -36,7 +36,7 @@ export function Screen({
   const t = useTheme();
   const ok = useMotionOk();
   return (
-    <SafeAreaView edges={edges} style={[styles.fill, { backgroundColor: t.bg }]}>
+    <InsetView edges={edges} style={[styles.fill, { backgroundColor: t.bg }]}>
       {/* A screen or tab fades in when it first opens (Plan 28). */}
       <Animated.View style={styles.fill} entering={ok ? FadeIn.duration(MOTION.base) : undefined}>
         {scroll ? (
@@ -47,7 +47,7 @@ export function Screen({
           <View style={[styles.fill, styles.content]}>{children}</View>
         )}
       </Animated.View>
-    </SafeAreaView>
+    </InsetView>
   );
 }
 

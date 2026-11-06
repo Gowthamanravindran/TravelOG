@@ -5,7 +5,7 @@ import { type } from '@travelog/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { InsetView } from '@/ui/inset-view';
 
 import { type PhotoInfo, type StatItem } from '@/components/studio/layer-view';
 import { ShareActions } from '@/components/studio/share-actions';
@@ -152,7 +152,7 @@ function ExportScreen() {
         </View>
       ) : null}
 
-      <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={['top', 'bottom']}>
+      <InsetView style={{ flex: 1, backgroundColor: t.bg }} edges={['top', 'bottom']}>
         <View
           style={{
             flexDirection: 'row',
@@ -221,7 +221,7 @@ function ExportScreen() {
             </Text>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </InsetView>
     </View>
   );
 }

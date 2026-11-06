@@ -11,7 +11,6 @@ import {
 import { Platform, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
-  SlideInDown,
   FadeIn,
   FadeInDown,
   FadeOut,
@@ -38,11 +37,6 @@ export const MOTION = {
   /** Eases out and stops; nothing overshoots or bounces (Plan 32). */
   ease: { duration: 220, easing: Easing.out(Easing.cubic) },
 } as const;
-
-/** Bottom sheets slide up and stop, with no bounce; nothing moves with Reduce motion on. */
-export function sheetEntering(ok: boolean) {
-  return ok ? SlideInDown.duration(MOTION.slow).easing(Easing.out(Easing.cubic)) : undefined;
-}
 
 /** False when the person has asked their phone to reduce motion. */
 export function useMotionOk(): boolean {

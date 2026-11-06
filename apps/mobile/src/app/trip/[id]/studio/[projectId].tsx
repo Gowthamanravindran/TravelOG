@@ -33,7 +33,7 @@ import { type } from '@travelog/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View, type LayoutChangeEvent } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { InsetView } from '@/ui/inset-view';
 
 import { type PhotoInfo, type StatItem } from '@/components/studio/layer-view';
 import {
@@ -117,12 +117,12 @@ function Editor() {
 
   if (!editor.project || !trip) {
     return (
-      <SafeAreaView
+      <InsetView
         style={{ flex: 1, backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center' }}
       >
         <Text style={[type.body, { color: t.ink }]}>This collage no longer exists.</Text>
         <Button label="Back" variant="link" onPress={() => router.back()} />
-      </SafeAreaView>
+      </InsetView>
     );
   }
 
@@ -217,7 +217,7 @@ function Editor() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={['top', 'bottom']}>
+    <InsetView style={{ flex: 1, backgroundColor: t.bg }} edges={['top', 'bottom']}>
       {/* Header */}
       <View
         style={{
@@ -538,6 +538,6 @@ function Editor() {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </InsetView>
   );
 }

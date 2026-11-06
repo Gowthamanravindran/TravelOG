@@ -90,3 +90,22 @@ it('nothing bounces: no springs, only eased timing (Plan 32)', () => {
   );
   expect(offenders).toEqual([]);
 });
+
+it('slide-ins land without a jump: no SafeAreaView, sheets only through BottomSheet (Plan 33)', () => {
+  const all = files(path.join(__dirname, '..'));
+  const scan = (re: RegExp, skip: string[] = []) =>
+    all
+      .filter((f) => !skip.some((s) => f.endsWith(s)))
+      .flatMap((f) =>
+        fs
+          .readFileSync(f, 'utf8')
+          .split('\n')
+          .map((line, i) => ({ line, at: `${path.basename(f)}:${i + 1}` }))
+          .filter(({ line }) => re.test(line))
+          .map(({ at }) => at),
+      );
+  // SafeAreaView measures insets from where it sits, so it changes padding as a page slides in.
+  expect(scan(/\bSafeAreaView\b/)).toEqual([]);
+  // A plain Modal settles its window after the first frame on Android.
+  expect(scan(/<Modal\b/, [`ui${path.sep}bottom-sheet.tsx`])).toEqual([]);
+});

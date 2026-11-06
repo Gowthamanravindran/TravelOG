@@ -1,4 +1,3 @@
-import Animated from 'react-native-reanimated';
 import {
   localDateIn,
   monthGrid,
@@ -15,12 +14,11 @@ import {
 } from '@travelog/core';
 import { font, radius, type } from '@travelog/ui';
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { shortDate } from '@/lib/format';
 
-import { sheetEntering, useMotionOk } from './motion';
+import { BottomSheet } from './bottom-sheet';
 import { Icon } from './icon';
 import { Button } from './kit';
 import { useTheme } from './theme';
@@ -224,9 +222,6 @@ export function TimeSheet({
   onDone: (time: string) => void;
 }) {
   const t = useTheme();
-  const insets = useSafeAreaInsets();
-  // The sheet springs up while the backdrop fades (Plan 28).
-  const sheetIn = sheetEntering(useMotionOk());
   const initial = () => splitTime(value) ?? { hour: 9, minute: 0 };
   const [picked, setPicked] = useState(initial);
   const [wasVisible, setWasVisible] = useState(visible);
@@ -261,69 +256,56 @@ export function TimeSheet({
     });
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close time picker" />
-      <Animated.View
-        entering={sheetIn}
-        style={[
-          styles.sheet,
-          { backgroundColor: t.surface, paddingBottom: Math.max(insets.bottom, 16) },
-        ]}
-      >
-        <View style={[styles.grabber, { backgroundColor: t.line }]} />
-        <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{title}</Text>
-        <View style={styles.monthRow}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="One minute earlier"
-            onPress={() => step(-1)}
-            hitSlop={10}
-            style={[styles.navBtn, { backgroundColor: t.surface2 }]}
-          >
-            <Icon name="remove" size={20} color={t.ink} />
-          </Pressable>
-          <Text style={[type.display, { color: t.ink, fontSize: 40, lineHeight: 46 }]}>
-            {joinTime(picked.hour, picked.minute)}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="One minute later"
-            onPress={() => step(1)}
-            hitSlop={10}
-            style={[styles.navBtn, { backgroundColor: t.surface2 }]}
-          >
-            <Icon name="add" size={20} color={t.ink} />
-          </Pressable>
+    <BottomSheet visible={visible} onClose={onClose} closeLabel="Close time picker">
+      <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{title}</Text>
+      <View style={styles.monthRow}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="One minute earlier"
+          onPress={() => step(-1)}
+          hitSlop={10}
+          style={[styles.navBtn, { backgroundColor: t.surface2 }]}
+        >
+          <Icon name="remove" size={20} color={t.ink} />
+        </Pressable>
+        <Text style={[type.display, { color: t.ink, fontSize: 40, lineHeight: 46 }]}>
+          {joinTime(picked.hour, picked.minute)}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="One minute later"
+          onPress={() => step(1)}
+          hitSlop={10}
+          style={[styles.navBtn, { backgroundColor: t.surface2 }]}
+        >
+          <Icon name="add" size={20} color={t.ink} />
+        </Pressable>
+      </View>
+      <Text style={[type.caption, { color: t.ink2 }]}>Hour</Text>
+      <View style={styles.timeGrid}>
+        {HOURS.map((h) =>
+          cell(picked.hour === h, String(h).padStart(2, '0'), `Hour ${h}`, () =>
+            setPicked((p) => ({ ...p, hour: h })),
+          ),
+        )}
+      </View>
+      <Text style={[type.caption, { color: t.ink2 }]}>Minutes</Text>
+      <View style={styles.timeGrid}>
+        {MINUTES.map((m) =>
+          cell(roundTo5(picked.minute) === m, `:${String(m).padStart(2, '0')}`, `Minute ${m}`, () =>
+            setPicked((p) => ({ ...p, minute: m })),
+          ),
+        )}
+      </View>
+      <View style={styles.actions}>
+        <View style={{ flex: 1 }}>
+          <Button label="Cancel" variant="secondary" onPress={onClose} />
         </View>
-        <Text style={[type.caption, { color: t.ink2 }]}>Hour</Text>
-        <View style={styles.timeGrid}>
-          {HOURS.map((h) =>
-            cell(picked.hour === h, String(h).padStart(2, '0'), `Hour ${h}`, () =>
-              setPicked((p) => ({ ...p, hour: h })),
-            ),
-          )}
+        <View style={{ flex: 1 }}>
+          <Button label="Done" onPress={() => onDone(joinTime(picked.hour, picked.minute))} />
         </View>
-        <Text style={[type.caption, { color: t.ink2 }]}>Minutes</Text>
-        <View style={styles.timeGrid}>
-          {MINUTES.map((m) =>
-            cell(
-              roundTo5(picked.minute) === m,
-              `:${String(m).padStart(2, '0')}`,
-              `Minute ${m}`,
-              () => setPicked((p) => ({ ...p, minute: m })),
-            ),
-          )}
-        </View>
-        <View style={styles.actions}>
-          <View style={{ flex: 1 }}>
-            <Button label="Cancel" variant="secondary" onPress={onClose} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button label="Done" onPress={() => onDone(joinTime(picked.hour, picked.minute))} />
-          </View>
-        </View>
-      </Animated.View>
-    </Modal>
+      </View>
+    </BottomSheet>
   );
 }
 
@@ -344,9 +326,6 @@ export function CalendarSheet({
   onDone: (range: DateRange) => void;
 }) {
   const t = useTheme();
-  const insets = useSafeAreaInsets();
-  // The sheet springs up while the backdrop fades (Plan 28).
-  const sheetIn = sheetEntering(useMotionOk());
   const today = localDateIn(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata');
   const [picked, setPicked] = useState<DateRange>(range);
   const [month, setMonth] = useState(() => monthOf(range.start ?? today));
@@ -375,111 +354,101 @@ export function CalendarSheet({
         : 'Tap a day';
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close calendar" />
-      <Animated.View
-        entering={sheetIn}
-        style={[
-          styles.sheet,
-          { backgroundColor: t.surface, paddingBottom: Math.max(insets.bottom, 16) },
-        ]}
-      >
-        <View style={[styles.grabber, { backgroundColor: t.line }]} />
-        <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{title}</Text>
-        <Text style={[type.title, { color: t.ink }]}>{summary}</Text>
+    <BottomSheet visible={visible} onClose={onClose} closeLabel="Close calendar">
+      <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{title}</Text>
+      <Text style={[type.title, { color: t.ink }]}>{summary}</Text>
 
-        <View style={styles.monthRow}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Previous month"
-            onPress={() => setMonth(shiftMonth(month, -1))}
-            hitSlop={10}
-            style={[styles.navBtn, { backgroundColor: t.surface2 }]}
-          >
-            <Icon name="left" size={20} color={t.ink} />
-          </Pressable>
-          <Text style={[type.headline, { color: t.ink }]}>{monthTitle(month)}</Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Next month"
-            onPress={() => setMonth(shiftMonth(month, 1))}
-            hitSlop={10}
-            style={[styles.navBtn, { backgroundColor: t.surface2 }]}
-          >
-            <Icon name="right" size={20} color={t.ink} />
-          </Pressable>
-        </View>
+      <View style={styles.monthRow}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Previous month"
+          onPress={() => setMonth(shiftMonth(month, -1))}
+          hitSlop={10}
+          style={[styles.navBtn, { backgroundColor: t.surface2 }]}
+        >
+          <Icon name="left" size={20} color={t.ink} />
+        </Pressable>
+        <Text style={[type.headline, { color: t.ink }]}>{monthTitle(month)}</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Next month"
+          onPress={() => setMonth(shiftMonth(month, 1))}
+          hitSlop={10}
+          style={[styles.navBtn, { backgroundColor: t.surface2 }]}
+        >
+          <Icon name="right" size={20} color={t.ink} />
+        </Pressable>
+      </View>
 
-        <View style={styles.week}>
-          {WEEKDAYS.map((w) => (
-            <Text key={w} style={[type.caption, styles.weekday, { color: t.ink2 }]}>
-              {w.slice(0, 2)}
-            </Text>
-          ))}
-        </View>
-        {monthGrid(month).map((week) => (
-          <View key={week[0]!.date} style={styles.week}>
-            {week.map(({ date, inMonth }) => {
-              const role = rangeRole(picked, date);
-              const edge = role === 'start' || role === 'end' || role === 'single';
-              return (
-                <View
-                  key={date}
+      <View style={styles.week}>
+        {WEEKDAYS.map((w) => (
+          <Text key={w} style={[type.caption, styles.weekday, { color: t.ink2 }]}>
+            {w.slice(0, 2)}
+          </Text>
+        ))}
+      </View>
+      {monthGrid(month).map((week) => (
+        <View key={week[0]!.date} style={styles.week}>
+          {week.map(({ date, inMonth }) => {
+            const role = rangeRole(picked, date);
+            const edge = role === 'start' || role === 'end' || role === 'single';
+            return (
+              <View
+                key={date}
+                style={[
+                  styles.cell,
+                  role === 'between' && { backgroundColor: t.accentSoft },
+                  role === 'start' && {
+                    backgroundColor: t.accentSoft,
+                    borderTopLeftRadius: 20,
+                    borderBottomLeftRadius: 20,
+                  },
+                  role === 'end' && {
+                    backgroundColor: t.accentSoft,
+                    borderTopRightRadius: 20,
+                    borderBottomRightRadius: 20,
+                  },
+                ]}
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={pretty(date)}
+                  accessibilityState={{ selected: !!role }}
+                  onPress={() => tap(date)}
                   style={[
-                    styles.cell,
-                    role === 'between' && { backgroundColor: t.accentSoft },
-                    role === 'start' && {
-                      backgroundColor: t.accentSoft,
-                      borderTopLeftRadius: 20,
-                      borderBottomLeftRadius: 20,
-                    },
-                    role === 'end' && {
-                      backgroundColor: t.accentSoft,
-                      borderTopRightRadius: 20,
-                      borderBottomRightRadius: 20,
-                    },
+                    styles.day,
+                    edge && { backgroundColor: t.accent },
+                    !edge && date === today && { borderWidth: 1.5, borderColor: t.accent },
                   ]}
                 >
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={pretty(date)}
-                    accessibilityState={{ selected: !!role }}
-                    onPress={() => tap(date)}
+                  <Text
                     style={[
-                      styles.day,
-                      edge && { backgroundColor: t.accent },
-                      !edge && date === today && { borderWidth: 1.5, borderColor: t.accent },
+                      type.body,
+                      {
+                        color: edge ? t.onAccent : inMonth ? t.ink : t.ink2,
+                        opacity: inMonth || edge ? 1 : 0.45,
+                        ...font('text', edge ? 600 : 400),
+                      },
                     ]}
                   >
-                    <Text
-                      style={[
-                        type.body,
-                        {
-                          color: edge ? t.onAccent : inMonth ? t.ink : t.ink2,
-                          opacity: inMonth || edge ? 1 : 0.45,
-                          ...font('text', edge ? 600 : 400),
-                        },
-                      ]}
-                    >
-                      {Number(date.slice(8))}
-                    </Text>
-                  </Pressable>
-                </View>
-              );
-            })}
-          </View>
-        ))}
-
-        <View style={styles.actions}>
-          <View style={{ flex: 1 }}>
-            <Button label="Cancel" variant="secondary" onPress={onClose} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button label="Done" onPress={() => onDone(picked)} disabled={!ready} />
-          </View>
+                    {Number(date.slice(8))}
+                  </Text>
+                </Pressable>
+              </View>
+            );
+          })}
         </View>
-      </Animated.View>
-    </Modal>
+      ))}
+
+      <View style={styles.actions}>
+        <View style={{ flex: 1 }}>
+          <Button label="Cancel" variant="secondary" onPress={onClose} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button label="Done" onPress={() => onDone(picked)} disabled={!ready} />
+        </View>
+      </View>
+    </BottomSheet>
   );
 }
 
@@ -495,15 +464,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 48,
   },
-  backdrop: { flex: 1, backgroundColor: '#00000066' },
-  sheet: {
-    borderTopLeftRadius: radius.sheet,
-    borderTopRightRadius: radius.sheet,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    gap: 8,
-  },
-  grabber: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, marginBottom: 8 },
   monthRow: {
     flexDirection: 'row',
     alignItems: 'center',
