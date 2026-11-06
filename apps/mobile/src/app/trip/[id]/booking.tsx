@@ -6,9 +6,11 @@ import {
   deleteAttachment,
   deleteBooking,
   getBooking,
+  getPlace,
   getTrip,
   listAttachments,
   listMembers,
+  saveTypedPlace,
   updateBooking,
   type BookingType,
 } from '@travelog/db';
@@ -16,8 +18,10 @@ import {
   localDateIn,
   localTimeIn,
   localToUtcIso,
+  placeText,
   type BookingDraft,
   type DraftField,
+  type Place,
 } from '@travelog/core';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -28,6 +32,7 @@ import { clearImport, peekImport, type BookingImport } from '@/lib/booking-impor
 import { amountText, errorMessage, parseAmount } from '@/lib/format';
 import { openAttachment, pickAttachment } from '@/lib/files';
 import { BOOKING_LABELS } from '@/lib/labels';
+import { openInMaps } from '@/lib/maps';
 import {
   Between,
   Body,
@@ -46,6 +51,7 @@ import {
 } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
 import { DateField, TimeField } from '@/ui/date-field';
+import { PlaceField } from '@/ui/place-field';
 
 /**
  * Add or edit a booking (Plans 31, 32): a full page that slides up from the bottom. Opened from an uploaded
@@ -84,6 +90,18 @@ export default function BookingEditor() {
 }
 
 const FROM_DOC = 'From your document';
+const JOURNEYS = new Set<BookingType>(['flight', 'train', 'bus']);
+
+/** A place as typed in the form: picked from our list (id), or just text. */
+interface PlaceInput {
+  text: string;
+  id: string | null;
+  timeZone: string | null;
+}
+const placeInput = (p: Place | undefined, text?: string | null): PlaceInput =>
+  p
+    ? { text: placeText(p), id: p.id, timeZone: p.timeZone }
+    : { text: text ?? '', id: null, timeZone: null };
 
 function BookingForm({
   tripId,
@@ -112,11 +130,41 @@ function BookingForm({
   );
   const files = useQuery((db) => (bookingId ? listAttachments(db, bookingId) : []), [bookingId]);
   const tz = trip?.timeZone ?? 'Asia/Kolkata';
-  const split = (iso?: string | null) =>
-    iso
-      ? { d: localDateIn(tz, new Date(iso)), t: localTimeIn(tz, new Date(iso)) }
-      : { d: '', t: '' };
   const found = new Set<DraftField>(draft?.found ?? []);
+  const initialPlaces = useQuery(
+    (db) => {
+      const get = (id?: string | null) => (id ? getPlace(db, id) : undefined);
+      return {
+        from: get(existing?.fromPlaceId ?? draft?.fromPlaceId),
+        to: get(existing?.toPlaceId ?? draft?.toPlaceId),
+        city: get(existing?.placeId ?? draft?.placeId),
+      };
+    },
+    [existing?.id, draft],
+  );
+  const [from, setFrom] = useState(() =>
+    placeInput(initialPlaces.from, existing ? null : draft?.fromText),
+  );
+  const [to, setTo] = useState(() => placeInput(initialPlaces.to, existing ? null : draft?.toText));
+  const [city, setCity] = useState(() =>
+    placeInput(initialPlaces.city, existing ? null : draft?.placeText),
+  );
+  const [address, setAddress] = useState(existing?.address ?? draft?.address ?? '');
+  // Each time is in the time zone of its place, else the trip's (Plan 35).
+  const zones = (type: BookingType, f: PlaceInput, t2: PlaceInput, c: PlaceInput) =>
+    JOURNEYS.has(type)
+      ? { start: f.timeZone ?? tz, end: t2.timeZone ?? tz }
+      : { start: c.timeZone ?? tz, end: c.timeZone ?? tz };
+  const firstZones = zones(
+    existing?.type ?? draft?.type ?? 'train',
+    placeInput(initialPlaces.from),
+    placeInput(initialPlaces.to),
+    placeInput(initialPlaces.city),
+  );
+  const split = (iso: string | null | undefined, zone: string) =>
+    iso
+      ? { d: localDateIn(zone, new Date(iso)), t: localTimeIn(zone, new Date(iso)) }
+      : { d: '', t: '' };
   const currency = existing?.currency ?? draft?.currency ?? trip?.currency ?? 'INR';
   const [kind, setKind] = useState<BookingType>(
     existing?.type ?? (draft && found.has('type') ? draft.type : 'train'),
@@ -125,10 +173,14 @@ function BookingForm({
   const [provider, setProvider] = useState(existing?.provider ?? draft?.provider ?? '');
   const [reference, setReference] = useState(existing?.reference ?? draft?.reference ?? '');
   const [start, setStart] = useState(
-    existing ? split(existing.startsAt) : { d: draft?.startDate ?? '', t: draft?.startTime ?? '' },
+    existing
+      ? split(existing.startsAt, firstZones.start)
+      : { d: draft?.startDate ?? '', t: draft?.startTime ?? '' },
   );
   const [end, setEnd] = useState(
-    existing ? split(existing.endsAt) : { d: draft?.endDate ?? '', t: draft?.endTime ?? '' },
+    existing
+      ? split(existing.endsAt, firstZones.end)
+      : { d: draft?.endDate ?? '', t: draft?.endTime ?? '' },
   );
   const [cost, setCost] = useState(amountText(existing?.costMinor ?? draft?.costMinor, currency));
   const [notes, setNotes] = useState(existing?.notes ?? draft?.notes ?? '');
@@ -138,9 +190,12 @@ function BookingForm({
   if (!trip) return null;
 
   const hint = (f: DraftField) => (found.has(f) ? FROM_DOC : undefined);
-  const instant = (v: { d: string; t: string }) =>
-    v.d ? localToUtcIso(v.d, v.t || '00:00', tz) : null;
+  const zone = zones(kind, from, to, city);
+  const instant = (v: { d: string; t: string }, z: string) =>
+    v.d ? localToUtcIso(v.d, v.t || '00:00', z) : null;
   const label = BOOKING_LABELS[kind];
+  const journey = JOURNEYS.has(kind);
+  const sameZones = zone.start === tz && zone.end === tz;
   const readable = !!imported?.readable;
 
   const save = () => {
@@ -152,15 +207,22 @@ function BookingForm({
         title,
         provider: provider || null,
         reference: reference || null,
-        startsAt: instant(start),
-        endsAt: instant(end),
+        startsAt: instant(start, zone.start),
+        endsAt: instant(end, zone.end),
         costMinor,
         currency,
         notes: notes.trim() || null,
+        address: journey ? null : address.trim() || null,
       };
       mutate((db) => {
-        if (existing) return updateBooking(db, existing.id, input);
-        const b = addBooking(db, input);
+        // Places typed but not picked are kept as typed, with the trip's time zone.
+        const ref = (p: PlaceInput) =>
+          p.id ?? (p.text.trim() ? saveTypedPlace(db, p.text, { timeZone: tz }).id : null);
+        const places = journey
+          ? { fromPlaceId: ref(from), toPlaceId: ref(to), placeId: null }
+          : { fromPlaceId: null, toPlaceId: null, placeId: ref(city) };
+        if (existing) return updateBooking(db, existing.id, { ...input, ...places });
+        const b = addBooking(db, { ...input, ...places });
         if (imported) addAttachment(db, { tripId, bookingId: b.id, ...imported.file });
         if (addAsExpense && sameCurrency && costMinor) {
           const members = listMembers(db, tripId);
@@ -267,6 +329,60 @@ function BookingForm({
           />
         </View>
       </Row>
+      {journey ? (
+        <Row>
+          <View style={{ flex: 1 }}>
+            <PlaceField
+              label="From"
+              value={from.text}
+              onChangeText={(text) => setFrom({ text, id: null, timeZone: null })}
+              onPick={(p) => setFrom(placeInput(p))}
+              placeholder="Bengaluru"
+              hint={hint('where')}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <PlaceField
+              label="To"
+              value={to.text}
+              onChangeText={(text) => setTo({ text, id: null, timeZone: null })}
+              onPick={(p) => setTo(placeInput(p))}
+              placeholder="Goa"
+              hint={hint('where')}
+            />
+          </View>
+        </Row>
+      ) : (
+        <>
+          <PlaceField
+            label={kind === 'stay' ? 'City' : 'Where'}
+            value={city.text}
+            onChangeText={(text) => setCity({ text, id: null, timeZone: null })}
+            onPick={(p) => setCity(placeInput(p))}
+            placeholder="Goa"
+            hint={hint('where')}
+          />
+          <Field
+            label="Address"
+            value={address}
+            onChangeText={setAddress}
+            placeholder="Candolim Beach Road, Goa"
+            hint={hint('address')}
+          />
+          {address.trim() || city.text.trim() ? (
+            <Button
+              label="Open in Maps"
+              icon="place"
+              variant="link"
+              onPress={() =>
+                openInMaps([title, address, city.text].filter((x) => x.trim()).join(', ')).catch(
+                  (e) => setError(errorMessage(e)),
+                )
+              }
+            />
+          ) : null}
+        </>
+      )}
       <Row>
         <View style={{ flex: 3 }}>
           <DateField
@@ -294,7 +410,9 @@ function BookingForm({
         </View>
       </Row>
       <Body muted small>
-        Times are in the trip&apos;s time zone ({tz}).
+        {sameZones
+          ? `Times are in the trip's time zone (${tz}).`
+          : 'Times are local to each place.'}
       </Body>
       <Field
         label={`Total cost (${currency})`}

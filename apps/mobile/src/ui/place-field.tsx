@@ -29,6 +29,7 @@ export function PlaceField({
   onPick,
   homeCountry,
   placeholder,
+  hint,
 }: {
   label: string;
   value: string;
@@ -36,6 +37,7 @@ export function PlaceField({
   onPick: (place: Place) => void;
   homeCountry?: string | null;
   placeholder?: string;
+  hint?: string;
 }) {
   const t = useTheme();
   const [open, setOpen] = useState(false);
@@ -53,6 +55,7 @@ export function PlaceField({
           onChangeText(text);
         }}
         placeholder={placeholder}
+        hint={hint}
         autoCorrect={false}
       />
       {showList ? (

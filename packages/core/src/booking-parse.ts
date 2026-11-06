@@ -11,7 +11,16 @@ import { minorDigits } from './money';
 
 export type DraftType = 'flight' | 'train' | 'bus' | 'stay' | 'event' | 'rental' | 'other';
 export type DraftField =
-  'type' | 'title' | 'provider' | 'reference' | 'start' | 'end' | 'cost' | 'notes';
+  | 'type'
+  | 'title'
+  | 'provider'
+  | 'reference'
+  | 'start'
+  | 'end'
+  | 'cost'
+  | 'notes'
+  | 'where'
+  | 'address';
 
 export interface BookingDraft {
   type: DraftType;
@@ -26,6 +35,18 @@ export interface BookingDraft {
   costMinor: number | null;
   currency: string | null;
   notes: string | null;
+  /** Places as printed (Plan 35): journeys' ends, or a stay's city. */
+  fromText?: string | null;
+  toText?: string | null;
+  placeText?: string | null;
+  /** Airport codes, when the ticket has them. */
+  fromCode?: string | null;
+  toCode?: string | null;
+  address?: string | null;
+  /** Filled in on the phone once the places above are found in our places list. */
+  fromPlaceId?: string | null;
+  toPlaceId?: string | null;
+  placeId?: string | null;
   /** The fields filled from the document. */
   found: DraftField[];
 }
