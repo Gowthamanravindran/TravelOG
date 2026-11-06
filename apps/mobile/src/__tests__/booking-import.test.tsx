@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import BookingEditor from '@/app/trip/[id]/booking';
 import { BookingsView } from '@/components/bookings-view';
-import { stashImport } from '@/lib/booking-import';
+import { buildImport, stashImport } from '@/lib/booking-import';
 import { makeDb, withData } from '@/testing/test-utils';
 import { emptyDraft, type BookingDraft } from '@travelog/core';
 
@@ -30,6 +30,14 @@ jest.mock('expo-router', () => ({
 const mockPick = jest.fn();
 jest.mock('@/lib/files', () => ({
   pickAttachment: () => mockPick(),
+  // Several files at once (Plan 39): the mock returns one file or a list.
+  pickAttachments: async () => {
+    const f = await mockPick();
+    if (!f) return null;
+    const all = Array.isArray(f) ? f : [f];
+    return { files: all.slice(0, 10), truncated: all.length > 10 };
+  },
+  MAX_UPLOADS: 10,
   openAttachment: jest.fn(),
 }));
 
@@ -59,7 +67,7 @@ function setup() {
 async function upload(db: ReturnType<typeof makeDb>, tripId: string) {
   await render(withData(db, <BookingsView tripId={tripId} />, 'plan'));
   await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
-  await fireEvent.press(screen.getByRole('button', { name: 'Upload document' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Upload documents' }));
   await waitFor(() => expect(mockPush).toHaveBeenCalled());
   const route = mockPush.mock.calls.at(-1)![0] as string;
   const importId = new URL(route, 'https://x').searchParams.get('importId')!;
@@ -80,7 +88,7 @@ describe('adding a booking from a document (Plan 31)', () => {
     await render(withData(db, <BookingsView tripId={tripId} />, 'plan'));
     await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
     const options = screen.getAllByRole('button').map((b) => b.props.accessibilityLabel);
-    expect(options.indexOf('Upload document')).toBeLessThan(
+    expect(options.indexOf('Upload documents')).toBeLessThan(
       options.indexOf('Enter booking details'),
     );
     await fireEvent.press(screen.getByRole('button', { name: 'Enter booking details' }));
@@ -102,7 +110,7 @@ describe('adding a booking from a document (Plan 31)', () => {
     mockParams = { id: tripId, importId };
     await render(withData(db, <BookingEditor />, 'plan'));
     expect(screen.getByText('Flight · Check the details')).toBeTruthy();
-    expect(screen.getByText('Filled in from your document: check before saving.')).toBeTruthy();
+    expect(screen.getByText('Filled in from this document: check before saving.')).toBeTruthy();
     expect(screen.getByLabelText('Name').props.value).toBe('Bengaluru → Goa · 6E 2134');
     expect(screen.getByLabelText('PNR').props.value).toBe('X7K2QP');
     expect(screen.getByLabelText('Provider').props.value).toBe('IndiGo');
@@ -152,9 +160,9 @@ describe('adding a booking from a document (Plan 31)', () => {
     mockPick.mockResolvedValue(null);
     await render(withData(db, <BookingsView tripId={tripId} />, 'plan'));
     await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Upload document' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Upload documents' }));
     expect(mockPush).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: 'Upload document' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Upload documents' })).toBeTruthy();
   });
 
   it('Enter booking details opens an empty form', async () => {
@@ -176,16 +184,23 @@ describe('adding a booking from a document (Plan 31)', () => {
       startDate,
       found: ['type', 'title', 'start'],
     });
-    const importId = stashImport({
-      file: {
-        name: 'trip.pdf',
-        mimeType: 'application/pdf',
-        sizeBytes: 10,
-        localUri: 'file:///t.pdf',
-      },
-      drafts: [leg('BLR → GOI · 6E 2134', '2026-07-12'), leg('GOI → BLR · 6E 517', '2026-07-15')],
-      readable: true,
-    });
+    const importId = stashImport(
+      buildImport([
+        {
+          file: {
+            name: 'trip.pdf',
+            mimeType: 'application/pdf',
+            sizeBytes: 10,
+            localUri: 'file:///t.pdf',
+          },
+          drafts: [
+            leg('BLR → GOI · 6E 2134', '2026-07-12'),
+            leg('GOI → BLR · 6E 517', '2026-07-15'),
+          ],
+          readable: true,
+        },
+      ]),
+    );
     mockParams = { id: tripId, importId };
     await render(withData(db, <BookingEditor />, 'plan'));
     expect(screen.getByText('Booking 1 of 2')).toBeTruthy();
@@ -197,5 +212,68 @@ describe('adding a booking from a document (Plan 31)', () => {
     expect(saved.map((b) => b.title)).toEqual(['BLR → GOI · 6E 2134', 'GOI → BLR · 6E 517']);
     expect(saved.every((b) => listAttachments(db, b.id).length === 1)).toBe(true);
     expect(mockBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('several files at once: one booking per step in date order, each with its own file (Plan 39)', async () => {
+    const { db, tripId } = setup();
+    const pdf = (name: string) => ({
+      name,
+      mimeType: 'application/pdf',
+      sizeBytes: TICKET.length,
+      localUri: `file:///docs/attachments/${name}`,
+    });
+    // The same ticket twice, and a photo: the copy is skipped, the photo kept.
+    mockPick.mockResolvedValue([
+      { name: 'IMG_7.jpg', mimeType: 'image/jpeg', sizeBytes: 9, localUri: 'file:///p.jpg' },
+      pdf('ticket.pdf'),
+      pdf('ticket copy.pdf'),
+    ]);
+    mockBytes.mockResolvedValue(new Uint8Array(TICKET));
+    await render(withData(db, <BookingsView tripId={tripId} />, 'plan'));
+    await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Upload documents' }));
+    await waitFor(() => expect(mockPush).toHaveBeenCalled());
+    const importId = new URL(
+      mockPush.mock.calls.at(-1)![0] as string,
+      'https://x',
+    ).searchParams.get('importId')!;
+
+    mockParams = { id: tripId, importId };
+    await render(withData(db, <BookingEditor />, 'plan'));
+    // The dated flight first, the unreadable photo last.
+    expect(screen.getByText('Booking 1 of 2')).toBeTruthy();
+    expect(screen.getByText('ticket.pdf')).toBeTruthy();
+    expect(screen.getByText('1 duplicate skipped.')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Add and go to the next' }));
+    expect(screen.getByText('IMG_7.jpg')).toBeTruthy();
+    expect(screen.getByText(/Couldn't read this file/)).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('Name'), 'Airport taxi');
+    await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
+    const saved = listBookings(db, tripId);
+    expect(saved).toHaveLength(2);
+    const files = Object.fromEntries(
+      saved.map((b) => [b.title, listAttachments(db, b.id)[0]!.name]),
+    );
+    expect(files).toEqual({
+      'Bengaluru → Goa · 6E 2134': 'ticket.pdf',
+      'Airport taxi': 'IMG_7.jpg',
+    });
+  });
+
+  it('only the first 10 of more files are used, and the form says so', async () => {
+    const { db, tripId } = setup();
+    mockPick.mockResolvedValue(
+      Array.from({ length: 12 }, (_, i) => ({
+        name: `photo-${i}.jpg`,
+        mimeType: 'image/jpeg',
+        sizeBytes: 9,
+        localUri: `file:///p${i}.jpg`,
+      })),
+    );
+    const { importId } = await upload(db, tripId);
+    mockParams = { id: tripId, importId };
+    await render(withData(db, <BookingEditor />, 'plan'));
+    expect(screen.getByText('Booking 1 of 10')).toBeTruthy();
+    expect(screen.getByText('Only the first 10 files were added.')).toBeTruthy();
   });
 });

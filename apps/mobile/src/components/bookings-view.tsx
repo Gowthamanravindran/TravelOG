@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useDb, useQuery } from '@/data/provider';
-import { readBookingDocument, stashImport } from '@/lib/booking-import';
+import { buildImport, readBookingDocument, stashImport, type FileRead } from '@/lib/booking-import';
 import { resolveDraftPlaces } from '@/lib/booking-places';
-import { pickAttachment } from '@/lib/files';
+import { MAX_UPLOADS, pickAttachments } from '@/lib/files';
 import { dateTimeIn, errorMessage, money } from '@/lib/format';
 import { BOOKING_LABELS } from '@/lib/labels';
 import { ChoiceSheet } from '@/ui/choice-sheet';
@@ -50,16 +50,26 @@ export function BookingsView({ tripId }: { tripId: string }) {
   const upload = async () => {
     try {
       setBusy('Opening your files…');
-      const file = await pickAttachment();
-      if (!file) return;
-      setBusy('Reading your document…');
-      const read = await readBookingDocument(file, trip);
-      if (read.readable) {
-        setBusy('Finding the places…');
-        read.drafts = await Promise.all(read.drafts.map((d) => resolveDraftPlaces(db, d)));
+      const picked = await pickAttachments();
+      if (!picked) return;
+      // Each file is read on its own; one that can't be read never stops the others (Plan 39).
+      const reads: FileRead[] = [];
+      for (const [n, file] of picked.files.entries()) {
+        setBusy(
+          picked.files.length > 1
+            ? `Reading ${n + 1} of ${picked.files.length}…`
+            : 'Reading your document…',
+        );
+        const read = await readBookingDocument(file, trip);
+        reads.push({ file, ...read });
       }
+      setBusy('Finding the places…');
+      for (const r of reads)
+        if (r.readable)
+          r.drafts = await Promise.all(r.drafts.map((d) => resolveDraftPlaces(db, d)));
       setChoosing(false);
-      router.push(`/trip/${tripId}/booking?importId=${stashImport({ file, ...read })}`);
+      const id = stashImport(buildImport(reads, picked.truncated));
+      router.push(`/trip/${tripId}/booking?importId=${id}`);
     } catch (e) {
       setChoosing(false);
       setError(errorMessage(e));
@@ -100,8 +110,8 @@ export function BookingsView({ tripId }: { tripId: string }) {
         choices={[
           {
             icon: 'upload',
-            label: 'Upload document',
-            body: 'PDF ticket or voucher: we fill in the details for you',
+            label: 'Upload documents',
+            body: `PDF tickets or vouchers, up to ${MAX_UPLOADS}: we fill in the details for you`,
             primary: true,
             onPress: upload,
           },

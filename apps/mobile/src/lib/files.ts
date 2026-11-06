@@ -60,31 +60,49 @@ function headOf(file: File): Uint8Array | undefined {
   }
 }
 
-/** Lets the user pick a ticket (PDF/photo) and keeps a copy in the app's documents folder. */
-export async function pickAttachment(): Promise<{
+export interface PickedFile {
   name: string;
   mimeType: string | null;
   sizeBytes: number | null;
   localUri: string;
-} | null> {
-  const picked = await File.pickFileAsync();
-  if (picked.canceled || !picked.result) return null;
-  const source = picked.result;
+}
+
+/** Copies a picked file into the app's attachments folder, keeping an extension (Plan 34). */
+async function keepCopy(source: File, n = 0): Promise<PickedFile> {
   const dir = new Directory(Paths.document, 'attachments');
   dir.create({ intermediates: true, idempotent: true });
   const name = source.name || 'ticket';
   const mimeType = usable(source.type) ? source.type : mimeFor(name, headOf(source));
-  // Keep an extension on the copy so the phone knows how to open it (Plan 34).
   const hasExt = /\.[a-z0-9]{2,5}$/i.test(name);
   const ext = !hasExt && mimeType && EXTENSION_FOR[mimeType] ? `.${EXTENSION_FOR[mimeType]}` : '';
-  const target = new File(dir, `${Date.now()}-${name.replace(/[^\w.\-]+/g, '_')}${ext}`);
+  const target = new File(dir, `${Date.now()}-${n}-${name.replace(/[^\w.\-]+/g, '_')}${ext}`);
   await source.copy(target);
-  return {
-    name,
-    mimeType: mimeType || null,
-    sizeBytes: source.size ?? null,
-    localUri: target.uri,
-  };
+  return { name, mimeType: mimeType || null, sizeBytes: source.size ?? null, localUri: target.uri };
+}
+
+/** Lets the user pick a ticket (PDF/photo) and keeps a copy in the app's documents folder. */
+export async function pickAttachment(): Promise<PickedFile | null> {
+  const picked = await File.pickFileAsync();
+  if (picked.canceled || !picked.result) return null;
+  return keepCopy(picked.result);
+}
+
+export const MAX_UPLOADS = 10;
+
+/**
+ * Several tickets at once (Plan 39), at most `max`: the rest are left out and
+ * `truncated` says so. Null when the person cancels.
+ */
+export async function pickAttachments(
+  max = MAX_UPLOADS,
+): Promise<{ files: PickedFile[]; truncated: boolean } | null> {
+  const picked = await File.pickFileAsync({ multipleFiles: true });
+  if (picked.canceled || !picked.result) return null;
+  const all = Array.isArray(picked.result) ? picked.result : [picked.result];
+  if (!all.length) return null;
+  const files: PickedFile[] = [];
+  for (const [n, f] of all.slice(0, max).entries()) files.push(await keepCopy(f, n));
+  return { files, truncated: all.length > max };
 }
 
 /**

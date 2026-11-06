@@ -28,7 +28,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
-import { clearImport, peekImport, type BookingImport } from '@/lib/booking-import';
+import { clearImport, peekImport, type ImportStep } from '@/lib/booking-import';
 import { amountText, errorMessage, parseAmount } from '@/lib/format';
 import { openAttachment, pickAttachment } from '@/lib/files';
 import { BOOKING_LABELS } from '@/lib/labels';
@@ -72,7 +72,17 @@ export default function BookingEditor() {
   const router = useRouter();
   const imported = peekImport(importId);
   const [step, setStep] = useState(0);
-  const steps = imported?.drafts.length ?? 0;
+  const steps = imported?.steps.length ?? 0;
+  // Said once, on the first booking: what was left out of a multi-file upload (Plan 39).
+  const extras =
+    step === 0 && imported
+      ? [
+          imported.skipped
+            ? `${imported.skipped} ${imported.skipped === 1 ? 'duplicate' : 'duplicates'} skipped.`
+            : '',
+          imported.truncated ? 'Only the first 10 files were added.' : '',
+        ].filter(Boolean)
+      : [];
   const finish = () => {
     clearImport(importId);
     router.back();
@@ -83,8 +93,9 @@ export default function BookingEditor() {
         key={step}
         tripId={id}
         bookingId={bookingId}
-        imported={imported}
-        draft={imported?.drafts[step]}
+        imported={imported?.steps[step]}
+        extras={extras}
+        draft={imported?.steps[step]?.draft}
         preset={preset}
         step={step}
         steps={steps}
@@ -119,6 +130,7 @@ function BookingForm({
   tripId,
   bookingId,
   imported,
+  extras = [],
   draft,
   preset,
   step,
@@ -128,7 +140,9 @@ function BookingForm({
 }: {
   tripId: string;
   bookingId?: string;
-  imported?: BookingImport;
+  /** The booking being checked, with the file it came from (Plan 39). */
+  imported?: ImportStep;
+  extras?: string[];
   draft?: BookingDraft;
   preset?: { type: BookingType; start: string; end: string };
   step: number;
@@ -320,11 +334,14 @@ function BookingForm({
           </WithIcon>
           <Body muted small>
             {readable
-              ? steps > 1
-                ? `This document has ${steps} bookings. Filled in from it: check before saving.`
-                : 'Filled in from your document: check before saving.'
+              ? 'Filled in from this document: check before saving.'
               : "Couldn't read this file: enter the details below. Scans and photos can't be read on the phone yet. It will be attached to the booking."}
           </Body>
+          {extras.map((e) => (
+            <Body key={e} muted small>
+              {e}
+            </Body>
+          ))}
         </Card>
       ) : null}
 
