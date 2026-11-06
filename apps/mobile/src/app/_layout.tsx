@@ -19,7 +19,7 @@ import { AppearanceProvider } from '@/lib/appearance';
 import { FONT_ASSETS, FontGate } from '@/lib/fonts';
 import { usePlacesSeed } from '@/lib/places';
 import { CelebrationHost } from '@/ui/motion';
-import { useScheme } from '@/ui/theme';
+import { useScheme, useTheme } from '@/ui/theme';
 import { useReminders } from '@/lib/reminders';
 
 SplashScreen.preventAutoHideAsync();
@@ -29,11 +29,27 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
   return <ErrorScreen {...props} />;
 }
 
-/** Navigation colours and the status bar follow the saved light/dark choice. */
+/**
+ * Navigation colours and the status bar follow the saved theme and light/dark
+ * choice, so the colour behind pages while they slide is the app's own (Plan 36).
+ */
 function Themed({ children }: { children: ReactNode }) {
   const scheme = useScheme();
+  const t = useTheme('home');
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  const navTheme = {
+    ...base,
+    colors: {
+      ...base.colors,
+      background: t.bg,
+      card: t.surface,
+      text: t.ink,
+      border: t.line,
+      primary: t.accent,
+    },
+  };
   return (
-    <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={navTheme}>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       {children}
     </ThemeProvider>

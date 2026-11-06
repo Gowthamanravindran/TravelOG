@@ -1,10 +1,12 @@
-import { getSetting, setSetting, upcomingReminders, type Db } from '@travelog/db';
+import { getSetting, getTrip, setSetting, upcomingReminders, type Db } from '@travelog/db';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
 import { useDataVersion, useDb } from '@/data/provider';
+
+import { tripHref } from './trip-route';
 
 /**
  * Local reminders (docs/01 §11): planned from the database by @travelog/db and
@@ -93,8 +95,10 @@ export function useReminders(): void {
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
       const tripId = response.notification.request.content.data?.tripId;
-      if (typeof tripId === 'string') router.push(`/trip/${tripId}`);
+      const trip = typeof tripId === 'string' ? getTrip(db, tripId) : undefined;
+      // Straight to the trip's own screen (Plan 36).
+      if (trip) router.push(tripHref(trip));
     });
     return () => sub.remove();
-  }, [router]);
+  }, [router, db]);
 }

@@ -2,6 +2,7 @@ import { createTrip, getLocalProfile } from '@travelog/db';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { tripHref } from '@/lib/trip-route';
 import { emptyTripForm, toTripInput, TripForm } from '@/components/trip-form';
 import { useMutate, useQuery } from '@/data/provider';
 import { errorMessage } from '@/lib/format';
@@ -27,7 +28,7 @@ export default function NewTrip() {
         }),
       );
       celebrate('Trip created');
-      router.replace(`/trip/${trip.id}`);
+      router.replace(tripHref(trip));
     } catch (e) {
       setError(errorMessage(e));
     }

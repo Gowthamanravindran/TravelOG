@@ -39,3 +39,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 33 | [Slide-ins land smoothly (no jump at the end)](33-smooth-slide-in.md) | see git log |
 | 34 | [Attachments open again](34-open-attachments.md) | see git log |
 | 35 | [Where you'll be: route strip, city per day, Check your plan](35-whereabouts.md) | see git log |
+| 36 | [Open a trip without the blank page](36-open-trip.md) | see git log |

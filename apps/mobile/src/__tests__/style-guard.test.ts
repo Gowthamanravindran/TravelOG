@@ -109,3 +109,17 @@ it('slide-ins land without a jump: no SafeAreaView, sheets only through BottomSh
   // A plain Modal settles its window after the first frame on Android.
   expect(scan(/<Modal\b/, [`ui${path.sep}bottom-sheet.tsx`])).toEqual([]);
 });
+
+it('pages are drawn at once, not faded in, so nothing slides in blank (Plan 36)', () => {
+  const kit = fs.readFileSync(path.join(__dirname, '..', 'ui', 'kit.tsx'), 'utf8');
+  const screenFn = kit.slice(
+    kit.indexOf('export function Screen('),
+    kit.indexOf('export function H1('),
+  );
+  expect(screenFn).not.toMatch(/entering=/);
+  // The app goes straight to a trip's screen, not through the redirect at /trip/<id>.
+  const offenders = files(path.join(__dirname, '..')).filter((f) =>
+    /router\.(push|replace|navigate)\(`\/trip\/\$\{[^}]+\}`\)/.test(fs.readFileSync(f, 'utf8')),
+  );
+  expect(offenders).toEqual([]);
+});

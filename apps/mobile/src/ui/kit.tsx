@@ -13,12 +13,7 @@ import {
 } from 'react-native';
 import { InsetView } from './inset-view';
 
-import Animated, {
-  FadeIn,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { Icon, type IconName } from './icon';
 import { haptic, MOTION, useMotionOk } from './motion';
@@ -34,19 +29,17 @@ export function Screen({
   edges?: ('top' | 'bottom')[];
 }) {
   const t = useTheme();
-  const ok = useMotionOk();
+  // Drawn at once, never faded in: a page that slides in already shows its content
+  // (Plan 36). Tabs cross-fade in their layouts instead.
   return (
     <InsetView edges={edges} style={[styles.fill, { backgroundColor: t.bg }]}>
-      {/* A screen or tab fades in when it first opens (Plan 28). */}
-      <Animated.View style={styles.fill} entering={ok ? FadeIn.duration(MOTION.base) : undefined}>
-        {scroll ? (
-          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-            {children}
-          </ScrollView>
-        ) : (
-          <View style={[styles.fill, styles.content]}>{children}</View>
-        )}
-      </Animated.View>
+      {scroll ? (
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          {children}
+        </ScrollView>
+      ) : (
+        <View style={[styles.fill, styles.content]}>{children}</View>
+      )}
     </InsetView>
   );
 }

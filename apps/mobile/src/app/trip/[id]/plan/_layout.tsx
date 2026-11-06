@@ -18,6 +18,8 @@ export default function PlanLayout() {
     <ModeProvider mode="plan">
       <Tabs
         screenOptions={{
+          // Switching tabs cross-fades; the first tab shows at once (Plan 36).
+          animation: 'fade',
           header: () => (
             <ModeProvider mode="plan">
               <TripHeader />

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { TripCard } from '@/components/trip-card';
+import { tripHref } from '@/lib/trip-route';
 import { useQuery } from '@/data/provider';
 import { Body, Button, Card, Empty, H1, Screen, Segmented, Strong, WithIcon } from '@/ui/kit';
 import { Appear } from '@/ui/motion';
@@ -30,7 +31,8 @@ export default function TripsScreen() {
     trips.some(matches.upcoming) || !trips.length ? 'upcoming' : 'planning',
   );
   const shown = trips.filter(matches[filter]);
-  const open = (trip: TripWithState) => router.push(`/trip/${trip.id}`);
+  // Straight to the trip's own screen, so no empty page slides in first (Plan 36).
+  const open = (trip: TripWithState) => router.push(tripHref(trip));
 
   return (
     <Screen>

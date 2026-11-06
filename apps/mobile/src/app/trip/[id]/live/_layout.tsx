@@ -18,6 +18,8 @@ export default function LiveLayout() {
     <ModeProvider mode="trip">
       <Tabs
         screenOptions={{
+          // Switching tabs cross-fades; the first tab shows at once (Plan 36).
+          animation: 'fade',
           header: () => (
             <ModeProvider mode="trip">
               <TripHeader />
