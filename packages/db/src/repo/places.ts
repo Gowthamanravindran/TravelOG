@@ -1,7 +1,7 @@
 import { normalizePlace, rankPlaces, type Place } from '@travelog/core';
 import { eq, inArray, like, or } from 'drizzle-orm';
 
-import { tx, type Db } from '../db';
+import { newId, tx, type Db } from '../db';
 import { placeNames, places } from '../schema';
 import { getSetting, setSetting } from './settings';
 
@@ -104,4 +104,44 @@ export function searchPlaces(
   const aliases = aliasesOf(db, ids);
   const found = rows.map((r) => toPlace(r, aliases.get(r.id) ?? []));
   return rankPlaces(found, query, { homeCountry }).slice(0, limit);
+}
+
+/**
+ * A place you typed that isn't in our list (Plan 35, "Use as typed"): saved on the
+ * phone as a city with the trip's time zone, so bookings and stops can point at it.
+ */
+export function saveTypedPlace(
+  db: Db,
+  name: string,
+  {
+    timeZone,
+    countryCode = null,
+    countryName = null,
+  }: {
+    timeZone: string | null;
+    countryCode?: string | null;
+    countryName?: string | null;
+  },
+): Place {
+  const clean = name.trim().slice(0, 80);
+  if (!clean) throw new RangeError('please type a place');
+  const place: Place = {
+    id: `user:${newId()}`,
+    kind: 'city',
+    name: clean,
+    countryCode,
+    countryName,
+    region: null,
+    continent: null,
+    lat: null,
+    lng: null,
+    timeZone,
+    currency: null,
+    population: 0,
+    boost: 0,
+    aliases: [],
+    source: 'ours',
+  };
+  savePlaces(db, [place]);
+  return place;
 }

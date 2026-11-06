@@ -251,8 +251,38 @@ export const bookings = sqliteTable(
     costMinor: integer('cost_minor'),
     currency: text('currency'),
     notes: text('notes'),
+    /** Where a journey leaves from and goes to (places.id), Plan 35. */
+    fromPlaceId: text('from_place_id'),
+    toPlaceId: text('to_place_id'),
+    /** The city of a stay, event or rental (places.id), Plan 35. */
+    placeId: text('place_id'),
+    address: text('address'),
   },
   (t) => [index('bookings_trip_idx').on(t.tripId, t.startsAt)],
+);
+
+export const STOP_KINDS = ['stay', 'travel'] as const;
+export type StopKind = (typeof STOP_KINDS)[number];
+
+/**
+ * Places you set yourself (Plan 35): "staying with friends in Goa", "driving
+ * Bengaluru → Delhi". The nights from start_date up to end_date (local dates).
+ */
+export const tripStops = sqliteTable(
+  'trip_stops',
+  {
+    ...syncColumns,
+    tripId: text('trip_id').notNull(),
+    kind: text('kind', { enum: STOP_KINDS }).notNull(),
+    placeId: text('place_id'),
+    toPlaceId: text('to_place_id'),
+    startDate: text('start_date').notNull(),
+    endDate: text('end_date').notNull(),
+    label: text('label'),
+    address: text('address'),
+    notes: text('notes'),
+  },
+  (t) => [index('trip_stops_trip_idx').on(t.tripId, t.startDate)],
 );
 
 export const attachments = sqliteTable(
@@ -417,6 +447,7 @@ export const syncedTables = {
   photos,
   check_ins: checkIns,
   studio_projects: studioProjects,
+  trip_stops: tripStops,
 } as const;
 
 export type SyncedTableName = keyof typeof syncedTables;

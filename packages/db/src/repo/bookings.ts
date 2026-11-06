@@ -17,6 +17,10 @@ export interface BookingInput {
   costMinor?: number | null;
   currency?: string | null;
   notes?: string | null;
+  fromPlaceId?: string | null;
+  toPlaceId?: string | null;
+  placeId?: string | null;
+  address?: string | null;
 }
 
 function validate(input: Partial<BookingInput>) {
