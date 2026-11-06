@@ -1,0 +1,7 @@
+"id","ident","type","name","latitude_deg","longitude_deg","elevation_ft","continent","iso_country","iso_region","municipality","scheduled_service","icao_code","iata_code","gps_code","local_code","home_link","wikipedia_link","keywords"
+1,"VOBL","large_airport","Kempegowda International Airport Bengaluru",13.19,77.70,3000,"AS","IN","IN-KA","Bengaluru","yes","VOBL","BLR","VOBL",,,,"Bangalore"
+2,"VOGO","medium_airport","Dabolim Airport",15.38,73.83,150,"AS","IN","IN-GA","Vasco da Gama","yes","VOGO","GOI","VOGO",,,,
+3,"VOGA","large_airport","Manohar International Airport",15.73,73.86,0,"AS","IN","IN-GA","Mopa","yes","VOGA","GOX","VOGA",,,,
+4,"XXXX","small_airport","Closed Strip, ""Old""",0,0,0,"AS","IN","IN-GA","Nowhere","no",,"ZZZ",,,,,
+5,"YYYY","heliport","City Heliport",0,0,0,"EU","FR","FR-IDF","Paris","yes",,"JDP",,,,,
+6,"RJAA","large_airport","Narita International Airport",35.76,140.38,141,"AS","JP","JP-12","Narita","yes","RJAA","NRT","RJAA",,,,

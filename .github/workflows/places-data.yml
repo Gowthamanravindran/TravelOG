@@ -2,6 +2,7 @@ name: Places data
 
 # Plan 29. Rebuilds the phone's basic places list from GeoNames (CC-BY 4.0) plus
 # data/places/overrides.json, checks it, and commits it to the branch it ran on.
+# Plan 35: also the airports list (IATA code → city) from OurAirports (public domain).
 # Optionally loads the full list (towns over 500 people) into Supabase.
 # Run it before each release: Actions → Places data → Run workflow.
 on:
@@ -26,19 +27,21 @@ jobs:
           # Plain Node scripts; no pnpm here, so don't let setup-node look for it.
           package-manager-cache: false
       - name: Test the pipeline
-        run: node --test scripts/places/lib.test.mjs
+        run: node --test scripts/places/lib.test.mjs scripts/places/airports.test.mjs
       - name: Build and check the phone's basic list
         run: node scripts/places/build.mjs
+      - name: Build and check the phone's airports list (Plan 35)
+        run: node scripts/places/airports.mjs
       - name: Commit it if it changed
         run: |
-          if git diff --quiet -- apps/mobile/assets/places/basic.places; then
-            echo "::notice::Places list unchanged."
+          if git diff --quiet -- apps/mobile/assets/places/; then
+            echo "::notice::Places lists unchanged."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/mobile/assets/places/basic.places
-          git commit -m "chore(places): rebuild the phone's basic places list from GeoNames"
+          git add apps/mobile/assets/places/basic.places apps/mobile/assets/places/airports.places
+          git commit -m "chore(places): rebuild the phone's places and airports lists"
           git push
 
   server:

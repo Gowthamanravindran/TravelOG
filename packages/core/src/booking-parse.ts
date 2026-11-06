@@ -593,6 +593,9 @@ const NOT_AIRPORTS = new Set([
 interface Route {
   from: string;
   to: string;
+  /** Airport codes, when the ticket prints them. */
+  fromCode?: string;
+  toCode?: string;
 }
 
 function findRoute(text: string): Route | null {
@@ -601,17 +604,19 @@ function findRoute(text: string): Route | null {
     /([A-Z][A-Za-z.' ]{1,30}?)\s*\(([A-Z]{3})\)[^\n]{0,40}?(?:→|->|–|—|-|to|✈)\s*([A-Z][A-Za-z.' ]{1,30}?)\s*\(([A-Z]{3})\)/.exec(
       text,
     );
-  if (named) return { from: named[1]!.trim(), to: named[3]!.trim() };
+  if (named)
+    return { from: named[1]!.trim(), to: named[3]!.trim(), fromCode: named[2]!, toCode: named[4]! };
   // "BLR → GOI", "BLR - GOI", "BLR to GOI"
   const re = /\b([A-Z]{3})\s*(?:→|->|–|—|-|to|✈)\s*([A-Z]{3})\b/g;
   for (let m = re.exec(text); m; m = re.exec(text))
     if (!NOT_AIRPORTS.has(m[1]!) && !NOT_AIRPORTS.has(m[2]!) && m[1] !== m[2])
-      return { from: m[1]!, to: m[2]! };
+      return { from: m[1]!, to: m[2]!, fromCode: m[1]!, toCode: m[2]! };
   // Two codes in brackets, in order: "(BLR) … (GOI)"
   const codes = [...text.matchAll(/\(([A-Z]{3})\)/g)]
     .map((m) => m[1]!)
     .filter((c) => !NOT_AIRPORTS.has(c));
-  if (codes.length >= 2 && codes[0] !== codes[1]) return { from: codes[0]!, to: codes[1]! };
+  if (codes.length >= 2 && codes[0] !== codes[1])
+    return { from: codes[0]!, to: codes[1]!, fromCode: codes[0]!, toCode: codes[1]! };
   return null;
 }
 
@@ -713,8 +718,6 @@ function findNotes(
     if (people) notes.push(`${people[1]} ${people[2]!.toLowerCase()}`);
     const nights = /\b(\d{1,2})\s*nights?\b/i.exec(text);
     if (nights) notes.push(`${nights[1]} night${nights[1] === '1' ? '' : 's'}`);
-    const address = valueAfter(lines, /\b(?:hotel\s+|property\s+)?address\s*:/i, /[^\s].{4,120}/);
-    if (address) notes.push(`Address: ${address.split(COL)[0]!.trim()}`);
   }
   if (site && site !== provider) notes.push(`Booked on ${site}`);
   return notes;
@@ -856,8 +859,22 @@ export function parseBookingText(text: string, opts: ParseOptions): BookingDraft
       title = eventName?.split(COL)[0]?.trim() ?? eventTitle(legLines, site) ?? '';
     else title = routeText;
 
+    // Where it happens (Plan 35): a journey's two ends, or the address of a stay or venue.
+    const journey = type === 'flight' || type === 'train' || type === 'bus';
+    const address = journey
+      ? null
+      : (valueAfter(
+          legLines,
+          /\b(?:hotel\s+|property\s+)?(?:address|venue|location)\s*:/i,
+          /[^\s].{4,120}/,
+        )
+          ?.split(COL)[0]!
+          .trim() ?? null);
+
     const found: DraftField[] = [];
     if (type !== 'other') found.push('type');
+    if (journey && route) found.push('where');
+    if (address) found.push('address');
     if (title) found.push('title');
     if (provider) found.push('provider');
     if (reference) found.push('reference');
@@ -879,6 +896,12 @@ export function parseBookingText(text: string, opts: ParseOptions): BookingDraft
       costMinor: cost?.minor ?? null,
       currency: cost?.currency ?? null,
       notes: notes.length ? notes.join('\n') : null,
+      fromText: journey ? (route?.from ?? null) : null,
+      toText: journey ? (route?.to ?? null) : null,
+      placeText: null,
+      fromCode: journey ? (route?.fromCode ?? null) : null,
+      toCode: journey ? (route?.toCode ?? null) : null,
+      address,
       found,
     } satisfies BookingDraft;
   });

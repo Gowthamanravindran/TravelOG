@@ -34,6 +34,7 @@ Total Fare   ₹ 4,567.00`;
       costMinor: 456700,
       currency: 'INR',
     });
+    expect(d).toMatchObject({ fromText: 'BLR', toText: 'GOI', fromCode: 'BLR', toCode: 'GOI' });
     expect(d!.notes).toContain('Passengers: Mr Arjun Rao');
     expect(d!.notes).toContain('Seat 14C');
     expect(d!.found).toEqual(
@@ -72,6 +73,7 @@ Grand Total   ₹9,840`;
       // The total belongs to the first leg only, so it isn't counted twice.
       costMinor: null,
     });
+    expect(drafts[1]).toMatchObject({ fromCode: 'GOI', toCode: 'BLR' });
     expect(drafts[0]!.notes).toContain('Booked on MakeMyTrip');
     expect(drafts[0]!.notes).toContain('Ms Priya Nair');
   });
@@ -98,6 +100,11 @@ IRCTC Convenience Fee is charged per e-ticket.`;
       endDate: '2026-07-13',
       endTime: '06:30',
       costMinor: 84500,
+    });
+    expect(d).toMatchObject({
+      fromText: 'KSR Bengaluru (SBC)',
+      toText: 'Madgaon (MAO)',
+      fromCode: null,
     });
     expect(d!.notes).toContain('Coach S7, Berth 41');
   });
@@ -152,7 +159,7 @@ Total price   ₹ 18,450`;
     });
     expect(d!.notes).toContain('Room: Deluxe Double Room with Sea View');
     expect(d!.notes).toContain('3 nights');
-    expect(d!.notes).toContain('Address: Candolim Beach Road');
+    expect(d!.address).toBe('Candolim Beach Road, Candolim, Goa 403515, India');
     expect(d!.notes).toContain('Guest: Arjun Rao');
   });
 
@@ -199,6 +206,7 @@ Tickets: 2   Total Amount: ₹ 3,000.00`;
       startDate: '2026-07-18',
       startTime: '19:00',
       costMinor: 300000,
+      address: 'Jio Garden, Bandra Kurla Complex, Mumbai',
     });
   });
 
@@ -230,6 +238,10 @@ Tickets: 2   Total Amount: ₹ 3,000.00`;
     expect(d).toMatchObject({
       type: 'flight',
       title: 'Bengaluru → Goa · 6E 2134',
+      fromText: 'Bengaluru',
+      toText: 'Goa',
+      fromCode: 'BLR',
+      toCode: 'GOI',
       provider: 'IndiGo',
       reference: 'X7K2QP',
       startDate: '2026-07-12',

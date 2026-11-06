@@ -4,8 +4,9 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { useQuery } from '@/data/provider';
+import { useDb, useQuery } from '@/data/provider';
 import { readBookingDocument, stashImport } from '@/lib/booking-import';
+import { resolveDraftPlaces } from '@/lib/booking-places';
 import { pickAttachment } from '@/lib/files';
 import { dateTimeIn, errorMessage, money } from '@/lib/format';
 import { BOOKING_LABELS } from '@/lib/labels';
@@ -29,6 +30,7 @@ import { useTheme } from '@/ui/theme';
 export function BookingsView({ tripId }: { tripId: string }) {
   const t = useTheme();
   const router = useRouter();
+  const db = useDb();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
   const bookings = useQuery(
     (db) =>
@@ -52,6 +54,10 @@ export function BookingsView({ tripId }: { tripId: string }) {
       if (!file) return;
       setBusy('Reading your document…');
       const read = await readBookingDocument(file, trip.currency);
+      if (read.readable) {
+        setBusy('Finding the places…');
+        read.drafts = await Promise.all(read.drafts.map((d) => resolveDraftPlaces(db, d)));
+      }
       setChoosing(false);
       router.push(`/trip/${tripId}/booking?importId=${stashImport({ file, ...read })}`);
     } catch (e) {

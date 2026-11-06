@@ -91,7 +91,7 @@ describe('where a booking happens (Plan 35)', () => {
 
   it('a stay in a place we don’t know keeps the place as typed, and opens in Maps', async () => {
     const { db, tripId } = setup();
-    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     mockParams = { id: tripId };
     await render(withData(db, <BookingEditor />, 'plan'));
     await fireEvent.press(screen.getByRole('button', { name: 'Stay' }));
