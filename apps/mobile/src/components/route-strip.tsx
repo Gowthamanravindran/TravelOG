@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BOOKING_LABELS } from '@/lib/labels';
 import { durationText, nightsText, placeName, type Where } from '@/lib/where';
 import { Icon, type IconName } from '@/ui/icon';
+import { Button } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
 const JOURNEY_ICON: Record<string, IconName> = {
@@ -19,10 +20,28 @@ const JOURNEY_ICON: Record<string, IconName> = {
  * The trip as a line (Plan 35): Bengaluru ✈ Goa 12–15 Jul 🚌 Gokarna 15–17 Jul.
  * A "?" marks a place worked out without a booking. Tap a stop to open it.
  */
-export function RouteStrip({ tripId, where }: { tripId: string; where: Where }) {
+export function RouteStrip({
+  tripId,
+  where,
+  onAddPlace,
+}: {
+  tripId: string;
+  where: Where;
+  /** Shows a "+ Place" pill at the end (Plan mode only). */
+  onAddPlace?: () => void;
+}) {
   const t = useTheme();
   const router = useRouter();
-  if (!where.route.length) return null;
+  const add = onAddPlace ? (
+    <Button
+      label={where.route.length ? 'Place' : 'Add a place'}
+      icon="add"
+      variant="secondary"
+      small
+      onPress={onAddPlace}
+    />
+  ) : null;
+  if (!where.route.length) return add ? <View style={styles.alone}>{add}</View> : null;
 
   const open = (sourceId: string | null) => {
     if (!sourceId) return;
@@ -46,10 +65,18 @@ export function RouteStrip({ tripId, where }: { tripId: string; where: Where }) 
       accessibilityLabel="Your route"
       contentContainerStyle={styles.row}
     >
-      {startName ? <Text style={[type.headline, { color: t.ink }]}>{startName}</Text> : null}
+      {startName ? (
+        <View style={[styles.stop, { borderColor: t.line }]}>
+          <Text style={[type.body, { color: t.ink, ...font('text', 600) }]} numberOfLines={1}>
+            {startName}
+          </Text>
+          <Text style={[type.caption, { color: t.ink2 }]}>From</Text>
+        </View>
+      ) : null}
       {where.route.map((item, i) => (
         <Item key={i} item={item} where={where} onPress={open} />
       ))}
+      {add}
     </ScrollView>
   );
 }
@@ -76,7 +103,9 @@ function Item({
         onPress={() => onPress(j.sourceId)}
         style={styles.journey}
       >
-        <Icon name={JOURNEY_ICON[j.type] ?? 'route'} size={18} color={t.accent} />
+        <View style={[styles.marker, { backgroundColor: t.accentSoft }]}>
+          <Icon name={JOURNEY_ICON[j.type] ?? 'route'} size={16} color={t.accent} />
+        </View>
         {time ? <Text style={[type.caption, { color: t.ink2 }]}>{time}</Text> : null}
       </Pressable>
     );
@@ -109,6 +138,14 @@ function Item({
 const styles = StyleSheet.create({
   row: { alignItems: 'center', gap: 8, paddingVertical: 2 },
   journey: { alignItems: 'center', gap: 2, paddingHorizontal: 2 },
+  marker: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  alone: { flexDirection: 'row' },
   stop: {
     borderWidth: 1,
     borderRadius: 14,

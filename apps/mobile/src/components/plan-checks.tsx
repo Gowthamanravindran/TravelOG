@@ -1,92 +1,110 @@
 import { type PlanCheck } from '@travelog/core';
+import { type, type TileFamily } from '@travelog/ui';
 import { useRouter } from 'expo-router';
-import { View } from 'react-native';
+import { type ReactNode } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useMutate } from '@/data/provider';
 import { shortDate } from '@/lib/format';
 import { dismissCheck, nightsText, placeName, type Where } from '@/lib/where';
-import { Body, Button, Card, Row, Strong, WithIcon } from '@/ui/kit';
+import { Icon, type IconName } from '@/ui/icon';
+import { Body, Button, Card, Divider, IconTile, Strong } from '@/ui/kit';
+import { useTheme } from '@/ui/theme';
 
 /**
- * "Check your plan" (Plan 35): gentle questions about gaps and clashes in the
- * bookings. Shown only when there is something to ask; each can be dismissed.
+ * "Check your plan" (Plans 35, 37): gentle questions about gaps and clashes in the
+ * bookings. Each question has a title, one line of detail, its actions as small
+ * outlined pills, and a ✕ to dismiss it. Shown only when there is something to ask.
  */
 export function PlanChecks({ tripId, where }: { tripId: string; where: Where }) {
+  const t = useTheme();
   const router = useRouter();
   const mutate = useMutate();
   if (!where.checks.length) return null;
   const dismiss = (c: PlanCheck) => mutate((db) => dismissCheck(db, tripId, c.key));
   const name = (id: string | null) => placeName(where.places, id);
+  const count = where.checks.length;
 
   return (
     <Card>
-      <WithIcon icon="question" size={18}>
-        <Strong>Check your plan</Strong>
-      </WithIcon>
-      {where.checks.map((c) => (
-        <View key={c.key} style={{ gap: 4 }}>
+      {/* A small label, so each question's title leads (Plan 37). */}
+      <Text style={[type.label, styles.eyebrow, { color: t.ink2 }]}>
+        Check your plan · {count} {count === 1 ? 'question' : 'questions'}
+      </Text>
+      {where.checks.map((c, i) => (
+        <View key={c.key} style={{ gap: 12 }}>
+          {i > 0 ? <Divider /> : null}
           {c.kind === 'noStay' ? (
-            <>
-              <Body>
-                {`No stay booked for ${nightsCount(c) > 1 ? 'the nights' : 'the night'} of ${nightsText(
-                  c.startDate,
-                  c.endDate,
-                )}${name(c.placeId) ? ` (probably in ${name(c.placeId)})` : ''}. Where will you sleep?`}
-              </Body>
-              <Row style={{ flexWrap: 'wrap', gap: 4 }}>
-                <Button
-                  label="Add stay"
-                  variant="link"
-                  onPress={() =>
-                    router.push(
-                      `/trip/${tripId}/booking?type=stay&start=${c.startDate}&end=${c.endDate}`,
-                    )
-                  }
-                />
-                <Button
-                  label="I'm sorted"
-                  variant="link"
-                  onPress={() =>
-                    router.push(
-                      `/trip/${tripId}/stop?kind=stay&start=${c.startDate}&end=${c.endDate}${
-                        c.placeId ? `&placeId=${encodeURIComponent(c.placeId)}` : ''
-                      }`,
-                    )
-                  }
-                />
-                <Button label="Dismiss" variant="link" onPress={() => dismiss(c)} />
-              </Row>
-            </>
+            <CheckItem
+              icon="stay"
+              family="clay"
+              title={`No stay for ${nightsText(c.startDate, c.endDate)}`}
+              line={`${name(c.placeId) ? `You'll probably be in ${name(c.placeId)}. ` : ''}Where will you sleep?`}
+              onDismiss={() => dismiss(c)}
+            >
+              <Button
+                label="Add stay"
+                icon="add"
+                variant="secondary"
+                small
+                onPress={() =>
+                  router.push(
+                    `/trip/${tripId}/booking?type=stay&start=${c.startDate}&end=${c.endDate}`,
+                  )
+                }
+              />
+              <Button
+                label="I'm sorted"
+                variant="secondary"
+                small
+                onPress={() =>
+                  router.push(
+                    `/trip/${tripId}/stop?kind=stay&start=${c.startDate}&end=${c.endDate}${
+                      c.placeId ? `&placeId=${encodeURIComponent(c.placeId)}` : ''
+                    }`,
+                  )
+                }
+              />
+            </CheckItem>
           ) : c.kind === 'arrivalMismatch' ? (
-            <>
-              <Body>
-                You arrive in {name(c.arrivePlaceId)} on {shortDate(c.date)}, but that night&apos;s
-                stay is in {name(c.stayPlaceId)}. Is that right?
-              </Body>
-              <Row style={{ flexWrap: 'wrap', gap: 4 }}>
-                <Button label="Yes, that's right" variant="link" onPress={() => dismiss(c)} />
-                <Button
-                  label="Open the booking"
-                  variant="link"
-                  onPress={() => router.push(`/trip/${tripId}/booking?bookingId=${c.bookingId}`)}
-                />
-              </Row>
-            </>
+            <CheckItem
+              icon="route"
+              family="sea"
+              title={`Landing in ${name(c.arrivePlaceId)}, sleeping in ${name(c.stayPlaceId)}`}
+              line={`On ${shortDate(c.date)}. Is that right?`}
+            >
+              <Button
+                label="That's right"
+                icon="check"
+                variant="secondary"
+                small
+                onPress={() => dismiss(c)}
+              />
+              <Button
+                label="Open booking"
+                variant="secondary"
+                small
+                onPress={() => router.push(`/trip/${tripId}/booking?bookingId=${c.bookingId}`)}
+              />
+            </CheckItem>
           ) : (
-            <>
-              <Body>Two stays are booked for the night of {shortDate(c.date)}.</Body>
-              <Row style={{ flexWrap: 'wrap', gap: 4 }}>
-                {c.sourceIds.map((id, i) => (
-                  <Button
-                    key={id}
-                    label={`Open stay ${i + 1}`}
-                    variant="link"
-                    onPress={() => router.push(`/trip/${tripId}/booking?bookingId=${id}`)}
-                  />
-                ))}
-                <Button label="Dismiss" variant="link" onPress={() => dismiss(c)} />
-              </Row>
-            </>
+            <CheckItem
+              icon="stay"
+              family="clay"
+              title={`Two stays on ${shortDate(c.date)}`}
+              line="Is one of them cancelled?"
+              onDismiss={() => dismiss(c)}
+            >
+              {c.sourceIds.slice(0, 2).map((id, n) => (
+                <Button
+                  key={id}
+                  label={n === 0 ? 'Open first' : 'Open second'}
+                  variant="secondary"
+                  small
+                  onPress={() => router.push(`/trip/${tripId}/booking?bookingId=${id}`)}
+                />
+              ))}
+            </CheckItem>
           )}
         </View>
       ))}
@@ -94,5 +112,52 @@ export function PlanChecks({ tripId, where }: { tripId: string; where: Where }) 
   );
 }
 
-const nightsCount = (c: { startDate: string; endDate: string }) =>
-  Math.round((Date.parse(c.endDate) - Date.parse(c.startDate)) / 86_400_000);
+function CheckItem({
+  icon,
+  family,
+  title,
+  line,
+  onDismiss,
+  children,
+}: {
+  icon: IconName;
+  family: TileFamily;
+  title: string;
+  line: string;
+  onDismiss?: () => void;
+  children: ReactNode;
+}) {
+  const t = useTheme();
+  return (
+    <View style={styles.item}>
+      <IconTile icon={icon} family={family} size={32} />
+      <View style={styles.text}>
+        <Strong>{title}</Strong>
+        <Body muted small>
+          {line}
+        </Body>
+        <View style={styles.actions}>{children}</View>
+      </View>
+      {onDismiss ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss"
+          onPress={onDismiss}
+          hitSlop={10}
+          style={({ pressed }) => [styles.close, { opacity: pressed ? 0.6 : 1 }]}
+        >
+          <Icon name="close" size={18} color={t.ink2} />
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  eyebrow: { textTransform: 'uppercase', letterSpacing: 0.8 },
+  item: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  text: { flex: 1, gap: 4 },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  // 24 pt visible, 44 pt to tap with the hit slop.
+  close: { width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
+});

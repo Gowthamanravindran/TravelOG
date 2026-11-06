@@ -80,6 +80,7 @@ describe('where you will be (Plan 35)', () => {
     const { db, tripId } = setup();
     await render(withData(db, <ItineraryView tripId={tripId} />, 'plan'));
     expect(screen.getByLabelText('Your route')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Place' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Flight to Panaji, 06:45' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Panaji, 12–13 Jul' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Panaji, probably, 14–15 Jul' })).toBeTruthy();
@@ -90,12 +91,9 @@ describe('where you will be (Plan 35)', () => {
   it('asks about nights with no stay, and Add stay opens the form for those nights', async () => {
     const { db, tripId } = setup();
     await render(withData(db, <ItineraryView tripId={tripId} />, 'plan'));
-    expect(screen.getByText('Check your plan')).toBeTruthy();
-    expect(
-      screen.getByText(
-        'No stay booked for the nights of 14–15 Jul (probably in Panaji). Where will you sleep?',
-      ),
-    ).toBeTruthy();
+    expect(screen.getByText('No stay for 14–15 Jul')).toBeTruthy();
+    expect(screen.getByText("You'll probably be in Panaji. Where will you sleep?")).toBeTruthy();
+    expect(screen.getByText('Check your plan · 1 question')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Add stay' }));
     expect(mockPush).toHaveBeenCalledWith(
       `/trip/${tripId}/booking?type=stay&start=2026-07-14&end=2026-07-16`,
@@ -127,7 +125,7 @@ describe('where you will be (Plan 35)', () => {
 
     mockParams = {};
     await render(withData(db, <ItineraryView tripId={tripId} />, 'plan'));
-    expect(screen.queryByText('Check your plan')).toBeNull();
+    expect(screen.queryByText(/^Check your plan/)).toBeNull();
     expect(screen.getByRole('tab', { name: 'Day 3, 14 Jul, Panaji' })).toBeTruthy();
   });
 
@@ -135,7 +133,7 @@ describe('where you will be (Plan 35)', () => {
     const { db, tripId } = setup();
     await render(withData(db, <ItineraryView tripId={tripId} />, 'plan'));
     await fireEvent.press(screen.getByRole('button', { name: 'Dismiss' }));
-    expect(screen.queryByText('Check your plan')).toBeNull();
+    expect(screen.queryByText(/^Check your plan/)).toBeNull();
   });
 
   it('says nothing for a trip with no bookings', async () => {
@@ -146,7 +144,10 @@ describe('where you will be (Plan 35)', () => {
       { displayName: 'Gowtham' },
     );
     await render(withData(db, <ItineraryView tripId={trip.id} />, 'plan'));
-    expect(screen.queryByText('Check your plan')).toBeNull();
+    expect(screen.queryByText(/^Check your plan/)).toBeNull();
     expect(screen.queryByLabelText('Your route')).toBeNull();
+    // Places can still be added before any booking.
+    await fireEvent.press(screen.getByRole('button', { name: 'Add a place' }));
+    expect(mockPush).toHaveBeenCalledWith(`/trip/${trip.id}/stop`);
   });
 });

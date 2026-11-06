@@ -118,16 +118,16 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
 
   return (
     <View style={{ gap: 14 }}>
-      {where ? <RouteStrip tripId={tripId} where={where} /> : null}
-      {where ? <PlanChecks tripId={tripId} where={where} /> : null}
-      {editable && trip?.startDate ? (
-        <Button
-          label="Add a place without a booking"
-          icon="place"
-          variant="link"
-          onPress={() => router.push(`/trip/${tripId}/stop`)}
+      {where ? (
+        <RouteStrip
+          tripId={tripId}
+          where={where}
+          onAddPlace={
+            editable && trip?.startDate ? () => router.push(`/trip/${tripId}/stop`) : undefined
+          }
         />
       ) : null}
+      {where ? <PlanChecks tripId={tripId} where={where} /> : null}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
