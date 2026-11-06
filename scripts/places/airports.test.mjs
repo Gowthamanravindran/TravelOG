@@ -27,6 +27,11 @@ test('keeps airports with scheduled flights and an IATA code', () => {
   ]);
 });
 
+test('names the city travellers mean when the airport sits in a small town', () => {
+  const goi = buildAirports(csv, { GOI: 'Goa' }).find((a) => a.iata === 'GOI');
+  assert.equal(goi.city, 'Goa');
+});
+
 test('stops the build when known airports are missing or the list is short', () => {
   const errors = checkAirports(buildAirports(csv), [{ iata: 'CDG', country: 'FR' }]);
   assert.deepEqual(errors, ['only 4 airports', 'CDG (FR) is missing']);

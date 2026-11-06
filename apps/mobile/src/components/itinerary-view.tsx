@@ -20,6 +20,9 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useMutate, useQuery } from '@/data/provider';
 import { dayChip, errorMessage, money } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
+import { dayPlaceLabel, useWhere } from '@/lib/where';
+import { PlanChecks } from './plan-checks';
+import { RouteStrip } from './route-strip';
 import {
   Between,
   Body,
@@ -51,6 +54,7 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
   const router = useRouter();
   const mutate = useMutate();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
+  const where = useWhere(tripId);
   const days = trip ? tripDays(trip) : [IDEAS_DAY];
   const today = trip ? localDateIn(trip.timeZone) : '';
   const [day, setDay] = useState(initialDay ?? (days.includes(today) ? today : days[0]!));
@@ -114,6 +118,16 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
 
   return (
     <View style={{ gap: 14 }}>
+      {where ? <RouteStrip tripId={tripId} where={where} /> : null}
+      {where ? <PlanChecks tripId={tripId} where={where} /> : null}
+      {editable && trip?.startDate ? (
+        <Button
+          label="Add a place without a booking"
+          icon="place"
+          variant="link"
+          onPress={() => router.push(`/trip/${tripId}/stop`)}
+        />
+      ) : null}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -122,12 +136,22 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
         {days.map((d, i) => {
           const selected = d === day;
           const label = d === IDEAS_DAY ? { weekday: 'Ideas', day: 'Unplaced' } : dayChip(d);
+          // Where you'll be that day, from the bookings (Plan 35).
+          const at =
+            d === IDEAS_DAY || !where
+              ? null
+              : dayPlaceLabel(
+                  where.w.days.find((x) => x.date === d),
+                  where,
+                );
           return (
             <Pressable
               key={d}
               accessibilityRole="tab"
               accessibilityState={{ selected }}
-              accessibilityLabel={d === IDEAS_DAY ? 'Ideas' : `Day ${i + 1}, ${label.day}`}
+              accessibilityLabel={
+                d === IDEAS_DAY ? 'Ideas' : `Day ${i + 1}, ${label.day}${at ? `, ${at}` : ''}`
+              }
               onPress={() => {
                 setDay(d);
                 setVariantId(null);
@@ -147,6 +171,14 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
               <Text style={[type.caption, { color: selected ? t.onAccent : t.ink2 }]}>
                 {d === today ? 'Today' : label.day}
               </Text>
+              {at ? (
+                <Text
+                  style={[type.caption, { color: selected ? t.onAccent : t.ink2, maxWidth: 96 }]}
+                  numberOfLines={1}
+                >
+                  {at}
+                </Text>
+              ) : null}
             </Pressable>
           );
         })}

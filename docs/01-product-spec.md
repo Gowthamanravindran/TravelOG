@@ -88,6 +88,11 @@ Top bar: back to Home · trip name & dates · member avatars · **Invite** · �
   - **"Let the group vote"** creates a Plan-variant poll in one tap. Winner becomes the day's main plan; losers are kept as archived alternatives.
 - Comment threads on items; @mentions.
 - Map preview strip for the selected day.
+- **Where you'll be** (Plan 35), worked out from bookings and places you add yourself:
+  - a **route strip** at the top, e.g. Bengaluru ✈ Goa 12–15 Jul 🚌 Gokarna 15–17 Jul;
+  - the **city under each day chip**: "Goa", "Goa?" when nothing is booked, "In transit", or "→ Delhi";
+  - a **"Check your plan"** card for nights with no stay, landing in one city while sleeping in another, and two stays on one night. Each question can be dismissed.
+- **Places without a booking** (staying with friends, a road trip): a city from our places (or as typed), plus an optional name and address that open in the phone's maps app. Pins on a map come with maps (Phase 4).
 
 ### 4.2 Budget (tab 2)
 - Trip budget: total + per person, split into categories (Stay, Travel, Food, Activities, Shopping, Misc).

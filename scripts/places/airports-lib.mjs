@@ -38,8 +38,11 @@ export function parseCsv(text) {
 const TYPES = new Set(['large_airport', 'medium_airport', 'small_airport']);
 const RANK = { large_airport: 0, medium_airport: 1, small_airport: 2 };
 
-/** airports.csv → [{ iata, city, country, name }], one per code (the biggest airport wins). */
-export function buildAirports(csvText) {
+/**
+ * airports.csv → [{ iata, city, country, name }], one per code (the biggest airport wins).
+ * `cityOverrides` (data/places/airport-cities.json) names the city travellers mean.
+ */
+export function buildAirports(csvText, cityOverrides = {}) {
   const [header, ...rows] = parseCsv(csvText);
   const col = (name) => {
     const i = header.indexOf(name);
@@ -58,7 +61,7 @@ export function buildAirports(csvText) {
   for (const r of rows) {
     const iata = (r[c.iata] ?? '').trim().toUpperCase();
     if (!/^[A-Z]{3}$/.test(iata) || r[c.scheduled] !== 'yes' || !TYPES.has(r[c.type])) continue;
-    const city = (r[c.city] ?? '').trim();
+    const city = (cityOverrides[iata] ?? r[c.city] ?? '').trim();
     if (!city) continue;
     const a = { iata, city, country: r[c.country], name: r[c.name].trim(), rank: RANK[r[c.type]] };
     const prev = best.get(iata);

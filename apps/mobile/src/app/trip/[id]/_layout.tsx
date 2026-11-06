@@ -22,6 +22,10 @@ export default function TripLayout() {
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen
+        name="stop"
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
         name="poll"
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />

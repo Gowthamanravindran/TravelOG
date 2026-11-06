@@ -59,11 +59,16 @@ import { PlaceField } from '@/ui/place-field';
  * return flight), with the document attached.
  */
 export default function BookingEditor() {
-  const { id, bookingId, importId } = useLocalSearchParams<{
+  const { id, bookingId, importId, type, start, end } = useLocalSearchParams<{
     id: string;
     bookingId?: string;
     importId?: string;
+    /** From "Check your plan" → Add stay (Plan 35): a type and dates to start with. */
+    type?: BookingType;
+    start?: string;
+    end?: string;
   }>();
+  const preset = type ? { type, start: start ?? '', end: end ?? '' } : undefined;
   const router = useRouter();
   const imported = peekImport(importId);
   const [step, setStep] = useState(0);
@@ -80,6 +85,7 @@ export default function BookingEditor() {
         bookingId={bookingId}
         imported={imported}
         draft={imported?.drafts[step]}
+        preset={preset}
         step={step}
         steps={steps}
         onDone={() => (step + 1 < steps ? setStep(step + 1) : finish())}
@@ -108,6 +114,7 @@ function BookingForm({
   bookingId,
   imported,
   draft,
+  preset,
   step,
   steps,
   onDone,
@@ -117,6 +124,7 @@ function BookingForm({
   bookingId?: string;
   imported?: BookingImport;
   draft?: BookingDraft;
+  preset?: { type: BookingType; start: string; end: string };
   step: number;
   steps: number;
   onDone: () => void;
@@ -167,7 +175,7 @@ function BookingForm({
       : { d: '', t: '' };
   const currency = existing?.currency ?? draft?.currency ?? trip?.currency ?? 'INR';
   const [kind, setKind] = useState<BookingType>(
-    existing?.type ?? (draft && found.has('type') ? draft.type : 'train'),
+    existing?.type ?? (draft && found.has('type') ? draft.type : (preset?.type ?? 'train')),
   );
   const [title, setTitle] = useState(existing?.title ?? draft?.title ?? '');
   const [provider, setProvider] = useState(existing?.provider ?? draft?.provider ?? '');
@@ -175,12 +183,12 @@ function BookingForm({
   const [start, setStart] = useState(
     existing
       ? split(existing.startsAt, firstZones.start)
-      : { d: draft?.startDate ?? '', t: draft?.startTime ?? '' },
+      : { d: draft?.startDate ?? preset?.start ?? '', t: draft?.startTime ?? '' },
   );
   const [end, setEnd] = useState(
     existing
       ? split(existing.endsAt, firstZones.end)
-      : { d: draft?.endDate ?? '', t: draft?.endTime ?? '' },
+      : { d: draft?.endDate ?? preset?.end ?? '', t: draft?.endTime ?? '' },
   );
   const [cost, setCost] = useState(amountText(existing?.costMinor ?? draft?.costMinor, currency));
   const [notes, setNotes] = useState(existing?.notes ?? draft?.notes ?? '');

@@ -4,7 +4,7 @@
  *   node scripts/places/airports.mjs
  * Writes apps/mobile/assets/places/airports.places.
  */
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 import { airportsCompact, buildAirports, checkAirports } from './airports-lib.mjs';
 
@@ -23,7 +23,10 @@ const KNOWN = [
 
 const res = await fetch(URL_CSV);
 if (!res.ok) throw new Error(`OurAirports: HTTP ${res.status}`);
-const airports = buildAirports(await res.text());
+const { cities } = JSON.parse(
+  readFileSync(new URL('../../data/places/airport-cities.json', import.meta.url), 'utf8'),
+);
+const airports = buildAirports(await res.text(), cities);
 const errors = checkAirports(airports, KNOWN);
 const text = JSON.stringify(airportsCompact(airports, new Date().toISOString().slice(0, 10)));
 if (text.length > 400_000)

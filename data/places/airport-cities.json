@@ -1,0 +1,18 @@
+{
+  "note": "Airports whose town in OurAirports isn't the place travellers mean (Plan 35). IATA code → city.",
+  "cities": {
+    "GOI": "Goa",
+    "GOX": "Goa",
+    "NRT": "Tokyo",
+    "KIX": "Osaka",
+    "CDG": "Paris",
+    "ORY": "Paris",
+    "LHR": "London",
+    "LGW": "London",
+    "STN": "London",
+    "DPS": "Bali",
+    "BOM": "Mumbai",
+    "DEL": "Delhi",
+    "SIN": "Singapore"
+  }
+}
