@@ -18,12 +18,17 @@ concurrency:
 
 jobs:
   android:
-    name: Release build on an emulator
+    name: Release build on an emulator (tree shaking ${{ matrix.shake || 'off' }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # Diagnosing a release crash: is it the tree shaking (Plan 49 T3)?
+        shake: ['1', '']
     env:
-      EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH: '1'
-      EXPO_UNSTABLE_TREE_SHAKING: '1'
+      EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH: ${{ matrix.shake }}
+      EXPO_UNSTABLE_TREE_SHAKING: ${{ matrix.shake }}
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -71,7 +76,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-results
+          name: e2e-results-shake-${{ matrix.shake || 'off' }}
           path: |
             e2e-report.xml
             e2e-output
