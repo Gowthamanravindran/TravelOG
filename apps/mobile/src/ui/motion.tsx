@@ -19,6 +19,8 @@ import Animated, {
   useReducedMotion,
 } from 'react-native-reanimated';
 
+import { spacing } from '@travelog/ui';
+
 import { Icon } from './icon';
 import { useTheme } from './theme';
 
@@ -188,4 +190,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Same gap as Screen's content, so wrapped sections keep their spacing.
+  deferred: { gap: spacing.lg },
 });
+
+/**
+ * Draws `fallback` first and `children` a couple of frames later (Plan 46), so a
+ * heavy screen appears (and its slide or fade starts) at once, then fills in.
+ * Once shown, the content stays; it never goes back to the fallback.
+ */
+export function Deferred({ fallback, children }: { fallback: ReactNode; children: ReactNode }) {
+  const ok = useMotionOk();
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => setReady(true));
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  }, []);
+  if (!ready) return <>{fallback}</>;
+  return (
+    <Animated.View entering={ok ? FadeIn.duration(MOTION.fast) : undefined} style={styles.deferred}>
+      {children}
+    </Animated.View>
+  );
+}

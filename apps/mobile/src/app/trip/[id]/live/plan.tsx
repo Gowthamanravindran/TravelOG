@@ -3,6 +3,8 @@ import { useCallback, useState } from 'react';
 
 import { ItineraryView } from '@/components/itinerary-view';
 import { Screen } from '@/ui/kit';
+import { Deferred } from '@/ui/motion';
+import { ItinerarySkeleton } from '@/ui/skeleton';
 import { useTripId } from '@/lib/use-trip-id';
 
 /** Read-only plan in Trip mode; edit via "Edit the plan" in the header. */
@@ -13,7 +15,10 @@ export default function LivePlanTab() {
   useFocusEffect(useCallback(() => setFocusKey((k) => k + 1), []));
   return (
     <Screen edges={[]}>
-      <ItineraryView tripId={id} focusKey={focusKey} />
+      {/* A skeleton shows at once; the plan fills in a frame later (Plan 46). */}
+      <Deferred fallback={<ItinerarySkeleton />}>
+        <ItineraryView tripId={id} focusKey={focusKey} />
+      </Deferred>
     </Screen>
   );
 }

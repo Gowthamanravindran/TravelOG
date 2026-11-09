@@ -4,6 +4,8 @@ import { useCallback, useState } from 'react';
 import { ItineraryView } from '@/components/itinerary-view';
 import { TripSetupCard } from '@/components/trip-setup';
 import { Screen } from '@/ui/kit';
+import { Deferred } from '@/ui/motion';
+import { ItinerarySkeleton } from '@/ui/skeleton';
 import { useTripId } from '@/lib/use-trip-id';
 
 export default function ItineraryTab() {
@@ -13,8 +15,11 @@ export default function ItineraryTab() {
   useFocusEffect(useCallback(() => setFocusKey((k) => k + 1), []));
   return (
     <Screen edges={[]}>
-      <TripSetupCard tripId={id} />
-      <ItineraryView tripId={id} focusKey={focusKey} />
+      {/* A skeleton shows at once; the plan fills in a frame later (Plan 46). */}
+      <Deferred fallback={<ItinerarySkeleton />}>
+        <TripSetupCard tripId={id} />
+        <ItineraryView tripId={id} focusKey={focusKey} />
+      </Deferred>
     </Screen>
   );
 }
