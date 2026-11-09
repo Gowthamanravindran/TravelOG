@@ -36,8 +36,10 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Create trip'
 # Itinerary: the skeleton gives way to the plan (Plan 46)
 - extendedWaitUntil:
-    visible: 'Add stop'
+    visible: 'Collect ideas here'
     timeout: 15000
+- scrollUntilVisible:
+    element: 'Add stop'
 - tapOn: 'Add stop'
 - tapOn: 'Name'
 - inputText: 'Chapora Fort'
@@ -48,7 +50,8 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn:
     text: 'Add'
     index: 0
-- assertVisible: 'Chapora Fort'
+- scrollUntilVisible:
+    element: 'Chapora Fort'
 - takeScreenshot: itinerary
 # Bookings: enter one by hand
 - tapOn: 'Bookings'
@@ -63,7 +66,8 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn:
     text: 'Add booking'
     index: 1
-- assertVisible: 'Panjim stay'
+- scrollUntilVisible:
+    element: 'Panjim stay'
 - takeScreenshot: bookings
 # Budget: add an expense; the spending chart shows it (Plans 47-48)
 - tapOn: 'Budget'
@@ -75,6 +79,8 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - scrollUntilVisible:
     element: 'Save expense'
 - tapOn: 'Save expense'
-- assertVisible: 'Fish thali'
-- assertVisible: 'spent'
+- scrollUntilVisible:
+    element: 'spent'
+- scrollUntilVisible:
+    element: 'Fish thali'
 - takeScreenshot: budget
