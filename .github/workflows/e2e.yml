@@ -69,7 +69,10 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # Android's test-device image: no Pixel Launcher, whose "isn't responding"
+          # dialog covered the app on the full image.
+          target: aosp_atd
+          channel: canary
           # A phone-sized screen; the default 320x640 hid buttons under the keyboard.
           profile: pixel_6
           disable-animations: true

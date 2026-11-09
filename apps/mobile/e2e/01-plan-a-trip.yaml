@@ -8,6 +8,12 @@ name: First run, plan a trip, add a stop, a booking and an expense
     # Allow notifications and the rest up front, so no system prompt covers the app.
     permissions:
       all: allow
+# A slow emulator can show "… isn't responding" over the app; let it wait.
+- runFlow:
+    when:
+      visible: ".*isn't responding"
+    commands:
+      - tapOn: 'Wait'
 # Welcome. A first launch sets up the encrypted database, so allow it time.
 - extendedWaitUntil:
     visible: 'Plan trips with your friends'
