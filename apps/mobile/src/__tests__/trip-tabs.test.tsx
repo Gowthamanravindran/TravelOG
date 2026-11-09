@@ -20,6 +20,7 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn(), replace: jest.fn() }),
   useLocalSearchParams: () => mockParams,
   useGlobalSearchParams: () => mockParams,
+  useFocusEffect: (fn: () => void) => require('react').useEffect(fn, [fn]),
 }));
 jest.mock('expo-image-picker', () => ({ launchImageLibraryAsync: jest.fn() }));
 jest.mock('expo-location', () => ({ requestForegroundPermissionsAsync: jest.fn() }));

@@ -18,7 +18,7 @@ import {
 import { datesBetween, dayBookings, localDateIn, type DayMoment } from '@travelog/core';
 import { type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -74,7 +74,16 @@ export function tripDays(trip: { startDate: string | null; endDate: string | nul
   return [...days, IDEAS_DAY];
 }
 
-export function ItineraryView({ tripId, initialDay }: { tripId: string; initialDay?: string }) {
+export function ItineraryView({
+  tripId,
+  initialDay,
+  focusKey,
+}: {
+  tripId: string;
+  initialDay?: string;
+  /** Changes each time the tab comes back into view; the selected day re-centres (Plan 44). */
+  focusKey?: number;
+}) {
   const t = useTheme();
   const mode = useMode();
   const router = useRouter();
@@ -105,6 +114,13 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
   const centreOnOpen = () => {
     if (!centred.current && centre(day, motionOk)) centred.current = true;
   };
+  // Tabs stay mounted, so coming back to this one doesn't re-open it: re-centre on focus.
+  const seenFocus = useRef(focusKey);
+  useEffect(() => {
+    if (focusKey === seenFocus.current) return;
+    seenFocus.current = focusKey;
+    if (centre(day, motionOk)) centred.current = true;
+  });
   const variants = useQuery((db) => listVariants(db, tripId, day), [tripId, day]);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [compare, setCompare] = useState(false);

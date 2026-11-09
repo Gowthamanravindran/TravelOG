@@ -47,3 +47,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 41 | [Polls only for trips with more than one person](41-polls-for-groups.md) | see git log |
 | 42 | [Bookings on the itinerary, each day](42-bookings-on-itinerary.md) | see git log |
 | 43 | [Today's day slides to the centre of the day strip](43-centre-today.md) | see git log |
+| 44 | [The day strip re-centres every time you come back to it](44-recentre-on-return.md) | see git log |
