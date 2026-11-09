@@ -65,7 +65,7 @@ jobs:
           disable-animations: true
           script: |
             adb install -r apps/mobile/android/app/build/outputs/apk/release/app-release.apk
-            maestro test apps/mobile/e2e --format junit --output e2e-report.xml --test-output-dir e2e-output
+            maestro test apps/mobile/e2e --format junit --output e2e-report.xml --test-output-dir e2e-output || (mkdir -p e2e-output && adb logcat -d > e2e-output/logcat.txt; grep -E "ReactNativeJS|AndroidRuntime|FATAL|ReactNative" e2e-output/logcat.txt | tail -120; exit 1)
 
       - name: Keep screenshots and the report
         if: always()

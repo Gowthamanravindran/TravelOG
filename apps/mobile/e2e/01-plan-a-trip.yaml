@@ -5,8 +5,13 @@ name: First run, plan a trip, add a stop, a booking and an expense
 ---
 - launchApp:
     clearState: true
-# Welcome
-- tapOn: 'Your name'
+# Welcome. A first launch sets up the encrypted database, so allow it time.
+- extendedWaitUntil:
+    visible: 'Plan trips with your friends'
+    timeout: 60000
+- takeScreenshot: welcome
+# The name field is focused on open; its placeholder identifies it.
+- tapOn: 'What friends call you'
 - inputText: 'Asha'
 - hideKeyboard
 - tapOn: "Let's go"
