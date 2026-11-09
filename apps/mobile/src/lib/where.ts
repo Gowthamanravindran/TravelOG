@@ -91,5 +91,5 @@ export function durationText(minutes: number | null): string | null {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   if (!h) return `${m} min`;
-  return m && h < 10 ? `${h} h ${m} min` : `${h} h`;
+  return m ? `${h} h ${m} min` : `${h} h`;
 }

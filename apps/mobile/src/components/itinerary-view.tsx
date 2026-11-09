@@ -2,7 +2,9 @@ import {
   addVariant,
   createPoll,
   ensureMainVariant,
+  getBooking,
   getTrip,
+  listAttachments,
   listItems,
   listMembers,
   listVariants,
@@ -10,9 +12,10 @@ import {
   myMember,
   setMainVariant,
   summarizeItems,
+  whereInputs,
   type Item,
 } from '@travelog/db';
-import { datesBetween, localDateIn } from '@travelog/core';
+import { datesBetween, dayBookings, localDateIn, type DayMoment } from '@travelog/core';
 import { type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -22,6 +25,7 @@ import { useMutate, useQuery } from '@/data/provider';
 import { dayChip, errorMessage, money } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
 import { dayPlaceLabel, useWhere } from '@/lib/where';
+import { BookedCard, StayStrip } from './booking-moment';
 import { PlanChecks } from './plan-checks';
 import { RouteStrip } from './route-strip';
 import {
@@ -68,6 +72,25 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
   const variant =
     variants.find((v) => v.id === variantId) ?? variants.find((v) => v.isMain) ?? variants[0];
   const items = useQuery((db) => (variant ? listItems(db, variant.id) : []), [variant?.id]);
+  // What's booked on this day, among the stops (Plan 42).
+  const booked = useQuery(
+    (db) => {
+      const inputs = day === IDEAS_DAY ? null : whereInputs(db, tripId);
+      if (!inputs) return null;
+      const d = dayBookings(inputs, day);
+      const ids = [...d.moments.map((m) => m.bookingId), d.staying?.bookingId].filter(
+        (x): x is string => !!x,
+      );
+      const info = new Map(
+        ids.map((id) => [
+          id,
+          { booking: getBooking(db, id)!, ticket: listAttachments(db, id)[0] ?? null },
+        ]),
+      );
+      return { ...d, info };
+    },
+    [tripId, day],
+  );
   const summaries = useQuery(
     (db) => variants.map((v) => ({ v, s: summarizeItems(listItems(db, v.id)) })),
     [variants.map((v) => v.id).join()],
@@ -89,6 +112,40 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
       const v = mutate((db) => ensureMainVariant(db, tripId, day, myMember(db, tripId)?.id));
       router.push(`/trip/${tripId}/item?variantId=${v.id}`);
     });
+
+  const openBooking = (id: string) => router.push(`/trip/${tripId}/booking?bookingId=${id}`);
+  const moments = booked?.moments ?? [];
+  const momentCard = (m: DayMoment) => {
+    const info = booked?.info.get(m.bookingId);
+    if (!info?.booking) return null;
+    return (
+      <BookedCard
+        key={`${m.kind}-${m.bookingId}`}
+        moment={m}
+        booking={info.booking}
+        ticket={info.ticket}
+        onPress={() => openBooking(m.bookingId)}
+      />
+    );
+  };
+  const stayStrip =
+    booked?.staying && booked.info.get(booked.staying.bookingId)?.booking ? (
+      <StayStrip
+        strip={booked.staying}
+        booking={booked.info.get(booked.staying.bookingId)!.booking}
+        onPress={() => openBooking(booked.staying!.bookingId)}
+      />
+    ) : null;
+  // Stops keep their own order; each booking goes before the first timed stop after it.
+  const entries: ({ k: 'm'; m: DayMoment } | { k: 'i'; item: Item; index: number })[] = [];
+  let next = 0;
+  items.forEach((item, index) => {
+    if (item.startTime)
+      while (next < moments.length && moments[next]!.time && moments[next]!.time! <= item.startTime)
+        entries.push({ k: 'm', m: moments[next++]! });
+    entries.push({ k: 'i', item, index });
+  });
+  while (next < moments.length) entries.push({ k: 'm', m: moments[next++]! });
 
   const addPlan = () =>
     run(() => {
@@ -241,6 +298,14 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
             <Button label="Let the group vote" icon="polls" onPress={putToVote} />
           ) : null}
         </View>
+      ) : !variant && (moments.length || stayStrip) ? (
+        <View style={{ gap: 8 }}>
+          {stayStrip}
+          {moments.map(momentCard)}
+          {editable ? (
+            <Button label="Add stop" icon="add" variant="secondary" onPress={addFirst} />
+          ) : null}
+        </View>
       ) : !variant ? (
         <Empty
           icon={day === IDEAS_DAY ? 'idea' : 'plan'}
@@ -262,28 +327,33 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
               </Body>
             );
           })()}
-          {items.map((item, index) => (
-            <Appear key={item.id} index={index}>
-              <ItemRow
-                item={item}
-                currency={trip.currency}
-                editable={editable}
-                onPress={() =>
-                  router.push(`/trip/${tripId}/item?variantId=${variant.id}&itemId=${item.id}`)
-                }
-                onUp={
-                  index > 0
-                    ? () => run(() => mutate((db) => moveItem(db, item.id, index - 1)))
-                    : undefined
-                }
-                onDown={
-                  index < items.length - 1
-                    ? () => run(() => mutate((db) => moveItem(db, item.id, index + 1)))
-                    : undefined
-                }
-              />
-            </Appear>
-          ))}
+          {stayStrip}
+          {entries.map((e, n) =>
+            e.k === 'm' ? (
+              momentCard(e.m)
+            ) : (
+              <Appear key={e.item.id} index={n}>
+                <ItemRow
+                  item={e.item}
+                  currency={trip.currency}
+                  editable={editable}
+                  onPress={() =>
+                    router.push(`/trip/${tripId}/item?variantId=${variant.id}&itemId=${e.item.id}`)
+                  }
+                  onUp={
+                    e.index > 0
+                      ? () => run(() => mutate((db) => moveItem(db, e.item.id, e.index - 1)))
+                      : undefined
+                  }
+                  onDown={
+                    e.index < items.length - 1
+                      ? () => run(() => mutate((db) => moveItem(db, e.item.id, e.index + 1)))
+                      : undefined
+                  }
+                />
+              </Appear>
+            ),
+          )}
           {editable ? (
             <Button
               label="Add stop"

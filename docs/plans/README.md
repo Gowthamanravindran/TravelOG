@@ -45,3 +45,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 39 | [Upload up to 10 documents at once](39-multi-upload.md) | see git log |
 | 40 | [Documents: every ticket in one place, one tap from the header, offline](40-documents.md) | see git log |
 | 41 | [Polls only for trips with more than one person](41-polls-for-groups.md) | see git log |
+| 42 | [Bookings on the itinerary, each day](42-bookings-on-itinerary.md) | see git log |
