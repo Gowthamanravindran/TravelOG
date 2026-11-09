@@ -26,6 +26,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
       - run: pnpm lint
+      # Native packages must be ones the installed app has (Plan 49 T1).
+      - run: pnpm check:native
       - run: pnpm typecheck
       - run: pnpm test
       - name: Export Android bundle

@@ -52,3 +52,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 46 | [Itinerary opens straight away, with a skeleton while it fills in](46-itinerary-skeleton.md) | see git log |
 | 47 | [Trip mode Expenses: no budget setting, solo-aware, switchable charts](47-trip-expenses.md) | see git log |
 | 48 | [Expenses chart without react-native-svg (crash fix)](48-donut-without-svg.md) | see git log |
+| 49 | [Tech backlog: native-package check, fewer re-reads, bundle headroom, end-to-end tests](49-tech-backlog.md) | see git log |

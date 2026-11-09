@@ -41,6 +41,8 @@ In this cloud environment the Expo CLI cannot reach `api.expo.dev`; prefix Expo 
 - **Add native packages with `npx expo install`** (SDK-compatible versions), never plain `pnpm add`. Prefer packages
   included in Expo Go; anything else must fall back gracefully there (`lib/runtime.ts` `isExpoGo`), and the plan
   summary must tell the owner a new development build is needed.
+  Every package with native code must be listed in `apps/mobile/native-packages.json` (checked in CI by
+  `pnpm check:native`); an unlisted one is not in the owner's installed app and crashes there (Plan 48).
 - **Secrets never go in the repo.** Public values only (Supabase URL/anon key, EAS project id).
   Secret stores: GitHub Actions, EAS environment variables, Supabase function secrets (`docs/14`).
 - **Placeholders** to change once the owner decides: bundle id `app.travelog.mobile`, scheme `travelog`,

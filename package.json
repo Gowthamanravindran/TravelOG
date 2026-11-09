@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test && node --test scripts/places/lib.test.mjs",
+    "test": "pnpm -r --if-present test && node --test scripts/places/lib.test.mjs scripts/native/lib.test.mjs",
+    "check:native": "node scripts/native/check.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:start": "supabase start",
