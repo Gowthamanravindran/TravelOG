@@ -37,6 +37,7 @@ import { Appear, CountUp } from '@/ui/motion';
 import { useMode, useTheme } from '@/ui/theme';
 
 import { PeopleCard } from './people-card';
+import { SpendChart } from './spend-chart';
 
 export function BudgetView({
   tripId,
@@ -69,6 +70,10 @@ export function BudgetView({
   const perPersonBudget = BUDGET_CATEGORIES.reduce((a, c) => a + budgets[c], 0);
   const groupBudget = perPersonBudget * members.length;
   const myNet = me ? (m.net.get(me.id) ?? 0) : 0;
+  // Splitting, balances and settling up need someone to split with (Plan 47).
+  const group = members.length > 1;
+  // The budget is set while planning; Trip mode only records spending.
+  const planning = mode === 'plan';
 
   const startEdit = () => {
     setDraft(budgetDraft(budgets, cur));
@@ -97,7 +102,7 @@ export function BudgetView({
           <IconTile icon="budget" size={44} />
           <View style={{ flex: 1 }}>
             <Body muted small>
-              Group spent
+              {planning && group ? 'Group spent' : 'Spent'}
             </Body>
             <CountUp
               value={m.spentMinor}
@@ -110,16 +115,16 @@ export function BudgetView({
           <>
             <Bar value={m.spentMinor / groupBudget} />
             <Body muted small>
-              of {money(groupBudget, cur)} budget ({money(perPersonBudget, cur)} per person ×{' '}
-              {members.length})
+              of {money(groupBudget, cur)} budget
+              {group ? ` (${money(perPersonBudget, cur)} per person × ${members.length})` : ''}
             </Body>
           </>
-        ) : (
+        ) : planning ? (
           <Body muted small>
             No budget set yet.
           </Body>
-        )}
-        {me ? (
+        ) : null}
+        {me && group ? (
           <Body
             style={{
               color: myNet > 0 ? t.success : myNet < 0 ? t.danger : t.ink2,
@@ -143,7 +148,7 @@ export function BudgetView({
               }
             />
           </View>
-          {!editing ? (
+          {planning && !editing ? (
             <View style={{ flex: 1 }}>
               <Button
                 label={groupBudget > 0 ? 'Edit budget' : 'Set budget'}
@@ -156,10 +161,9 @@ export function BudgetView({
         </Row>
       </Card>
 
-      <PeopleCard tripId={tripId} />
+      {group ? <PeopleCard tripId={tripId} /> : <SoloPeople tripId={tripId} />}
 
-      <H2>By category</H2>
-      {editing ? (
+      {planning && editing ? (
         <Card>
           <Body muted small>
             Budget per person, in {cur}
@@ -184,69 +188,45 @@ export function BudgetView({
             </View>
           </Row>
         </Card>
-      ) : (
-        <Card>
-          {BUDGET_CATEGORIES.map((c: BudgetCategory) => {
-            const budget = budgets[c] * members.length;
-            const spent = m.byCategory[c];
-            if (!budget && !spent) return null;
-            return (
-              <View key={c} style={{ gap: 6 }}>
-                <Between>
-                  <WithIcon icon={CATEGORY_LABELS[c].icon}>
-                    <Strong>{CATEGORY_LABELS[c].label}</Strong>
-                  </WithIcon>
-                  <Body small>
-                    {money(spent, cur)}
-                    {budget ? ` / ${money(budget, cur)}` : ''}
+      ) : null}
+
+      <SpendChart tripId={tripId} group={group} showBudget={planning} />
+
+      {group ? (
+        <>
+          <H2
+            right={
+              m.transfers.length ? (
+                <Button
+                  label="Settle up"
+                  variant="link"
+                  onPress={() => router.push(`/trip/${tripId}/settle`)}
+                />
+              ) : null
+            }
+          >
+            Balances
+          </H2>
+          <Card>
+            {members.map((x) => {
+              const v = m.net.get(x.id) ?? 0;
+              return (
+                <Between key={x.id}>
+                  <Body>{x.isMe ? `${x.displayName} (you)` : x.displayName}</Body>
+                  <Body
+                    style={{
+                      color: v > 0 ? t.success : v < 0 ? t.danger : t.ink2,
+                      ...font('text', 600),
+                    }}
+                  >
+                    {v > 0 ? `gets ${money(v, cur)}` : v < 0 ? `owes ${money(-v, cur)}` : 'settled'}
                   </Body>
                 </Between>
-                {budget ? <Bar value={spent / budget} color={t.categories[c]} /> : null}
-              </View>
-            );
-          })}
-          {!m.spentMinor && !perPersonBudget ? (
-            <Body muted>Add a budget or your first expense.</Body>
-          ) : null}
-        </Card>
-      )}
-
-      <H2
-        right={
-          m.transfers.length ? (
-            <Button
-              label="Settle up"
-              variant="link"
-              onPress={() => router.push(`/trip/${tripId}/settle`)}
-            />
-          ) : null
-        }
-      >
-        Balances
-      </H2>
-      <Card>
-        {members.map((x) => {
-          const v = m.net.get(x.id) ?? 0;
-          return (
-            <Between key={x.id}>
-              <Body>{x.isMe ? `${x.displayName} (you)` : x.displayName}</Body>
-              <Body
-                style={{
-                  color: v > 0 ? t.success : v < 0 ? t.danger : t.ink2,
-                  ...font('text', 600),
-                }}
-              >
-                {v > 0 ? `gets ${money(v, cur)}` : v < 0 ? `owes ${money(-v, cur)}` : 'settled'}
-              </Body>
-            </Between>
-          );
-        })}
-        {members.length < 2 ? (
-          <Body muted small>
-            Add the people on this trip in People above to split costs.
-          </Body>
-        ) : null}
-      </Card>
+              );
+            })}
+          </Card>
+        </>
+      ) : null}
 
       <H2
         right={
@@ -254,7 +234,9 @@ export function BudgetView({
             label="Add"
             icon="add"
             variant="link"
-            onPress={() => router.push(`/trip/${tripId}/expense`)}
+            onPress={() =>
+              router.push(`/trip/${tripId}/expense${mode === 'trip' ? '?mode=trip' : ''}`)
+            }
           />
         }
       >
@@ -280,19 +262,28 @@ export function BudgetView({
                           <Strong>{e.title}</Strong>
                         </WithIcon>
                       </View>
-                      <Body
-                        style={{ color: net >= 0 ? t.success : t.danger, ...font('text', 600) }}
-                      >
-                        {net >= 0 ? '+' : '−'}
-                        {money(Math.abs(net), cur)}
-                      </Body>
+                      {group ? (
+                        <Body
+                          style={{ color: net >= 0 ? t.success : t.danger, ...font('text', 600) }}
+                        >
+                          {net >= 0 ? '+' : '−'}
+                          {money(Math.abs(net), cur)}
+                        </Body>
+                      ) : (
+                        <Body style={{ color: t.ink, ...font('text', 600) }}>
+                          {money(e.tripAmountMinor, cur)}
+                        </Body>
+                      )}
                     </Between>
                     <Body muted small>
-                      {name(e.paidByMemberId)} paid {money(e.amountMinor, e.currency)}
+                      {group
+                        ? `${name(e.paidByMemberId)} paid `
+                        : `${CATEGORY_LABELS[e.category].label} · `}
+                      {money(e.amountMinor, e.currency)}
                       {e.currency !== cur
                         ? ` (${money(e.tripAmountMinor, cur)}${e.fxRate ? ` @ ${formatRate(Number(e.fxRate))}` : ''})`
-                        : ''}{' '}
-                      · split {e.splits.length} ways
+                        : ''}
+                      {group ? ` · split ${e.splits.length} ways` : ''}
                     </Body>
                   </View>
                 </View>
@@ -317,5 +308,19 @@ function budgetDraft(
 ): Record<string, string> {
   return Object.fromEntries(
     BUDGET_CATEGORIES.map((c) => [c, amountText(budgets[c] || null, currency)]),
+  );
+}
+
+/** A solo trip: one line instead of the People card, which opens when tapped (Plan 47). */
+function SoloPeople({ tripId }: { tripId: string }) {
+  const [open, setOpen] = useState(false);
+  if (open) return <PeopleCard tripId={tripId} startOpen />;
+  return (
+    <Row style={{ gap: 4, flexWrap: 'wrap' }}>
+      <Body muted small>
+        Travelling with others?
+      </Body>
+      <Button label="Add people" icon="personAdd" variant="link" onPress={() => setOpen(true)} />
+    </Row>
   );
 }

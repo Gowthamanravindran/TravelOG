@@ -8,11 +8,11 @@ const TABS: TabSpec[] = [
   { name: 'index', label: 'Today', icon: 'today' },
   { name: 'plan', label: 'Plan', icon: 'plan' },
   { name: 'nearby', label: 'Nearby', icon: 'nearby' },
-  { name: 'budget', label: 'Budget', icon: 'budget' },
+  { name: 'expenses', label: 'Expenses', icon: 'expense' },
   { name: 'memories', label: 'Memories', icon: 'memories' },
 ];
 
-/** Trip mode (always dark, teal): Today · Plan · Nearby · Budget · Memories. */
+/** Trip mode (always dark, teal): Today · Plan · Nearby · Expenses · Memories. */
 export default function LiveLayout() {
   return (
     <ModeProvider mode="trip">

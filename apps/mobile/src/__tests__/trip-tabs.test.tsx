@@ -3,7 +3,7 @@ import { createTrip } from '@travelog/db';
 import { render, screen } from '@testing-library/react-native';
 import type { ComponentType } from 'react';
 
-import LiveBudget from '@/app/trip/[id]/live/budget';
+import LiveExpenses from '@/app/trip/[id]/live/expenses';
 import LiveToday from '@/app/trip/[id]/live/index';
 import LiveMemories from '@/app/trip/[id]/live/memories';
 import LiveNearby from '@/app/trip/[id]/live/nearby';
@@ -34,7 +34,7 @@ const TABS: [string, ComponentType, 'plan' | 'trip'][] = [
   ['Today', LiveToday, 'trip'],
   ['Trip plan', LivePlan, 'trip'],
   ['Nearby', LiveNearby, 'trip'],
-  ['Trip budget', LiveBudget, 'trip'],
+  ['Trip expenses', LiveExpenses, 'trip'],
   ['Trip memories', LiveMemories, 'trip'],
 ];
 

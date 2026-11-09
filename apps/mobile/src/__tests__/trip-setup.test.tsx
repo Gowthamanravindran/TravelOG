@@ -48,10 +48,12 @@ describe('Set up your trip', () => {
 });
 
 describe('Budget tab', () => {
-  it('offers Set budget and people, in Trip mode too', async () => {
+  // Plan 47: the budget is set while planning; Trip mode's Expenses has no Set budget.
+  it('offers Set budget and people in Plan mode', async () => {
     const { db, trip } = newTrip();
-    await render(withData(db, <BudgetView tripId={trip.id} />, 'trip'));
-    expect(screen.getByText('People · 1')).toBeTruthy();
+    await render(withData(db, <BudgetView tripId={trip.id} />, 'plan'));
+    // A solo trip shows a link to add people instead of the People card.
+    expect(screen.getByRole('button', { name: 'Add people' })).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Set budget' }));
     expect(screen.getByRole('button', { name: 'Save budget' })).toBeTruthy();
   });

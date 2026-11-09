@@ -50,3 +50,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 44 | [The day strip re-centres every time you come back to it](44-recentre-on-return.md) | see git log |
 | 45 | [Opening the Itinerary / Plan tab faster](45-faster-itinerary.md) | see git log |
 | 46 | [Itinerary opens straight away, with a skeleton while it fills in](46-itinerary-skeleton.md) | see git log |
+| 47 | [Trip mode Expenses: no budget setting, solo-aware, switchable charts](47-trip-expenses.md) | see git log |

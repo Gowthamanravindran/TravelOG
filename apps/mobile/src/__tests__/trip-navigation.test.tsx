@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import LiveLayout from '@/app/trip/[id]/live/_layout';
-import LiveBudget from '@/app/trip/[id]/live/budget';
+import LiveExpenses from '@/app/trip/[id]/live/expenses';
 import LiveToday from '@/app/trip/[id]/live/index';
 import LiveMemories from '@/app/trip/[id]/live/memories';
 import LiveNearby from '@/app/trip/[id]/live/nearby';
@@ -40,7 +40,7 @@ const routes = {
   'trip/[id]/live/index': LiveToday,
   'trip/[id]/live/plan': LivePlan,
   'trip/[id]/live/nearby': LiveNearby,
-  'trip/[id]/live/budget': LiveBudget,
+  'trip/[id]/live/expenses': LiveExpenses,
   'trip/[id]/live/memories': LiveMemories,
 };
 
@@ -101,10 +101,10 @@ describe('trip tabs with the real router', () => {
     expect(await screen.findByRole('tab', { name: 'Polls' })).toBeTruthy();
   });
 
-  it('Trip mode: Budget and Memories show their content', async () => {
+  it('Trip mode: Expenses and Memories show their content', async () => {
     const { db, trip } = newTrip();
     await renderRouter(routes, { initialUrl: `/trip/${trip.id}/live`, wrapper: wrapperFor(db) });
-    await fireEvent.press(await screen.findByRole('tab', { name: 'Budget' }));
+    await fireEvent.press(await screen.findByRole('tab', { name: 'Expenses' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add expense' })).toBeTruthy());
     await fireEvent.press(screen.getByRole('tab', { name: 'Memories' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add photos' })).toBeTruthy());

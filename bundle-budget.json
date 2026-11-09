@@ -1,5 +1,5 @@
 {
-  "androidBundleBytes": 5111695,
+  "androidBundleBytes": 5755729,
   "maxGrowthPercent": 10,
-  "note": "Raised in Plan 15 (Studio): the editor's drag/pinch/rotate uses react-native-gesture-handler v3, which brings in Reanimated and Worklets (~1.3 MB, both already in the planned stack, docs/09). 3.81 MB to 5.11 MB. Raise deliberately, with a reason, when a feature needs it."
+  "note": "Raised in Plan 47: the Expenses donut chart uses react-native-svg (in Expo Go, ~190 KB of JS); Plans 29-46 had added ~450 KB of features (places, PDF reading, whereabouts, documents) within the earlier allowance. 5.11 MB to 5.76 MB. Before that, raised in Plan 15 (Studio) for gesture-handler v3 + Reanimated/Worklets, 3.81 MB to 5.11 MB. Raise deliberately, with a reason, when a feature needs it."
 }
