@@ -1,6 +1,6 @@
 # Plan 49 — Tech backlog: native-package check, fewer re-reads, bundle headroom, end-to-end tests
 
-**Status:** 🚧 In progress (T1, T2, T3 built)
+**Status:** ✅ Built (T3 tree shaking held back from builds, see below)
 
 The owner asked what tech work was on the backlog and chose all four engineering items. Each item lands as its own commit.
 
@@ -58,3 +58,29 @@ Our own code is under 300 KB in total; the largest parts are `packages/core` at 
 | After | 5,167,992 bytes (−406 KB, −7.3%) | +1.1% |
 
 **Risk and check:** tree shaking is labelled unstable by Expo and only runs in release builds, so a problem wouldn't show in Expo Go. T4's end-to-end run builds a release APK with the same settings and drives it on an emulator, which checks it. If anything breaks there, the two settings come out.
+
+### T3 update — tree shaking crashed release builds; now held back
+The first T4 run caught it. **The tree-shaken release app crashed on launch** with `Tried to access a non-existent registry`.
+- **Cause:** tree shaking removed react-native-gesture-handler's lookup of its native module (`TurboModuleRegistry.getEnforcing('RNGestureHandlerModule')`). That lookup is what creates the module's registry, so the app's root `GestureHandlerRootView` found none. Confirmed by comparing the two bundles: the normal bundle has one reference to the module and the tree-shaken one has none.
+- **Fix:** the root layout (`app/_layout.tsx`) now looks the module up itself, which tree shaking keeps.
+- **Builds:** tree shaking is **off again** in the `preview` and `production` EAS profiles and in `export:android`, so the bundle check is back at +9.1%.
+- **Evidence so far:** with the fix, the tree-shaken release passes the full end-to-end flow (T4). Tree shaking also drops a few other names (`Reanimated`, `Worklets`, `NativeModulesProxy`), and the flow doesn't yet cover the Studio, PDF import or notifications. Turning it on for builds is the owner's call: it saves 406 KB, against the risk of a crash in a part the flow doesn't cover yet.
+
+## T4 — End-to-end tests on a real Android app ✅
+- **Flow (`apps/mobile/e2e/01-plan-a-trip.yaml`):** first launch, then welcome, create a trip, add the first stop, add a booking by hand, and add an expense. It checks each one shows up, including the spending chart, and takes screenshots. It uses the labels screen readers use, so the app needed no test IDs.
+- **Workflow (`.github/workflows/e2e.yml`):**
+  1. builds a release APK on GitHub (`expo prebuild` + Gradle, x86_64 only, debug-signed, no EAS or secrets);
+  2. runs it on an Android 14 emulator (`aosp_atd` test image, Pixel 6 size) with Maestro.
+
+  It runs nightly, on demand, and when the flows or workflow change.
+  - It has two variants: a normal release and a tree-shaken one, which keeps checking T3.
+  - On failure it prints the app's log and the texts on screen.
+  - Screenshots are kept as a download.
+- **Getting it green took the run itself to show what was wrong:**
+  - **A real app crash:** the tree-shaken release crashed on launch (above).
+  - **Emulator problems:**
+    - the default screen was too small (320×640);
+    - the full emulator image's launcher hung and its "isn't responding" dialog covered the app;
+    - the test image has no on-screen keyboard, so `hideKeyboard` pressed Back and closed the app.
+  - **Flow fixes:** the empty day's button is "Add the first stop"; elements are scrolled to before tapping.
+- **Result:** both variants pass the whole flow ([run 11](https://github.com/Gowthamanravindran/TravelOG/actions/runs/42711881772)).
