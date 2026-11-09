@@ -1,5 +1,7 @@
 # Plan 49 T4: a first run on a real Android app, as a person would use it.
 # Selectors are the labels screen readers use (accessibilityLabel / visible text).
+# No hideKeyboard: on the test emulator image there's no on-screen keyboard and it
+# presses Back, which closes the app. Buttons are scrolled to instead.
 appId: app.travelog.mobile
 name: First run, plan a trip, add a stop, a booking and an expense
 ---
@@ -22,13 +24,13 @@ name: First run, plan a trip, add a stop, a booking and an expense
 # The name field is focused on open; its placeholder identifies it.
 - tapOn: 'What friends call you'
 - inputText: 'Asha'
-- hideKeyboard
+- scrollUntilVisible:
+    element: "Let's go"
 - tapOn: "Let's go"
 # New trip
 - tapOn: 'Plan a trip'
 - tapOn: 'Trip name'
 - inputText: 'Goa test'
-- hideKeyboard
 - scrollUntilVisible:
     element: 'Create trip'
 - tapOn: 'Create trip'
@@ -39,7 +41,6 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Add stop'
 - tapOn: 'Name'
 - inputText: 'Chapora Fort'
-- hideKeyboard
 - scrollUntilVisible:
     element:
       text: 'Add'
@@ -55,7 +56,6 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Enter booking details'
 - tapOn: 'Name'
 - inputText: 'Panjim stay'
-- hideKeyboard
 - scrollUntilVisible:
     element:
       text: 'Add booking'
@@ -70,10 +70,8 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Add expense'
 - tapOn: 'What for'
 - inputText: 'Fish thali'
-- hideKeyboard
 - tapOn: 'Amount (INR)'
 - inputText: '450'
-- hideKeyboard
 - scrollUntilVisible:
     element: 'Save expense'
 - tapOn: 'Save expense'
