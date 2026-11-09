@@ -11,7 +11,6 @@ import { font, type } from '@travelog/ui';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
 
 import { useQuery } from '@/data/provider';
 import { money } from '@/lib/format';
@@ -29,8 +28,6 @@ type ChartView = 'category' | 'person';
 
 const SIZE = 168;
 const STROKE = 22;
-const R = (SIZE - STROKE) / 2;
-const C = 2 * Math.PI * R;
 /** People take the category colours in this order. */
 const PERSON_COLOURS: BudgetCategory[] = [
   'travel',
@@ -123,32 +120,10 @@ export function SpendChart({
           accessibilityLabel={summary}
           testID="spend-donut"
         >
-          <Svg width={SIZE} height={SIZE}>
-            <Circle
-              cx={SIZE / 2}
-              cy={SIZE / 2}
-              r={R}
-              stroke={t.surface2}
-              strokeWidth={STROKE}
-              fill="none"
-            />
-            {arcs.map((a) => (
-              <Circle
-                key={a.key}
-                testID={`arc-${a.key}`}
-                cx={SIZE / 2}
-                cy={SIZE / 2}
-                r={R}
-                stroke={colourOf.get(a.key)}
-                strokeWidth={STROKE}
-                fill="none"
-                strokeDasharray={`${(a.sweep / 360) * C} ${C}`}
-                // Clockwise from the top.
-                strokeDashoffset={-(a.start / 360) * C}
-                transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}
-              />
-            ))}
-          </Svg>
+          <Ring colour={t.surface2} start={0} sweep={360} />
+          {arcs.map((a) => (
+            <Ring key={a.key} colour={colourOf.get(a.key)!} start={a.start} sweep={a.sweep} />
+          ))}
           <View style={styles.centre} pointerEvents="none">
             <Text style={[type.headline, { color: t.ink, ...font('display', 700) }]}>
               {money(total, cur)}
@@ -186,7 +161,52 @@ export function SpendChart({
   );
 }
 
+/**
+ * One arc of the ring, drawn with plain views so it works in every build (Plan 48):
+ * a half-ring rotated by the sweep and clipped to the right half covers 0…sweep,
+ * then the whole piece turns to its start. Sweeps over 180° are two pieces.
+ */
+function Ring({ colour, start, sweep }: { colour: string; start: number; sweep: number }) {
+  if (sweep > 180)
+    return (
+      <>
+        <Ring colour={colour} start={start} sweep={180} />
+        <Ring colour={colour} start={start + 180} sweep={sweep - 180} />
+      </>
+    );
+  return (
+    <View style={[styles.layer, { transform: [{ rotate: `${start}deg` }] }]} pointerEvents="none">
+      <View style={styles.rightHalf}>
+        <View style={[styles.rotor, { transform: [{ rotate: `${sweep}deg` }] }]}>
+          <View style={styles.leftHalf}>
+            <View style={[styles.ring, { borderColor: colour }]} />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  layer: { position: 'absolute', top: 0, left: 0, width: SIZE, height: SIZE },
+  rightHalf: {
+    position: 'absolute',
+    top: 0,
+    left: SIZE / 2,
+    width: SIZE / 2,
+    height: SIZE,
+    overflow: 'hidden',
+  },
+  rotor: { position: 'absolute', top: 0, left: -SIZE / 2, width: SIZE, height: SIZE },
+  leftHalf: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: SIZE / 2,
+    height: SIZE,
+    overflow: 'hidden',
+  },
+  ring: { width: SIZE, height: SIZE, borderRadius: SIZE / 2, borderWidth: STROKE },
   donut: { alignSelf: 'center', width: SIZE, height: SIZE },
   centre: {
     position: 'absolute',

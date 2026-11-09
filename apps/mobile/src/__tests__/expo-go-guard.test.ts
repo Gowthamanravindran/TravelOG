@@ -6,7 +6,8 @@ import path from 'node:path';
  * package that isn't in them crashes every screen that uses it, so these may not
  * be imported anywhere in the app (use a JS alternative or an optional module).
  */
-const NOT_IN_EXPO_GO = ['@react-native-community/datetimepicker'];
+// react-native-svg: missing from the owner's installed app, crashed Expenses (Plan 48).
+const NOT_IN_EXPO_GO = ['@react-native-community/datetimepicker', 'react-native-svg'];
 
 function files(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
