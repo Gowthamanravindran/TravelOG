@@ -1,4 +1,4 @@
-import { createTrip, type Db } from '@travelog/db';
+import { addMember, createTrip, type Db } from '@travelog/db';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { renderRouter } from 'expo-router/testing-library';
 import type { ReactNode } from 'react';
@@ -67,6 +67,8 @@ function newTrip() {
 describe('trip tabs with the real router', () => {
   it('Plan mode: Budget, Bookings, Polls and Memories show their content and buttons', async () => {
     const { db, trip } = newTrip();
+    // Polls show once someone else is on the trip.
+    addMember(db, trip.id, 'Priya');
     await renderRouter(routes, { initialUrl: `/trip/${trip.id}/plan`, wrapper: wrapperFor(db) });
     expect(await screen.findByText('Set up your trip')).toBeTruthy();
 
@@ -82,6 +84,21 @@ describe('trip tabs with the real router', () => {
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Memories' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add photos' })).toBeTruthy());
+  });
+
+  it('a trip with one person has no Polls tab; adding someone brings it back (Plan 41)', async () => {
+    const { db, trip } = newTrip();
+    const view = await renderRouter(routes, {
+      initialUrl: `/trip/${trip.id}/plan`,
+      wrapper: wrapperFor(db),
+    });
+    expect(await screen.findByRole('tab', { name: 'Budget' })).toBeTruthy();
+    expect(screen.queryByRole('tab', { name: 'Polls' })).toBeNull();
+    await view.unmount();
+
+    addMember(db, trip.id, 'Priya');
+    await renderRouter(routes, { initialUrl: `/trip/${trip.id}/plan`, wrapper: wrapperFor(db) });
+    expect(await screen.findByRole('tab', { name: 'Polls' })).toBeTruthy();
   });
 
   it('Trip mode: Budget and Memories show their content', async () => {

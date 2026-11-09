@@ -4,6 +4,7 @@ import {
   ensureMainVariant,
   getTrip,
   listItems,
+  listMembers,
   listVariants,
   moveItem,
   myMember,
@@ -55,6 +56,8 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
   const mutate = useMutate();
   const trip = useQuery((db) => getTrip(db, tripId), [tripId]);
   const where = useWhere(tripId);
+  // Voting needs someone to vote with.
+  const group = useQuery((db) => listMembers(db, tripId).length > 1, [tripId]);
   const days = trip ? tripDays(trip) : [IDEAS_DAY];
   const today = trip ? localDateIn(trip.timeZone) : '';
   const [day, setDay] = useState(initialDay ?? (days.includes(today) ? today : days[0]!));
@@ -234,7 +237,9 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
               </Body>
             </Card>
           ))}
-          {editable ? <Button label="Let the group vote" icon="polls" onPress={putToVote} /> : null}
+          {editable && group ? (
+            <Button label="Let the group vote" icon="polls" onPress={putToVote} />
+          ) : null}
         </View>
       ) : !variant ? (
         <Empty
