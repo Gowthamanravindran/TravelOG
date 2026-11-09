@@ -18,8 +18,15 @@ import {
 import { datesBetween, dayBookings, localDateIn, type DayMoment } from '@travelog/core';
 import { type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  type ScrollViewInstance,
+} from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
 import { dayChip, errorMessage, money } from '@/lib/format';
@@ -41,11 +48,25 @@ import {
   Strong,
   WithIcon,
 } from '@/ui/kit';
-import { Appear } from '@/ui/motion';
+import { Appear, useMotionOk } from '@/ui/motion';
 import { useMode, useTheme } from '@/ui/theme';
 import { Icon, type IconName } from '@/ui/icon';
 
 export const IDEAS_DAY = 'ideas';
+
+/**
+ * How far to scroll the day strip so a chip sits in the middle (Plan 43),
+ * kept within the strip's ends so the first and last days stay at their edge.
+ */
+export function centreOffset(
+  chipX: number,
+  chipW: number,
+  stripW: number,
+  contentW: number,
+): number {
+  const ideal = chipX + chipW / 2 - stripW / 2;
+  return Math.max(0, Math.min(ideal, Math.max(0, contentW - stripW)));
+}
 
 /** Days of a trip plus an "Ideas" bucket for things not yet placed on a day. */
 export function tripDays(trip: { startDate: string | null; endDate: string | null }): string[] {
@@ -65,6 +86,25 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
   const days = trip ? tripDays(trip) : [IDEAS_DAY];
   const today = trip ? localDateIn(trip.timeZone) : '';
   const [day, setDay] = useState(initialDay ?? (days.includes(today) ? today : days[0]!));
+  // Today's chip glides to the centre of the strip when the section opens (Plan 43).
+  const motionOk = useMotionOk();
+  const strip = useRef<ScrollViewInstance>(null);
+  const chips = useRef(new Map<string, { x: number; w: number }>());
+  const stripW = useRef(0);
+  const centred = useRef(false);
+  const centre = (d: string, animated: boolean) => {
+    const chip = chips.current.get(d);
+    if (!chip || !stripW.current) return false;
+    const contentW = Math.max(...[...chips.current.values()].map((c) => c.x + c.w));
+    strip.current?.scrollTo({
+      x: centreOffset(chip.x, chip.w, stripW.current, contentW),
+      animated,
+    });
+    return true;
+  };
+  const centreOnOpen = () => {
+    if (!centred.current && centre(day, motionOk)) centred.current = true;
+  };
   const variants = useQuery((db) => listVariants(db, tripId, day), [tripId, day]);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [compare, setCompare] = useState(false);
@@ -189,9 +229,15 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
       ) : null}
       {where ? <PlanChecks tripId={tripId} where={where} /> : null}
       <ScrollView
+        ref={strip}
+        testID="day-strip"
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 8 }}
+        onLayout={(e) => {
+          stripW.current = e.nativeEvent.layout.width;
+          centreOnOpen();
+        }}
       >
         {days.map((d, i) => {
           const selected = d === day;
@@ -212,10 +258,16 @@ export function ItineraryView({ tripId, initialDay }: { tripId: string; initialD
               accessibilityLabel={
                 d === IDEAS_DAY ? 'Ideas' : `Day ${i + 1}, ${label.day}${at ? `, ${at}` : ''}`
               }
+              onLayout={(e) => {
+                const { x, width } = e.nativeEvent.layout;
+                chips.current.set(d, { x, w: width });
+                if (d === day) centreOnOpen();
+              }}
               onPress={() => {
                 setDay(d);
                 setVariantId(null);
                 setCompare(false);
+                centre(d, motionOk);
               }}
               style={[
                 styles.dayChip,
