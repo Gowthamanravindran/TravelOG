@@ -48,3 +48,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 42 | [Bookings on the itinerary, each day](42-bookings-on-itinerary.md) | see git log |
 | 43 | [Today's day slides to the centre of the day strip](43-centre-today.md) | see git log |
 | 44 | [The day strip re-centres every time you come back to it](44-recentre-on-return.md) | see git log |
+| 45 | [Opening the Itinerary / Plan tab faster](45-faster-itinerary.md) | see git log |

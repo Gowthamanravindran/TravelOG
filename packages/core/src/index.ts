@@ -3,6 +3,7 @@ export * from './splits';
 export * from './balances';
 export * from './upi';
 export * from './dates';
+export * from './intl';
 export * from './trips';
 export * from './reminders';
 export * from './fx';

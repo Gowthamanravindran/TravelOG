@@ -6,6 +6,7 @@ import {
   createTrip,
   ensureMainVariant,
   savePlaces,
+  whereInputs,
 } from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
@@ -19,6 +20,11 @@ jest.mock('expo-router', () => ({
   useGlobalSearchParams: () => ({}),
 }));
 jest.mock('expo-constants', () => ({ expoConfig: { extra: {} } }));
+// Counts trip reads (Plan 45); behaves as the real one.
+jest.mock('@travelog/db', () => {
+  const actual = jest.requireActual('@travelog/db');
+  return { ...actual, whereInputs: jest.fn(actual.whereInputs) };
+});
 const mockOpen = jest.fn();
 jest.mock('@/lib/files', () => ({ openAttachment: (a: unknown) => mockOpen(a) }));
 
@@ -135,5 +141,17 @@ describe('bookings on the itinerary (Plan 42)', () => {
     expect(screen.getByText('By 11:30')).toBeTruthy();
     expect(screen.queryByText('Nothing planned for this day')).toBeNull();
     expect(screen.getByRole('button', { name: 'Add stop' })).toBeTruthy();
+  });
+});
+
+describe('opening the itinerary reads the trip once (Plan 45)', () => {
+  it('reads bookings and places once on opening, and not again on a day tap', async () => {
+    const { db, tripId } = setup();
+    const reads = whereInputs as jest.Mock;
+    reads.mockClear();
+    await render(withData(db, <ItineraryView tripId={tripId} initialDay="2024-12-20" />, 'plan'));
+    expect(reads).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getAllByRole('tab')[2]!);
+    expect(reads).toHaveBeenCalledTimes(1);
   });
 });

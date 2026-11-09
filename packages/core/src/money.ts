@@ -1,3 +1,5 @@
+import { numberFormatter } from './intl';
+
 /**
  * Money is always stored as an integer number of minor units (paise for INR,
  * cents for USD, yen for JPY) together with its currency code. Never use
@@ -55,7 +57,7 @@ export function formatMoney(
 ): string {
   const { locale = 'en-IN', showMinor = true } = options;
   const digits = showMinor ? minorDigits(currency) : 0;
-  return new Intl.NumberFormat(locale, {
+  return numberFormatter(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: digits,

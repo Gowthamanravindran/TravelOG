@@ -26,6 +26,8 @@ export interface Where {
   places: ReadonlyMap<string, WherePlace>;
   /** Ids of places you set yourself, to tell them from bookings. */
   stopIds: ReadonlySet<string>;
+  /** The trip, bookings, stops and places read for this, so screens don't read them again (Plan 45). */
+  inputs: NonNullable<ReturnType<typeof whereInputs>>;
 }
 
 const dismissedKey = (tripId: string) => `where.dismissed.${tripId}`;
@@ -53,6 +55,7 @@ export function whereFor(db: Db, tripId: string): Where | null {
     checks: planChecks(inputs, w).filter((c) => !dismissed.has(c.key)),
     places: inputs.places,
     stopIds: new Set(inputs.stops.map((s) => s.id)),
+    inputs,
   };
 }
 

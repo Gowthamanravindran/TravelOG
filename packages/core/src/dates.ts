@@ -1,3 +1,5 @@
+import { dateFormatter } from './intl';
+
 /**
  * Calendar helpers. Trip dates are local calendar dates ('YYYY-MM-DD') in the
  * trip's IANA time zone; instants are stored as UTC ISO strings.
@@ -13,7 +15,7 @@ export function isLocalDate(value: string): boolean {
 
 /** The calendar date at `at` in `timeZone`, e.g. localDateIn('Asia/Kolkata', now) -> '2026-11-04'. */
 export function localDateIn(timeZone: string, at: Date = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
+  const parts = dateFormatter('en-CA', {
     timeZone,
     year: 'numeric',
     month: '2-digit',
@@ -25,7 +27,7 @@ export function localDateIn(timeZone: string, at: Date = new Date()): string {
 
 /** The wall-clock time 'HH:MM' at `at` in `timeZone`. */
 export function localTimeIn(timeZone: string, at: Date = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-GB', {
+  const parts = dateFormatter('en-GB', {
     timeZone,
     hour: '2-digit',
     minute: '2-digit',
@@ -67,7 +69,7 @@ export function timeToMinutes(time: string): number {
 
 /** Offset of `timeZone` from UTC at instant `at`, in minutes (e.g. +330 for India). */
 export function timeZoneOffsetMinutes(timeZone: string, at: Date): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
+  const parts = dateFormatter('en-US', {
     timeZone,
     hourCycle: 'h23',
     year: 'numeric',

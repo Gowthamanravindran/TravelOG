@@ -1,3 +1,4 @@
+import { dateFormatter } from './intl';
 import { localToUtcIso } from './dates';
 
 /**
@@ -74,7 +75,7 @@ function minus(iso: string, ms: number): string {
 }
 
 function timeLabel(iso: string, timeZone: string): string {
-  return new Intl.DateTimeFormat('en-IN', {
+  return dateFormatter('en-IN', {
     hour: 'numeric',
     minute: '2-digit',
     timeZone,

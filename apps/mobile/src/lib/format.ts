@@ -1,4 +1,4 @@
-import { formatMoney, minorDigits, toMinor } from '@travelog/core';
+import { dateFormatter, formatMoney, minorDigits, toMinor } from '@travelog/core';
 
 export const CURRENCIES = [
   'INR',
@@ -58,7 +58,7 @@ export function dateRange(start: string | null, end: string | null): string {
 
 /** UTC ISO -> '14 Nov, 18:30' in the given time zone. */
 export function dateTimeIn(iso: string, timeZone: string): string {
-  return new Intl.DateTimeFormat('en-IN', {
+  return dateFormatter('en-IN', {
     timeZone,
     day: 'numeric',
     month: 'short',

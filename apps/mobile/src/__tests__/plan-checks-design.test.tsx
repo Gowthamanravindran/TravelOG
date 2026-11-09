@@ -16,6 +16,12 @@ const where: Where = {
     ['gok', { id: 'gok', name: 'Gokarna', kind: 'city', timeZone: 'Asia/Kolkata' }],
   ]),
   stopIds: new Set(),
+  inputs: {
+    trip: { startDate: null, endDate: null, timeZone: 'Asia/Kolkata', destinationPlaceId: null },
+    bookings: [],
+    stops: [],
+    places: new Map(),
+  },
   checks: [
     { key: 'a', kind: 'noStay', startDate: '2026-07-14', endDate: '2026-07-16', placeId: 'goa' },
     {

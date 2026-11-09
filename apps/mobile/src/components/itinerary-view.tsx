@@ -12,7 +12,6 @@ import {
   myMember,
   setMainVariant,
   summarizeItems,
-  whereInputs,
   type Item,
 } from '@travelog/db';
 import { datesBetween, dayBookings, localDateIn, type DayMoment } from '@travelog/core';
@@ -129,9 +128,10 @@ export function ItineraryView({
     variants.find((v) => v.id === variantId) ?? variants.find((v) => v.isMain) ?? variants[0];
   const items = useQuery((db) => (variant ? listItems(db, variant.id) : []), [variant?.id]);
   // What's booked on this day, among the stops (Plan 42).
+  // The trip's bookings come from `where`, already read once for the route strip (Plan 45).
   const booked = useQuery(
     (db) => {
-      const inputs = day === IDEAS_DAY ? null : whereInputs(db, tripId);
+      const inputs = day === IDEAS_DAY ? null : where?.inputs;
       if (!inputs) return null;
       const d = dayBookings(inputs, day);
       const ids = [...d.moments.map((m) => m.bookingId), d.staying?.bookingId].filter(
@@ -145,7 +145,7 @@ export function ItineraryView({
       );
       return { ...d, info };
     },
-    [tripId, day],
+    [where, day],
   );
   const summaries = useQuery(
     (db) => variants.map((v) => ({ v, s: summarizeItems(listItems(db, v.id)) })),

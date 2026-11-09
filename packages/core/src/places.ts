@@ -1,3 +1,5 @@
+import { dateFormatter } from './intl';
+
 /**
  * Places for destination autocomplete (Plan 29): cities, regions, countries and
  * continents from open data (GeoNames, OpenStreetMap). Pure ranking and wording;
@@ -109,7 +111,7 @@ export function timeZoneLabel(
   let offset = '';
   try {
     offset =
-      new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'shortOffset' })
+      dateFormatter('en-US', { timeZone, timeZoneName: 'shortOffset' })
         .formatToParts(at)
         .find((x) => x.type === 'timeZoneName')?.value ?? '';
   } catch {
