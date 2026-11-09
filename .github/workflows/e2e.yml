@@ -26,9 +26,6 @@ jobs:
       matrix:
         # Diagnosing a release crash: is it the tree shaking (Plan 49 T3)?
         shake: ['1', '']
-    env:
-      EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH: ${{ matrix.shake }}
-      EXPO_UNSTABLE_TREE_SHAKING: ${{ matrix.shake }}
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -41,6 +38,12 @@ jobs:
           distribution: temurin
           java-version: '17'
       - run: pnpm install --frozen-lockfile
+      # Only the tree-shaking variant sets these (an empty value isn't read as off).
+      - name: Turn on tree shaking
+        if: matrix.shake == '1'
+        run: |
+          echo "EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH=1" >> "$GITHUB_ENV"
+          echo "EXPO_UNSTABLE_TREE_SHAKING=1" >> "$GITHUB_ENV"
 
       - name: Generate the Android project
         working-directory: apps/mobile
