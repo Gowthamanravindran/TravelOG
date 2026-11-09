@@ -70,6 +70,8 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
+          # A phone-sized screen; the default 320x640 hid buttons under the keyboard.
+          profile: pixel_6
           disable-animations: true
           script: |
             adb install -r apps/mobile/android/app/build/outputs/apk/release/app-release.apk

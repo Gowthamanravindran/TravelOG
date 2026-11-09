@@ -20,6 +20,8 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Trip name'
 - inputText: 'Goa test'
 - hideKeyboard
+- scrollUntilVisible:
+    element: 'Create trip'
 - tapOn: 'Create trip'
 # Itinerary: the skeleton gives way to the plan (Plan 46)
 - extendedWaitUntil:
@@ -29,6 +31,10 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Name'
 - inputText: 'Chapora Fort'
 - hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: 'Add'
+      index: 0
 - tapOn:
     text: 'Add'
     index: 0
