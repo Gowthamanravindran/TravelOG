@@ -1,5 +1,14 @@
 import type { Db } from '@travelog/db';
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { NavigationContext } from 'expo-router/react-navigation';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 interface DataContextValue {
   db: Db;
@@ -31,11 +40,42 @@ function useData(): DataContextValue {
   return ctx;
 }
 
-/** Reads data from the local database; re-runs after any write. */
+/**
+ * True while the screen this is drawn in is the one in view. Outside navigation
+ * (tests, the root) it's always true.
+ */
+function useShown(): boolean {
+  const nav = useContext(NavigationContext);
+  const [shown, setShown] = useState(() => nav?.isFocused() ?? true);
+  useEffect(() => {
+    if (!nav) return;
+    setShown(nav.isFocused());
+    const offFocus = nav.addListener('focus', () => setShown(true));
+    const offBlur = nav.addListener('blur', () => setShown(false));
+    return () => {
+      offFocus();
+      offBlur();
+    };
+  }, [nav]);
+  return shown;
+}
+
+/**
+ * Reads data from the local database; re-runs after any write. Tabs and screens
+ * under the current one stay mounted, so a hidden screen keeps what it last read
+ * and catches up when it's shown again (Plan 49 T2): a save re-reads only the
+ * screen in view.
+ */
 export function useQuery<T>(read: (db: Db) => T, deps: readonly unknown[] = []): T {
   const { db, version } = useData();
+  const shown = useShown();
+  const [seen, setSeen] = useState(version);
+  useEffect(() => {
+    if (shown) setSeen(version);
+  }, [shown, version]);
+  const at = shown ? version : seen;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => read(db), [db, version, ...deps]);
+  return useMemo(() => read(db), [db, at, ...deps]);
 }
 
 /** Returns a function that performs a write and refreshes screens. */
