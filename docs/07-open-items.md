@@ -26,7 +26,7 @@ Everything still undecided or not yet done before and during the build. Each ite
 ## Quality and operations
 | Item | Plan | Closes in |
 |---|---|---|
-| Test strategy | Unit (Jest), component (React Native Testing Library), database permission tests (pgTAP), end-to-end (Maestro) on CI | Phase 0 setup, grows each phase |
+| Test strategy | Unit (Jest), component (React Native Testing Library), database permission tests (pgTAP), end-to-end (Maestro) on CI. Maestro runs nightly on an emulator since Plan 49 (`apps/mobile/e2e`) | Phase 0 setup, grows each phase |
 | AI quality checks | A fixed set of trip requests with expected properties, run before any AI change | Phase 7 |
 | Accessibility pass | Screen reader labels, dynamic type, contrast | Each phase; full pass Phase 8 |
 | Backups and restore drill | Supabase daily backups (Pro); one practice restore to staging | Phase 8 |
