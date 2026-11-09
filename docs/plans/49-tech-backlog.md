@@ -1,6 +1,6 @@
 # Plan 49 — Tech backlog: native-package check, fewer re-reads, bundle headroom, end-to-end tests
 
-**Status:** 🚧 In progress (T1, T2 built)
+**Status:** 🚧 In progress (T1, T2, T3 built)
 
 The owner asked what tech work was on the backlog and chose all four engineering items. Each item lands as its own commit.
 
@@ -33,3 +33,28 @@ So a hidden tab or a screen under a form never re-reads on a save, and is up to 
 - Return to the Itinerary: it re-reads.
 
 The test failed before the change and passes after. All 197 mobile tests pass.
+
+## T3 — Bundle headroom ✅
+**Measured first:** I exported plain minified JS with a source map and attributed every module's bytes (3.59 MB of JS before Hermes compiles it). The top contributors were:
+- react-native 672 KB;
+- Reanimated 640 KB, which includes every built-in animation (Bounce, Flip, Rotate, Zoom…) though the app uses a few;
+- expo-router 484 KB;
+- gesture-handler 193 KB;
+- drizzle 159 KB.
+
+Our own code is under 300 KB in total; the largest parts are `packages/core` at 86 KB and the trip screens at 70 KB.
+
+`@expo/ui` (85 KB) looked unused but is needed by expo-router's stack toolbar on Android, so it stays. Android release apps are one Hermes bundle with no lazy loading of separate files, so the saving has to come from shipping less code.
+
+**Change:** Expo's tree shaking (`EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH=1`, `EXPO_UNSTABLE_TREE_SHAKING=1`) removes exports nothing uses.
+- It's on in `export:android`, which CI's size check runs, and in the `preview` and `production` EAS build profiles.
+- Development (`pnpm dev:go`, development builds) is unchanged; tree shaking only applies to release bundles.
+- I also tried Metro `inlineRequires`. It made the bundle larger together with tree shaking, and Expo turns it off by default, so it isn't used.
+
+**Result:**
+| | Android bundle | vs baseline (limit +10%) |
+|---|---|---|
+| Before | 5,573,947 bytes | +9.0% |
+| After | 5,167,992 bytes (−406 KB, −7.3%) | +1.1% |
+
+**Risk and check:** tree shaking is labelled unstable by Expo and only runs in release builds, so a problem wouldn't show in Expo Go. T4's end-to-end run builds a release APK with the same settings and drives it on an emulator, which checks it. If anything breaks there, the two settings come out.
