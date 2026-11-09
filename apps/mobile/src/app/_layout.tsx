@@ -10,6 +10,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, type ReactNode } from 'react';
+import { TurboModuleRegistry } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ErrorScreen } from '@/components/error-screen';
@@ -21,6 +22,12 @@ import { usePlacesSeed } from '@/lib/places';
 import { CelebrationHost } from '@/ui/motion';
 import { useScheme, useTheme } from '@/ui/theme';
 import { useReminders } from '@/lib/reminders';
+
+// Gesture-handler's root view needs its native module to exist before it's drawn.
+// The library looks the module up when it loads, but tree shaking (release builds)
+// removes that lookup, and the app crashed on launch with "Tried to access a
+// non-existent registry" (Plan 49 T4). Looking it up here keeps it in every build.
+TurboModuleRegistry.get('RNGestureHandlerModule');
 
 SplashScreen.preventAutoHideAsync();
 

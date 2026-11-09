@@ -13,20 +13,12 @@
     "preview": {
       "distribution": "internal",
       "channel": "preview",
-      "environment": "preview",
-      "env": {
-        "EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH": "1",
-        "EXPO_UNSTABLE_TREE_SHAKING": "1"
-      }
+      "environment": "preview"
     },
     "production": {
       "autoIncrement": true,
       "channel": "production",
-      "environment": "production",
-      "env": {
-        "EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH": "1",
-        "EXPO_UNSTABLE_TREE_SHAKING": "1"
-      }
+      "environment": "production"
     }
   },
   "submit": {
