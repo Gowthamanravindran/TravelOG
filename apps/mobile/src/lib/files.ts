@@ -87,6 +87,15 @@ export async function pickAttachment(): Promise<PickedFile | null> {
   return keepCopy(picked.result);
 }
 
+/** True when the app's copy of a file is on this phone (Plan 40: it opens without signal). */
+export function fileOnPhone(localUri: string): boolean {
+  try {
+    return new File(localUri).exists;
+  } catch {
+    return false;
+  }
+}
+
 export const MAX_UPLOADS = 10;
 
 /**

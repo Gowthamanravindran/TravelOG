@@ -140,6 +140,12 @@ export function TripHeader() {
               <Text style={[type.label, { color: t.onAccent }]}>{switchTo.label}</Text>
             </Pressable>
           ) : null}
+          {/* Tickets one tap away (Plan 40): Bookings → Documents, or its own page in Trip mode. */}
+          {roundButton('document', 'Documents', () =>
+            mode === 'trip'
+              ? router.push(`/trip/${id}/documents?mode=trip`)
+              : router.navigate(`/trip/${id}/plan/bookings?view=documents`),
+          )}
           {roundButton('more', 'Trip settings', () => router.push(`/trip/${id}/edit`))}
         </View>
 

@@ -72,7 +72,8 @@ export function addAttachment(
   db: Db,
   input: {
     tripId: string;
-    bookingId: string;
+    /** Null for a trip document that belongs to no booking (Plan 40). */
+    bookingId: string | null;
     name: string;
     mimeType?: string | null;
     sizeBytes?: number | null;
@@ -88,4 +89,33 @@ export function listAttachments(db: Db, bookingId: string): Attachment[] {
 
 export function deleteAttachment(db: Db, id: string): void {
   deleteRow(db, 'attachments', id);
+}
+
+export interface TripDocument extends Attachment {
+  /** The booking this file belongs to; null for a trip document (passport, insurance…). */
+  booking: Pick<Booking, 'id' | 'title' | 'type' | 'startsAt'> | null;
+}
+
+/**
+ * Every file in a trip (Plan 40): trip documents first, then each booking's
+ * files in the order of the bookings (by start, undated last).
+ */
+export function listTripAttachments(db: Db, tripId: string): TripDocument[] {
+  const bookings = listBookings(db, tripId);
+  const order = new Map(bookings.map((b, i) => [b.id, i]));
+  const byId = new Map(bookings.map((b) => [b.id, b]));
+  return liveRows(db, 'attachments', eq(attachments.tripId, tripId))
+    .filter((a) => !a.bookingId || byId.has(a.bookingId))
+    .map((a) => {
+      const b = a.bookingId ? byId.get(a.bookingId)! : null;
+      return {
+        ...a,
+        booking: b ? { id: b.id, title: b.title, type: b.type, startsAt: b.startsAt } : null,
+      };
+    })
+    .sort(
+      (a, b) =>
+        (a.bookingId ? order.get(a.bookingId)! + 1 : 0) -
+          (b.bookingId ? order.get(b.bookingId)! + 1 : 0) || a.createdAt.localeCompare(b.createdAt),
+    );
 }

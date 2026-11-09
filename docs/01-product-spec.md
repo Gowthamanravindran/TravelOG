@@ -125,6 +125,8 @@ A segmented control at the top switches between searching and the ticket wallet.
 - Reminders (check-in opens, departure in 3 h).
 - v2: forward confirmation emails to `trip-xyz@in.travelog.app` → parsed into bookings.
 
+**Documents** (Plan 40): Bookings has two tabs, All bookings · Documents. Documents lists every ticket, voucher and trip document (passport, insurance), grouped by booking. They are kept on the phone and open without signal. The trip header's Documents button reaches them from anywhere, including Trip mode.
+
 ### 4.4 Polls (tab 4)
 | Poll type | Options are… | Result action on "Lock in" |
 |---|---|---|
