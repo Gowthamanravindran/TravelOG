@@ -1,0 +1,62 @@
+# Plan 49 T4: a first run on a real Android app, as a person would use it.
+# Selectors are the labels screen readers use (accessibilityLabel / visible text).
+appId: app.travelog.mobile
+name: First run, plan a trip, add a stop, a booking and an expense
+---
+- launchApp:
+    clearState: true
+# Welcome
+- tapOn: 'Your name'
+- inputText: 'Asha'
+- hideKeyboard
+- tapOn: "Let's go"
+# New trip
+- tapOn: 'Plan a trip'
+- tapOn: 'Trip name'
+- inputText: 'Goa test'
+- hideKeyboard
+- tapOn: 'Create trip'
+# Itinerary: the skeleton gives way to the plan (Plan 46)
+- extendedWaitUntil:
+    visible: 'Add stop'
+    timeout: 15000
+- tapOn: 'Add stop'
+- tapOn: 'Name'
+- inputText: 'Chapora Fort'
+- hideKeyboard
+- tapOn:
+    text: 'Add'
+    index: 0
+- assertVisible: 'Chapora Fort'
+- takeScreenshot: itinerary
+# Bookings: enter one by hand
+- tapOn: 'Bookings'
+- tapOn: 'Add booking'
+- tapOn: 'Enter booking details'
+- tapOn: 'Name'
+- inputText: 'Panjim stay'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: 'Add booking'
+      index: 1
+- tapOn:
+    text: 'Add booking'
+    index: 1
+- assertVisible: 'Panjim stay'
+- takeScreenshot: bookings
+# Budget: add an expense; the spending chart shows it (Plans 47-48)
+- tapOn: 'Budget'
+- tapOn: 'Add expense'
+- tapOn: 'What for'
+- inputText: 'Fish thali'
+- hideKeyboard
+- tapOn: 'Amount (INR)'
+- inputText: '450'
+- hideKeyboard
+- scrollUntilVisible:
+    element: 'Save expense'
+- tapOn: 'Save expense'
+- assertVisible: 'Fish thali'
+- assertVisible: 'spent'
+- takeScreenshot: budget
