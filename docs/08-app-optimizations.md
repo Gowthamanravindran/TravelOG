@@ -44,6 +44,7 @@ How the app stays fast, light on data and battery, and small. These are rules fo
 - Android App Bundle so each phone downloads only its architecture.
 - **EAS Update** for JavaScript-only fixes; bytecode diffing keeps updates small. Native changes go through a store release.
 - Track bundle size in CI and fail if it grows more than 10 % in one change.
+  **Paused (Plan 50):** the owner chose to set size aside until most of the planned app is built. CI still prints the size and warns past the limit but doesn't fail; `BUNDLE_BUDGET_ENFORCE=1` turns failing back on. Revisit before beta (Phase 8). Measured options (Plan 49 T3): Expo tree shaking saves about 406 KB; it needs the gesture-handler fix already in `app/_layout.tsx` and e2e flows covering the Studio, PDF import and notifications before it goes into builds.
 
 ## Server-side support for a fast app
 - Indexes that match permission checks, e.g. `trip_members(user_id, trip_id)`.
@@ -62,6 +63,6 @@ How the app stays fast, light on data and battery, and small. These are rules fo
 | Cold start to first screen | < 1.5 s mid-range Android | Sentry performance + manual check per release |
 | Dropped frames on lists | < 1 % | React Native perf monitor, Sentry |
 | Crash-free sessions | > 99.5 % | Sentry |
-| JS bundle size | No > 10 % jump per change | CI check |
+| JS bundle size | No > 10 % jump per change | CI check (reports only since Plan 50; see below) |
 | Data per active trip-day | < 5 MB excluding photos | Sync logs |
 | Battery during a live day | No noticeable drain from location | Manual test on two phones |

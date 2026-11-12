@@ -26,7 +26,7 @@ pnpm dev:go                  # everyday testing: install anything new, start for
 pnpm dev                     # same for the TravelOG development build (encryption, Instagram posting, native changes)
 pnpm --filter @travelog/mobile start          # dev server without the install step
 pnpm --filter @travelog/mobile export:android # production bundle → apps/mobile/dist
-node scripts/check-bundle-size.mjs            # bundle budget (docs/08)
+node scripts/check-bundle-size.mjs            # bundle size vs budget (docs/08); reports only, enforcement paused (Plan 50)
 pnpm db:start | db:reset | db:test | db:types # local Supabase (needs Docker)
 pnpm --filter @travelog/db exec drizzle-kit generate   # after editing packages/db/src/schema.ts
 ```

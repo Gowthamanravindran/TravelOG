@@ -1,8 +1,9 @@
 name: E2E (Android emulator)
 
-# Plan 49 T4: builds a release APK (with the same tree shaking as preview and
-# production builds, T3), runs it on an Android emulator and drives it with the
-# Maestro flows in apps/mobile/e2e. About 25 minutes, so not on every push.
+# Plan 49 T4: builds a release APK, the same way as preview and production
+# builds, runs it on an Android emulator and drives it with the Maestro flows in
+# apps/mobile/e2e. About 20 minutes, so not on every push. (Plan 50 dropped the
+# tree-shaking variant: size is tracked, not worked on, for now.)
 on:
   workflow_dispatch:
   schedule:
@@ -18,14 +19,9 @@ concurrency:
 
 jobs:
   android:
-    name: Release build on an emulator (tree shaking ${{ matrix.shake || 'off' }})
+    name: Release build on an emulator
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        # Diagnosing a release crash: is it the tree shaking (Plan 49 T3)?
-        shake: ['1', '']
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -38,12 +34,6 @@ jobs:
           distribution: temurin
           java-version: '17'
       - run: pnpm install --frozen-lockfile
-      # Only the tree-shaking variant sets these (an empty value isn't read as off).
-      - name: Turn on tree shaking
-        if: matrix.shake == '1'
-        run: |
-          echo "EXPO_UNSTABLE_METRO_OPTIMIZE_GRAPH=1" >> "$GITHUB_ENV"
-          echo "EXPO_UNSTABLE_TREE_SHAKING=1" >> "$GITHUB_ENV"
 
       - name: Generate the Android project
         working-directory: apps/mobile
@@ -84,7 +74,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-results-shake-${{ matrix.shake || 'off' }}
+          name: e2e-results
           path: |
             e2e-report.xml
             e2e-output
