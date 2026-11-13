@@ -36,8 +36,12 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Create trip'
 # Itinerary: the skeleton gives way to the plan (Plan 46)
 - extendedWaitUntil:
-    visible: 'Collect ideas here'
+    visible:
+      id: 'day-strip'
     timeout: 15000
+# The empty day's 3D art (Plan 52) puts its text further down: scroll to it.
+- scrollUntilVisible:
+    element: 'Collect ideas here'
 # An empty day offers "Add the first stop".
 - scrollUntilVisible:
     element: 'Add the first stop'
