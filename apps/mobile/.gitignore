@@ -11,6 +11,10 @@ expo-env.d.ts
 
 # Native
 .kotlin/
+# Gradle caches and outputs when an editor or Gradle opens a local module (Plan 51)
+modules/**/android/.gradle/
+modules/**/android/build/
+modules/**/android/local.properties
 *.orig.*
 *.jks
 *.p8

@@ -54,3 +54,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 48 | [Expenses chart without react-native-svg (crash fix)](48-donut-without-svg.md) | see git log |
 | 49 | [Tech backlog: native-package check, fewer re-reads, bundle headroom, end-to-end tests](49-tech-backlog.md) | see git log |
 | 50 | [App size: track it, don't block on it (for now)](50-size-later.md) | see git log |
+| 51 | [Ignore Gradle's cache in the local native module](51-ignore-gradle-cache.md) | see git log |
