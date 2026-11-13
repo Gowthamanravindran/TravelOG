@@ -294,6 +294,8 @@ export function BudgetView({
       ) : (
         <Empty
           icon="expense"
+          art="money"
+          artFamily="mango"
           title="No expenses yet"
           body="Add the first one — everyone's share is worked out for you."
         />

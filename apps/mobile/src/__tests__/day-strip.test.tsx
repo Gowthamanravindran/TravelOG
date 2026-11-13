@@ -14,7 +14,7 @@ jest.mock('expo-router', () => ({
 jest.mock('expo-constants', () => ({ expoConfig: { extra: {} } }));
 jest.mock('react-native-reanimated', () => {
   const actual = jest.requireActual('react-native-reanimated');
-  return { ...actual, useReducedMotion: jest.fn(() => false) };
+  return { __esModule: true, ...actual, useReducedMotion: jest.fn(() => false) };
 });
 
 describe('centreOffset (Plan 43)', () => {

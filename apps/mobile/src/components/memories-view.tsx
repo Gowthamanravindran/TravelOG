@@ -208,6 +208,8 @@ export function MemoriesView({ tripId }: { tripId: string }) {
         {!photos.length ? (
           <Empty
             icon="memories"
+            art="camera"
+            artFamily="rose"
             title="No photos yet"
             body="Photos you add stay on this phone. Sharing them with your group comes with accounts."
           />

@@ -1,12 +1,12 @@
 import type { TripWithState } from '@travelog/db';
-import { radius, spacing, type, type TileFamily } from '@travelog/ui';
+import { radius, spacing, type } from '@travelog/ui';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { dateRange } from '@/lib/format';
 import { Body, Card, Strong } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
-import { tripIcon } from '@/lib/labels';
-import { Icon } from '@/ui/icon';
+import { tripArt, tripIcon, tripIconFamily } from '@/lib/labels';
+import { Art, ArtBackdrop } from '@/ui/art';
 
 const STATE_LABELS = {
   planning: 'Planning',
@@ -16,30 +16,22 @@ const STATE_LABELS = {
   archived: 'Archived',
 } as const;
 
-/** Cover colour by trip state, from the theme's tile families (Plan 26). */
-const COVERS: Record<TripWithState['state'], TileFamily> = {
-  planning: 'sea',
-  upcoming: 'clay',
-  live: 'leaf',
-  completed: 'mango',
-  archived: 'rose',
-};
-
 export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () => void }) {
   const t = useTheme();
-  const cover = t.tiles[COVERS[trip.state]];
+  // The trip's 3D object on a gradient of its type's colour (Plan 52).
+  const icon = tripIcon(trip.emoji);
   return (
     <Card
       onPress={onPress}
       style={styles.card}
       accessibilityLabel={`${trip.title}, ${STATE_LABELS[trip.state]}`}
     >
-      <View style={[styles.cover, { backgroundColor: cover.bg }]}>
-        <Icon name={tripIcon(trip.emoji)} size={34} color={cover.fg} />
+      <ArtBackdrop family={tripIconFamily(icon)} style={styles.cover}>
+        <Art name={tripArt(icon)} size={96} float style={styles.art} />
         <View style={[styles.badge, { backgroundColor: t.surface }]}>
           <Text style={[type.caption, { color: t.ink }]}>{STATE_LABELS[trip.state]}</Text>
         </View>
-      </View>
+      </ArtBackdrop>
       <View style={styles.meta}>
         <Strong>{trip.title}</Strong>
         <Body muted small numberOfLines={1}>
@@ -54,13 +46,13 @@ export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () =
 const styles = StyleSheet.create({
   card: { padding: 0, overflow: 'hidden', gap: 0 },
   cover: {
-    height: 96,
+    height: 112,
     padding: spacing.md,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     borderTopLeftRadius: radius.card,
     borderTopRightRadius: radius.card,
   },
-  emoji: { position: 'absolute', right: 16, top: 10, fontSize: 40 },
+  art: { position: 'absolute', right: 16, top: 8 },
   badge: { alignSelf: 'flex-start', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 },
   meta: { padding: spacing.lg, gap: 4 },
 });

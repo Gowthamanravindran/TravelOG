@@ -10,6 +10,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test && node --test scripts/places/lib.test.mjs scripts/native/lib.test.mjs",
     "check:native": "node scripts/native/check.mjs",
+    "licenses:build": "node scripts/licenses/build.mjs",
     "e2e": "maestro test apps/mobile/e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

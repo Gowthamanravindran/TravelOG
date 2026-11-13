@@ -13,6 +13,8 @@ export default function ExploreScreen() {
       <H1>Explore</H1>
       <Empty
         icon="explore"
+        art="globe"
+        artFamily="leaf"
         title="Ready-made trips are on the way"
         body="Templates you can copy into your own trip, and plans from real travellers."
       />

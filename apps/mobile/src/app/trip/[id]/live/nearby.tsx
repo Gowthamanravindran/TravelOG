@@ -5,6 +5,8 @@ export default function NearbyTab() {
     <Screen edges={[]}>
       <Empty
         icon="nearby"
+        art="pin"
+        artFamily="rose"
         title="Nearby is coming"
         body="Food, sights, events and essentials around you, plus the map with today's route. Arrives with the maps update."
       />

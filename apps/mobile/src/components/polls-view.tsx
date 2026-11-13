@@ -120,6 +120,8 @@ export function PollsView({ tripId }: { tripId: string }) {
       ) : (
         <Empty
           icon="polls"
+          art="ballot"
+          artFamily="leaf"
           title="No polls yet"
           body="Can't decide on dates, a stay or Plan A vs B? Put it to a vote."
         />

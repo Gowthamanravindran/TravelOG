@@ -37,3 +37,11 @@ export function statusAt<T extends TimedItem>(
 export function minutesUntil(startTime: string, nowTime: string): number {
   return timeToMinutes(startTime) - timeToMinutes(nowTime);
 }
+
+/** "Good morning" by the trip's local time ('HH:MM'). */
+export function greeting(time: string): string {
+  const h = Number(time.slice(0, 2));
+  if (h >= 5 && h < 12) return 'Good morning';
+  if (h >= 12 && h < 17) return 'Good afternoon';
+  return 'Good evening';
+}

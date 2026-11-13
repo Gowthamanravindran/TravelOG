@@ -60,6 +60,8 @@ export function DocumentsView({ tripId, timeZone }: { tripId: string; timeZone: 
       <View style={{ gap: 12 }}>
         <Empty
           icon="document"
+          art="page"
+          artFamily="mango"
           title="No documents yet"
           body="Tickets, vouchers, passport and insurance copies. Kept on this phone, so they open without signal."
           action={<Button label="Add documents" icon="upload" onPress={add} disabled={busy} />}

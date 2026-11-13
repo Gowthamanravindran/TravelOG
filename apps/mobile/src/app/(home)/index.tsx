@@ -96,6 +96,8 @@ export default function TripsScreen() {
       ) : (
         <Empty
           icon="trips"
+          art={['luggage', 'airplane']}
+          artFamily="clay"
           title="No trips yet"
           body="Start one, add the people coming, and plan it day by day."
           action={<Button label="Plan a trip" onPress={() => router.push('/new-trip')} />}

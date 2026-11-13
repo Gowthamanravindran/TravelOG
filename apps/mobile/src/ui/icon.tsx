@@ -73,6 +73,7 @@ export const ICONS = {
   mountain: { ios: 'mountain.2', android: 'landscape' },
   city: { ios: 'building.2', android: 'location_city' },
   camping: { ios: 'tent', android: 'camping' },
+  desert: { ios: 'sun.horizon', android: 'wb_twilight' },
   hiking: { ios: 'figure.hiking', android: 'hiking' },
   festival: { ios: 'party.popper', android: 'celebration' },
   sailing: { ios: 'sailboat', android: 'sailing' },

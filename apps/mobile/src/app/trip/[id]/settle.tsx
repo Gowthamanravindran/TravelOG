@@ -99,7 +99,7 @@ export default function Settle() {
             );
           })
         ) : (
-          <Empty icon="check" title="Everyone is square" />
+          <Empty art="party" artFamily="mango" icon="check" title="Everyone is square" />
         )}
         <ErrorText>{error}</ErrorText>
       </Screen>

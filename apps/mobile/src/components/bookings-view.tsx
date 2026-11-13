@@ -179,6 +179,8 @@ export function BookingsView({ tripId }: { tripId: string }) {
       ) : (
         <Empty
           icon="bookings"
+          art="ticket"
+          artFamily="sea"
           title="No bookings yet"
           body="Add flights, trains, buses, stays and event tickets with their PDFs."
           action={<Button label="Add your first booking" icon="add" onPress={add} />}

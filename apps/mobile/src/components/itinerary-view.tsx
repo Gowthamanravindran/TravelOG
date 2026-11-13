@@ -29,7 +29,7 @@ import {
 
 import { useMutate, useQuery } from '@/data/provider';
 import { dayChip, errorMessage, money } from '@/lib/format';
-import { ITEM_LABELS } from '@/lib/labels';
+import { ITEM_LABELS, tripArt, tripIcon, tripIconFamily } from '@/lib/labels';
 import { dayPlaceLabel, useWhere } from '@/lib/where';
 import { BookedCard, StayStrip } from './booking-moment';
 import { PlanChecks } from './plan-checks';
@@ -377,6 +377,8 @@ export function ItineraryView({
       ) : !variant ? (
         <Empty
           icon={day === IDEAS_DAY ? 'idea' : 'plan'}
+          art={day === IDEAS_DAY ? 'globe' : tripArt(tripIcon(trip.emoji))}
+          artFamily={day === IDEAS_DAY ? 'leaf' : tripIconFamily(tripIcon(trip.emoji))}
           title={day === IDEAS_DAY ? 'Collect ideas here' : 'Nothing planned for this day'}
           body={
             editable

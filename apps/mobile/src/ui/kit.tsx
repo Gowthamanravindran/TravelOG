@@ -15,6 +15,7 @@ import { InsetView } from './inset-view';
 
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
+import { Art, ArtBackdrop, type ArtName } from './art';
 import { Icon, type IconName } from './icon';
 import { haptic, MOTION, useMotionOk } from './motion';
 import { useTheme } from './theme';
@@ -380,13 +381,39 @@ export function Empty({
   title,
   body,
   action,
+  art,
+  artFamily = 'sea',
 }: {
   icon: IconName;
   title: string;
   body?: string;
   action?: ReactNode;
+  /** A 3D object (or an object and a small companion) above the text (Plan 52). */
+  art?: ArtName | [ArtName, ArtName];
+  /** The gradient behind the art. */
+  artFamily?: TileFamily;
 }) {
   const t = useTheme();
+  if (art) {
+    const [main, extra] = Array.isArray(art) ? art : [art, undefined];
+    return (
+      <View style={[styles.emptyArt, { backgroundColor: t.surface, borderColor: t.line }]}>
+        <ArtBackdrop family={artFamily} style={styles.emptyArtPanel}>
+          <Art name={main} size={104} float />
+          {extra ? (
+            <Art name={extra} size={52} float delay={500} style={styles.emptyArtExtra} />
+          ) : null}
+        </ArtBackdrop>
+        <View style={styles.emptyArtText}>
+          <Text style={[type.headline, { color: t.ink, textAlign: 'center' }]}>{title}</Text>
+          {body ? (
+            <Text style={[type.body, { color: t.ink2, textAlign: 'center' }]}>{body}</Text>
+          ) : null}
+          {action}
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={[styles.empty, { borderColor: t.line }]}>
       <View style={[styles.emptyIcon, { backgroundColor: t.accentSoft }]}>
@@ -587,6 +614,10 @@ const styles = StyleSheet.create({
   },
   fieldLabel: { textTransform: 'uppercase', letterSpacing: 0.6 },
   input: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
+  emptyArt: { borderWidth: 1, borderRadius: radius.card, overflow: 'hidden' },
+  emptyArtPanel: { height: 148, alignItems: 'center', justifyContent: 'center' },
+  emptyArtExtra: { position: 'absolute', right: '22%', top: 14 },
+  emptyArtText: { padding: spacing.lg, alignItems: 'center', gap: spacing.sm },
   empty: {
     borderWidth: 1.5,
     borderStyle: 'dashed',

@@ -13,14 +13,14 @@ import { durationLabel, localDateIn, localTimeIn, timeline } from '@travelog/cor
 import { type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useDb, useMutate, useQuery } from '@/data/provider';
 import { TripSetupCard } from '@/components/trip-setup';
 import { checkInNow } from '@/lib/check-in';
 import { dateTimeIn, errorMessage, money } from '@/lib/format';
-import { ITEM_LABELS } from '@/lib/labels';
-import { minutesUntil, statusAt } from '@/lib/today';
+import { ITEM_LABELS, tripArt, tripIcon, tripIconFamily } from '@/lib/labels';
+import { greeting, minutesUntil, statusAt } from '@/lib/today';
 import {
   Between,
   Body,
@@ -36,6 +36,7 @@ import {
 } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 import { Icon } from '@/ui/icon';
+import { Art, ArtBackdrop } from '@/ui/art';
 import { useTripId } from '@/lib/use-trip-id';
 
 export default function TodayTab() {
@@ -107,6 +108,16 @@ export default function TodayTab() {
 
   return (
     <Screen edges={[]}>
+      {/* A greeting with the trip's 3D object (Plan 52). */}
+      {trip ? (
+        <ArtBackdrop family={tripIconFamily(tripIcon(trip.emoji))} style={styles.hero}>
+          <View style={{ flex: 1, gap: 4 }}>
+            <Text style={[type.label, { color: t.ink2 }]}>{trip.destination ?? trip.title}</Text>
+            <Text style={[type.display, { color: t.ink }]}>{greeting(nowTime)}</Text>
+          </View>
+          <Art name={tripArt(tripIcon(trip.emoji))} size={96} float />
+        </ArtBackdrop>
+      ) : null}
       <TripSetupCard tripId={id} />
       {focus ? (
         <View style={{ backgroundColor: t.accent, borderRadius: 24, padding: 18, gap: 8 }}>
@@ -130,6 +141,8 @@ export default function TodayTab() {
       ) : (
         <Empty
           icon="today"
+          art={tripArt(tripIcon(trip?.emoji))}
+          artFamily={tripIconFamily(tripIcon(trip?.emoji))}
           title={items.length ? 'Nothing else timed today' : 'No plan for today'}
           body={items.length ? 'Enjoy the evening.' : "Add today's stops in the plan."}
           action={
@@ -270,3 +283,16 @@ export default function TodayTab() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  hero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 24,
+    paddingVertical: 14,
+    paddingLeft: 18,
+    paddingRight: 12,
+    overflow: 'hidden',
+  },
+});

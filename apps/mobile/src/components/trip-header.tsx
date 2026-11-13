@@ -7,7 +7,8 @@ import { InsetView } from '@/ui/inset-view';
 
 import { useQuery } from '@/data/provider';
 import { dateRange } from '@/lib/format';
-import { tripIcon, tripIconFamily } from '@/lib/labels';
+import { tripArt, tripIcon, tripIconFamily } from '@/lib/labels';
+import { Art, ArtBackdrop } from '@/ui/art';
 import { useTripId } from '@/lib/use-trip-id';
 import { Icon, type IconName } from '@/ui/icon';
 import { useMode, useTheme } from '@/ui/theme';
@@ -48,7 +49,6 @@ export function TripHeader() {
   const ground = t.band ?? t.bg;
   const chipBg = t.band ? t.surface : t.surface2;
   const icon = tripIcon(trip.emoji);
-  const tile = t.tiles[tripIconFamily(icon)];
 
   const roundButton = (icon: IconName, label: string, onPress: () => void) => (
     <Pressable
@@ -150,18 +150,20 @@ export function TripHeader() {
         </View>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <View
+          {/* The trip's 3D object (Plan 52). */}
+          <ArtBackdrop
+            family={tripIconFamily(icon)}
             style={{
-              width: 60,
-              height: 60,
-              borderRadius: 20,
-              backgroundColor: t.band ? t.surface : tile.bg,
+              width: 76,
+              height: 76,
+              borderRadius: 24,
+              overflow: 'hidden',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Icon name={icon} size={32} color={tile.fg} />
-          </View>
+            <Art name={tripArt(icon)} size={64} float />
+          </ArtBackdrop>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={[type.display, { color: t.ink }]} numberOfLines={1}>
               {trip.title}

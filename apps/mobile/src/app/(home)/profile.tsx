@@ -58,11 +58,11 @@ export default function ProfileScreen() {
       <Section title="Appearance">
         <AppearanceCard />
       </Section>
-      <Card>
-        <Strong>Place data</Strong>
+      <Card onPress={() => router.push('/licenses')} accessibilityLabel="Licences and credits">
+        <Strong>Licences and credits</Strong>
         <Body muted small>
-          Places © GeoNames (geonames.org, CC-BY 4.0). Places found online © OpenStreetMap
-          contributors (openstreetmap.org, ODbL), through Geoapify.
+          3D art by Microsoft (Fluent Emoji, MIT), fonts, icons, place data from GeoNames and
+          OpenStreetMap, and the open-source packages TravelOG is built with.
         </Body>
       </Card>
       <Card>

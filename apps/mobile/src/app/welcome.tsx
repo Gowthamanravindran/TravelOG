@@ -1,13 +1,13 @@
 import { getLocalProfile, saveLocalProfile } from '@travelog/db';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
 import { CURRENCIES, errorMessage } from '@/lib/format';
 import { Body, Button, Chip, ChipRow, ErrorText, Field, H1, Screen } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
-import { Icon } from '@/ui/icon';
+import { Art, ArtBackdrop } from '@/ui/art';
 
 /** First launch: who are you? (Sign-in arrives later; this profile stays on this phone.) */
 export default function Welcome() {
@@ -33,7 +33,12 @@ export default function Welcome() {
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <Icon name="flight" size={44} color={t.accent} />
+      {/* 3D welcome (Plan 52): a world map with a plane and sparkles. */}
+      <ArtBackdrop family="sea" style={styles.hero}>
+        <Art name="map" size={150} float />
+        <Art name="airplane" size={64} float delay={400} style={styles.plane} />
+        <Art name="sparkles" size={40} float delay={800} style={styles.sparkles} />
+      </ArtBackdrop>
       <H1 eyebrow="Welcome to TravelOG">Plan trips with your friends</H1>
       <Body muted>Vote, split, go. Your trips are saved on this phone and work offline.</Body>
       <Field
@@ -67,3 +72,15 @@ export default function Welcome() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  hero: {
+    height: 190,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  plane: { position: 'absolute', right: '14%', top: 14 },
+  sparkles: { position: 'absolute', left: '16%', bottom: 18 },
+});

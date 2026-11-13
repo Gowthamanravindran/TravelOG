@@ -2,6 +2,7 @@ import type { TileFamily } from '@travelog/ui';
 import type { BookingType, BudgetCategory, ItemType, PollType, SplitMethod } from '@travelog/db';
 
 import { isIconName, type IconName } from '@/ui/icon';
+import type { ArtName } from '@/ui/art';
 
 export const ITEM_LABELS: Record<ItemType, { label: string; icon: IconName; family: TileFamily }> =
   {
@@ -77,7 +78,29 @@ export const TRIP_ICONS: { icon: IconName; label: string; family: TileFamily }[]
   { icon: 'temple', label: 'Pilgrimage', family: 'rose' },
   { icon: 'festival', label: 'Celebration', family: 'mango' },
   { icon: 'food', label: 'Food', family: 'mango' },
+  { icon: 'desert', label: 'Desert', family: 'mango' },
 ];
+
+/** The 3D object for a trip icon (Plan 52); anything unknown gets the suitcase. */
+const TRIP_ART: Partial<Record<IconName, ArtName>> = {
+  trips: 'luggage',
+  beach: 'beach',
+  mountain: 'mountain',
+  city: 'city',
+  car: 'car',
+  flight: 'airplane',
+  train: 'train',
+  camping: 'camping',
+  hiking: 'boot',
+  temple: 'temple',
+  festival: 'party',
+  food: 'food',
+  desert: 'desert',
+};
+
+export function tripArt(icon: IconName): ArtName {
+  return TRIP_ART[icon] ?? 'luggage';
+}
 
 /** The tile colour family for a trip icon (Plan 26); unknown icons are rose. */
 export function tripIconFamily(icon: IconName): TileFamily {
