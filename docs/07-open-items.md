@@ -22,6 +22,7 @@ Everything still undecided or not yet done before and during the build. Each ite
 | Analytics event list | Funnel defined in [15](15-go-to-market.md) §7; event names and properties to write | Phase 1, extended each phase |
 | Languages | English at launch; Hindi after launch (strings externalised from day one) | Phase 1 (setup), post-launch |
 | App icon and store screenshots | Final brand assets | Phase 8 |
+| Choose a trip's cover (after Plan 53, Plan 54) | A trip setting **Cover**: *Automatic* (the default, so a new trip never looks empty: destination photo, else 3D art), *one of the trip's own photos* from Memories, or *3D art only*. Stored on the trip as a nullable `cover_photo_id` (`null` = automatic) and synced like other trip fields; shown through the same `RemoteImage` layer, or the local file while the photo is only on the phone. Useful during and after a trip, once Memories has photos | When Memories photos sync (Phase 5) |
 | Destination photos for trip covers (Plans 52–53) | The app side is built (Plan 53): covers load from our Cloudflare R2 bucket over the 3D art. Waiting on the owner to upload photos and set `EXPO_PUBLIC_MEDIA_URL` (`docs/14` §3 step 6) | When photos are uploaded |
 
 ## Quality and operations
