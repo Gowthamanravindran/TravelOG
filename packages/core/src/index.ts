@@ -18,3 +18,4 @@ export * from './whereabouts';
 export * from './booking-tables';
 export * from './day-bookings';
 export * from './charts';
+export * from './geo';

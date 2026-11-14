@@ -9,6 +9,7 @@ import {
   listMembers,
   listVariants,
   moveItem,
+  setItemOrder,
   myMember,
   setMainVariant,
   summarizeItems,
@@ -34,6 +35,7 @@ import { dayPlaceLabel, useWhere } from '@/lib/where';
 import { BookedCard, StayStrip } from './booking-moment';
 import { PlanChecks } from './plan-checks';
 import { RouteStrip } from './route-strip';
+import { BestOrderSheet, suggestOrder, TravelLeg } from './travel';
 import {
   Between,
   Body,
@@ -124,6 +126,9 @@ export function ItineraryView({
   const [variantId, setVariantId] = useState<string | null>(null);
   const [compare, setCompare] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Plan 57: Best order's sheet, and the order to go back to after applying it.
+  const [ordering, setOrdering] = useState(false);
+  const [undo, setUndo] = useState<{ variantId: string; ids: string[] } | null>(null);
   const variant =
     variants.find((v) => v.id === variantId) ?? variants.find((v) => v.isMain) ?? variants[0];
   const items = useQuery((db) => (variant ? listItems(db, variant.id) : []), [variant?.id]);
@@ -153,6 +158,8 @@ export function ItineraryView({
   );
   if (!trip) return null;
   const editable = mode === 'plan';
+  const suggestion = editable && day !== IDEAS_DAY ? suggestOrder(items) : null;
+  const undoHere = undo && undo.variantId === variant?.id ? undo : null;
 
   const run = (fn: () => void) => {
     try {
@@ -283,6 +290,7 @@ export function ItineraryView({
                 setDay(d);
                 setVariantId(null);
                 setCompare(false);
+                setUndo(null);
                 centre(d, motionOk);
               }}
               style={[
@@ -389,14 +397,36 @@ export function ItineraryView({
         />
       ) : (
         <View style={{ gap: 8 }}>
-          {(() => {
-            const s = summarizeItems(items);
-            return (
-              <Body muted small>
-                {s.itemCount} stops · est. {money(s.estCostMinor, trip.currency)}
-              </Body>
-            );
-          })()}
+          <Between>
+            {(() => {
+              const s = summarizeItems(items);
+              return (
+                <Body muted small>
+                  {s.itemCount} stops · est. {money(s.estCostMinor, trip.currency)}
+                </Body>
+              );
+            })()}
+            {suggestion ? (
+              <Chip label="Best order" icon="route" onPress={() => setOrdering(true)} />
+            ) : null}
+          </Between>
+          {undoHere ? (
+            <Card style={{ padding: 10 }}>
+              <Between>
+                <Body small>New order saved</Body>
+                <Button
+                  label="Undo"
+                  variant="link"
+                  onPress={() =>
+                    run(() => {
+                      mutate((db) => setItemOrder(db, undoHere.variantId, undoHere.ids));
+                      setUndo(null);
+                    })
+                  }
+                />
+              </Between>
+            </Card>
+          ) : null}
           {stayStrip}
           {entries.map((e, n) =>
             e.k === 'm' ? (
@@ -421,9 +451,25 @@ export function ItineraryView({
                       : undefined
                   }
                 />
+                {items[e.index + 1] ? <TravelLeg from={e.item} to={items[e.index + 1]!} /> : null}
               </Appear>
             ),
           )}
+          <BestOrderSheet
+            visible={ordering}
+            dayLabel={dayChip(day).day}
+            items={items}
+            suggestion={suggestion}
+            onClose={() => setOrdering(false)}
+            onApply={() =>
+              run(() => {
+                const back = { variantId: variant.id, ids: items.map((i) => i.id) };
+                mutate((db) => setItemOrder(db, variant.id, suggestion!.order));
+                setUndo(back);
+                setOrdering(false);
+              })
+            }
+          />
           {editable ? (
             <Button
               label="Add stop"
@@ -487,6 +533,11 @@ function ItemRow({
         <Body muted small>
           {meta}
         </Body>
+        {item.placeName && item.placeName !== item.title ? (
+          <Body muted small numberOfLines={1}>
+            At {item.placeName}
+          </Body>
+        ) : null}
         {item.notes ? (
           <Body small numberOfLines={2}>
             {item.notes}

@@ -8,6 +8,9 @@ import {
   addBooking,
   addExpense,
   addItem,
+  liveTripItems,
+  setItemOrder,
+  updateItem,
   addMember,
   addVariant,
   castVote,
@@ -186,6 +189,34 @@ describe('itinerary', () => {
     });
     expect(() => addItem(db, a.id, { type: 'note', title: 'x', startTime: '25:00' })).toThrow();
     expect(fort.tripId).toBe(t.id);
+  });
+
+  it('keeps where a stop is, and copies it into Plan B (Plan 57)', () => {
+    const t = goa();
+    const a = ensureMainVariant(db, t.id, '2026-11-13');
+    const cafe = addItem(db, a.id, {
+      type: 'food',
+      title: 'Breakfast',
+      placeName: ' Artjuna Café ',
+      address: 'Anjuna, Goa',
+      lat: 15.5791,
+      lng: 73.7402,
+      poiId: 'osm:N1',
+    });
+    expect(cafe).toMatchObject({ placeName: 'Artjuna Café', lat: 15.5791, poiId: 'osm:N1' });
+    const typed = addItem(db, a.id, { type: 'place', title: 'Beach', placeName: 'Vagator' });
+    expect(typed.lat).toBeNull();
+    expect(() => updateItem(db, typed.id, { lat: 15.6 })).toThrow(/both/);
+    expect(() => updateItem(db, typed.id, { lat: 95, lng: 73 })).toThrow(/off the map/);
+    expect(
+      updateItem(db, typed.id, { lat: null, lng: null, placeName: null }).placeName,
+    ).toBeNull();
+    const b = addVariant(db, t.id, '2026-11-13', { copyFromVariantId: a.id });
+    expect(listItems(db, b.id)[0]).toMatchObject({ placeName: 'Artjuna Café', lng: 73.7402 });
+    expect(liveTripItems(db, t.id)).toHaveLength(4);
+    const ids = listItems(db, a.id).map((i) => i.id);
+    expect(setItemOrder(db, a.id, [ids[1]!]).map((i) => i.id)).toEqual([ids[1], ids[0]]);
+    expect(setItemOrder(db, a.id, ids).map((i) => i.id)).toEqual(ids);
   });
 
   it('adds Plan B by copying Plan A', () => {

@@ -12,11 +12,13 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
+import { tripCentre } from '@/lib/stop-search';
 import { amountText, errorMessage, parseAmount } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
 import { Between, Button, Chip, ChipRow, ErrorText, Field, H1, Row, Screen } from '@/ui/kit';
 import { ModeProvider } from '@/ui/theme';
 import { TimeField } from '@/ui/date-field';
+import { NO_PLACE, StopPlaceField, type StopPlaceValue } from '@/ui/stop-place-field';
 
 export default function ItemEditor() {
   const { id, variantId, itemId } = useLocalSearchParams<{
@@ -40,6 +42,19 @@ export default function ItemEditor() {
   );
   const [cost, setCost] = useState(amountText(existing?.estCostMinor, currency));
   const [notes, setNotes] = useState(existing?.notes ?? '');
+  const near = useQuery((db) => tripCentre(db, id), [id]);
+  const [place, setPlace] = useState<StopPlaceValue>(
+    existing
+      ? {
+          name: existing.placeName ?? '',
+          address: existing.address,
+          lat: existing.lat,
+          lng: existing.lng,
+          poiId: existing.poiId,
+        }
+      : NO_PLACE,
+  );
+  const [kindChosen, setKindChosen] = useState(!!existing);
   const [error, setError] = useState<string | null>(null);
 
   const save = () => {
@@ -52,6 +67,11 @@ export default function ItemEditor() {
         estCostMinor: parseAmount(cost, currency),
         currency,
         notes: notes || null,
+        placeName: place.name.trim() || null,
+        address: place.address,
+        lat: place.lat,
+        lng: place.lng,
+        poiId: place.poiId,
       };
       mutate((db) =>
         existing ? updateItem(db, existing.id, input) : addItem(db, variantId, input),
@@ -76,7 +96,10 @@ export default function ItemEditor() {
               label={ITEM_LABELS[k].label}
               icon={ITEM_LABELS[k].icon}
               selected={kind === k}
-              onPress={() => setKind(k)}
+              onPress={() => {
+                setKind(k);
+                setKindChosen(true);
+              }}
             />
           ))}
         </ChipRow>
@@ -86,6 +109,16 @@ export default function ItemEditor() {
           onChangeText={setTitle}
           placeholder="Chapora Fort"
           autoFocus={!existing}
+        />
+        <StopPlaceField
+          tripId={id}
+          near={near ?? null}
+          value={place}
+          onChange={setPlace}
+          onPick={(p) => {
+            if (!title.trim()) setTitle(p.name);
+            if (!kindChosen) setKind(p.kind);
+          }}
         />
         <Row>
           <View style={{ flex: 1 }}>
@@ -113,7 +146,7 @@ export default function ItemEditor() {
           value={notes}
           onChangeText={setNotes}
           multiline
-          placeholder="Address, booking link, tips"
+          placeholder="Booking link, tips"
         />
         <ErrorText>{error}</ErrorText>
         <Button label={existing ? 'Save' : 'Add'} onPress={save} disabled={!title.trim()} />

@@ -92,6 +92,16 @@ export const itineraryItems = sqliteTable(
     currency: text('currency'),
     notes: text('notes'),
     sortOrder: integer('sort_order').notNull().default(0),
+    /** Plan 57: where the stop is. A name alone (typed, or offline) has no coordinates. */
+    placeName: text('place_name'),
+    address: text('address'),
+    lat: real('lat'),
+    lng: real('lng'),
+    /** The map place it came from, e.g. 'osm:N123'. */
+    poiId: text('poi_id'),
+    url: text('url'),
+    /** Plan 58: the Saved place it was added from. */
+    savedPlaceId: text('saved_place_id'),
   },
   (t) => [index('itinerary_items_variant_idx').on(t.variantId, t.sortOrder)],
 );

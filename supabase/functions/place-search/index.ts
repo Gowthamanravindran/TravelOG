@@ -1,10 +1,18 @@
 // Plan 29 · place-search: destination autocomplete for the app.
+// Plan 57 · `scope=poi&near=lat,lng`: cafés, sights and shops for itinerary stops, near the
+//   trip's destination. Not saved to `places`; kept briefly in memory to save lookups.
 // 1. Search our `places` table (GeoNames seed plus places found earlier).
 // 2. Too few matches and a lookup key is set: ask Geoapify (OpenStreetMap data, ODbL)
 //    once, save the results to `places`, so the next search finds them here.
 // Secrets: PLACES_API_KEY (Geoapify). SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are
 // provided by Supabase. The key never reaches the app.
-import { fromGeoapify, normalizeForSearch, type PlaceRow } from '../_shared/places-osm.ts';
+import {
+  fromGeoapify,
+  normalizeForSearch,
+  poiFromGeoapify,
+  type PlaceRow,
+  type PoiRow,
+} from '../_shared/places-osm.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -86,14 +94,60 @@ async function save(rows: PlaceRow[]): Promise<Record<string, unknown>[]> {
   return res.ok ? await res.json() : full;
 }
 
+const poiCache = new Map<string, { at: number; pois: PoiRow[] }>();
+const POI_TTL = 6 * 60 * 60_000;
+
+/** Points of interest matching `q`, nearest to `near` first. */
+async function lookupPois(q: string, near: { lat: number; lng: number } | null): Promise<PoiRow[]> {
+  if (!PLACES_API_KEY) return [];
+  const key = `${q}|${near ? `${near.lat.toFixed(2)},${near.lng.toFixed(2)}` : ''}`;
+  const hit = poiCache.get(key);
+  if (hit && Date.now() - hit.at < POI_TTL) return hit.pois;
+  const url = new URL('https://api.geoapify.com/v1/geocode/autocomplete');
+  url.searchParams.set('text', q);
+  url.searchParams.set('type', 'amenity');
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('limit', '8');
+  url.searchParams.set('lang', 'en');
+  if (near) url.searchParams.set('bias', `proximity:${near.lng},${near.lat}`);
+  url.searchParams.set('apiKey', PLACES_API_KEY);
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const body = await res.json();
+  const rows = (body.results ?? [])
+    .map(poiFromGeoapify)
+    .filter((r: PoiRow | null): r is PoiRow => !!r);
+  const pois = [...new Map(rows.map((r: PoiRow) => [r.id, r])).values()] as PoiRow[];
+  if (poiCache.size > 2000) poiCache.clear();
+  poiCache.set(key, { at: Date.now(), pois });
+  return pois;
+}
+
+function parseNear(s: string | null): { lat: number; lng: number } | null {
+  const [lat, lng] = (s ?? '').split(',').map(Number);
+  return Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    Math.abs(lat!) <= 90 &&
+    Math.abs(lng!) <= 180
+    ? { lat: lat!, lng: lng! }
+    : null;
+}
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 Deno.serve(async (req) => {
-  const q = normalizeForSearch(new URL(req.url).searchParams.get('q') ?? '');
-  if (q.length < 2 || q.length > 60) return json({ places: [], attribution: null });
+  const params = new URL(req.url).searchParams;
+  const q = normalizeForSearch(params.get('q') ?? '');
+  const poi = params.get('scope') === 'poi';
+  if (q.length < 2 || q.length > 60) return json({ places: [], pois: [], attribution: null });
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
   if (!allowed(ip)) return json({ error: 'Too many searches, try again in a minute.' }, 429);
+
+  if (poi) {
+    const pois = await lookupPois(q, parseNear(params.get('near')));
+    return json({ pois, attribution: pois.length ? 'openstreetmap' : null });
+  }
 
   const ours = await searchOurs(q);
   if (ours.length >= ENOUGH) return json({ places: ours, attribution: null });

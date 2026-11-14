@@ -48,6 +48,10 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - tapOn: 'Add the first stop'
 - tapOn: 'Name'
 - inputText: 'Chapora Fort'
+# Plan 57: a place as typed (no server in e2e, so no map spot).
+- tapOn: 'Place'
+- inputText: 'Vagator'
+- tapOn: 'Use "Vagator" as typed'
 - scrollUntilVisible:
     element:
       text: 'Add'
@@ -57,6 +61,7 @@ name: First run, plan a trip, add a stop, a booking and an expense
     index: 0
 - scrollUntilVisible:
     element: 'Chapora Fort'
+- assertVisible: 'At Vagator'
 - takeScreenshot: itinerary
 # Bookings: enter one by hand
 - tapOn: 'Bookings'

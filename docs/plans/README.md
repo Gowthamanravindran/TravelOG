@@ -60,3 +60,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 54 | ["Choose cover" recorded for later](54-cover-choice-backlog.md) | see git log |
 | 55 | [A separate public bucket for destination photos](55-public-bucket.md) | see git log |
 | 56 | [Destination photo catalogue in Supabase (before beta)](56-photo-catalogue.md) | see git log |
+| 57 | [Stops get a real place: travel time and Best order](57-stop-places.md) | see git log |

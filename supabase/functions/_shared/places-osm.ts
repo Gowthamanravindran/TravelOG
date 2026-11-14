@@ -16,6 +16,13 @@ export interface GeoapifyResult {
   lon?: number;
   timezone?: { name?: string };
   datasource?: { sourcename?: string; raw?: { osm_type?: string; osm_id?: number } };
+  /** Plan 57: points of interest. */
+  suburb?: string;
+  street?: string;
+  housenumber?: string;
+  address_line1?: string;
+  address_line2?: string;
+  category?: string;
 }
 
 export interface PlaceRow {
@@ -72,5 +79,50 @@ export function fromGeoapify(r: GeoapifyResult): PlaceRow | null {
     time_zone: r.timezone?.name ?? null,
     source: 'osm',
     search: normalizeForSearch(name),
+  };
+}
+
+/** Plan 57: a café, sight or shop for an itinerary stop. Not stored in `places`. */
+export interface PoiRow {
+  id: string;
+  name: string;
+  address: string | null;
+  /** The kind of stop it suggests in the app. */
+  kind: 'food' | 'stay' | 'activity' | 'place';
+  category: string | null;
+  lat: number;
+  lng: number;
+}
+
+const POI_KIND: [prefix: string, kind: PoiRow['kind']][] = [
+  ['catering', 'food'],
+  ['accommodation', 'stay'],
+  ['entertainment', 'activity'],
+  ['sport', 'activity'],
+  ['leisure', 'activity'],
+  ['activity', 'activity'],
+];
+
+/** A stop-sized place (an amenity, sight or building with a name), or null. */
+export function poiFromGeoapify(r: GeoapifyResult): PoiRow | null {
+  const raw = r.datasource?.raw;
+  const name = r.name?.trim();
+  if (!name || !raw?.osm_type || raw.osm_id == null || r.lat == null || r.lon == null) return null;
+  if (r.result_type && !['amenity', 'building'].includes(r.result_type)) return null;
+  const area = [r.suburb, r.city ?? r.state].filter((x, i, all) => x && all.indexOf(x) === i);
+  const street = [r.street, r.housenumber].filter(Boolean).join(' ');
+  const address =
+    [street, ...area].filter(Boolean).join(', ') ||
+    (r.address_line2 && r.address_line2 !== name ? r.address_line2 : null);
+  const category = r.category ?? null;
+  const kind = POI_KIND.find(([p]) => category?.startsWith(p))?.[1] ?? 'place';
+  return {
+    id: `osm:${raw.osm_type.toUpperCase()}${raw.osm_id}`,
+    name,
+    address: address || null,
+    kind,
+    category,
+    lat: r.lat,
+    lng: r.lon,
   };
 }

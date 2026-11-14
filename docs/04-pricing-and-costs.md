@@ -167,7 +167,7 @@ Net to us = gross × 0.85 (15 % store fee — Apple Small Business Program / Goo
 | Supabase Pro + Medium compute | ~$75 | DB ~5 GB, 10k MAU (well under 100k included) |
 | R2 (540 GB → 3.5 TB with originals) | $8 – $52 | still zero egress |
 | Map tiles | $0 | hosted free tier, then self-hosted PMTiles on R2 |
-| Routing | ~$40 | **self-host OSRM/Valhalla (India extract) on a VPS** — a paid directions API (e.g. Mapbox) would be ~$800/mo at ~500k req |
+| Routing | ~$40 (unmeasured; spike in [07](07-open-items.md), Plan 57) | **self-host OSRM/Valhalla (India extract) on a VPS** — a paid directions API (e.g. Mapbox) would be ~$800/mo at ~500k req |
 | Google Places | $150 – $450 | cache hit-rate rises with scale; consider Google's India pricing SKUs or Foursquare/OSM for POIs |
 | EAS, Sentry Team, PostHog, Resend | ~$65 – $120 | leave free tiers |
 | **Total** | **≈ $340 – $740 / mo (₹3–6.5 L / yr)** | ₹30–65 per user / yr |

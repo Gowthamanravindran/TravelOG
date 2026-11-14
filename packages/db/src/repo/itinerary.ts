@@ -67,6 +67,13 @@ export function addVariant(
           currency: item.currency,
           notes: item.notes,
           sortOrder: item.sortOrder,
+          placeName: item.placeName,
+          address: item.address,
+          lat: item.lat,
+          lng: item.lng,
+          poiId: item.poiId,
+          url: item.url,
+          savedPlaceId: item.savedPlaceId,
         });
       }
     }
@@ -113,6 +120,14 @@ export interface ItemInput {
   estCostMinor?: number | null;
   currency?: string | null;
   notes?: string | null;
+  /** Plan 57: the stop's place. */
+  placeName?: string | null;
+  address?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  poiId?: string | null;
+  url?: string | null;
+  savedPlaceId?: string | null;
 }
 
 function validateItem(input: Partial<ItemInput>) {
@@ -133,6 +148,13 @@ function validateItem(input: Partial<ItemInput>) {
   ) {
     throw new RangeError('cost must be a positive amount');
   }
+  if (
+    (input.lat == null) !== (input.lng == null) &&
+    (input.lat !== undefined || input.lng !== undefined)
+  )
+    throw new RangeError('a place needs both latitude and longitude');
+  if (input.lat != null && (Math.abs(input.lat) > 90 || Math.abs(input.lng!) > 180))
+    throw new RangeError('that place is off the map');
 }
 
 /** Items of a plan in display order: timed items by time, then untimed in their saved order. */
@@ -140,6 +162,30 @@ export function listItems(db: Db, variantId: string): Item[] {
   return liveRows(db, 'itinerary_items', eq(itineraryItems.variantId, variantId)).sort(
     (a, b) => a.sortOrder - b.sortOrder || a.createdAt.localeCompare(b.createdAt),
   );
+}
+
+/** Every live item on a trip, in any plan or day (Plan 57: places used on the trip). */
+export function liveTripItems(db: Db, tripId: string): Item[] {
+  return liveRows(db, 'itinerary_items', eq(itineraryItems.tripId, tripId));
+}
+
+/**
+ * Puts a plan's items in the given order (Plan 57: Best order, and its Undo). Ids missing from
+ * the list keep their relative order after the listed ones.
+ */
+export function setItemOrder(db: Db, variantId: string, ids: readonly string[]): Item[] {
+  return tx(db, (db) => {
+    const items = listItems(db, variantId);
+    const rank = new Map(ids.map((id, i) => [id, i]));
+    const ordered = [
+      ...items.filter((i) => rank.has(i.id)).sort((a, b) => rank.get(a.id)! - rank.get(b.id)!),
+      ...items.filter((i) => !rank.has(i.id)),
+    ];
+    ordered.forEach((it, index) => {
+      if (it.sortOrder !== index) updateRow(db, 'itinerary_items', it.id, { sortOrder: index });
+    });
+    return listItems(db, variantId);
+  });
 }
 
 export function addItem(db: Db, variantId: string, input: ItemInput): Item {
@@ -158,13 +204,27 @@ export function addItem(db: Db, variantId: string, input: ItemInput): Item {
     estCostMinor: input.estCostMinor ?? null,
     currency: input.currency ?? null,
     notes: input.notes ?? null,
+    placeName: input.placeName?.trim().slice(0, 160) || null,
+    address: input.address?.trim().slice(0, 300) || null,
+    lat: input.lat ?? null,
+    lng: input.lng ?? null,
+    poiId: input.poiId ?? null,
+    url: input.url ?? null,
+    savedPlaceId: input.savedPlaceId ?? null,
     sortOrder,
   });
 }
 
 export function updateItem(db: Db, id: string, patch: Partial<ItemInput>): Item {
   validateItem(patch);
-  return updateRow(db, 'itinerary_items', id, { ...patch, title: patch.title?.trim() });
+  const clean = (v: string | null | undefined, max: number) =>
+    v === undefined ? undefined : v?.trim().slice(0, max) || null;
+  return updateRow(db, 'itinerary_items', id, {
+    ...patch,
+    title: patch.title?.trim(),
+    placeName: clean(patch.placeName, 160),
+    address: clean(patch.address, 300),
+  });
 }
 
 export function deleteItem(db: Db, id: string): void {
