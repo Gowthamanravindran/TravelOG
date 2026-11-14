@@ -82,6 +82,8 @@ describe('place-search: stops near the trip (Plan 57)', () => {
       address: 'Market Road, Anjuna, Bardez',
       kind: 'food',
       category: 'catering.cafe',
+      area: 'Anjuna',
+      country_code: 'IN',
       lat: 15.5791,
       lng: 73.7402,
     });

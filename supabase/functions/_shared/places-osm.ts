@@ -90,6 +90,9 @@ export interface PoiRow {
   /** The kind of stop it suggests in the app. */
   kind: 'food' | 'stay' | 'activity' | 'place';
   category: string | null;
+  /** The town or area it's in, for grouping saved places (Plan 58). */
+  area: string | null;
+  country_code: string | null;
   lat: number;
   lng: number;
 }
@@ -122,6 +125,8 @@ export function poiFromGeoapify(r: GeoapifyResult): PoiRow | null {
     address: address || null,
     kind,
     category,
+    area: r.suburb ?? r.city ?? r.state ?? null,
+    country_code: r.country_code ? r.country_code.toUpperCase() : null,
     lat: r.lat,
     lng: r.lon,
   };

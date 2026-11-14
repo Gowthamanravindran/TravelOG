@@ -15,6 +15,7 @@ type Pair = Extract<SymbolName, { ios?: unknown }>;
 export const ICONS = {
   // Navigation
   trips: { ios: 'suitcase.rolling', android: 'luggage' },
+  saved: { ios: 'bookmark', android: 'bookmark' },
   feed: { ios: 'rectangle.stack', android: 'dynamic_feed' },
   explore: { ios: 'safari', android: 'explore' },
   profile: { ios: 'person.crop.circle', android: 'account_circle' },
@@ -97,6 +98,7 @@ export const ICONS = {
   left: { ios: 'chevron.left', android: 'chevron_left' },
   right: { ios: 'chevron.right', android: 'chevron_right' },
   remove: { ios: 'minus', android: 'remove' },
+  delete: { ios: 'trash', android: 'delete' },
   star: { ios: 'star.fill', android: 'star' },
   located: { ios: 'location.fill', android: 'my_location' },
   seamless: { ios: 'arrow.left.and.right', android: 'swap_horiz' },

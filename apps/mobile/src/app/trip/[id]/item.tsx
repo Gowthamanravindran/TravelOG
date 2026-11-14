@@ -1,9 +1,11 @@
 import {
   addItem,
   deleteItem,
+  findSaved,
   getTrip,
   ITEM_TYPES,
   listItems,
+  savePlace,
   updateItem,
   type ItemType,
 } from '@travelog/db';
@@ -12,6 +14,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useMutate, useQuery } from '@/data/provider';
+import { savedFromStop } from '@/lib/saved';
 import { tripCentre } from '@/lib/stop-search';
 import { amountText, errorMessage, parseAmount } from '@/lib/format';
 import { ITEM_LABELS } from '@/lib/labels';
@@ -55,7 +58,24 @@ export default function ItemEditor() {
       : NO_PLACE,
   );
   const [kindChosen, setKindChosen] = useState(!!existing);
+  // Plan 58: whether this place is in Saved.
+  const saved = useQuery(
+    (db) =>
+      place.name.trim()
+        ? findSaved(db, { title: place.name, poiId: place.poiId, lat: place.lat, lng: place.lng })
+        : undefined,
+    [place.name, place.poiId, place.lat, place.lng],
+  );
   const [error, setError] = useState<string | null>(null);
+
+  const run = (fn: () => void) => {
+    try {
+      setError(null);
+      fn();
+    } catch (e) {
+      setError(errorMessage(e));
+    }
+  };
 
   const save = () => {
     try {
@@ -120,6 +140,19 @@ export default function ItemEditor() {
             if (!kindChosen) setKind(p.kind);
           }}
         />
+        {place.name.trim() ? (
+          <Button
+            label={saved ? 'In Saved' : 'Save to Saved'}
+            icon={saved ? 'check' : 'saved'}
+            variant="link"
+            disabled={!!saved}
+            onPress={() =>
+              run(() =>
+                mutate((db) => savePlace(db, savedFromStop(db, id, { title, type: kind, place }))),
+              )
+            }
+          />
+        ) : null}
         <Row>
           <View style={{ flex: 1 }}>
             <TimeField label="Time" value={time} onChange={setTime} />

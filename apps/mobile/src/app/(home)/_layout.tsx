@@ -8,6 +8,7 @@ import { ModeProvider } from '@/ui/theme';
 
 const TABS: TabSpec[] = [
   { name: 'index', label: 'Trips', icon: 'trips' },
+  { name: 'saved', label: 'Saved', icon: 'saved' },
   { name: 'feed', label: 'Feed', icon: 'feed' },
   { name: 'explore', label: 'Explore', icon: 'explore' },
   { name: 'profile', label: 'Profile', icon: 'profile' },

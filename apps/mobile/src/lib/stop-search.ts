@@ -18,6 +18,9 @@ export interface StopPlace {
   name: string;
   address: string | null;
   kind: 'food' | 'stay' | 'activity' | 'place';
+  /** The town or area it's in (Plan 58: grouping in Saved). */
+  area?: string | null;
+  countryCode?: string | null;
   lat: number;
   lng: number;
 }
@@ -34,9 +37,9 @@ export function tripCentre(db: Db, tripId: string): LatLng | null {
 }
 
 /** Places already used on this trip whose name matches. */
-export function tripPlaces(db: Db, tripId: string, query: string): StopPlace[] {
+export function tripPlaces(db: Db, tripId: string | null, query: string): StopPlace[] {
   const q = normalizePlace(query);
-  if (q.length < 2) return [];
+  if (q.length < 2 || !tripId) return [];
   const seen = new Set<string>();
   const out: StopPlace[] = [];
   for (const i of liveTripItems(db, tripId)) {
@@ -72,10 +75,13 @@ export async function searchStopsServer(
       signal,
     });
     if (!res.ok) return { places: [], attribution: null };
-    const body = (await res.json()) as { pois?: StopPlace[]; attribution?: string | null };
-    const places = (body.pois ?? []).filter(
-      (p) => typeof p.name === 'string' && Number.isFinite(p.lat) && Number.isFinite(p.lng),
-    );
+    const body = (await res.json()) as {
+      pois?: (StopPlace & { country_code?: string | null })[];
+      attribution?: string | null;
+    };
+    const places = (body.pois ?? [])
+      .filter((p) => typeof p.name === 'string' && Number.isFinite(p.lat) && Number.isFinite(p.lng))
+      .map(({ country_code, ...p }) => ({ ...p, countryCode: country_code ?? null }));
     return { places, attribution: body.attribution ?? null };
   } catch {
     return { places: [], attribution: null };
@@ -83,7 +89,7 @@ export async function searchStopsServer(
 }
 
 export function useStopSearch(
-  tripId: string,
+  tripId: string | null,
   query: string,
   near: LatLng | null,
 ): { places: StopPlace[]; searching: boolean; attribution: string | null; online: boolean } {

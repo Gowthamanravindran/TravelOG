@@ -433,6 +433,36 @@ export const placeNames = sqliteTable(
   ],
 );
 
+export const SAVED_SOURCES = ['typed', 'stop', 'instagram', 'youtube', 'tiktok', 'web'] as const;
+export type SavedSource = (typeof SAVED_SOURCES)[number];
+
+/**
+ * Plan 58: places you want to go, kept across trips (the Saved tab). Copied into a trip's
+ * ideas on request; the copy remembers it with `itinerary_items.saved_place_id`.
+ */
+export const savedPlaces = sqliteTable(
+  'saved_places',
+  {
+    ...syncColumns,
+    title: text('title').notNull(),
+    type: text('type', { enum: ITEM_TYPES }).notNull().default('place'),
+    address: text('address'),
+    /** The town or area it's in, for grouping ("Anjuna", "Fort Kochi"). */
+    area: text('area'),
+    countryCode: text('country_code'),
+    lat: real('lat'),
+    lng: real('lng'),
+    poiId: text('poi_id'),
+    /** Where it came from: typed, a stop, or a link (Plan 59). */
+    source: text('source', { enum: SAVED_SOURCES }).notNull().default('typed'),
+    url: text('url'),
+    sourceTitle: text('source_title'),
+    thumbUrl: text('thumb_url'),
+    note: text('note'),
+  },
+  (t) => [index('saved_places_country_idx').on(t.countryCode, t.area)],
+);
+
 /** Device-only key/value settings (my name, home currency, sync cursor later). Not synced. */
 export const settings = sqliteTable('settings', {
   key: text('key').primaryKey(),
@@ -458,6 +488,7 @@ export const syncedTables = {
   check_ins: checkIns,
   studio_projects: studioProjects,
   trip_stops: tripStops,
+  saved_places: savedPlaces,
 } as const;
 
 export type SyncedTableName = keyof typeof syncedTables;

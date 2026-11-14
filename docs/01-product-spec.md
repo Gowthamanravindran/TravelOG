@@ -12,7 +12,7 @@ The app has three **modes**. Each mode swaps the **bottom nav and the accent col
 
 | Mode | When | Accent | Bottom nav |
 |---|---|---|---|
-| **Home** | Default; browsing, social | Coral `#FF6B5B` | Trips · Feed · ＋ · Explore · Profile |
+| **Home** | Default; browsing, social | Coral `#FF6B5B` | Trips · Saved · Feed · ＋ · Explore · Profile (Saved: Plan 58) |
 | **Plan / Edit** | Creating or editing a trip before it starts | Indigo `#5B5BD6` | Itinerary · Budget · Bookings · Polls |
 | **Trip** | While the trip is live | Teal `#14B8A6` on dark | Today · Plan · Nearby · Expenses (Plan 47; budget is set in Plan mode) |
 

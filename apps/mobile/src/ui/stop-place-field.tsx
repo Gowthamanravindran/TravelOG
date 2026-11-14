@@ -19,6 +19,9 @@ export interface StopPlaceValue {
   lat: number | null;
   lng: number | null;
   poiId: string | null;
+  /** Not stored on the stop; kept for saving it to Saved (Plan 58). */
+  area?: string | null;
+  countryCode?: string | null;
 }
 
 export const NO_PLACE: StopPlaceValue = {
@@ -41,7 +44,8 @@ export function StopPlaceField({
   onChange,
   onPick,
 }: {
-  tripId: string;
+  /** The trip, to offer its places first; null outside a trip (Saved). */
+  tripId: string | null;
   near: LatLng | null;
   value: StopPlaceValue;
   onChange: (value: StopPlaceValue) => void;
@@ -156,6 +160,8 @@ export function StopPlaceField({
                     lat: p.lat,
                     lng: p.lng,
                     poiId: p.id,
+                    area: p.area ?? null,
+                    countryCode: p.countryCode ?? null,
                   });
                   onPick?.(p);
                 }}

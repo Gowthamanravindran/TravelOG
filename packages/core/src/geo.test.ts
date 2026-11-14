@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { bestOrder, distanceKm, estimateTravel, formatKm, formatMinutes, routeTotals } from './geo';
+import {
+  bestOrder,
+  distanceKm,
+  estimateTravel,
+  formatKm,
+  formatMinutes,
+  routeTotals,
+  spreadOverDays,
+} from './geo';
 
 // Real places in North Goa.
 const artjuna = { lat: 15.5791, lng: 73.7402 };
@@ -91,5 +99,54 @@ describe('best order', () => {
     const r = bestOrder(points.map((p, i) => stop(String(i), p)));
     expect(r.after.minutes).toBeLessThanOrEqual(r.before.minutes);
     expect(new Set(r.order).size).toBe(12);
+  });
+});
+
+describe('spreading ideas over days (Plan 58)', () => {
+  const vagator = { lat: 15.5975, lng: 73.7445 };
+  const oldGoa = { lat: 15.5009, lng: 73.9116 };
+  const fontainhas = { lat: 15.4989, lng: 73.8294 };
+
+  it('keeps nearby ideas on the same day and fills the emptiest days first', () => {
+    const r = spreadOverDays(
+      [
+        { id: 'chapora', point: chapora },
+        { id: 'basilica', point: oldGoa },
+        { id: 'artjuna', point: artjuna },
+        { id: 'call', point: null },
+        { id: 'vagator', point: vagator },
+        { id: 'fontainhas', point: fontainhas },
+      ],
+      [
+        { day: 'd1', load: 3 },
+        { day: 'd2', load: 0 },
+        { day: 'd3', load: 1 },
+      ],
+    );
+    expect(r.left).toEqual(['call']);
+    const dayOf = (id: string) => r.plan.find((p) => p.ids.includes(id))!.day;
+    expect(dayOf('chapora')).toBe(dayOf('vagator'));
+    expect(dayOf('chapora')).toBe(dayOf('artjuna'));
+    expect(dayOf('chapora')).toBe('d2');
+    expect(r.plan.map((p) => p.day)).toEqual([...r.plan.map((p) => p.day)].sort());
+  });
+
+  it('puts a few nearby ideas on one day even when there are days to spare', () => {
+    const r = spreadOverDays(
+      [
+        { id: 'a', point: artjuna },
+        { id: 'b', point: chapora },
+      ],
+      [
+        { day: 'd1', load: 0 },
+        { day: 'd2', load: 0 },
+      ],
+    );
+    expect(r.plan).toEqual([{ day: 'd1', ids: ['a', 'b'] }]);
+  });
+
+  it('with no days or no places, everything stays in Ideas', () => {
+    expect(spreadOverDays([{ id: 'a', point: artjuna }], []).left).toEqual(['a']);
+    expect(spreadOverDays([{ id: 'a', point: null }], [{ day: 'd1', load: 0 }]).plan).toEqual([]);
   });
 });

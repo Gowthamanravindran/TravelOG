@@ -181,3 +181,90 @@ function* permutations<T>(items: readonly T[]): Generator<T[]> {
     for (const p of permutations(rest)) yield [items[i]!, ...p];
   }
 }
+
+/** Ideas whose groups are this close go on the same day. */
+const SAME_DAY_KM = 6;
+
+export interface SpreadIdea {
+  id: string;
+  point: LatLng | null;
+}
+
+export interface SpreadDay {
+  day: string;
+  /** How many stops the day already has. */
+  load: number;
+}
+
+export interface Spread {
+  /** Ideas per day, only days that get some, in the days' order. */
+  plan: { day: string; ids: string[] }[];
+  /** Ideas left in Ideas: no place, or more groups than days. */
+  left: string[];
+}
+
+/**
+ * Plan 58: spreads ideas over a trip's days, grouped by area so each day stays close by.
+ * Groups are made with k-means (k = number of days, fewer if there are fewer ideas); the
+ * biggest group goes to the emptiest day. Ideas without a place stay in Ideas.
+ */
+export function spreadOverDays(ideas: readonly SpreadIdea[], days: readonly SpreadDay[]): Spread {
+  const placed = ideas.filter((i): i is SpreadIdea & { point: LatLng } => !!i.point);
+  const left = ideas.filter((i) => !i.point).map((i) => i.id);
+  const k = Math.min(days.length, placed.length);
+  if (!k) return { plan: [], left: [...left, ...placed.map((i) => i.id)] };
+
+  // Farthest-point start: deterministic and spread out.
+  const centres: LatLng[] = [placed[0]!.point];
+  while (centres.length < k) {
+    let best = placed[0]!.point;
+    let bestD = -1;
+    for (const i of placed) {
+      const d = Math.min(...centres.map((c) => distanceKm(c, i.point)));
+      if (d > bestD) {
+        bestD = d;
+        best = i.point;
+      }
+    }
+    centres.push(best);
+  }
+  let groups: (typeof placed)[] = [];
+  for (let round = 0; round < 12; round++) {
+    groups = centres.map(() => []);
+    for (const i of placed) {
+      let at = 0;
+      centres.forEach((c, n) => {
+        if (distanceKm(c, i.point) < distanceKm(centres[at]!, i.point)) at = n;
+      });
+      groups[at]!.push(i);
+    }
+    groups.forEach((g, n) => {
+      if (!g.length) return;
+      centres[n] = {
+        lat: g.reduce((s, i) => s + i.point.lat, 0) / g.length,
+        lng: g.reduce((s, i) => s + i.point.lng, 0) / g.length,
+      };
+    });
+  }
+  // Groups whose middles are close belong on one day, even with days to spare.
+  const merged: (typeof placed)[] = [];
+  const mids: LatLng[] = [];
+  groups.forEach((g, n) => {
+    if (!g.length) return;
+    const near = mids.findIndex((m) => distanceKm(m, centres[n]!) <= SAME_DAY_KM);
+    if (near >= 0) merged[near]!.push(...g);
+    else {
+      merged.push([...g]);
+      mids.push(centres[n]!);
+    }
+  });
+  const bySize = merged.sort((a, b) => b.length - a.length);
+  const byLoad = days
+    .map((d, order) => ({ ...d, order }))
+    .sort((a, b) => a.load - b.load || a.order - b.order);
+  const plan = bySize
+    .map((g, n) => ({ day: byLoad[n]!, ids: g.map((i) => i.id) }))
+    .sort((a, b) => a.day.order - b.day.order)
+    .map((p) => ({ day: p.day.day, ids: p.ids }));
+  return { plan, left };
+}

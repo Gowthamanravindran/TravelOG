@@ -13,3 +13,4 @@ export * from './repo/check-ins';
 export * from './repo/studio';
 export * from './repo/places';
 export * from './repo/stops';
+export * from './repo/saved';

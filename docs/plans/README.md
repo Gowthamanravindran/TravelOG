@@ -61,3 +61,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 55 | [A separate public bucket for destination photos](55-public-bucket.md) | see git log |
 | 56 | [Destination photo catalogue in Supabase (before beta)](56-photo-catalogue.md) | see git log |
 | 57 | [Stops get a real place: travel time and Best order](57-stop-places.md) | see git log |
+| 58 | [Saved places, across trips](58-saved-places.md) | see git log |

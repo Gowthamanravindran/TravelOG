@@ -246,6 +246,33 @@ export function moveItem(db: Db, id: string, toIndex: number): Item[] {
   });
 }
 
+/**
+ * Plan 58: moves items to other days of the same trip (Plan these ideas): each goes to the end
+ * of that day's main plan, which is made if needed.
+ */
+export function moveItemsToDays(
+  db: Db,
+  tripId: string,
+  plan: readonly { day: string; ids: readonly string[] }[],
+  memberId?: string | null,
+): number {
+  return tx(db, (db) => {
+    let moved = 0;
+    for (const { day, ids } of plan) {
+      if (!ids.length) continue;
+      const v = ensureMainVariant(db, tripId, day, memberId);
+      let order = listItems(db, v.id).reduce((m, i) => Math.max(m, i.sortOrder + 1), 0);
+      for (const id of ids) {
+        const item = getRow(db, 'itinerary_items', id);
+        if (!item || item.tripId !== tripId || item.variantId === v.id) continue;
+        updateRow(db, 'itinerary_items', id, { variantId: v.id, sortOrder: order++ });
+        moved += 1;
+      }
+    }
+    return moved;
+  });
+}
+
 export interface VariantSummary {
   itemCount: number;
   estCostMinor: number;
