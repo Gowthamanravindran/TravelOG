@@ -31,7 +31,8 @@ jobs:
       - uses: supabase/setup-cli@v1
         if: steps.secrets.outputs.ready == 'true'
         with:
-          version: latest
+          # Pinned to the version in the lockfile: "latest" asks GitHub's API, which rate-limits CI.
+          version: 2.122.1
       - name: Push migrations to staging
         if: steps.secrets.outputs.ready == 'true'
         run: |
