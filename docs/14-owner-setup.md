@@ -37,8 +37,8 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
    - GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 5. **Turnstile** (Phase 1): Turnstile → Add site → domain → get site key + secret.
    - EAS variable `EXPO_PUBLIC_TURNSTILE_SITE_KEY`; Supabase dashboard → Auth → Attack protection → enable CAPTCHA (Turnstile) with the secret.
-6. **Destination photos for trip covers (Plan 53):**
-   1. R2 → **`travelog-public`** → Settings → **Public access**: connect a custom domain such as `media.travelog.app`, or, until the domain exists, allow the bucket's public `r2.dev` URL. Public here means:
+6. **Destination photos for trip covers (Plans 53, 55, 56) · before beta:**
+   1. Needs the domain on Cloudflare (§2). R2 → **`travelog-public`** → Settings → **Custom Domains** → Connect domain → `media.<your domain>`; Cloudflare adds the DNS record. Leave the **Public Development URL** (`r2.dev`) **off**: Cloudflare's image resizing doesn't work on `r2.dev` addresses, so covers would stay on the 3D art. Public here means:
       - anyone with a file's exact link can **view** it, like an image on any website;
       - nobody can **list** what's in the bucket;
       - nobody can **upload, change or delete** files through that address. That needs your Cloudflare login or an R2 API token, which never goes in the app, the repo or chat.
@@ -46,11 +46,9 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
       - allow resizing only for your own domain (turn off resizing images from other origins);
       - optionally, add a rate limit for `/cdn-cgi/image/` in the domain's Security rules.
       If the quota ever runs out, covers simply fall back to the 3D art.
-   3. Upload originals into `travelog-public` as `destinations/<name>.jpg`, e.g. `destinations/goa.jpg`. Only use photos you have the rights to, and only upload what you're happy for anyone to see: never personal photos or documents.
-   4. Add a row per photo to `data/destinations/destinations.csv` (columns explained in `data/destinations/README.md`).
-   5. Put the public base URL in `apps/mobile/.env` and in the EAS environment variables as `EXPO_PUBLIC_MEDIA_URL=https://media.travelog.app`. It's public, not a secret.
-   6. Run `pnpm media:destinations`, then `pnpm licenses:build`, and commit both outputs.
-   7. Tell Claude the base URL if anything looks off. Until it's set, trips keep showing their 3D art.
+   3. Collect the photos: only ones you have the rights to, and only what you're happy for anyone to see (never personal photos or documents). For each: the file, the places it shows, the country, who took it and the licence.
+   4. Adding them: once Plan 56 is built, `pnpm media:add` uploads a photo to `travelog-public` and adds it to the Supabase catalogue, with no app release. Until then, send Claude the list and Claude adds them the interim way (`data/destinations/README.md`).
+   5. Put the public base URL in `apps/mobile/.env` and in the EAS environment variables as `EXPO_PUBLIC_MEDIA_URL=https://media.<your domain>`. It's public, not a secret. Until it's set, trips keep showing their 3D art.
 
 ## §4 Supabase — Phase 0 · free for staging, Pro $25/mo for production
 1. Sign up at supabase.com, create an organisation.

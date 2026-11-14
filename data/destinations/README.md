@@ -1,5 +1,7 @@
 # Destination photos (Plan 53)
 
+> **Interim.** This bundles the photo list in the app, so a new photo needs an app release. Plan 56 replaces it with a Supabase catalogue (`destination_photos`) before beta; this folder and `pnpm media:destinations` are then removed.
+
 Trip covers come from photos in our public Cloudflare R2 bucket, `travelog-public` (Plan 55). Anyone with a link can view its files, so put nothing personal there; people's own photos live in the private `travelog-media-*` buckets. To add photos:
 
 1. Upload each original to `travelog-public` as `destinations/<file>`, e.g. `destinations/goa.jpg`. Use only photos you have the rights to use.

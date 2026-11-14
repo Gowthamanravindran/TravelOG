@@ -58,7 +58,7 @@ The single source of truth for what the app is built with. [03 · Architecture](
 | Purpose | Choice |
 |---|---|
 | Photo and file storage | Cloudflare R2 (zero egress) via presigned uploads; served through a Worker that checks access |
-| Destination photos | A separate public-only R2 bucket (`travelog-public`, Plan 55; user media stays in private buckets) + Cloudflare Images transformations (resized WebP/AVIF), bundled BlurHash manifest (`pnpm media:destinations`), `ui/remote-image.tsx` on expo-image (Plan 53) |
+| Destination photos | Catalogue in a Supabase `destination_photos` table, asked when a trip is created (Plan 56, before beta; until then a bundled manifest) + a separate public-only R2 bucket on a custom domain (`travelog-public`, Plan 55; user media stays in private buckets) + Cloudflare Images transformations (resized WebP/AVIF), bundled BlurHash manifest (`pnpm media:destinations`), `ui/remote-image.tsx` on expo-image (Plan 53) |
 | Map tiles | Hosted vector tiles on a free tier (e.g. MapTiler/Stadia) → self-hosted PMTiles on R2 at scale |
 | Routing and travel times | OpenRouteService (dev) → self-hosted OSRM or Valhalla (VPS) |
 | Places | Own `places` table from Foursquare OS Places + Overture + OpenStreetMap; Google Places (New) as a fallback for fresh details ([06](06-cost-optimization.md)) |

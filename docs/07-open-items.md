@@ -23,7 +23,7 @@ Everything still undecided or not yet done before and during the build. Each ite
 | Languages | English at launch; Hindi after launch (strings externalised from day one) | Phase 1 (setup), post-launch |
 | App icon and store screenshots | Final brand assets | Phase 8 |
 | Choose a trip's cover (after Plan 53, Plan 54) | A trip setting **Cover**: *Automatic* (the default, so a new trip never looks empty: destination photo, else 3D art), *one of the trip's own photos* from Memories, or *3D art only*. Stored on the trip as a nullable `cover_photo_id` (`null` = automatic) and synced like other trip fields; shown through the same `RemoteImage` layer, or the local file while the photo is only on the phone. Useful during and after a trip, once Memories has photos | When Memories photos sync (Phase 5) |
-| Destination photos for trip covers (Plans 52–53) | The app side is built (Plan 53): covers load from our Cloudflare R2 bucket over the 3D art. Waiting on the owner to upload photos and set `EXPO_PUBLIC_MEDIA_URL` (`docs/14` §3 step 6) | When photos are uploaded |
+| Destination photo catalogue in Supabase (Plans 53, 55, 56) | Covers already load over the 3D art (Plan 53), but today's photo list is bundled in the app, so a new photo needs an app release. Move it to a Supabase `destination_photos` table that the app asks when a trip is created (Plan 56). Owner: domain on Cloudflare, `travelog-public` with a custom domain, the photos (`docs/14` §3 step 6). Claude: table, upload script, app | Before beta (Phase 8) |
 
 ## Quality and operations
 | Item | Plan | Closes in |
