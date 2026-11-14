@@ -1,8 +1,8 @@
 # Destination photos (Plan 53)
 
-Trip covers come from photos in our Cloudflare R2 media bucket. To add photos:
+Trip covers come from photos in our public Cloudflare R2 bucket, `travelog-public` (Plan 55). Anyone with a link can view its files, so put nothing personal there; people's own photos live in the private `travelog-media-*` buckets. To add photos:
 
-1. Upload each original to the bucket as `destinations/<file>`, e.g. `destinations/goa.jpg`. Use only photos you have the rights to use.
+1. Upload each original to `travelog-public` as `destinations/<file>`, e.g. `destinations/goa.jpg`. Use only photos you have the rights to use.
 2. Add one row per photo to `destinations.csv`:
 
    | Column | What | Example |

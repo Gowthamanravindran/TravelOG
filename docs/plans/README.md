@@ -58,3 +58,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 52 | [3D hero art across the app, with proper licences](52-hero-art.md) | see git log |
 | 53 | [Remote images done like production apps: never empty, never broken, fast](53-remote-images.md) | see git log |
 | 54 | ["Choose cover" recorded for later](54-cover-choice-backlog.md) | see git log |
+| 55 | [A separate public bucket for destination photos](55-public-bucket.md) | see git log |

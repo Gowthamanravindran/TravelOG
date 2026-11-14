@@ -27,7 +27,7 @@ Built once in `apps/mobile/src/ui/remote-image.tsx` and reused by trip covers no
 - **Never empty:** a fallback that needs no network is drawn first. For trips that's the 3D art; for posts, a BlurHash preview stored with the photo.
 - **Then the photo:** the right-sized photo cross-fades in, with no fade under Reduce motion.
 - **Never broken:** if the photo fails or is slow, the fallback simply stays. There are no spinners and no timeouts to tune.
-- **Right-sized:** one original goes into Cloudflare R2. `lib/media.ts` asks Cloudflare's image resizing for WebP or AVIF at the slot's width × the phone's pixel ratio, rounded up to 320 / 480 / 720 / 1080 / 1440, so phones share cached copies.
+- **Right-sized:** one original goes into Cloudflare R2. `lib/media.ts` asks Cloudflare's image resizing for WebP or AVIF at the slot's width × the phone's pixel ratio, rounded up to 320 / 480 / 720 / 1080 / 1440, so phones share cached copies. Destination photos sit in a separate public-only bucket (`travelog-public`); people's own photos stay in private buckets behind signed links or an access-checking Worker (Plan 55).
 - **Cached twice:** at Cloudflare's edge, and on the phone in memory and on disk (`cachePolicy="memory-disk"`), so a photo shows instantly the second time and offline.
 - **Fetched ahead:** the Trips list prefetches the first six trips' covers. Lists will prefetch the next page while you look at the current one.
 - **No jumps:** each photo's width and height are known before it loads (bundled for destination photos, saved with each post), so space is reserved.

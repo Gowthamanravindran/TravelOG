@@ -29,7 +29,8 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 
 ## §3 Cloudflare — Phase 0 · free to start
 1. Create an account at cloudflare.com.
-2. **R2:** R2 → Create bucket `travelog-media-staging` and `travelog-media-prod` (location: Asia-Pacific). R2 → Manage API tokens → Create token with *Object Read & Write* on these buckets.
+2. **R2:** R2 → Create bucket `travelog-media-staging` and `travelog-media-prod` (location: Asia-Pacific). These hold people's own photos and tickets and **stay private**: never turn on public access for them. R2 → Manage API tokens → Create token with *Object Read & Write* on these two buckets only.
+   - Also create **`travelog-public`** (same location) for images meant for everyone, such as destination photos (step 6). It's the only bucket that is ever public (Plan 55).
    - Supabase function secrets: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`.
 3. **Pages:** Workers & Pages → Create → Pages → Connect to Git → choose the repo; build settings come later from Claude.
 4. **API token for CI:** My Profile → API Tokens → Create token → template "Edit Cloudflare Workers".
@@ -37,9 +38,15 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
 5. **Turnstile** (Phase 1): Turnstile → Add site → domain → get site key + secret.
    - EAS variable `EXPO_PUBLIC_TURNSTILE_SITE_KEY`; Supabase dashboard → Auth → Attack protection → enable CAPTCHA (Turnstile) with the secret.
 6. **Destination photos for trip covers (Plan 53):**
-   1. R2 → `travelog-media-prod` → Settings → **Public access**: connect a custom domain such as `media.travelog.app`, or, until the domain exists, allow the bucket's public `r2.dev` URL.
-   2. **Images → Transformations:** turn on transformations for that domain. The free tier covers 5,000 unique resizes a month, plenty for destination photos.
-   3. Upload originals into the bucket as `destinations/<name>.jpg`, e.g. `destinations/goa.jpg`. Only use photos you have the rights to.
+   1. R2 → **`travelog-public`** → Settings → **Public access**: connect a custom domain such as `media.travelog.app`, or, until the domain exists, allow the bucket's public `r2.dev` URL. Public here means:
+      - anyone with a file's exact link can **view** it, like an image on any website;
+      - nobody can **list** what's in the bucket;
+      - nobody can **upload, change or delete** files through that address. That needs your Cloudflare login or an R2 API token, which never goes in the app, the repo or chat.
+   2. **Images → Transformations:** turn on transformations for that domain, and protect the free quota (5,000 unique resizes a month, plenty for destination photos):
+      - allow resizing only for your own domain (turn off resizing images from other origins);
+      - optionally, add a rate limit for `/cdn-cgi/image/` in the domain's Security rules.
+      If the quota ever runs out, covers simply fall back to the 3D art.
+   3. Upload originals into `travelog-public` as `destinations/<name>.jpg`, e.g. `destinations/goa.jpg`. Only use photos you have the rights to, and only upload what you're happy for anyone to see: never personal photos or documents.
    4. Add a row per photo to `data/destinations/destinations.csv` (columns explained in `data/destinations/README.md`).
    5. Put the public base URL in `apps/mobile/.env` and in the EAS environment variables as `EXPO_PUBLIC_MEDIA_URL=https://media.travelog.app`. It's public, not a secret.
    6. Run `pnpm media:destinations`, then `pnpm licenses:build`, and commit both outputs.
