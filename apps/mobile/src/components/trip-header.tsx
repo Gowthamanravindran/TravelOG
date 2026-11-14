@@ -9,6 +9,8 @@ import { useQuery } from '@/data/provider';
 import { dateRange } from '@/lib/format';
 import { tripArt, tripIcon, tripIconFamily } from '@/lib/labels';
 import { Art, ArtBackdrop } from '@/ui/art';
+import { RemoteImage } from '@/ui/remote-image';
+import { useTripCover } from '@/lib/trip-cover';
 import { useTripId } from '@/lib/use-trip-id';
 import { Icon, type IconName } from '@/ui/icon';
 import { useMode, useTheme } from '@/ui/theme';
@@ -25,6 +27,7 @@ export function TripHeader() {
   const id = useTripId();
   const trip = useQuery((db) => getTrip(db, id), [id]);
   const people = useQuery((db) => listMembers(db, id).length, [id]);
+  const cover = useTripCover(trip, 76);
   if (!trip) return null;
 
   const state = tripState(trip);
@@ -150,20 +153,22 @@ export function TripHeader() {
         </View>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          {/* The trip's 3D object (Plan 52). */}
-          <ArtBackdrop
-            family={tripIconFamily(icon)}
-            style={{
-              width: 76,
-              height: 76,
-              borderRadius: 24,
-              overflow: 'hidden',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Art name={tripArt(icon)} size={64} float />
-          </ArtBackdrop>
+          {/* The trip's destination photo over its 3D object (Plans 52, 53). */}
+          <RemoteImage
+            uri={cover.uri}
+            blurhash={cover.photo?.blurhash}
+            priority="high"
+            accessibilityLabel={cover.photo ? `Photo by ${cover.photo.credit}` : undefined}
+            style={{ width: 76, height: 76, borderRadius: 24 }}
+            fallback={
+              <ArtBackdrop
+                family={tripIconFamily(icon)}
+                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Art name={tripArt(icon)} size={64} float />
+              </ArtBackdrop>
+            }
+          />
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={[type.display, { color: t.ink }]} numberOfLines={1}>
               {trip.title}

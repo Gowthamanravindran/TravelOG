@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FlatList, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Between, Body, Button, Card, H1, Strong } from '@/ui/kit';
+import { PHOTOS, type DestinationPhoto } from '@/lib/destinations';
 import { InsetView } from '@/ui/inset-view';
 import { useTheme } from '@/ui/theme';
 
@@ -31,6 +32,13 @@ interface Pkg {
 }
 const NOTICES = (noticesFile as { notices: Notice[] }).notices;
 const PACKAGES = (packagesFile as { packages: Pkg[] }).packages;
+
+/** "goa.jpg" → "Goa": a readable name for a photo in the credits. */
+const photoName = (p: DestinationPhoto) =>
+  (p.key.split('/').pop() ?? p.key)
+    .replace(/\.[a-z]+$/i, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/^./, (c) => c.toUpperCase());
 
 function NoticeCard({ n }: { n: Notice }) {
   const t = useTheme();
@@ -89,6 +97,25 @@ export default function Licenses() {
                 ))}
               </View>
             ))}
+            {PHOTOS.length ? (
+              <View style={{ gap: spacing.sm }}>
+                <Text style={[type.label, { color: t.ink2 }]}>DESTINATION PHOTOS</Text>
+                <Card>
+                  {PHOTOS.map((p) => (
+                    <Pressable
+                      key={p.key}
+                      accessibilityRole={p.source ? 'link' : undefined}
+                      disabled={!p.source}
+                      onPress={() => p.source && Linking.openURL(p.source).catch(() => {})}
+                    >
+                      <Body small>
+                        {photoName(p)}: {p.credit} · {p.license}
+                      </Body>
+                    </Pressable>
+                  ))}
+                </Card>
+              </View>
+            ) : null}
             <Text style={[type.label, { color: t.ink2 }]}>
               OPEN-SOURCE PACKAGES · {PACKAGES.length}
             </Text>

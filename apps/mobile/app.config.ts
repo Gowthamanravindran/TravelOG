@@ -98,5 +98,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? null,
     // Meta App ID: only needed to share to Instagram Stories (docs/14 §12). Public, not a secret.
     facebookAppId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID ?? null,
+    // Public base URL of the Cloudflare R2 media bucket (Plan 53), e.g. https://media.travelog.app.
+    // Not a secret. Without it, trips show their 3D art instead of photos.
+    mediaUrl: process.env.EXPO_PUBLIC_MEDIA_URL ?? null,
   },
 });

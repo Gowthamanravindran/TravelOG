@@ -21,6 +21,25 @@ How the app stays fast, light on data and battery, and small. These are rules fo
 - Lists load ~320 px thumbnails; full images load only on open.
 - Photos are resized on the device before upload (already in [03](03-architecture.md)).
 
+### How remote images work (Plan 53)
+Built once in `apps/mobile/src/ui/remote-image.tsx` and reused by trip covers now and by Feed and Nearby later.
+
+- **Never empty:** a fallback that needs no network is drawn first. For trips that's the 3D art; for posts, a BlurHash preview stored with the photo.
+- **Then the photo:** the right-sized photo cross-fades in, with no fade under Reduce motion.
+- **Never broken:** if the photo fails or is slow, the fallback simply stays. There are no spinners and no timeouts to tune.
+- **Right-sized:** one original goes into Cloudflare R2. `lib/media.ts` asks Cloudflare's image resizing for WebP or AVIF at the slot's width × the phone's pixel ratio, rounded up to 320 / 480 / 720 / 1080 / 1440, so phones share cached copies.
+- **Cached twice:** at Cloudflare's edge, and on the phone in memory and on disk (`cachePolicy="memory-disk"`), so a photo shows instantly the second time and offline.
+- **Fetched ahead:** the Trips list prefetches the first six trips' covers. Lists will prefetch the next page while you look at the current one.
+- **No jumps:** each photo's width and height are known before it loads (bundled for destination photos, saved with each post), so space is reserved.
+
+For Feed and Nearby when they're built:
+- `@shopify/flash-list` (JS-only, no new build) with recycled rows and `recyclingKey`;
+- 320–480 px thumbnails in lists, and the full photo only when opened;
+- pages loaded as you scroll;
+- uploads resized on the phone to 2048 px at about 80% quality, with the BlurHash and size computed on the phone and stored with the post;
+- presigned uploads straight to R2 (`docs/09`);
+- a "Data saver" setting later for mobile data.
+
 ## Network and sync
 - **Delta sync:** only rows changed since the last sync cursor (see [11](11-local-db-and-sync.md)).
 - **Batched writes:** queued edits are sent together; text edits are debounced (500 ms).

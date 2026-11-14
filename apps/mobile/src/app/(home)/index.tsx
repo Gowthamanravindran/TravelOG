@@ -1,10 +1,13 @@
 import { getLocalProfile, listTrips, type TripWithState } from '@travelog/db';
 import { useRouter } from 'expo-router';
 import { spacing } from '@travelog/ui';
-import { useState } from 'react';
-import { View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { useWindowDimensions, View } from 'react-native';
 
 import { TripCard } from '@/components/trip-card';
+import { mediaUrl } from '@/lib/media';
+import { tripCover } from '@/lib/trip-cover';
+import { prefetchImages } from '@/ui/remote-image';
 import { tripHref } from '@/lib/trip-route';
 import { useQuery } from '@/data/provider';
 import { Body, Button, Card, Empty, H1, Screen, Segmented, Strong, WithIcon } from '@/ui/kit';
@@ -26,6 +29,20 @@ export default function TripsScreen() {
   const t = useTheme();
   const profile = useQuery((db) => getLocalProfile(db));
   const trips = useQuery((db) => listTrips(db));
+  // Start the first trips' cover photos downloading now, so opening a trip shows its
+  // header photo at once (Plan 53). Already-cached photos cost nothing.
+  const { width } = useWindowDimensions();
+  const prefetch = useQuery(
+    (db) =>
+      trips.slice(0, 6).flatMap((trip) => {
+        const photo = tripCover(db, trip);
+        return photo ? [mediaUrl(photo.key, width), mediaUrl(photo.key, 76)] : [];
+      }),
+    [trips, width],
+  );
+  useEffect(() => {
+    prefetchImages(prefetch);
+  }, [prefetch]);
   const live = trips.find((x) => x.state === 'live');
   const [filter, setFilter] = useState<Filter>(
     trips.some(matches.upcoming) || !trips.length ? 'upcoming' : 'planning',

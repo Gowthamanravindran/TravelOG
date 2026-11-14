@@ -22,7 +22,7 @@ Everything still undecided or not yet done before and during the build. Each ite
 | Analytics event list | Funnel defined in [15](15-go-to-market.md) §7; event names and properties to write | Phase 1, extended each phase |
 | Languages | English at launch; Hindi after launch (strings externalised from day one) | Phase 1 (setup), post-launch |
 | App icon and store screenshots | Final brand assets | Phase 8 |
-| Destination photos for trip covers (Plan 52, later) | Real photos of each trip's place on trip cards and headers, fetched once through our server (the photo service's key stays secret), kept on the phone, with the photographer's credit. Needs a photo source (Unsplash or Pexels), its key as a Supabase function secret, and network access to it. Until then, trips show their 3D object | After accounts (Phase 1) |
+| Destination photos for trip covers (Plans 52–53) | The app side is built (Plan 53): covers load from our Cloudflare R2 bucket over the 3D art. Waiting on the owner to upload photos and set `EXPO_PUBLIC_MEDIA_URL` (`docs/14` §3 step 6) | When photos are uploaded |
 
 ## Quality and operations
 | Item | Plan | Closes in |

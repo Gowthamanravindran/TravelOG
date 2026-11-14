@@ -36,6 +36,14 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
    - GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 5. **Turnstile** (Phase 1): Turnstile → Add site → domain → get site key + secret.
    - EAS variable `EXPO_PUBLIC_TURNSTILE_SITE_KEY`; Supabase dashboard → Auth → Attack protection → enable CAPTCHA (Turnstile) with the secret.
+6. **Destination photos for trip covers (Plan 53):**
+   1. R2 → `travelog-media-prod` → Settings → **Public access**: connect a custom domain such as `media.travelog.app`, or, until the domain exists, allow the bucket's public `r2.dev` URL.
+   2. **Images → Transformations:** turn on transformations for that domain. The free tier covers 5,000 unique resizes a month, plenty for destination photos.
+   3. Upload originals into the bucket as `destinations/<name>.jpg`, e.g. `destinations/goa.jpg`. Only use photos you have the rights to.
+   4. Add a row per photo to `data/destinations/destinations.csv` (columns explained in `data/destinations/README.md`).
+   5. Put the public base URL in `apps/mobile/.env` and in the EAS environment variables as `EXPO_PUBLIC_MEDIA_URL=https://media.travelog.app`. It's public, not a secret.
+   6. Run `pnpm media:destinations`, then `pnpm licenses:build`, and commit both outputs.
+   7. Tell Claude the base URL if anything looks off. Until it's set, trips keep showing their 3D art.
 
 ## §4 Supabase — Phase 0 · free for staging, Pro $25/mo for production
 1. Sign up at supabase.com, create an organisation.

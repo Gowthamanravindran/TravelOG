@@ -8,9 +8,10 @@
   "scripts": {
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test && node --test scripts/places/lib.test.mjs scripts/native/lib.test.mjs",
+    "test": "pnpm -r --if-present test && node --test scripts/places/lib.test.mjs scripts/native/lib.test.mjs scripts/media/destinations.test.mjs",
     "check:native": "node scripts/native/check.mjs",
     "licenses:build": "node scripts/licenses/build.mjs",
+    "media:destinations": "node scripts/media/destinations.mjs",
     "e2e": "maestro test apps/mobile/e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -23,7 +24,9 @@
     "places:build": "node scripts/places/build.mjs"
   },
   "devDependencies": {
+    "blurhash": "^2.0.5",
     "prettier": "^3.6.2",
+    "sharp": "^0.34.5",
     "supabase": "^2.40.0"
   },
   "pnpm": {

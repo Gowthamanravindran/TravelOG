@@ -10,3 +10,4 @@ dist/
 supabase/.temp/
 supabase/.branches/
 .places-cache/
+data/destinations/photos/

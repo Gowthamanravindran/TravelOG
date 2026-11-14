@@ -90,6 +90,7 @@ const notices = [
 ];
 writeFileSync(path.join(app, 'assets/notices.json'), JSON.stringify({ notices }, null, 1) + '\n');
 
+const photos = JSON.parse(readFileSync(path.join(app, 'assets/destinations.json'), 'utf8')).photos;
 const md = [
   '# Third-party notices',
   '',
@@ -108,6 +109,19 @@ const md = [
     '```',
     '',
   ]),
+  ...(photos.length
+    ? [
+        '## Destination photos',
+        '',
+        'Trip cover photos served from our media bucket (Plan 53), listed in `data/destinations/destinations.csv`.',
+        '',
+        ...photos.map(
+          (p) =>
+            `- \`${p.key}\`: ${p.credit}. Licence: ${p.license}.${p.source ? ` Source: ${p.source}` : ''}`,
+        ),
+        '',
+      ]
+    : []),
 ].join('\n');
 writeFileSync(path.join(root, 'THIRD_PARTY_NOTICES.md'), md);
 console.log(
