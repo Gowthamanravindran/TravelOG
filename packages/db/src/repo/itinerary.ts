@@ -74,6 +74,7 @@ export function addVariant(
           poiId: item.poiId,
           url: item.url,
           savedPlaceId: item.savedPlaceId,
+          mustDo: item.mustDo,
         });
       }
     }
@@ -128,6 +129,8 @@ export interface ItemInput {
   poiId?: string | null;
   url?: string | null;
   savedPlaceId?: string | null;
+  /** Plan 62: starred as a Must-do. */
+  mustDo?: boolean;
 }
 
 function validateItem(input: Partial<ItemInput>) {
@@ -211,6 +214,7 @@ export function addItem(db: Db, variantId: string, input: ItemInput): Item {
     poiId: input.poiId ?? null,
     url: input.url ?? null,
     savedPlaceId: input.savedPlaceId ?? null,
+    mustDo: input.mustDo ?? false,
     sortOrder,
   });
 }

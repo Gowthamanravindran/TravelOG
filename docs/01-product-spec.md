@@ -14,7 +14,7 @@ The app has three **modes**. Each mode swaps the **bottom nav and the accent col
 |---|---|---|---|
 | **Home** | Default; browsing, social | Coral `#FF6B5B` | Trips · Saved · Feed · ＋ · Explore · Profile (Saved: Plan 58) |
 | **Plan / Edit** | Creating or editing a trip before it starts | Indigo `#5B5BD6` | Itinerary · Budget · Bookings · Polls |
-| **Trip** | While the trip is live | Teal `#14B8A6` on dark | Today · Plan · Nearby · Expenses (Plan 47; budget is set in Plan mode) |
+| **Trip** | While the trip is live | Teal `#14B8A6` on dark | Today · Plan · Must-do · Expenses · Memories (Plan 47; budget is set in Plan mode. Plan 62: Must-do holds the third tab until maps bring Nearby) |
 
 ```
 Home ──tap trip (not started)──▶ Plan mode ──"Start trip" / start date──▶ Trip mode
@@ -198,7 +198,7 @@ Dark, high-contrast UI built for one-handed use outdoors. Header: trip name · "
 - For each stop: **planned vs actual time spent** (from location timeline or check-ins), travel time between stops.
 - Day selector; tap stop → detail sheet.
 
-### 5.3 Nearby (tab 3)
+### 5.3 Nearby (tab 3; Must-do holds this tab until maps, Plan 62)
 - Categories: Food · Sights · Cafés · Shopping · Events · Essentials (ATM, pharmacy, fuel).
 - Distance, open now, rating, price level; **Add to today** (inserts at best slot).
 - v1 data: Google Places (cached). v2: live events (PredictHQ / Ticketmaster where available).

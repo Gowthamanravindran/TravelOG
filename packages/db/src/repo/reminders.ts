@@ -2,7 +2,7 @@ import { planReminders, type Reminder, type ReminderInput } from '@travelog/core
 import { inArray } from 'drizzle-orm';
 
 import { liveRows, now, type Db } from '../db';
-import { bookings, itineraryItems, planVariants, polls } from '../schema';
+import { bookings, checklistItems, itineraryItems, planVariants, polls } from '../schema';
 import { listTrips } from './trips';
 
 /** Everything reminders are planned from, for trips that haven't ended. */
@@ -56,6 +56,10 @@ export function reminderSources(db: Db, at: Date = now()): ReminderInput {
       deadline: p.deadline,
       locked: p.lockedOptionId !== null,
     })),
+    // Plan 61: Get ready items with a due date and Remind me on.
+    checklist: liveRows(db, 'checklist_items', inArray(checklistItems.tripId, ids))
+      .filter((c) => c.list === 'ready' && c.remind && c.dueDate && !c.doneAt)
+      .map((c) => ({ id: c.id, tripId: c.tripId, title: c.title, dueDate: c.dueDate! })),
   };
 }
 

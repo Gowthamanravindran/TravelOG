@@ -7,12 +7,13 @@ import { ModeProvider } from '@/ui/theme';
 const TABS: TabSpec[] = [
   { name: 'index', label: 'Today', icon: 'today' },
   { name: 'plan', label: 'Plan', icon: 'plan' },
-  { name: 'nearby', label: 'Nearby', icon: 'nearby' },
+  // Plan 62: Must-do has this tab until maps bring Nearby.
+  { name: 'must-do', label: 'Must-do', icon: 'check' },
   { name: 'expenses', label: 'Expenses', icon: 'expense' },
   { name: 'memories', label: 'Memories', icon: 'memories' },
 ];
 
-/** Trip mode (always dark, teal): Today · Plan · Nearby · Expenses · Memories. */
+/** Trip mode (always dark, teal): Today · Plan · Must-do · Expenses · Memories. */
 export default function LiveLayout() {
   return (
     <ModeProvider mode="trip">

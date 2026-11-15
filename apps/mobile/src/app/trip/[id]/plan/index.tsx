@@ -2,7 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import { ItineraryView } from '@/components/itinerary-view';
-import { TripSetupCard } from '@/components/trip-setup';
+import { GetReadyCard } from '@/components/get-ready';
 import { Screen } from '@/ui/kit';
 import { Deferred } from '@/ui/motion';
 import { ItinerarySkeleton } from '@/ui/skeleton';
@@ -17,7 +17,7 @@ export default function ItineraryTab() {
     <Screen edges={[]}>
       {/* A skeleton shows at once; the plan fills in a frame later (Plan 46). */}
       <Deferred fallback={<ItinerarySkeleton />}>
-        <TripSetupCard tripId={id} />
+        <GetReadyCard tripId={id} />
         <ItineraryView tripId={id} focusKey={focusKey} />
       </Deferred>
     </Screen>

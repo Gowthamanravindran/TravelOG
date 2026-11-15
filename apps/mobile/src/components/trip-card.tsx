@@ -9,6 +9,9 @@ import { tripArt, tripIcon, tripIconFamily } from '@/lib/labels';
 import { Art, ArtBackdrop } from '@/ui/art';
 import { RemoteImage } from '@/ui/remote-image';
 import { useTripCover } from '@/lib/trip-cover';
+import { useTripReadiness } from '@/lib/readiness';
+import { shortDate } from '@/lib/format';
+import { ProgressRing } from '@/ui/progress-ring';
 
 const STATE_LABELS = {
   planning: 'Planning',
@@ -25,6 +28,10 @@ export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () =
   // A destination photo fades in over the art when there is one (Plan 53).
   const { width } = useWindowDimensions();
   const cover = useTripCover(trip, width);
+  // Plan 61: how ready a trip still being planned is, and what's due first.
+  const ready = useTripReadiness(trip.id);
+  const preparing = (trip.state === 'planning' || trip.state === 'upcoming') && !!ready;
+  const due = preparing ? ready.summary.next?.dueDate : null;
   return (
     <Card
       onPress={onPress}
@@ -46,6 +53,16 @@ export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () =
         <View style={[styles.badge, { backgroundColor: t.surface }]}>
           <Text style={[type.caption, { color: t.ink }]}>{STATE_LABELS[trip.state]}</Text>
         </View>
+        {preparing && ready.manual.length > 0 ? (
+          <View style={[styles.ring, { backgroundColor: t.surface }]}>
+            <ProgressRing
+              done={ready.summary.done}
+              total={ready.summary.total}
+              size={40}
+              stroke={4}
+            />
+          </View>
+        ) : null}
         {cover.uri && cover.photo ? (
           <View style={[styles.credit, { backgroundColor: t.surface }]}>
             <Text style={[type.caption, { color: t.ink2 }]} numberOfLines={1}>
@@ -60,6 +77,11 @@ export function TripCard({ trip, onPress }: { trip: TripWithState; onPress: () =
           {[trip.destination, dateRange(trip.startDate, trip.endDate)].filter(Boolean).join(' · ')}
           {` · ${trip.memberCount} ${trip.memberCount === 1 ? 'person' : 'people'}`}
         </Body>
+        {due && ready?.summary.next ? (
+          <Text style={[type.label, { color: t.danger }]} numberOfLines={1}>
+            {`${ready.summary.next.title}: by ${shortDate(due)}`}
+          </Text>
+        ) : null}
       </View>
     </Card>
   );
@@ -83,6 +105,13 @@ const styles = StyleSheet.create({
     borderRadius: 99,
     paddingHorizontal: 8,
     paddingVertical: 2,
+  },
+  ring: {
+    position: 'absolute',
+    left: spacing.md,
+    bottom: spacing.sm,
+    borderRadius: 99,
+    padding: 3,
   },
   badge: { alignSelf: 'flex-start', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 },
   meta: { padding: spacing.lg, gap: 4 },

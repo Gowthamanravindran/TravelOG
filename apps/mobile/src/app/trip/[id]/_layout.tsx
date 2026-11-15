@@ -47,6 +47,11 @@ export default function TripLayout() {
         name="check-in"
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
+      {/* Plan 61: the Get ready checklist. */}
+      <Stack.Screen
+        name="ready"
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
       <Stack.Screen name="studio/[projectId]" options={{ animation: 'fade' }} />
       <Stack.Screen name="studio/export" options={{ animation: 'slide_from_right' }} />
     </Stack>

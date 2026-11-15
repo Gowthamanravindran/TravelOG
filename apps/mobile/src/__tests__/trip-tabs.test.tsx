@@ -6,7 +6,7 @@ import type { ComponentType } from 'react';
 import LiveExpenses from '@/app/trip/[id]/live/expenses';
 import LiveToday from '@/app/trip/[id]/live/index';
 import LiveMemories from '@/app/trip/[id]/live/memories';
-import LiveNearby from '@/app/trip/[id]/live/nearby';
+import LiveMustDo from '@/app/trip/[id]/live/must-do';
 import LivePlan from '@/app/trip/[id]/live/plan';
 import PlanBookings from '@/app/trip/[id]/plan/bookings';
 import PlanBudget from '@/app/trip/[id]/plan/budget';
@@ -33,7 +33,7 @@ const TABS: [string, ComponentType, 'plan' | 'trip'][] = [
   ['Memories', PlanMemories, 'plan'],
   ['Today', LiveToday, 'trip'],
   ['Trip plan', LivePlan, 'trip'],
-  ['Nearby', LiveNearby, 'trip'],
+  ['Must-do', LiveMustDo, 'trip'],
   ['Trip expenses', LiveExpenses, 'trip'],
   ['Trip memories', LiveMemories, 'trip'],
 ];

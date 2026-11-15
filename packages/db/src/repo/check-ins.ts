@@ -1,7 +1,7 @@
 import { localDateIn } from '@travelog/core';
 import { and, eq } from 'drizzle-orm';
 
-import { deleteRow, getRow, insertRow, liveRows, now, type Db } from '../db';
+import { deleteRow, getRow, insertRow, liveRows, now, updateRow, type Db } from '../db';
 import { checkIns } from '../schema';
 import { getTrip, myMember } from './trips';
 
@@ -45,6 +45,18 @@ export function listCheckIns(db: Db, tripId: string, dayDate: string): CheckIn[]
     'check_ins',
     and(eq(checkIns.tripId, tripId), eq(checkIns.dayDate, dayDate)),
   ).sort((a, b) => a.at.localeCompare(b.at));
+}
+
+/** All of a trip's check-ins, earliest first (Plan 62: Must-do). */
+export function listTripCheckIns(db: Db, tripId: string): CheckIn[] {
+  return liveRows(db, 'check_ins', eq(checkIns.tripId, tripId)).sort((a, b) =>
+    a.at.localeCompare(b.at),
+  );
+}
+
+/** Plan 62: a line about it, added after ticking a Must-do. */
+export function setCheckInNote(db: Db, id: string, note: string | null): CheckIn {
+  return updateRow(db, 'check_ins', id, { note: note?.trim() || null });
 }
 
 export function getCheckIn(db: Db, id: string): CheckIn | undefined {

@@ -64,6 +64,13 @@
       "when": 1794679750854,
       "tag": "0008_saved_places",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1794766676680,
+      "tag": "0009_checklists",
+      "breakpoints": true
     }
   ]
 }

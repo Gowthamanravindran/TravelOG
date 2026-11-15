@@ -102,6 +102,8 @@ export const itineraryItems = sqliteTable(
     url: text('url'),
     /** Plan 58: the Saved place it was added from. */
     savedPlaceId: text('saved_place_id'),
+    /** Plan 62: starred as a Must-do for the trip. */
+    mustDo: integer('must_do', { mode: 'boolean' }).notNull().default(false),
   },
   (t) => [index('itinerary_items_variant_idx').on(t.variantId, t.sortOrder)],
 );
@@ -463,6 +465,36 @@ export const savedPlaces = sqliteTable(
   (t) => [index('saved_places_country_idx').on(t.countryCode, t.area)],
 );
 
+export const CHECKLIST_LISTS = ['ready', 'mustdo'] as const;
+export type ChecklistList = (typeof CHECKLIST_LISTS)[number];
+export const CHECKLIST_SECTIONS = ['bookings', 'documents', 'money', 'packing', 'other'] as const;
+export type ChecklistSection = (typeof CHECKLIST_SECTIONS)[number];
+
+/**
+ * Plan 61 (Get ready) and Plan 62 (Must-do): a trip's checklist items you add or tick by hand.
+ * Items ticked from the trip itself (bookings, stays, budget) aren't stored; they're worked out.
+ */
+export const checklistItems = sqliteTable(
+  'checklist_items',
+  {
+    ...syncColumns,
+    tripId: text('trip_id').notNull(),
+    list: text('list', { enum: CHECKLIST_LISTS }).notNull(),
+    title: text('title').notNull(),
+    section: text('section', { enum: CHECKLIST_SECTIONS }).notNull().default('other'),
+    /** Local date it's due by (Get ready). */
+    dueDate: text('due_date'),
+    remind: integer('remind', { mode: 'boolean' }).notNull().default(false),
+    note: text('note'),
+    /** When it was ticked (UTC ISO); null while not done. */
+    doneAt: text('done_at'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    /** Must-do: the check-in made when it was ticked. */
+    checkInId: text('check_in_id'),
+  },
+  (t) => [index('checklist_items_trip_idx').on(t.tripId, t.list, t.sortOrder)],
+);
+
 /** Device-only key/value settings (my name, home currency, sync cursor later). Not synced. */
 export const settings = sqliteTable('settings', {
   key: text('key').primaryKey(),
@@ -489,6 +521,7 @@ export const syncedTables = {
   studio_projects: studioProjects,
   trip_stops: tripStops,
   saved_places: savedPlaces,
+  checklist_items: checklistItems,
 } as const;
 
 export type SyncedTableName = keyof typeof syncedTables;

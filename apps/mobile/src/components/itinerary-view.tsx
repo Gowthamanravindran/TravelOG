@@ -10,6 +10,7 @@ import {
   listVariants,
   moveItem,
   setItemOrder,
+  updateItem,
   myMember,
   setMainVariant,
   summarizeItems,
@@ -447,6 +448,9 @@ export function ItineraryView({
                       ? () => run(() => mutate((db) => moveItem(db, e.item.id, e.index - 1)))
                       : undefined
                   }
+                  onStar={() =>
+                    run(() => mutate((db) => updateItem(db, e.item.id, { mustDo: !e.item.mustDo })))
+                  }
                   onDown={
                     e.index < items.length - 1
                       ? () => run(() => mutate((db) => moveItem(db, e.item.id, e.index + 1)))
@@ -504,6 +508,7 @@ function ItemRow({
   onPress,
   onUp,
   onDown,
+  onStar,
 }: {
   item: Item;
   currency: string;
@@ -511,6 +516,8 @@ function ItemRow({
   onPress: () => void;
   onUp?: () => void;
   onDown?: () => void;
+  /** Plan 62: star as a Must-do. */
+  onStar?: () => void;
 }) {
   const t = useTheme();
   const meta = [
@@ -533,11 +540,17 @@ function ItemRow({
         <Between>
           <View style={{ flex: 1 }}>
             <WithIcon icon={ITEM_LABELS[item.type].icon}>
-              <Strong>{item.title}</Strong>
+              <Strong>{item.mustDo ? `★ ${item.title}` : item.title}</Strong>
             </WithIcon>
           </View>
           {editable ? (
             <Row style={{ gap: 4 }}>
+              <SmallIcon
+                label={item.mustDo ? 'Remove from Must-do' : 'Add to Must-do'}
+                icon="star"
+                onPress={onStar}
+                on={item.mustDo}
+              />
               <SmallIcon label="Move up" icon="up" onPress={onUp} />
               <SmallIcon label="Move down" icon="down" onPress={onDown} />
             </Row>
@@ -565,10 +578,13 @@ function SmallIcon({
   label,
   icon,
   onPress,
+  on,
 }: {
   label: string;
   icon: IconName;
   onPress?: () => void;
+  /** Drawn in the accent colour (a star that's set). */
+  on?: boolean;
 }) {
   const t = useTheme();
   return (
@@ -578,9 +594,13 @@ function SmallIcon({
       disabled={!onPress}
       onPress={onPress}
       hitSlop={6}
-      style={[styles.icon, { backgroundColor: t.surface2, opacity: onPress ? 1 : 0.3 }]}
+      accessibilityState={on === undefined ? undefined : { selected: on }}
+      style={[
+        styles.icon,
+        { backgroundColor: on ? t.accentSoft : t.surface2, opacity: onPress ? 1 : 0.3 },
+      ]}
     >
-      <Icon name={icon} size={16} color={t.ink} />
+      <Icon name={icon} size={16} color={on ? t.accent : t.ink} />
     </Pressable>
   );
 }

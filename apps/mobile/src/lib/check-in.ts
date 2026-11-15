@@ -1,4 +1,11 @@
-import { checkIn, getSetting, setSetting, type CheckInInput, type Db } from '@travelog/db';
+import {
+  checkIn,
+  getSetting,
+  setSetting,
+  type CheckIn,
+  type CheckInInput,
+  type Db,
+} from '@travelog/db';
 import * as Location from 'expo-location';
 
 /**
@@ -45,8 +52,8 @@ export async function checkInNow(
   mutate: <T>(fn: (db: Db) => T) => T,
   input: Omit<CheckInInput, 'position'>,
   withLocation: boolean = checkInLocationOn(db),
-): Promise<void> {
+): Promise<CheckIn> {
   const at = input.at ?? new Date().toISOString();
   const position = withLocation ? await currentPosition() : null;
-  mutate((db) => checkIn(db, { ...input, position, at }));
+  return mutate((db) => checkIn(db, { ...input, position, at }));
 }

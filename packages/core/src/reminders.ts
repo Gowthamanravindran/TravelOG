@@ -1,5 +1,5 @@
 import { dateFormatter } from './intl';
-import { localToUtcIso } from './dates';
+import { addDays, localToUtcIso } from './dates';
 
 /**
  * Local reminders (docs/01 §11). Pure planning: the app turns the result into
@@ -47,12 +47,25 @@ export interface Reminder {
   body: string;
 }
 
+/** Plan 61: a Get ready item with a due date and Remind me on. */
+export interface ReminderChecklist {
+  id: string;
+  tripId: string;
+  title: string;
+  /** Local date it's due ('YYYY-MM-DD'). */
+  dueDate: string;
+}
+
 export interface ReminderInput {
   trips: readonly ReminderTrip[];
   bookings: readonly ReminderBooking[];
   items: readonly ReminderItem[];
   polls: readonly ReminderPoll[];
+  checklist?: readonly ReminderChecklist[];
 }
+
+/** Get ready reminders: this many days before the due date, at 09:00 trip time. */
+export const CHECKLIST_LEAD_DAYS = 3;
 
 const HOUR = 60 * 60 * 1000;
 const MINUTE = 60 * 1000;
@@ -131,6 +144,29 @@ export function planReminders(
       at: minus(p.deadline, POLL_LEAD),
       title: 'Poll closes in 1 hour',
       body: `${trip.title} · ${p.question}`,
+    });
+  }
+
+  for (const c of input.checklist ?? []) {
+    const trip = trips.get(c.tripId);
+    if (!trip) continue;
+    const at = [addDays(c.dueDate, -CHECKLIST_LEAD_DAYS), c.dueDate]
+      .map((d) => {
+        try {
+          return localToUtcIso(d, '09:00', trip.timeZone);
+        } catch {
+          return null;
+        }
+      })
+      // The earliest that's still ahead: 3 days before, else the day itself.
+      .find((iso) => iso && Date.parse(iso) > now.getTime());
+    if (!at) continue;
+    out.push({
+      key: `check:${c.id}`,
+      tripId: trip.id,
+      at,
+      title: `Get ready: ${c.title}`,
+      body: `${trip.title} · due ${c.dueDate}`,
     });
   }
 

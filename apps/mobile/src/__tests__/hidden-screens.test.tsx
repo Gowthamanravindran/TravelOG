@@ -8,7 +8,7 @@ import LiveLayout from '@/app/trip/[id]/live/_layout';
 import LiveExpenses from '@/app/trip/[id]/live/expenses';
 import LiveToday from '@/app/trip/[id]/live/index';
 import LiveMemories from '@/app/trip/[id]/live/memories';
-import LiveNearby from '@/app/trip/[id]/live/nearby';
+import LiveMustDo from '@/app/trip/[id]/live/must-do';
 import LivePlan from '@/app/trip/[id]/live/plan';
 import TripLayout from '@/app/trip/[id]/_layout';
 import PlanLayout from '@/app/trip/[id]/plan/_layout';
@@ -44,7 +44,7 @@ const routes = {
   'trip/[id]/live/_layout': LiveLayout,
   'trip/[id]/live/index': LiveToday,
   'trip/[id]/live/plan': LivePlan,
-  'trip/[id]/live/nearby': LiveNearby,
+  'trip/[id]/live/must-do': LiveMustDo,
   'trip/[id]/live/expenses': LiveExpenses,
   'trip/[id]/live/memories': LiveMemories,
 };
