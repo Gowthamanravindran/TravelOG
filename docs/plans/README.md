@@ -66,3 +66,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 60 | [Share to TravelOG from other apps](60-share-to-travelog.md) | see git log |
 | 61 | [Get ready: trip readiness in Plan mode](61-get-ready.md) | see git log |
 | 62 | [Must-do in Trip mode](62-must-do.md) | see git log |
+| 63 | [The dev server's web page: blank, now a notice](63-web-page-bundle.md) | see git log |

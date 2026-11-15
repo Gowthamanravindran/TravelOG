@@ -34,6 +34,10 @@ jobs:
         run: pnpm --filter @travelog/mobile export:android
       - name: Check bundle size budget
         run: node scripts/check-bundle-size.mjs
+      # Plan 63: the dev server also serves a web page; make sure it still bundles and renders.
+      - name: Export web page
+        working-directory: apps/mobile
+        run: npx expo export --platform web --output-dir /tmp/web-export
 
   database:
     name: Database migrations and permission tests

@@ -10,7 +10,8 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, type ReactNode } from 'react';
-import { TurboModuleRegistry } from 'react-native';
+import { Platform, Text, TurboModuleRegistry, View } from 'react-native';
+import { themeFor, type } from '@travelog/ui';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ErrorScreen } from '@/components/error-screen';
@@ -28,7 +29,8 @@ import { ShareIntentHandler } from '@/lib/share-intent';
 // The library looks the module up when it loads, but tree shaking (release builds)
 // removes that lookup, and the app crashed on launch with "Tried to access a
 // non-existent registry" (Plan 49 T4). Looking it up here keeps it in every build.
-TurboModuleRegistry.get('RNGestureHandlerModule');
+// Not on web, where there are no native modules (Plan 63).
+if (Platform.OS !== 'web') TurboModuleRegistry.get('RNGestureHandlerModule');
 
 SplashScreen.preventAutoHideAsync();
 
@@ -71,7 +73,40 @@ function Background() {
   return null;
 }
 
+/**
+ * Plan 63: TravelOG runs on phones. The dev server also serves a web page (opened when a QR
+ * code is scanned with the camera instead of Expo Go); it explains that instead of trying to
+ * open the phone's encrypted database.
+ */
+function WebNotice() {
+  const t = themeFor('sunset', 'home', 'light');
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        gap: 12,
+        backgroundColor: t.bg,
+      }}
+    >
+      <Text style={[type.display, { color: t.ink, textAlign: 'center' }]}>
+        TravelOG runs on your phone
+      </Text>
+      <Text style={[type.body, { color: t.ink2, textAlign: 'center', maxWidth: 420 }]}>
+        Open Expo Go, tap Scan QR code, and scan the code in your terminal. Scanning it with the
+        camera opens this page instead.
+      </Text>
+    </View>
+  );
+}
+
 export default function RootLayout() {
+  return Platform.OS === 'web' ? <WebNotice /> : <AppRoot />;
+}
+
+function AppRoot() {
   const fonts = useFonts(FONT_ASSETS);
   const [db, setDb] = useState<Db | null>(null);
   const [error, setError] = useState<string | null>(null);
