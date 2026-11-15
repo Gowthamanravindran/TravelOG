@@ -63,3 +63,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 57 | [Stops get a real place: travel time and Best order](57-stop-places.md) | see git log |
 | 58 | [Saved places, across trips](58-saved-places.md) | see git log |
 | 59 | [Save from a link, and find the places in it](59-save-from-a-link.md) | see git log |
+| 60 | [Share to TravelOG from other apps](60-share-to-travelog.md) | see git log |
