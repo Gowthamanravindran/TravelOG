@@ -26,21 +26,28 @@ export function sharedText(intent: { text?: string | null; webUrl?: string | nul
   return text;
 }
 
-function Handler({ hook }: { hook: UseShareIntent }) {
-  const router = useRouter();
-  const { hasShareIntent, shareIntent, resetShareIntent } = hook({ resetOnBackground: true });
-  useEffect(() => {
-    if (!hasShareIntent) return;
-    const text = sharedText(shareIntent);
-    if (text) router.push(`/save-link?text=${encodeURIComponent(text)}`);
-    resetShareIntent();
-  }, [hasShareIntent, shareIntent, resetShareIntent, router]);
-  return null;
+/**
+ * The handler for this build. The hook is chosen once, at load, and called by a `use…` name:
+ * the React Compiler only treats `use…` calls as hooks, and memoizing a hook call breaks hook
+ * order (the release build crashed with "Cannot read property 'inst' of null").
+ */
+export function makeShareIntentHandler(useIntent: UseShareIntent | null): () => null {
+  if (!useIntent) return () => null;
+  return function ShareIntentHandler() {
+    'use no memo';
+    const router = useRouter();
+    const { hasShareIntent, shareIntent, resetShareIntent } = useIntent({
+      resetOnBackground: true,
+    });
+    useEffect(() => {
+      if (!hasShareIntent) return;
+      const text = sharedText(shareIntent);
+      if (text) router.push(`/save-link?text=${encodeURIComponent(text)}`);
+      resetShareIntent();
+    }, [hasShareIntent, shareIntent, resetShareIntent, router]);
+    return null;
+  };
 }
 
 /** Mounted once in the root layout. */
-export function ShareIntentHandler() {
-  // The same function on every render once loaded (modules are cached), so hook order holds.
-  const hook = loadShareIntent();
-  return hook ? <Handler hook={hook} /> : null;
-}
+export const ShareIntentHandler = makeShareIntentHandler(loadShareIntent());

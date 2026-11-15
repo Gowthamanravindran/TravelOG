@@ -19,3 +19,9 @@ The last of the four features chosen from the mocks: TravelOG in other apps' sha
 
 ## Owner
 Install a new development (or preview) build; see `docs/14` §5. Until then, Save from a link works as before, in Expo Go too.
+
+## Fix after the first release build
+The first e2e release build compiled, with the share filter in it, but the app stopped at start with "Cannot read property 'inst' of null".
+- **Cause:** the handler called the package's hook through a prop named `hook`. The React Compiler, which only treats `use…` calls as hooks, cached that call, so on the next render the hook's own hooks were skipped. Jest doesn't run the compiler, so the tests passed.
+- **Fix:** `makeShareIntentHandler(useIntent)` picks the hook once, at load, and calls it by a `use…` name, with `'use no memo'` as a second guard. Compiling with the compiler on now shows the call isn't cached.
+- **Prevention:** the e2e workflow now also runs when `native-packages.json`, `app.config.ts` or `lib/share-intent.tsx` change.
