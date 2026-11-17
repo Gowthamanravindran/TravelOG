@@ -8,6 +8,9 @@ The whole bottom bar was missing on Trips, Explore and Profile. Each tab's drawe
 ## Change
 The stage clips what it draws (`overflow: 'hidden'`), so nothing on it reaches the tab bar.
 
+## The emulator flow, fixed too
+The flow failed on this branch for a reason of its own: after picking dates it tapped `Next.*`, which also matches the calendar's "Next month" button, so it kept turning the month and never reached "Pick your stops". The buttons are now named exactly. The flow also now checks the tab bar right after the globe loads: Profile, Explore, then back to Trips.
+
 ## Why the checks missed it
 - **Unit tests** (Jest) have no layout or drawing: they cannot see one view covering another. The new test only pins the clipping style; it cannot prove the bar shows.
 - **The map check** (`scripts/globe/page-check.py`) only runs the web page inside the globe, not the app.
