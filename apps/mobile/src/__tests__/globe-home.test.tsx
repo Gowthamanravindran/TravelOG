@@ -61,6 +61,15 @@ describe('Trips tab where the web view is not in the installed app', () => {
   });
 });
 
+describe('the home tab bar (Plan 68)', () => {
+  it('has Trips, Feed, Explore and Profile, and no Saved tab', async () => {
+    await render(withData(db(), <HomeLayout />));
+    for (const label of ['Trips', 'Feed', 'Explore', 'Profile'])
+      expect(screen.getByText(label)).toBeTruthy();
+    expect(screen.queryByText('Saved')).toBeNull();
+  });
+});
+
 describe('Trips tab with the globe', () => {
   beforeEach(() => mockHasGlobe.mockReturnValue(true));
 

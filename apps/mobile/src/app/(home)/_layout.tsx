@@ -10,7 +10,6 @@ import { ModeProvider } from '@/ui/theme';
 
 const TABS: TabSpec[] = [
   { name: 'index', label: 'Trips', icon: 'trips' },
-  { name: 'saved', label: 'Saved', icon: 'saved' },
   { name: 'feed', label: 'Feed', icon: 'feed' },
   { name: 'explore', label: 'Explore', icon: 'explore' },
   { name: 'profile', label: 'Profile', icon: 'profile' },
@@ -44,6 +43,8 @@ export default function HomeLayout() {
         {TABS.map((t) => (
           <Tabs.Screen key={t.name} name={t.name} options={{ title: t.label }} />
         ))}
+        {/* Saved places is out of the plan (Plan 68): its screen stays in the code but has no tab. */}
+        <Tabs.Screen name="saved" options={{ href: null }} />
       </Tabs>
     </ModeProvider>
   );
