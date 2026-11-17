@@ -70,3 +70,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 64 | [Save from a link and Share to TravelOG removed, to the backlog](64-reel-import-removed.md) | see git log |
 | 65 | [A black and white theme, the default for new installs](65-black-and-white-theme.md) | see git log |
 | 66 | [The Trips tab is a globe, with the trip list in a drawer](66-globe-home.md) | see git log |
+| 67 | [Create a trip on the globe](67-create-trip-on-the-globe.md) | see git log |

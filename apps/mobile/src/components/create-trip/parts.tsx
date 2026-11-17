@@ -2,6 +2,7 @@ import { font, radius, spacing, type } from '@travelog/ui';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/ui/icon';
+import { Pop } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
 /** A search result: tap to add. `tag` says what it is ("Country", "City") or "Added". */
@@ -59,24 +60,28 @@ export function PickChip({
 }) {
   const t = useTheme();
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`Remove ${label}`}
-      onPress={onRemove}
-      style={[styles.chip, { borderColor: t.line, backgroundColor: t.surface }]}
-    >
-      {number != null ? (
-        <View style={[styles.number, { backgroundColor: t.accent }]}>
-          <Text style={[type.caption, { color: t.onAccent, ...font('text', 600) }]}>{number}</Text>
-        </View>
-      ) : flag ? (
-        <Image source={{ uri: flag }} style={styles.flag} />
-      ) : null}
-      <Text style={[type.label, { color: t.ink }]} numberOfLines={1}>
-        {label}
-      </Text>
-      <Icon name="close" size={14} color={t.ink2} />
-    </Pressable>
+    <Pop style={styles.chipWrap}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Remove ${label}`}
+        onPress={onRemove}
+        style={[styles.chip, { borderColor: t.line, backgroundColor: t.surface }]}
+      >
+        {number != null ? (
+          <View style={[styles.number, { backgroundColor: t.accent }]}>
+            <Text style={[type.caption, { color: t.onAccent, ...font('text', 600) }]}>
+              {number}
+            </Text>
+          </View>
+        ) : flag ? (
+          <Image source={{ uri: flag }} style={styles.flag} />
+        ) : null}
+        <Text style={[type.label, { color: t.ink }]} numberOfLines={1}>
+          {label}
+        </Text>
+        <Icon name="close" size={14} color={t.ink2} />
+      </Pressable>
+    </Pop>
   );
 }
 
@@ -95,6 +100,7 @@ const styles = StyleSheet.create({
   rowText: { flex: 1, gap: 1 },
   flag: { width: 24, height: 18, borderRadius: 3 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  chipWrap: { maxWidth: '100%' },
   chip: {
     minHeight: 44,
     flexDirection: 'row',

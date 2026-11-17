@@ -31,6 +31,8 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 
 ---
 
+> **Plans 65–67** change the app's front door ahead of the phases: a black and white theme (the default for new installs), the Trips tab as a globe with the trip list in a drawer, and creating a trip on that globe in four steps. They add no server work. A new development build is needed for the globe.
+
 ## Phase 0 — Project setup
 **Claude builds**
 - pnpm monorepo: `apps/mobile` (Expo), `apps/web` (Cloudflare), `packages/core`, `packages/ui`, `supabase/`.

@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   BackHandler,
   Keyboard,
   StyleSheet,
@@ -38,7 +39,7 @@ import { draftReducer, emptyDraft } from '@/lib/trip-draft-state';
 import { tripHref } from '@/lib/trip-route';
 import { Drawer } from '@/ui/drawer';
 import { Between, Button, H1, H2, Screen } from '@/ui/kit';
-import { useCelebrate } from '@/ui/motion';
+import { haptic, Swap, useCelebrate } from '@/ui/motion';
 import { ModeProvider, useTheme } from '@/ui/theme';
 
 /** How much of the screen the drawer takes: at rest, part raised (the days step), and raised. */
@@ -140,6 +141,32 @@ function GlobeHome() {
     countryCount.current = draft.countries.length;
   }, [flow.open, draft.countries.length]);
 
+  // Each pick is felt and said aloud: the globe itself cannot be read by a screen reader.
+  const before = useRef({ countries: draft.countries, cities: draft.cities });
+  useEffect(() => {
+    const was = before.current;
+    before.current = { countries: draft.countries, cities: draft.cities };
+    if (!flow.open) return;
+    const say = (text: string) => AccessibilityInfo.announceForAccessibility(text);
+    const nameOf = (code: string) => countryByCode(code)?.name ?? code;
+    for (const code of draft.countries)
+      if (!was.countries.includes(code)) {
+        haptic('light');
+        say(`${nameOf(code)} added`);
+      }
+    for (const code of was.countries)
+      if (!draft.countries.includes(code) && !draft.dropped.includes(code))
+        say(`${nameOf(code)} removed`);
+    draft.cities.forEach((city, i) => {
+      if (!was.cities.some((c) => c.id === city.id)) {
+        haptic('light');
+        say(`${city.name} added, stop ${i + 1}`);
+      }
+    });
+    for (const city of was.cities)
+      if (!draft.cities.some((c) => c.id === city.id)) say(`${city.name} removed`);
+  }, [flow.open, draft.countries, draft.cities, draft.dropped]);
+
   const back = useCallback(() => {
     if (draft.step === 'countries') flow.close();
     else dispatch({ type: 'back' });
@@ -166,6 +193,8 @@ function GlobeHome() {
           save.places,
         );
       });
+      // One last look at the whole route, then the celebration.
+      globe.current?.fitStops();
       celebrate('Trip created');
       flow.close();
       router.push(tripHref(trip));
@@ -195,6 +224,35 @@ function GlobeHome() {
         onPlacePress: (p) => draft.step === 'cities' && toggleCityById(p.id),
       }
     : { countryTapEnabled: false };
+
+  const stepBody =
+    draft.step === 'countries' ? (
+      <StepCountries
+        draft={draft}
+        dispatch={dispatch}
+        onSearching={setSearching}
+        onPickCity={picked}
+        onPickCountry={(c) => {
+          Keyboard.dismiss();
+          globe.current?.focusCountry(c.iso);
+        }}
+      />
+    ) : draft.step === 'dates' ? (
+      <StepDates draft={draft} dispatch={dispatch} />
+    ) : draft.step === 'cities' ? (
+      <StepCities
+        draft={draft}
+        dispatch={dispatch}
+        onSearching={setSearching}
+        onPickCity={picked}
+        onShowCountry={(code) => {
+          const iso = countryByCode(code)?.iso;
+          if (iso) globe.current?.focusCountry(iso);
+        }}
+      />
+    ) : (
+      <StepDays draft={draft} dispatch={dispatch} />
+    );
 
   const footer =
     flow.open && !searching ? (
@@ -242,35 +300,7 @@ function GlobeHome() {
           )
         }
       >
-        {!flow.open ? (
-          <TripsList onCreate={flow.start} />
-        ) : draft.step === 'countries' ? (
-          <StepCountries
-            draft={draft}
-            dispatch={dispatch}
-            onSearching={setSearching}
-            onPickCity={picked}
-            onPickCountry={(c) => {
-              Keyboard.dismiss();
-              globe.current?.focusCountry(c.iso);
-            }}
-          />
-        ) : draft.step === 'dates' ? (
-          <StepDates draft={draft} dispatch={dispatch} />
-        ) : draft.step === 'cities' ? (
-          <StepCities
-            draft={draft}
-            dispatch={dispatch}
-            onSearching={setSearching}
-            onPickCity={picked}
-            onShowCountry={(code) => {
-              const iso = countryByCode(code)?.iso;
-              if (iso) globe.current?.focusCountry(iso);
-            }}
-          />
-        ) : (
-          <StepDays draft={draft} dispatch={dispatch} />
-        )}
+        {!flow.open ? <TripsList onCreate={flow.start} /> : <Swap id={draft.step}>{stepBody}</Swap>}
       </Drawer>
     </View>
   );

@@ -16,7 +16,11 @@ import Animated, {
   FadeOut,
   LinearTransition,
   ZoomIn,
+  useAnimatedStyle,
   useReducedMotion,
+  useSharedValue,
+  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { spacing } from '@travelog/ui';
@@ -75,6 +79,66 @@ export function Appear({
   );
 }
 
+/**
+ * Content that is replaced as a whole, like a step of a flow (Plan 67): each time `id` changes
+ * the new content fades in and rises a little into place. With Reduce motion it only fades.
+ */
+export function Swap({ id, children }: { id: string; children: ReactNode }) {
+  const ok = useMotionOk();
+  return (
+    <Animated.View
+      key={id}
+      entering={
+        ok
+          ? FadeInDown.duration(MOTION.base + 30).withInitialValues({
+              transform: [{ translateY: 16 }],
+            })
+          : FadeIn.duration(MOTION.fast)
+      }
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
+/** Something just picked: it pops in (a short eased scale). With Reduce motion it just appears. */
+export function Pop({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const ok = useMotionOk();
+  return (
+    <Animated.View style={style} entering={ok ? ZoomIn.duration(MOTION.fast) : undefined}>
+      {children}
+    </Animated.View>
+  );
+}
+
+/**
+ * Shakes its content sideways once each time `count` goes up (a refused value, like too many
+ * days). Timing only, no spring; with Reduce motion it stays still.
+ */
+export function Shake({ count, children }: { count: number; children: ReactNode }) {
+  const ok = useMotionOk();
+  const x = useSharedValue(0);
+  const seen = useRef(count);
+  useEffect(() => {
+    if (count > seen.current && ok) {
+      const step = { duration: 50, easing: Easing.inOut(Easing.quad) };
+      x.set(
+        withSequence(
+          withTiming(-6, step),
+          withTiming(6, step),
+          withTiming(-6, step),
+          withTiming(6, step),
+          withTiming(-3, step),
+          withTiming(0, step),
+        ),
+      );
+    }
+    seen.current = count;
+  }, [count, ok, x]);
+  const style = useAnimatedStyle(() => ({ transform: [{ translateX: x.get() }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
+}
+
 /** A number that counts up to its value (budget totals). Shows the final value at once with reduced motion. */
 export function CountUp({
   value,
@@ -112,7 +176,7 @@ export function CountUp({
   return <Text style={style}>{format(shown)}</Text>;
 }
 
-type HapticKind = 'select' | 'light' | 'success';
+type HapticKind = 'select' | 'light' | 'success' | 'warning';
 
 /** A light haptic; never throws (no motor, web, or a refusing device). */
 export function haptic(kind: HapticKind): void {
@@ -122,7 +186,9 @@ export function haptic(kind: HapticKind): void {
       ? () => Haptics.selectionAsync()
       : kind === 'light'
         ? () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-        : () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        : kind === 'warning'
+          ? () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
+          : () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   try {
     Promise.resolve(run()).catch(() => {});
   } catch {

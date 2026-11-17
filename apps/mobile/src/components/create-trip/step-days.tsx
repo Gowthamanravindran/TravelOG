@@ -1,7 +1,7 @@
 import { splitStatus, stopDays, tripLengthDays } from '@travelog/core';
 import { countryByCode } from '@travelog/globe';
 import { font, spacing, type } from '@travelog/ui';
-import { useState, type Dispatch } from 'react';
+import { useEffect, useRef, useState, type Dispatch } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useQuery } from '@/data/provider';
@@ -9,6 +9,7 @@ import { draftAutoName, draftStops } from '@/lib/trip-draft-save';
 import type { DraftAction, DraftState } from '@/lib/trip-draft-state';
 import { Icon } from '@/ui/icon';
 import { Body, Field } from '@/ui/kit';
+import { haptic, Shake, Swap } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
 import { datesText } from './step-dates';
@@ -46,6 +47,24 @@ export function StepDays({
   const days = stopDays(stops, draft.startDate);
   const over = state === 'over';
 
+  // One tap when the days come to match, one warning (and a shake) each time they go over.
+  const [overs, setOvers] = useState(0);
+  const was = useRef(state);
+  useEffect(() => {
+    if (state !== was.current) {
+      if (state === 'exact') haptic('success');
+      if (state === 'over') {
+        haptic('warning');
+        setOvers((n) => n + 1);
+      }
+    }
+    was.current = state;
+  }, [state]);
+  const setDays = (cityId: string, n: number) => {
+    haptic('select');
+    dispatch({ type: 'setDays', cityId, days: n });
+  };
+
   return (
     <View style={{ gap: spacing.md }}>
       <Field
@@ -59,17 +78,19 @@ export function StepDays({
         onBlur={() => setTyping(null)}
         maxLength={80}
       />
-      <View style={styles.between}>
-        <Text style={[type.headline, { color: over ? t.danger : t.ink }]}>
-          {placed} of {total} days
-        </Text>
-        <Text
-          accessibilityLiveRegion="polite"
-          style={[type.label, { color: over ? t.danger : t.ink2 }]}
-        >
-          {splitText(left)}
-        </Text>
-      </View>
+      <Shake count={overs}>
+        <View style={styles.between}>
+          <Text style={[type.headline, { color: over ? t.danger : t.ink }]}>
+            {placed} of {total} days
+          </Text>
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[type.label, { color: over ? t.danger : t.ink2 }]}
+          >
+            {splitText(left)}
+          </Text>
+        </View>
+      </Shake>
       <View>
         {draft.cities.map((city, i) => {
           const n = stops[i]!.days;
@@ -93,18 +114,21 @@ export function StepDays({
                 label={`One day less in ${city.name}`}
                 icon="remove"
                 disabled={n <= 1}
-                onPress={() => dispatch({ type: 'setDays', cityId: city.id, days: n - 1 })}
+                onPress={() => setDays(city.id, n - 1)}
               />
-              <Text
-                style={[type.headline, styles.count, { color: late ? t.danger : t.ink }]}
-                accessibilityLabel={`${plural(n, 'day')} in ${city.name}`}
-              >
-                {n}
-              </Text>
+              {/* The count rolls in each time it changes. */}
+              <Swap id={String(n)}>
+                <Text
+                  style={[type.headline, styles.count, { color: late ? t.danger : t.ink }]}
+                  accessibilityLabel={`${plural(n, 'day')} in ${city.name}`}
+                >
+                  {n}
+                </Text>
+              </Swap>
               <Stepper
                 label={`One day more in ${city.name}`}
                 icon="add"
-                onPress={() => dispatch({ type: 'setDays', cityId: city.id, days: n + 1 })}
+                onPress={() => setDays(city.id, n + 1)}
               />
             </View>
           );
