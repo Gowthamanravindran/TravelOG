@@ -3,25 +3,42 @@ import { listStops, listTrips, saveLocalProfile, savePlaces } from '@travelog/db
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { DeviceEventEmitter } from 'react-native';
 
-import TripsScreen from '@/app/(home)/index';
+import HomeLayout from '@/app/(home)/_layout';
 import { closeCreateFlow, createFlowOpen } from '@/lib/create-flow';
 import { hasGlobe } from '@/lib/runtime';
 import { tripHref } from '@/lib/trip-route';
 import { makeDb, withData } from '@/testing/test-utils';
 import { prettyDay } from '@/ui/range-calendar';
 
+let mockPath = '/';
+let mockParams: Record<string, string | undefined> = {};
 const mockPush = jest.fn();
 const mockNavigate = jest.fn();
+const mockSetParams = jest.fn();
 jest.mock('expo-router', () => ({
   useRouter: () => ({
     push: mockPush,
     back: jest.fn(),
     replace: jest.fn(),
     navigate: mockNavigate,
+    setParams: mockSetParams,
   }),
-  useLocalSearchParams: () => ({}),
-  useGlobalSearchParams: () => ({}),
+  usePathname: () => mockPath,
+  useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
+  Redirect: () => null,
 }));
+// The tab navigator is replaced by something that only draws the layout's own tab bar; the
+// globe stage and its panels are drawn by the layout itself.
+jest.mock('expo-router/tabs', () => {
+  const Tabs = ({ tabBar }: { tabBar: (p: unknown) => React.ReactNode }) =>
+    tabBar({
+      state: { index: 0, routes: [{ name: 'index', key: 'index' }] },
+      navigateToTab: jest.fn(),
+    });
+  Tabs.Screen = () => null;
+  return { Tabs };
+});
 jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 jest.mock('@/lib/runtime', () => ({
   ...jest.requireActual('@/lib/runtime'),
@@ -93,6 +110,8 @@ async function toCitiesStep() {
 }
 
 beforeEach(() => {
+  mockPath = '/';
+  mockParams = {};
   mockPush.mockClear();
   mockNavigate.mockClear();
   closeCreateFlow();
@@ -101,7 +120,7 @@ beforeEach(() => {
 describe('creating a trip on the globe, by search and buttons alone (Plan 67)', () => {
   it('goes countries → dates → cities → days and saves the trip with its stops', async () => {
     const d = db();
-    await render(withData(d, <TripsScreen />));
+    await render(withData(d, <HomeLayout />));
     await press('Create a trip');
     expect(screen.getByText('Where to?')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Let’s go →' })).toBeNull();
@@ -169,7 +188,7 @@ describe('creating a trip on the globe, by search and buttons alone (Plan 67)', 
 
   it('a typed trip name is kept, and can be cleared while typing', async () => {
     const d = db();
-    await render(withData(d, <TripsScreen />));
+    await render(withData(d, <HomeLayout />));
     await toCitiesStep();
     await press('Next →');
     const name = () => screen.getByLabelText('Trip name');
@@ -185,7 +204,7 @@ describe('creating a trip on the globe, by search and buttons alone (Plan 67)', 
   });
 
   it('a country with no city is left out, and said so', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await search('Search a country or city', 'tok');
     await press('Add Tokyo, Japan');
@@ -202,7 +221,7 @@ describe('creating a trip on the globe, by search and buttons alone (Plan 67)', 
   });
 
   it('Back steps back through the flow and then closes it, discarding the draft', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await toDatesStep();
     await press('Back');
     expect(screen.getByText('Where to?')).toBeTruthy();
@@ -217,7 +236,7 @@ describe('creating a trip on the globe, by search and buttons alone (Plan 67)', 
 
 describe('search and the panel', () => {
   it('stepping back while a search field has focus does not hide the next step’s button', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await toCitiesStep();
     await fireEvent(screen.getByLabelText('Search a city'), 'focus');
     expect(screen.queryByRole('button', { name: 'Next →' })).toBeNull();
@@ -227,7 +246,7 @@ describe('search and the panel', () => {
   });
 
   it('closing the keyboard brings the main button back', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await toCitiesStep();
     await fireEvent(screen.getByLabelText('Search a city'), 'focus');
     expect(screen.queryByRole('button', { name: 'Next →' })).toBeNull();
@@ -238,7 +257,7 @@ describe('search and the panel', () => {
   });
 
   it('searching raises the panel even after it was dragged down', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await press('Expand panel');
     await press('Collapse panel');
@@ -247,7 +266,7 @@ describe('search and the panel', () => {
   });
 
   it('more stops than days says what to do, since the days can never match', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await toDatesStep();
     await press('Next month');
     await press(prettyDay(day(12)));
@@ -270,7 +289,7 @@ describe('search and the panel', () => {
 
 describe('tapping a country on the home globe (Plan 70)', () => {
   it('opens Explore for that country', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
     expect(webview().injected.some((js) => js.includes('setCountryTap(true)'))).toBe(true);
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
@@ -278,7 +297,7 @@ describe('tapping a country on the home globe (Plan 70)', () => {
   });
 
   it('while creating a trip a tap picks the country and does not leave the screen', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
@@ -289,7 +308,7 @@ describe('tapping a country on the home globe (Plan 70)', () => {
 
 describe('the globe during the flow', () => {
   it('a tapped country is picked, and tapped again is removed', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
@@ -300,7 +319,7 @@ describe('the globe during the flow', () => {
   });
 
   it('shows a country’s best-known cities to tap, and a tapped one becomes a stop', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
@@ -332,7 +351,7 @@ describe('the globe during the flow', () => {
   });
 
   it('with several countries, a country chip on the cities step moves the globe to it', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
@@ -348,7 +367,7 @@ describe('the globe during the flow', () => {
   });
 
   it('removing a picked country by its chip clears its outline on the globe', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await press('Create a trip');
     await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
@@ -359,7 +378,7 @@ describe('the globe during the flow', () => {
   });
 
   it('losing the globe mid-flow loses nothing that was picked', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     await toCitiesStep();
     await act(async () => webview().props.onContentProcessDidTerminate());
     expect(screen.getByText('Pick your stops')).toBeTruthy();

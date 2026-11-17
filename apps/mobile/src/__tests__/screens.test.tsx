@@ -8,6 +8,12 @@ import {
 } from '@travelog/db';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+// These render the Trips route on its own: the plain list page, as drawn where the globe
+// cannot run. With the globe, the tabs layout draws Trips on the shared stage (Plan 72).
+jest.mock('@/lib/runtime', () => ({
+  ...jest.requireActual('@/lib/runtime'),
+  hasGlobe: () => false,
+}));
 jest.mock('expo-notifications', () => ({
   setNotificationHandler: jest.fn(),
 }));

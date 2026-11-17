@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 
-import TripsScreen from '@/app/(home)/index';
+import HomeLayout from '@/app/(home)/_layout';
 import { closeCreateFlow } from '@/lib/create-flow';
 import { hasGlobe } from '@/lib/runtime';
 import { makeDb, withData } from '@/testing/test-utils';
@@ -24,11 +24,35 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: { Light: 'light' },
   NotificationFeedbackType: { Success: 'success', Warning: 'warning' },
 }));
+let mockPath = '/';
+let mockParams: Record<string, string | undefined> = {};
+const mockPush = jest.fn();
+const mockNavigate = jest.fn();
+const mockSetParams = jest.fn();
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), back: jest.fn(), replace: jest.fn(), navigate: jest.fn() }),
-  useLocalSearchParams: () => ({}),
-  useGlobalSearchParams: () => ({}),
+  useRouter: () => ({
+    push: mockPush,
+    back: jest.fn(),
+    replace: jest.fn(),
+    navigate: mockNavigate,
+    setParams: mockSetParams,
+  }),
+  usePathname: () => mockPath,
+  useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
+  Redirect: () => null,
 }));
+// The tab navigator is replaced by something that only draws the layout's own tab bar; the
+// globe stage and its panels are drawn by the layout itself.
+jest.mock('expo-router/tabs', () => {
+  const Tabs = ({ tabBar }: { tabBar: (p: unknown) => React.ReactNode }) =>
+    tabBar({
+      state: { index: 0, routes: [{ name: 'index', key: 'index' }] },
+      navigateToTab: jest.fn(),
+    });
+  Tabs.Screen = () => null;
+  return { Tabs };
+});
 jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 jest.mock('@/lib/runtime', () => ({
   ...jest.requireActual('@/lib/runtime'),
@@ -51,7 +75,7 @@ const press = (name: string) => fireEvent.press(screen.getByRole('button', { nam
 async function toDaysStep() {
   const d = makeDb();
   saveLocalProfile(d, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
-  await render(withData(d, <TripsScreen />));
+  await render(withData(d, <HomeLayout />));
   await press('Create a trip');
   await fireEvent.changeText(screen.getByLabelText('Search a country or city'), 'tok');
   await press('Add Tokyo, Japan');

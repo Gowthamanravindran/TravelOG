@@ -8,14 +8,26 @@ import { closeCreateFlow, createFlowOpen } from '@/lib/create-flow';
 import { hasGlobe } from '@/lib/runtime';
 import { makeDb, withData } from '@/testing/test-utils';
 
+let mockPath = '/';
+let mockParams: Record<string, string | undefined> = {};
 const mockPush = jest.fn();
+const mockNavigate = jest.fn();
+const mockSetParams = jest.fn();
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: mockPush, back: jest.fn(), replace: jest.fn(), navigate: jest.fn() }),
-  useLocalSearchParams: () => ({}),
-  useGlobalSearchParams: () => ({}),
+  useRouter: () => ({
+    push: mockPush,
+    back: jest.fn(),
+    replace: jest.fn(),
+    navigate: mockNavigate,
+    setParams: mockSetParams,
+  }),
+  usePathname: () => mockPath,
+  useLocalSearchParams: () => mockParams,
+  useGlobalSearchParams: () => mockParams,
   Redirect: () => null,
 }));
-// The tab navigator is replaced by something that only draws the layout's own tab bar.
+// The tab navigator is replaced by something that only draws the layout's own tab bar; the
+// globe stage and its panels are drawn by the layout itself.
 jest.mock('expo-router/tabs', () => {
   const Tabs = ({ tabBar }: { tabBar: (p: unknown) => React.ReactNode }) =>
     tabBar({
@@ -39,7 +51,10 @@ function db() {
 }
 
 beforeEach(() => {
+  mockPath = '/';
+  mockParams = {};
   mockPush.mockClear();
+  mockNavigate.mockClear();
   mockHasGlobe.mockReturnValue(false);
   closeCreateFlow();
 });
@@ -74,7 +89,7 @@ describe('Trips tab with the globe', () => {
   beforeEach(() => mockHasGlobe.mockReturnValue(true));
 
   it('shows the globe, the drawer with the trip list, and Create a trip starts the flow', async () => {
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     expect(screen.getByLabelText('Globe')).toBeTruthy();
     expect(screen.getByText('Your trips')).toBeTruthy();
     expect(screen.getByText('No trips yet')).toBeTruthy();
@@ -96,7 +111,7 @@ describe('Trips tab with the globe', () => {
 describe('globe look', () => {
   it('keeps its own colours and satellite imagery in every app theme', async () => {
     mockHasGlobe.mockReturnValue(true);
-    await render(withData(db(), <TripsScreen />));
+    await render(withData(db(), <HomeLayout />));
     const html = (global as unknown as { mockWebViews: { props: { source: { html: string } } }[] })
       .mockWebViews[0]!.props.source.html;
     expect(html.includes(defaultTheme.ocean)).toBe(true);
