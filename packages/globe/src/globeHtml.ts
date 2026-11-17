@@ -1,36 +1,10 @@
 // Builds the self-contained HTML page that runs inside the WebView.
 // The map library and country shapes are baked in, so only satellite imagery needs the network.
 // All map logic lives in the page; React Native sends data in and receives events out.
+import { defaultTheme, type GlobeTheme } from './theme';
 import { MAPLIBRE_CSS, MAPLIBRE_JS } from './maplibreAssets';
 
-export type GlobeTheme = {
-  space: string; // behind the globe
-  ocean: string; // used when imagery is off or still loading
-  land: string; // same
-  visited: string;
-  border: string; // border colour in low quality
-  pin: string;
-  route: string;
-  rim: string; // glowing outline around the globe, as 'r,g,b'
-  tag?: string; // name tags and the country popup; default navy
-  tagText?: string;
-  /** False draws every star white (for a black and white theme). Default true. */
-  starTints?: boolean;
-};
-
-export const defaultTheme: GlobeTheme = {
-  space: '#050b1a',
-  ocean: '#0d2f57',
-  land: '#3f8463',
-  visited: '#ff5a5f',
-  border: '#0a2340',
-  pin: '#ffd166',
-  route: '#ffffff',
-  rim: '56,152,255',
-  tag: '#0b2239',
-  tagText: '#ffffff',
-  starTints: true,
-};
+export { defaultTheme, type GlobeTheme } from './theme';
 
 export type GlobeQuality = 'auto' | 'high' | 'low';
 

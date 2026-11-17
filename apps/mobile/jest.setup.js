@@ -7,3 +7,27 @@ jest.mock('react-native-worklets', () => ({
   ...jest.requireActual('react-native-worklets'),
   getUIRuntimeHolder: () => ({}),
 }));
+
+// The globe's web view (Plan 66): a plain view in tests. `mockWebViews` holds every mounted one, so a
+// test can read what was injected (`injected`) and send page messages (`props.onMessage`).
+global.mockWebViews = [];
+jest.mock('react-native-webview', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const WebView = React.forwardRef((props, ref) => {
+    const self = React.useRef({ props, injected: [] });
+    self.current.props = props;
+    React.useImperativeHandle(ref, () => ({
+      injectJavaScript: (js) => self.current.injected.push(js),
+    }));
+    React.useEffect(() => {
+      const entry = self.current;
+      global.mockWebViews.push(entry);
+      return () => {
+        global.mockWebViews.splice(global.mockWebViews.indexOf(entry), 1);
+      };
+    }, []);
+    return React.createElement(View, { testID: 'webview' });
+  });
+  return { WebView, default: WebView };
+});

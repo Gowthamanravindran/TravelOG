@@ -8,6 +8,8 @@
 
 **The mock illustrates; this document governs.** Where they differ, the differences are called out below.
 
+> **Changed during the build (17 Nov, owner):** "You don't have to make the globe black and white." The globe keeps the proof of concept's own colours and satellite imagery in every app theme; only the app around it is themed. The lines below that said otherwise have been updated.
+
 ## Intent
 The owner's words: the app "feels like filling out forms over and over again and sucks the fun out of planning". People should feel engaged and want to come back. So the front door becomes a globe, and making a trip becomes something you do on that globe.
 
@@ -23,7 +25,7 @@ The owner's words: the app "feels like filling out forms over and over again and
 **Non-goals (not in this work)**
 - Changing the edit-trip screen, the trip's own screens, or the Saved, Feed, Explore and Profile tabs (they only pick up the new theme).
 - Showing past trips, visited countries or saved places on the home globe. The home globe may show existing trips' pins if cheap (builder's call), nothing more.
-- Hosting our own satellite imagery. The globe ships without imagery.
+- Hosting our own satellite imagery. The globe uses the proof of concept's public mirror for now; hosting it ourselves stays on the owner's list before launch. Offline or on a slow connection the flat map shows, as the proof of concept already does.
 - Removing the `sunset` and `block` themes. The owner is still trying themes in beta.
 
 **Anti-goals (a failure even if it works)**
@@ -35,8 +37,8 @@ The owner's words: the app "feels like filling out forms over and over again and
 
 ## Constraints (from the project)
 - **Native package:** `react-native-webview` is added with `npx expo install`, listed in `apps/mobile/native-packages.json`, and the plan summary must tell the owner a new development build is needed. It is included in Expo Go. Until the owner installs the new build, the Trips tab must not crash there: check the native module is present and fall back to today's list screen without the globe.
-- **App size:** about 3 MB is added (MapLibre 1.1 MB, cities 1 MB, one countries file 0.5–0.7 MB, flags 0.3 MB). Size enforcement is paused (Plan 50); the plan should record the measured number. Only one countries file (see Borders) should be loaded at run time, and the city list only on first search or first city step, as the proof of concept already does.
-- **Design rules:** colours only from `useTheme()`; no hex colours or `fontWeight` in app chrome; fonts from `font(role, weight)`; every text pair at least 4.5:1 (theme test); no violet. The globe page's own colours are passed in from the theme, not written in the page.
+- **App size:** the design estimated about 3 MB (MapLibre 1.1 MB, cities 1 MB, one countries file 0.5 MB, flags 0.3 MB). Measured after the build: the Android bundle grew by 5.5 MB (5.1 → 10.6 MB), because data kept as JavaScript takes more room once compiled. Moving the map library and the data to asset files is recorded as a follow-up (Plan 66). Size enforcement is paused (Plan 50); the plan should record the measured number. Only one countries file (see Borders) should be loaded at run time, and the city list only on first search or first city step, as the proof of concept already does.
+- **Design rules:** colours only from `useTheme()`; no hex colours or `fontWeight` in app chrome; fonts from `font(role, weight)`; every text pair at least 4.5:1 (theme test); no violet. The globe keeps its own colours (see the note at the top); the app chrome around it follows these rules.
 - **Motion:** through `apps/mobile/src/ui/motion.tsx`; Reduce motion respected; follow `.claude/skills/react-native-skills`.
 - **Data:** money, time and database conventions in `CLAUDE.md` apply. No server change is expected. If the builder finds a local schema change is needed, it follows `docs/12` and gets its own migration; the design below is meant to need none.
 - **Licences:** GeoNames (CC BY 4.0) is already credited for places; add MapLibre GL JS (BSD-3) and Natural Earth (public domain) to `apps/mobile/assets/licenses.json`. Flags: record their source and licence from the proof of concept, or leave flags out if it cannot be established.
@@ -128,7 +130,7 @@ Then the celebration (`useCelebrate`), the drawer shows the new trip, and the ap
 
 ### The globe package
 - New workspace package `packages/globe` holding the component, the map page, the bundled MapLibre, country shapes, flags and the city list with its search. Vitest for the pure parts (city search, top cities per country, route order).
-- **Look:** imagery off (`imageryUrl=''`), so no network is needed and nothing depends on a public mirror. Colours come from the app theme through the existing `GlobeTheme` prop: in the black and white theme, greys with white picks; in `sunset` and `block`, their own surface, ink and accent. *(My call.)*
+- **Look:** the proof of concept's own colours and satellite imagery, the same in every app theme *(owner, during the build)*. Text the app draws over the globe takes the theme's dark-scheme colours, since the globe's ground is dark.
 - **Borders:** `worldview="IN"` for everyone for now (India-first), loading only `countries.in.json`. *(My call. The proof of concept's README says the borders need a review before launch; that stays an open item for the owner, not part of this build.)*
 - **Additions the map page needs** beyond the proof of concept:
   - a layer of candidate city dots, tappable, separate from picked pins;

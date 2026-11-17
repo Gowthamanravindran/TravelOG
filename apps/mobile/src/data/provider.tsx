@@ -44,7 +44,7 @@ function useData(): DataContextValue {
  * True while the screen this is drawn in is the one in view. Outside navigation
  * (tests, the root) it's always true.
  */
-function useShown(): boolean {
+export function useShown(): boolean {
   const nav = useContext(NavigationContext);
   const [shown, setShown] = useState(() => nav?.isFocused() ?? true);
   useEffect(() => {

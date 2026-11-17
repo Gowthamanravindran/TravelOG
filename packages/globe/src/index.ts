@@ -3,4 +3,5 @@
 export * from './cities';
 export * from './countries';
 export type { GlobeMapHandle, GlobeMapProps, Place, CountryTap } from './GlobeMap';
-export type { GlobeTheme, GlobeQuality } from './globeHtml';
+export type { GlobeQuality } from './globeHtml';
+export { defaultTheme, type GlobeTheme } from './theme';

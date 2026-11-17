@@ -1,56 +1,38 @@
-import { getLocalProfile, listTrips, type TripWithState } from '@travelog/db';
+import { getLocalProfile } from '@travelog/db';
+import { spacing, type } from '@travelog/ui';
 import { useRouter } from 'expo-router';
-import { spacing } from '@travelog/ui';
-import { useEffect, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
+import { StyleSheet, Text, useWindowDimensions, View, type LayoutChangeEvent } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { TripCard } from '@/components/trip-card';
-import { mediaUrl } from '@/lib/media';
-import { tripCover } from '@/lib/trip-cover';
-import { prefetchImages } from '@/ui/remote-image';
-import { tripHref } from '@/lib/trip-route';
-import { useQuery } from '@/data/provider';
-import { Body, Button, Card, Empty, H1, Screen, Segmented, Strong, WithIcon } from '@/ui/kit';
-import { Appear } from '@/ui/motion';
-import { useTheme } from '@/ui/theme';
-import { tripDayNumber } from '@travelog/core';
-import { tripIcon } from '@/lib/labels';
+import { Globe, GLOBE_SPACE } from '@/components/globe';
+import { TripsList } from '@/components/trips-list';
+import { useQuery, useShown } from '@/data/provider';
+import { useCreateFlow } from '@/lib/create-flow';
+import { hasGlobe } from '@/lib/runtime';
+import { Drawer } from '@/ui/drawer';
+import { Between, Button, H1, H2, Screen } from '@/ui/kit';
+import { ModeProvider, useTheme } from '@/ui/theme';
 
-type Filter = 'upcoming' | 'planning' | 'past';
-
-const matches: Record<Filter, (t: TripWithState) => boolean> = {
-  upcoming: (t) => t.state === 'upcoming' || t.state === 'live',
-  planning: (t) => t.state === 'planning',
-  past: (t) => t.state === 'completed' || t.state === 'archived',
-};
+/** How much of the screen the drawer takes at rest and raised. */
+const LOW = 0.45;
+const HIGH = 0.88;
+/** The globe runs this far under the drawer's rounded corners. */
+const UNDERLAP = 28;
 
 export default function TripsScreen() {
   const router = useRouter();
+  const flow = useCreateFlow();
+  if (!hasGlobe()) return <TripsListScreen onCreate={() => router.push('/new-trip')} />;
+  return <GlobeHome onCreate={flow.start} />;
+}
+
+/** The Trips tab as it was before the globe: used where the web view is not in the app. */
+function TripsListScreen({ onCreate }: { onCreate: () => void }) {
   const t = useTheme();
   const profile = useQuery((db) => getLocalProfile(db));
-  const trips = useQuery((db) => listTrips(db));
-  // Start the first trips' cover photos downloading now, so opening a trip shows its
-  // header photo at once (Plan 53). Already-cached photos cost nothing.
-  const { width } = useWindowDimensions();
-  const prefetch = useQuery(
-    (db) =>
-      trips.slice(0, 6).flatMap((trip) => {
-        const photo = tripCover(db, trip);
-        return photo ? [mediaUrl(photo.key, width), mediaUrl(photo.key, 76)] : [];
-      }),
-    [trips, width],
-  );
-  useEffect(() => {
-    prefetchImages(prefetch);
-  }, [prefetch]);
-  const live = trips.find((x) => x.state === 'live');
-  const [filter, setFilter] = useState<Filter>(
-    trips.some(matches.upcoming) || !trips.length ? 'upcoming' : 'planning',
-  );
-  const shown = trips.filter(matches[filter]);
-  // Straight to the trip's own screen, so no empty page slides in first (Plan 36).
-  const open = (trip: TripWithState) => router.push(tripHref(trip));
-
   return (
     <Screen>
       <View
@@ -69,60 +51,77 @@ export default function TripsScreen() {
       >
         <H1 eyebrow={`Hi ${profile?.displayName ?? 'there'}`}>Your trips</H1>
       </View>
-      {live ? (
-        <Card
-          onPress={() => open(live)}
-          style={{ backgroundColor: t.accent, borderColor: t.accent }}
-        >
-          <Body small style={{ color: t.onAccent }}>
-            LIVE NOW
-            {(() => {
-              const d = tripDayNumber(live);
-              return d ? ` · Day ${d.day} of ${d.of}` : '';
-            })()}
-          </Body>
-          <WithIcon icon={tripIcon(live.emoji)} color={t.onAccent} size={22}>
-            <Strong style={{ color: t.onAccent, fontSize: 20 }}>{live.title}</Strong>
-          </WithIcon>
-          <Body small style={{ color: t.onAccent }}>
-            Open trip mode →
-          </Body>
-        </Card>
-      ) : null}
-      {trips.length ? (
-        <>
-          <Segmented<Filter>
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { value: 'upcoming', label: 'Upcoming' },
-              { value: 'planning', label: 'Planning' },
-              { value: 'past', label: 'Past' },
-            ]}
-          />
-          {shown.length ? (
-            shown.map((trip, i) => (
-              <Appear key={trip.id} index={i}>
-                <TripCard trip={trip} onPress={() => open(trip)} />
-              </Appear>
-            ))
-          ) : (
-            <Body muted>No {filter} trips.</Body>
-          )}
-        </>
-      ) : (
-        <Empty
-          icon="trips"
-          art={['luggage', 'airplane']}
-          artFamily="clay"
-          title="No trips yet"
-          body="Start one, add the people coming, and plan it day by day."
-          action={<Button label="Plan a trip" onPress={() => router.push('/new-trip')} />}
-        />
-      )}
-      <Body small muted style={{ color: t.ink2, textAlign: 'center' }}>
-        Trips are saved on this phone. Sharing with friends comes with sign-in.
-      </Body>
+      <TripsList onCreate={onCreate} />
     </Screen>
   );
 }
+
+/** The globe on top, the trips in a drawer over its lower part (Plan 66). */
+function GlobeHome({ onCreate }: { onCreate: () => void }) {
+  const shown = useShown();
+  // The window's height is a first guess, so the first frame is already laid out; the real
+  // height (less the tab bar) follows from layout.
+  const window = useWindowDimensions();
+  const [height, setHeight] = useState(window.height);
+  const [index, setIndex] = useState(0);
+  const progress = useSharedValue(0);
+  const heights = [Math.round(height * LOW), Math.round(height * HIGH)];
+  const globeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 - 0.08 * progress.get() }],
+  }));
+  const onLayout = (e: LayoutChangeEvent) => setHeight(e.nativeEvent.layout.height);
+
+  return (
+    <View style={[styles.fill, { backgroundColor: GLOBE_SPACE }]} onLayout={onLayout}>
+      {shown ? <StatusBar style="light" /> : null}
+      {height ? (
+        <>
+          <Animated.View
+            style={[styles.globe, { height: height - heights[0]! + UNDERLAP }, globeStyle]}
+          >
+            <Globe active={shown && index === 0} countryTapEnabled={false} />
+          </Animated.View>
+          <ModeProvider mode="home" scheme="dark">
+            <Greeting />
+          </ModeProvider>
+          <Drawer
+            heights={heights}
+            index={index}
+            onIndexChange={setIndex}
+            label="trip list"
+            progress={progress}
+            padBottom={false}
+            header={
+              <Between>
+                <H2>Your trips</H2>
+                <Button label="Create a trip" onPress={onCreate} />
+              </Between>
+            }
+          >
+            <TripsList onCreate={onCreate} />
+          </Drawer>
+        </>
+      ) : null}
+    </View>
+  );
+}
+
+/** Sits on the globe's dark ground, so it takes the theme's dark colours. */
+function Greeting() {
+  const t = useTheme();
+  const insets = useSafeAreaInsets();
+  const profile = useQuery((db) => getLocalProfile(db));
+  return (
+    <View pointerEvents="none" style={[styles.greeting, { top: insets.top + spacing.sm }]}>
+      <Text style={[type.label, { color: t.ink2 }]} numberOfLines={1}>
+        Hi {profile?.displayName ?? 'there'}
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  fill: { flex: 1 },
+  globe: { position: 'absolute', top: 0, left: 0, right: 0 },
+  greeting: { position: 'absolute', left: spacing.lg, right: spacing.lg },
+});

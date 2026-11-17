@@ -13,7 +13,13 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { loadCountries } from './countries';
 import { FLAGS } from './flags';
 import { globePayload } from './payload';
-import { buildGlobeHtml, defaultTheme, GlobeQuality, GlobeTheme } from './globeHtml';
+import {
+  buildGlobeHtml,
+  DEFAULT_IMAGERY_URL,
+  defaultTheme,
+  GlobeQuality,
+  GlobeTheme,
+} from './globeHtml';
 
 export type Place = {
   id: string;
@@ -94,9 +100,9 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     countryTapEnabled = true,
     reduceMotion = false,
     quality = 'auto',
-    imageryUrl = '',
+    imageryUrl = DEFAULT_IMAGERY_URL,
     imageryMaxZoom = 5,
-    imageryAttribution = '',
+    imageryAttribution = 'NASA Blue Marble',
     active = true,
     focusCountryOnPress = true,
     benchmark = false,
