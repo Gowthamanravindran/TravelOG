@@ -3,7 +3,6 @@ import {
   addChecklistItem,
   deleteChecklistItem,
   getTrip,
-  savePlace,
   setCheckInNote,
   type CheckIn,
 } from '@travelog/db';
@@ -42,13 +41,12 @@ import { useTheme } from '@/ui/theme';
 const SOURCE: Record<MustDoSource, string> = {
   idea: 'Idea',
   star: '★ Stop',
-  saved: 'Saved',
   added: 'Added',
 };
 
 /**
  * Plan 62: Must-do (the Nearby tab until maps arrive). The trip's Ideas, starred stops,
- * Saved places near it and anything typed here; ticking one saves a check-in.
+ * and anything typed here; ticking one saves a check-in. (Saved places are hidden, Plan 69.)
  */
 export default function MustDoTab() {
   const id = useTripId();
@@ -62,12 +60,10 @@ export default function MustDoTab() {
   const [just, setJust] = useState<CheckIn | null>(null);
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [kept, setKept] = useState(false);
   if (!trip) return null;
   const todo = list.filter((m) => !m.done);
   const done = list.filter((m) => m.done).sort((a, b) => b.done!.at.localeCompare(a.done!.at));
   const ended = ['completed', 'archived'].includes(tripState(trip));
-  const leftWithPlace = todo.filter((m) => m.point);
 
   const tick = async (m: MustDo) => {
     try {
@@ -86,14 +82,14 @@ export default function MustDoTab() {
         <Body muted small>
           {list.length
             ? `${done.length} of ${list.length} done`
-            : 'Ideas, starred stops and Saved places show here'}
+            : 'Ideas and starred stops show here'}
         </Body>
         {list.length ? (
           <ProgressRing done={done.length} total={list.length} size={38} stroke={4} />
         ) : null}
       </Between>
 
-      {ended && todo.length && !kept ? (
+      {ended && todo.length ? (
         <Card style={{ gap: 8 }}>
           <Text style={[type.headline, { color: t.ink }]}>
             {`${todo.length} left for next time`}
@@ -101,24 +97,6 @@ export default function MustDoTab() {
           <Body muted small>
             {todo.map((m) => m.title).join(' · ')}
           </Body>
-          <Button
-            label="Keep in Saved"
-            disabled={!leftWithPlace.length && !todo.length}
-            onPress={() => {
-              mutate((db) => {
-                for (const m of todo)
-                  if (m.source !== 'saved')
-                    savePlace(db, {
-                      title: m.title,
-                      lat: m.point?.lat ?? null,
-                      lng: m.point?.lng ?? null,
-                      address: m.detail,
-                      source: 'stop',
-                    });
-              });
-              setKept(true);
-            }}
-          />
         </Card>
       ) : null}
 

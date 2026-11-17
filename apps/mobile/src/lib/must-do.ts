@@ -1,17 +1,12 @@
 import {
-  addSavedToTrip,
   deleteCheckIn,
   getCheckIn,
-  getPlace,
   getTrip,
   listChecklist,
   listItems,
   listTripCheckIns,
   listVariants,
   liveTripItems,
-  myMember,
-  savedNear,
-  savedOnTrip,
   setChecklistDone,
   type CheckIn,
   type Db,
@@ -20,13 +15,13 @@ import {
 import { IDEAS_DAY } from '@/components/itinerary-view';
 
 import { checkInNow } from './check-in';
-import { tripCentre } from './stop-search';
 
 /**
- * Plan 62: Must-do, one list from what the trip already has: its Ideas, stops starred ★,
- * Saved places near it, and things typed here. Ticking one is a check-in.
+ * Plan 62: Must-do, one list from what the trip already has: its Ideas, stops starred ★, and
+ * things typed here. Ticking one is a check-in. Saved places near the trip used to join the
+ * list; Saved is hidden for now (Plan 69).
  */
-export type MustDoSource = 'idea' | 'star' | 'saved' | 'added';
+export type MustDoSource = 'idea' | 'star' | 'added';
 
 export interface MustDo {
   key: string;
@@ -67,25 +62,6 @@ export function mustDoList(db: Db, tripId: string): MustDo[] {
     done: byItem.get(i.id) ?? null,
   }));
 
-  const dest = trip.destinationPlaceId ? getPlace(db, trip.destinationPlaceId) : undefined;
-  const on = savedOnTrip(db, tripId);
-  const saved: MustDo[] = savedNear(db, {
-    centre: tripCentre(db, tripId),
-    countryCode: dest?.countryCode,
-  })
-    .filter((s) => !on.has(s.id))
-    .map((s) => ({
-      key: `saved:${s.id}`,
-      title: s.title,
-      source: 'saved',
-      detail: s.area ?? s.address,
-      itemId: null,
-      savedId: s.id,
-      rowId: null,
-      point: point(s),
-      done: null,
-    }));
-
   const added: MustDo[] = listChecklist(db, tripId, 'mustdo').map((r) => ({
     key: `row:${r.id}`,
     title: r.title,
@@ -98,24 +74,17 @@ export function mustDoList(db: Db, tripId: string): MustDo[] {
     done: r.checkInId ? (getCheckIn(db, r.checkInId) ?? null) : null,
   }));
 
-  return [...fromItems, ...saved, ...added];
+  return [...fromItems, ...added];
 }
 
-/** Ticks a Must-do: a check-in now (a Saved place joins the trip's Ideas first). */
+/** Ticks a Must-do: a check-in now. */
 export async function tickMustDo(
   db: Db,
   mutate: <T>(fn: (db: Db) => T) => T,
   tripId: string,
   m: MustDo,
 ): Promise<CheckIn> {
-  let itemId = m.itemId;
-  if (!itemId && m.savedId) {
-    itemId = mutate((db) => {
-      addSavedToTrip(db, [m.savedId!], tripId, IDEAS_DAY, myMember(db, tripId)?.id);
-      return liveTripItems(db, tripId).find((i) => i.savedPlaceId === m.savedId)?.id ?? null;
-    });
-  }
-  const c = await checkInNow(db, mutate, { tripId, title: m.title, itemId });
+  const c = await checkInNow(db, mutate, { tripId, title: m.title, itemId: m.itemId });
   if (m.rowId) mutate((db) => setChecklistDone(db, m.rowId!, true, c.id));
   return c;
 }

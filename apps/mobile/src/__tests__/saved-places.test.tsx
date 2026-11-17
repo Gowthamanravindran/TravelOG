@@ -127,8 +127,8 @@ describe('the Saved tab', () => {
   });
 });
 
-describe('saving from a trip', () => {
-  it('a stop’s place can be saved from the stop editor', async () => {
+describe('Saved is hidden inside a trip for now (Plan 69)', () => {
+  it('the stop editor has no Save to Saved', async () => {
     const { db, tripId } = setup();
     const v = ensureMainVariant(db, tripId, '2030-11-15');
     const item = addItem(db, v.id, {
@@ -144,35 +144,20 @@ describe('saving from a trip', () => {
         {withData(db, <ItemEditor />, 'plan')}
       </SafeAreaProvider>,
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'Save to Saved' }));
-    expect(listSaved(db)[0]).toMatchObject({
-      title: 'Artjuna',
-      type: 'food',
-      area: 'Anjuna',
-      countryCode: 'IN',
-      source: 'stop',
-    });
-    expect(screen.getByRole('button', { name: 'In Saved' })).toBeTruthy();
+    expect(screen.getByDisplayValue('Breakfast')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Save to Saved' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'In Saved' })).toBeNull();
   });
 
-  it('the Ideas day offers saved places near the trip, and plans ideas over the days', async () => {
+  it('the Ideas day does not offer saved places; ideas are still planned over the days', async () => {
     const { db, tripId } = setup();
-    savePlace(db, { title: 'Artjuna', countryCode: 'IN', ...artjuna });
-    savePlace(db, { title: 'Chapora Fort', countryCode: 'IN', ...chapora });
     savePlace(db, { title: 'Fontainhas walk', countryCode: 'IN', ...fontainhas });
-    savePlace(db, { title: 'Kashi Art Café', countryCode: 'IN', ...kochi });
-    await render(withData(db, <ItineraryView tripId={tripId} initialDay={IDEAS_DAY} />, 'plan'));
-    expect(screen.getByText('3 saved places near Goa')).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Add' }));
-    await fireEvent.press(screen.getByRole('checkbox', { name: 'Fontainhas walk' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Add 2 to Ideas' }));
     const ideas = ensureMainVariant(db, tripId, IDEAS_DAY);
-    expect(
-      listItems(db, ideas.id)
-        .map((i) => i.title)
-        .sort(),
-    ).toEqual(['Artjuna', 'Chapora Fort']);
-    expect(screen.getByText('1 saved place near Goa')).toBeTruthy();
+    addItem(db, ideas.id, { type: 'food', title: 'Artjuna', ...artjuna });
+    addItem(db, ideas.id, { type: 'place', title: 'Chapora Fort', ...chapora });
+    await render(withData(db, <ItineraryView tripId={tripId} initialDay={IDEAS_DAY} />, 'plan'));
+    expect(screen.queryByText(/saved places? near/)).toBeNull();
+    expect(screen.queryByText('From your Saved list')).toBeNull();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Plan these ideas' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Add 2 to days' }));

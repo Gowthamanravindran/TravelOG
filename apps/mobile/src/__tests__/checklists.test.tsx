@@ -141,33 +141,35 @@ describe('Get ready', () => {
 
 /** Plan 62: Must-do. */
 describe('Must-do', () => {
-  it('lists ideas, starred stops, saved places and typed ones; ticking is a check-in', async () => {
+  it('lists ideas, starred stops and typed ones, not saved places (Plan 69); ticking is a check-in', async () => {
     const { db, id } = bali();
     const ideas = ensureMainVariant(db, id, IDEAS_DAY);
     addItem(db, ideas.id, { type: 'place', title: 'Tirta Empul' });
     const day = ensureMainVariant(db, id, '2026-12-14');
     addItem(db, day.id, { type: 'place', title: 'Uluwatu sunset', mustDo: true });
     addItem(db, day.id, { type: 'food', title: 'Lunch' });
-    const ibu = savePlace(db, { title: 'Ibu Oka', countryCode: 'ID', lat: -8.5, lng: 115.26 });
+    savePlace(db, { title: 'Ibu Oka', countryCode: 'ID', lat: -8.5, lng: 115.26 });
     await screenWith(db, <MustDoTab />, 'trip');
-    for (const name of ['Tirta Empul', 'Uluwatu sunset', 'Ibu Oka'])
+    for (const name of ['Tirta Empul', 'Uluwatu sunset'])
       expect(screen.getByRole('checkbox', { name })).toBeTruthy();
     expect(screen.queryByRole('checkbox', { name: 'Lunch' })).toBeNull();
+    // A place saved earlier stays out of the trip: Saved is hidden for now.
+    expect(screen.queryByRole('checkbox', { name: 'Ibu Oka' })).toBeNull();
+    expect(screen.queryByText('Saved')).toBeNull();
 
     await fireEvent.changeText(screen.getByLabelText('Add something'), 'Try kopi luwak');
     await fireEvent.press(screen.getByRole('button', { name: 'Add' }));
     expect(screen.getByRole('checkbox', { name: 'Try kopi luwak' })).toBeTruthy();
 
-    // A Saved place joins the trip's Ideas, then gets a check-in.
-    await fireEvent.press(screen.getByRole('checkbox', { name: 'Ibu Oka' }));
-    await waitFor(() => expect(screen.getByText('Ibu Oka ✓')).toBeTruthy());
-    await fireEvent.changeText(screen.getByLabelText('A line about it'), 'Crispy');
+    // Ticking an idea is a check-in on that stop.
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Tirta Empul' }));
+    await waitFor(() => expect(screen.getByText('Tirta Empul ✓')).toBeTruthy());
+    await fireEvent.changeText(screen.getByLabelText('A line about it'), 'Cold');
     await fireEvent.press(screen.getByRole('button', { name: 'Done' }));
     const c = listTripCheckIns(db, id);
     expect(c).toHaveLength(1);
-    expect(c[0]).toMatchObject({ title: 'Ibu Oka', note: 'Crispy' });
+    expect(c[0]).toMatchObject({ title: 'Tirta Empul', note: 'Cold' });
     expect(c[0]!.itemId).not.toBeNull();
-    expect(listSaved(db)[0]!.id).toBe(ibu.id);
 
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Try kopi luwak' }));
     await waitFor(() => expect(listTripCheckIns(db, id)).toHaveLength(2));
@@ -177,15 +179,14 @@ describe('Must-do', () => {
     expect(listTripCheckIns(db, id)).toHaveLength(1);
   });
 
-  it('after the trip, what is left can be kept in Saved', async () => {
+  it('after the trip, what is left is listed, with nothing to save it to (Plan 69)', async () => {
     const { db, id } = bali({ startDate: '2025-01-10', endDate: '2025-01-12' });
     const ideas = ensureMainVariant(db, id, IDEAS_DAY);
     addItem(db, ideas.id, { type: 'place', title: 'Snorkel at Amed', lat: -8.34, lng: 115.66 });
     await screenWith(db, <MustDoTab />, 'trip');
     expect(screen.getByText('1 left for next time')).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Keep in Saved' }));
-    expect(listSaved(db).map((s) => s.title)).toEqual(['Snorkel at Amed']);
-    expect(screen.queryByText('1 left for next time')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Keep in Saved' })).toBeNull();
+    expect(listSaved(db)).toEqual([]);
   });
 
   it('Today shows progress and what is next', async () => {

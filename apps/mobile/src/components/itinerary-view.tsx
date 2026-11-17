@@ -36,7 +36,7 @@ import { dayPlaceLabel, useWhere } from '@/lib/where';
 import { BookedCard, StayStrip } from './booking-moment';
 import { PlanChecks } from './plan-checks';
 import { RouteStrip } from './route-strip';
-import { PlanIdeas, SavedForTrip } from './ideas-tools';
+import { PlanIdeas } from './ideas-tools';
 import { BestOrderSheet, suggestOrder, TravelLeg } from './travel';
 import {
   Between,
@@ -348,7 +348,6 @@ export function ItineraryView({
         </Between>
       ) : null}
       <ErrorText>{error}</ErrorText>
-      {editable && day === IDEAS_DAY ? <SavedForTrip tripId={tripId} day={day} /> : null}
 
       {compare ? (
         <View style={{ gap: 10 }}>
