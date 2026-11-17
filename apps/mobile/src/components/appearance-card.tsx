@@ -2,7 +2,12 @@ import { radius, type, type ThemeName } from '@travelog/ui';
 import { Pressable, Text, View } from 'react-native';
 
 import { useMutate } from '@/data/provider';
-import { saveAppearance, useAppearance, type AppearanceMode } from '@/lib/appearance';
+import {
+  saveAppearance,
+  useAppearance,
+  type Appearance,
+  type AppearanceMode,
+} from '@/lib/appearance';
 import { Body, Card, Segmented } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
 
@@ -12,6 +17,19 @@ const THEME_CARDS: { name: ThemeName; label: string; strip: string[] }[] = [
   { name: 'sunset', label: 'Sunset', strip: ['#FFF4EC', '#B32F18', '#0B6584', '#FFB23F'] },
   { name: 'block', label: 'Colour block', strip: ['#C6D9FF', '#FFFFFF', '#1F4FD1', '#141414'] },
 ];
+
+const MODES: { value: AppearanceMode; label: string }[] = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'Match phone' },
+];
+
+/** The current choice in a line, e.g. "Black & white · Match phone". */
+export function appearanceSummary(a: Appearance): string {
+  const theme = THEME_CARDS.find((c) => c.name === a.theme)?.label ?? '';
+  const mode = MODES.find((m) => m.value === a.mode)?.label ?? '';
+  return `${theme} · ${mode}`;
+}
 
 /** Profile → Appearance (Plan 26): pick the theme and light, dark or match phone. */
 export function AppearanceCard() {
@@ -58,11 +76,7 @@ export function AppearanceCard() {
       <Segmented<AppearanceMode>
         value={appearance.mode}
         onChange={(mode) => mutate((db) => saveAppearance(db, { mode }))}
-        options={[
-          { value: 'light', label: 'Light' },
-          { value: 'dark', label: 'Dark' },
-          { value: 'system', label: 'Match phone' },
-        ]}
+        options={MODES}
       />
       <Body muted small>
         Match phone follows your phone’s dark-mode setting. Trip mode follows this too.

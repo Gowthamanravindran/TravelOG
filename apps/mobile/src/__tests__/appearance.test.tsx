@@ -23,6 +23,11 @@ jest.mock('expo-router', () => ({
   useGlobalSearchParams: () => mockParams,
 }));
 jest.mock('expo-linear-gradient', () => ({ LinearGradient: () => null }));
+// The Profile route on its own is the plain page, as drawn where the globe cannot run.
+jest.mock('@/lib/runtime', () => ({
+  ...jest.requireActual('@/lib/runtime'),
+  hasGlobe: () => false,
+}));
 jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 const mockStatusBars: (string | undefined)[] = [];
 jest.mock('expo-status-bar', () => ({
@@ -132,6 +137,9 @@ describe('Profile → Appearance', () => {
     const db = makeDb();
     saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
     await render(withData(db, <ProfileScreen />));
+    // Appearance lives in Settings, behind the gear (Plan 74).
+    await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
+    await fireEvent.press(screen.getByRole('button', { name: /^Appearance/ }));
     expect(
       screen.getByRole('radio', { name: 'Theme Black & white' }).props.accessibilityState,
     ).toMatchObject({

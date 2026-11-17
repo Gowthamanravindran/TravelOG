@@ -58,7 +58,10 @@ describe('screens on a real database', () => {
     saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
     await render(withData(db, <ProfileScreen />));
     expect(remindersEnabled(db)).toBe(true);
-    fireEvent(screen.getByLabelText('Trip reminders'), 'valueChange', false);
+    // Reminders are in Settings, behind the gear (Plan 74).
+    await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
+    await fireEvent.press(screen.getByRole('button', { name: /^Trip reminders/ }));
+    await fireEvent(screen.getByLabelText('Trip reminders'), 'valueChange', false);
     expect(remindersEnabled(db)).toBe(false);
   });
 

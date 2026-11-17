@@ -13,7 +13,12 @@ import {
 } from 'react-native';
 import { InsetView } from './inset-view';
 
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { Art, ArtBackdrop, type ArtName } from './art';
 import { Icon, type IconName } from './icon';
@@ -545,6 +550,72 @@ export function Section({
 }
 
 /** An icon followed by text on one line (titles of items, bookings, expenses). */
+/**
+ * A section that opens in place (Plan 74): a full-width button row with a title, an optional
+ * count and a one-line summary of what is inside, and the content below it when open.
+ */
+export function Expander({
+  title,
+  summary,
+  badge,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  /** What is inside or currently chosen, shown under the title. */
+  summary?: string;
+  /** A count, shown beside the title. */
+  badge?: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  const t = useTheme();
+  const ok = useMotionOk();
+  return (
+    <View style={[styles.expander, { borderColor: t.line, backgroundColor: t.surface }]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={[title, badge, summary].filter(Boolean).join(', ')}
+        accessibilityState={{ expanded: open }}
+        onPress={() => {
+          haptic('select');
+          onToggle();
+        }}
+        style={styles.expanderRow}
+      >
+        <View style={{ flex: 1, gap: 2 }}>
+          <View style={styles.inline}>
+            <Text style={[type.headline, { color: t.ink, flexShrink: 1 }]}>{title}</Text>
+            {badge ? (
+              <Text
+                style={[
+                  type.caption,
+                  styles.expanderBadge,
+                  { color: t.ink, backgroundColor: t.surface2 },
+                ]}
+              >
+                {badge}
+              </Text>
+            ) : null}
+          </View>
+          {summary ? <Text style={[type.caption, { color: t.ink2 }]}>{summary}</Text> : null}
+        </View>
+        <Icon name={open ? 'collapse' : 'expand'} size={20} color={t.ink2} />
+      </Pressable>
+      {open ? (
+        <Animated.View
+          entering={ok ? FadeIn.duration(MOTION.fast) : undefined}
+          style={styles.expanderBody}
+        >
+          {children}
+        </Animated.View>
+      ) : null}
+    </View>
+  );
+}
+
 export function WithIcon({
   icon,
   children,
@@ -595,6 +666,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chipRow: { gap: spacing.sm, paddingVertical: 2 },
+  expander: { borderWidth: 1, borderRadius: radius.card, overflow: 'hidden' },
+  expanderRow: {
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  expanderBadge: {
+    minWidth: 24,
+    textAlign: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  expanderBody: { paddingHorizontal: spacing.md, paddingBottom: spacing.md, gap: spacing.sm },
   segmented: { flexDirection: 'row', borderRadius: 14, padding: 4, gap: 4 },
   segmentPill: { position: 'absolute', top: 4, bottom: 4, left: 4, borderRadius: 10 },
   segment: {

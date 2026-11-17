@@ -1,5 +1,5 @@
 import { saveLocalProfile } from '@travelog/db';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import ProfileScreen from '@/app/(home)/profile';
 import { globeStatus } from '@/lib/runtime';
@@ -14,12 +14,17 @@ jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 jest.mock('@/lib/runtime', () => ({
   ...jest.requireActual('@/lib/runtime'),
   globeStatus: jest.fn(),
+  // The Profile route on its own is the plain page, as drawn where the globe cannot run.
+  hasGlobe: () => false,
 }));
 
 async function profile() {
   const db = makeDb();
   saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
   await render(withData(db, <ProfileScreen />));
+  // "This app build" is in Settings → About (Plan 74).
+  await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
+  await fireEvent.press(screen.getByRole('button', { name: /^About/ }));
 }
 
 describe('Profile → This app build says whether the globe is in it (Plan 71)', () => {
