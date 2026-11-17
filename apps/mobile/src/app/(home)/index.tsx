@@ -230,7 +230,13 @@ function GlobeHome() {
         // A numbered stop comes off when tapped while cities are being picked.
         onPlacePress: (p) => draft.step === 'cities' && toggleCityById(p.id),
       }
-    : { countryTapEnabled: false };
+    : {
+        // On the home globe a tapped country opens its Explore page (Plan 70).
+        onCountryPress: (c) => {
+          globe.current?.clearFocus();
+          router.navigate({ pathname: '/explore', params: { country: c.iso } });
+        },
+      };
 
   const stepBody =
     draft.step === 'countries' ? (

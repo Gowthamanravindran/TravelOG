@@ -11,8 +11,14 @@ import { makeDb, withData } from '@/testing/test-utils';
 import { prettyDay } from '@/ui/range-calendar';
 
 const mockPush = jest.fn();
+const mockNavigate = jest.fn();
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: mockPush, back: jest.fn(), replace: jest.fn(), navigate: jest.fn() }),
+  useRouter: () => ({
+    push: mockPush,
+    back: jest.fn(),
+    replace: jest.fn(),
+    navigate: mockNavigate,
+  }),
   useLocalSearchParams: () => ({}),
   useGlobalSearchParams: () => ({}),
 }));
@@ -88,6 +94,7 @@ async function toCitiesStep() {
 
 beforeEach(() => {
   mockPush.mockClear();
+  mockNavigate.mockClear();
   closeCreateFlow();
 });
 
@@ -258,6 +265,25 @@ describe('search and the panel', () => {
     expect(
       screen.getByText('More stops than days. Remove a stop, or go back and add days.'),
     ).toBeTruthy();
+  });
+});
+
+describe('tapping a country on the home globe (Plan 70)', () => {
+  it('opens Explore for that country', async () => {
+    await render(withData(db(), <TripsScreen />));
+    await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
+    expect(webview().injected.some((js) => js.includes('setCountryTap(true)'))).toBe(true);
+    await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
+    expect(mockNavigate).toHaveBeenCalledWith({ pathname: '/explore', params: { country: 'JPN' } });
+  });
+
+  it('while creating a trip a tap picks the country and does not leave the screen', async () => {
+    await render(withData(db(), <TripsScreen />));
+    await press('Create a trip');
+    await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
+    await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Remove Japan' })).toBeTruthy();
   });
 });
 
