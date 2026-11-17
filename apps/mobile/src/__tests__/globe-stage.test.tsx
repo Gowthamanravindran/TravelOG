@@ -98,6 +98,29 @@ describe('the globe stage', () => {
     );
   });
 
+  it('the tab bar is drawn after the stage, so the raised New trip button sits on top of the globe', async () => {
+    // Of two overlapping views, the later one is drawn on top. The New trip button rises above
+    // the bar into the stage's space; drawn first, the stage hid its top (Plan 76).
+    await render(withData(db(), <HomeLayout />));
+    // Every testID in drawing order: a walk down the rendered tree, children in order.
+    type Node = { props?: { testID?: string }; children?: (Node | string)[] | null };
+    const order: string[] = [];
+    const walk = (n: Node | Node[] | string | null) => {
+      if (!n || typeof n === 'string') return;
+      if (Array.isArray(n)) return n.forEach(walk);
+      if (n.props?.testID) order.push(n.props.testID);
+      (n.children ?? []).forEach(walk);
+    };
+    walk(screen.toJSON() as Node | Node[] | null);
+    expect(order).toContain('globe-stage');
+    expect(order.indexOf('tab-bar')).toBeGreaterThan(order.indexOf('globe-stage'));
+  });
+
+  it('the trip list scrolls with the drawer at rest, not only when raised', async () => {
+    await render(withData(db(), <HomeLayout />));
+    expect(screen.getByTestId('drawer-scroll').props.scrollEnabled).toBe(true);
+  });
+
   it('on Feed the stage is hidden and does not take touches', async () => {
     mockPath = '/feed';
     await render(withData(db(), <HomeLayout />));

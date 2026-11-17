@@ -8,6 +8,10 @@ The whole bottom bar was missing on Trips, Explore and Profile. Each tab's drawe
 ## Change
 The stage clips what it draws (`overflow: 'hidden'`), so nothing on it reaches the tab bar.
 
+## After the first fix (owner's phone)
+- **The New trip button's top was hidden.** It rises above the bar, into the globe's space, and the globe stage was drawn after the bar, so on top of it. The layout now draws the bar itself, after the stage; the navigator only hands it the tab state.
+- **The trip list did not scroll at rest.** The Trips drawer only let its list scroll once raised to the top. It now scrolls at any height, like Explore and Profile; the drawer still moves by its handle and header.
+
 ## The emulator flow, fixed too
 The flow failed on this branch for a reason of its own: after picking dates it tapped `Next.*`, which also matches the calendar's "Next month" button, so it kept turning the month and never reached "Pick your stops". The buttons are now named exactly. The flow also now checks the tab bar right after the globe loads: Profile, Explore, then back to Trips.
 

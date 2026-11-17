@@ -241,7 +241,7 @@ export function TripsPanel() {
         onIndexChange={flow.open ? setDragged : setHomeIndex}
         label={flow.open ? 'panel' : 'trip list'}
         padBottom={flow.open}
-        scroll={flow.open ? 'always' : 'raised'}
+        scroll="always"
         footer={footer}
         header={
           flow.open ? (
