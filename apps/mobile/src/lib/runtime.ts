@@ -1,5 +1,4 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { TurboModuleRegistry } from 'react-native';
 
 /**
  * True inside the Expo Go app (Plan 19). Expo Go can run TravelOG for quick
@@ -10,11 +9,29 @@ export function isExpoGo(): boolean {
   return Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 }
 
+let globe: { ok: boolean; why: string | null } | undefined;
+
 /**
- * True when the web view the globe draws in is part of the installed app (Plan 66). It is in
- * Expo Go, and in development builds made after Plan 66. Importing `react-native-webview`
- * where it is missing throws, so ask this first and load the globe with `require`.
+ * Whether the globe can run in this app, and if not, why (Plans 66, 71). The globe draws in a
+ * web view, which is native code: it is in Expo Go and in builds made after Plan 66. The check
+ * is to load the web view package itself, once. It throws on import where its native part is
+ * missing, and nothing else is a reliable sign: looking the native module up by name said "no"
+ * on a build that had it (Plan 71).
  */
+export function globeStatus(): { ok: boolean; why: string | null } {
+  if (!globe) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('react-native-webview');
+      globe = { ok: true, why: null };
+    } catch (e) {
+      globe = { ok: false, why: e instanceof Error ? e.message : String(e) };
+    }
+  }
+  return globe;
+}
+
+/** True when the globe can run. Where it cannot, the Trips tab is the list and the old form. */
 export function hasGlobe(): boolean {
-  return TurboModuleRegistry.get('RNCWebViewModule') != null;
+  return globeStatus().ok;
 }

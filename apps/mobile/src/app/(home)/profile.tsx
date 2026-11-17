@@ -6,7 +6,7 @@ import { Switch } from 'react-native';
 import { AppearanceCard } from '@/components/appearance-card';
 import { useMutate, useQuery } from '@/data/provider';
 import { remindersEnabled, setRemindersEnabled } from '@/lib/reminders';
-import { isExpoGo } from '@/lib/runtime';
+import { globeStatus, isExpoGo } from '@/lib/runtime';
 import { sharingBuildLevel } from '@/lib/social-share';
 import { Between, Body, Button, Card, H1, Screen, Section, Strong } from '@/ui/kit';
 
@@ -17,6 +17,7 @@ export default function ProfileScreen() {
   const mutate = useMutate();
   const sharing = sharingBuildLevel();
   const expoGo = isExpoGo();
+  const globe = globeStatus();
   const reminders = useQuery((db) => remindersEnabled(db));
   const done = trips.filter((t) => t.state === 'completed' || t.state === 'archived').length;
 
@@ -75,6 +76,12 @@ export default function ProfileScreen() {
               : sharing === 1
                 ? 'Older build: install the latest build to open Instagram with your slides.'
                 : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}
+        </Body>
+        {/* Says outright why the Trips tab is a globe or a list on this phone (Plan 71). */}
+        <Body muted small>
+          {globe.ok
+            ? 'Globe: included.'
+            : `Globe: not in this build, so Trips shows the list. Install the latest build. (${globe.why})`}
         </Body>
       </Card>
       <Card>

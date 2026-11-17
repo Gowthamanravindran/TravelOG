@@ -3,7 +3,7 @@
 # No hideKeyboard: on the test emulator image there's no on-screen keyboard and it
 # presses Back, which closes the app. Buttons are scrolled to instead.
 appId: app.travelog.mobile
-name: First run, plan a trip, add a stop, a booking and an expense
+name: First run, see the globe, create a trip on it, add a stop, a booking and an expense
 ---
 - launchApp:
     clearState: true
@@ -27,21 +27,41 @@ name: First run, plan a trip, add a stop, a booking and an expense
 - scrollUntilVisible:
     element: "Let's go"
 - tapOn: "Let's go"
-# New trip
-- tapOn: 'Plan a trip'
-- tapOn: 'Trip name'
-- inputText: 'Goa test'
-- scrollUntilVisible:
-    element: 'Create trip'
+# Trips: the globe is really on screen (Plans 66, 71). Unit tests use a stand-in for the web
+# view, so this is the one check that the globe loads in a built app.
+- extendedWaitUntil:
+    visible: 'Globe'
+    timeout: 30000
+- takeScreenshot: globe-home
+# Create a trip on the globe, by search (Plan 67)
+- tapOn: 'Create a trip'
+- assertVisible: 'Where to?'
+- tapOn: 'Search a country or city'
+- inputText: 'Panaji'
+- tapOn: 'Add Panaji, India'
+- tapOn: 'Let.s go.*'
+# Next month, the 15th to the 17th: three days, always in the future.
+- tapOn: 'Next month'
+- tapOn: '15 [A-Z][a-z]+ 20[0-9]{2}'
+- tapOn: '17 [A-Z][a-z]+ 20[0-9]{2}'
+- tapOn: 'Next.*'
+- assertVisible: 'Pick your stops'
+- tapOn: 'Next.*'
+- assertVisible: 'Panaji trip'
+- tapOn: 'One day more in Panaji'
+- tapOn: 'One day more in Panaji'
+- assertVisible: 'All days placed'
+- takeScreenshot: create-trip-days
 - tapOn: 'Create trip'
 # Itinerary: the skeleton gives way to the plan (Plan 46)
 - extendedWaitUntil:
     visible:
       id: 'day-strip'
     timeout: 15000
-# The empty day's 3D art (Plan 52) puts its text further down: scroll to it.
+# The trip has dates now, so it opens on its first day. The empty day's 3D art (Plan 52)
+# puts its text further down: scroll to it.
 - scrollUntilVisible:
-    element: 'Collect ideas here'
+    element: 'Nothing planned for this day'
 # An empty day offers "Add the first stop".
 - scrollUntilVisible:
     element: 'Add the first stop'

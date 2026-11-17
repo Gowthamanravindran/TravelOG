@@ -74,3 +74,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 68 | [The Saved tab is hidden](68-saved-tab-hidden.md) | see git log |
 | 69 | [Saved places are hidden inside trips too](69-saved-hidden-inside-trips.md) | see git log |
 | 70 | [Tap a country on the home globe to explore it](70-explore-a-country-from-the-globe.md) | see git log |
+| 71 | [The globe did not show on a build that had it](71-globe-detection.md) | see git log |
