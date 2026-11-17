@@ -169,6 +169,39 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     setReady(false);
   }, [html, reloadKey]);
 
+  // A start can fail: the drawing context is refused, or the page goes silent. The page is then
+  // loaded again, up to three starts in a row, before the fallback is shown (Plan 77).
+  const failures = useRef(0);
+  const retry = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startFailed = useCallback(
+    (message: string) => {
+      failures.current += 1;
+      onError?.(message, true);
+      if (retry.current) clearTimeout(retry.current);
+      if (failures.current >= START_TRIES) {
+        setFailed(true);
+        return;
+      }
+      retry.current = setTimeout(() => setReloadKey((k) => k + 1), RETRY_MS);
+    },
+    [onError],
+  );
+  useEffect(
+    () => () => {
+      if (retry.current) clearTimeout(retry.current);
+    },
+    [],
+  );
+  // A page that has not said it is ready within the limit is counted as a failed start.
+  useEffect(() => {
+    if (ready || failed) return;
+    const timer = setTimeout(
+      () => startFailed(`Map did not start within ${READY_LIMIT_MS / 1000} s`),
+      READY_LIMIT_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [ready, failed, html, reloadKey, startFailed]);
+
   useEffect(() => {
     if (ready) run('window.globe.setInset(' + Math.round(bottomInset) + ')');
   }, [ready, bottomInset, run]);
@@ -255,6 +288,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
       }
       switch (msg.type) {
         case 'ready':
+          failures.current = 0;
           setReady(true);
           onReady?.({ ms: msg.ms, quality: msg.quality, pixelRatio: msg.pixelRatio });
           break;
@@ -280,8 +314,8 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
           reload();
           break;
         case 'error':
-          if (msg.fatal) setFailed(true);
-          onError?.(msg.message, !!msg.fatal);
+          if (msg.fatal) startFailed(String(msg.message));
+          else onError?.(msg.message, false);
           break;
       }
     },
@@ -295,6 +329,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
       onImagery,
       onError,
       reload,
+      startFailed,
     ],
   );
 
@@ -329,6 +364,13 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
 });
 
 export default GlobeMap;
+
+/** Starts tried in a row before the fallback is shown. */
+const START_TRIES = 3;
+/** Wait before loading the page again after a failed start. */
+const RETRY_MS = 1000;
+/** How long a page may take to say it is ready (country shapes in; imagery is not waited for). */
+const READY_LIMIT_MS = 15_000;
 
 const styles = StyleSheet.create({
   container: { flex: 1, overflow: 'hidden' },

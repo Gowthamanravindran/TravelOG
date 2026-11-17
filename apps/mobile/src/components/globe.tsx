@@ -3,7 +3,7 @@ import type GlobeMapComponent from '@travelog/globe/src/GlobeMap';
 import { forwardRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { hasGlobe } from '@/lib/runtime';
+import { hasGlobe, noteGlobeProblem } from '@/lib/runtime';
 import { useMotionOk } from '@/ui/motion';
 
 export type GlobeHandle = GlobeMapHandle;
@@ -32,6 +32,10 @@ export const Globe = forwardRef<GlobeHandle, GlobeProps>(function Globe(props, r
         ref={ref}
         {...props}
         reduceMotion={!ok}
+        onError={(message, fatal) => {
+          if (fatal) noteGlobeProblem(message);
+          props.onError?.(message, fatal);
+        }}
         fallback={<View style={[styles.fill, styles.space]} />}
       />
     </View>

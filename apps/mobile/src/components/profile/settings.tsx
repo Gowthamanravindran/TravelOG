@@ -8,7 +8,7 @@ import { AppearanceCard, appearanceSummary } from '@/components/appearance-card'
 import { useMutate, useQuery } from '@/data/provider';
 import { useAppearance } from '@/lib/appearance';
 import { remindersEnabled, setRemindersEnabled } from '@/lib/reminders';
-import { globeStatus, isExpoGo } from '@/lib/runtime';
+import { globeProblem, globeStatus, isExpoGo } from '@/lib/runtime';
 import { sharingBuildLevel } from '@/lib/social-share';
 import { Between, Body, Button, Card, Expander, Strong } from '@/ui/kit';
 import { useTheme } from '@/ui/theme';
@@ -42,6 +42,7 @@ export function ProfileSettings() {
   const sharing = sharingBuildLevel();
   const expoGo = isExpoGo();
   const globe = globeStatus();
+  const problem = globeProblem();
   const [open, setOpen] = useState<SectionName | null>(null);
   const section = (name: SectionName) => ({
     open: open === name,
@@ -97,7 +98,7 @@ export function ProfileSettings() {
           {/* Says outright why the Trips tab is a globe or a list on this phone (Plan 71). */}
           <Body muted small>
             {globe.ok
-              ? 'Globe: included.'
+              ? `Globe: included.${problem ? ` Last problem starting it: ${problem}` : ''}`
               : `Globe: not in this build, so Trips shows the list. Install the latest build. (${globe.why})`}
           </Body>
         </Card>

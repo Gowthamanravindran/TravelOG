@@ -31,6 +31,21 @@ export function globeStatus(): { ok: boolean; why: string | null } {
   return globe;
 }
 
+let problem: string | null = null;
+
+/**
+ * The last time the globe failed to start, and why (Plan 77). The globe retries by itself; this
+ * is kept so Settings → About can say what went wrong, and it goes to the developer log too.
+ */
+export function noteGlobeProblem(message: string): void {
+  problem = message;
+  console.warn(`[globe] ${message}`);
+}
+
+export function globeProblem(): string | null {
+  return problem;
+}
+
 /** True when the globe can run. Where it cannot, the Trips tab is the list and the old form. */
 export function hasGlobe(): boolean {
   return globeStatus().ok;
