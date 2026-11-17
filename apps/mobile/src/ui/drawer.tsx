@@ -3,19 +3,20 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useMotionOk } from './motion';
+import { MOTION, useMotionOk } from './motion';
 import { useTheme } from './theme';
 
-/** Settles without bouncing past its resting place (Plan 32: nothing overshoots). */
-const SPRING = { damping: 28, stiffness: 260, mass: 0.9, overshootClamping: true } as const;
+/** Eases to rest and stops; nothing overshoots or bounces (Plan 32). */
+const SETTLE = { duration: MOTION.slow, easing: Easing.out(Easing.cubic) };
 
 /**
  * A drawer that stays on the screen, over whatever is behind it (Plan 66). Unlike
@@ -66,7 +67,7 @@ export function Drawer({
   const bottomPad = padBottom ? insets.bottom : 0;
 
   useEffect(() => {
-    offset.set(ok ? withSpring(resting, SPRING) : resting);
+    offset.set(ok ? withTiming(resting, SETTLE) : resting);
   }, [resting, ok, offset]);
 
   const pan = Gesture.Pan()
@@ -84,7 +85,7 @@ export function Drawer({
       for (let i = 1; i < heights.length; i++)
         if (Math.abs(max - heights[i]! - aim) < Math.abs(max - heights[best]! - aim)) best = i;
       const to = max - heights[best]!;
-      offset.set(ok ? withSpring(to, SPRING) : to);
+      offset.set(ok ? withTiming(to, SETTLE) : to);
       runOnJS(onIndexChange)(best);
     });
 

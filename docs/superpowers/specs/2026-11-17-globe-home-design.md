@@ -67,7 +67,7 @@ The owner's words: the app "feels like filling out forms over and over again and
 *Owner decided:* globe on top, bottom drawer with the trip list, as in the mock.
 
 - `app/(home)/index.tsx` becomes one screen with two layers: the globe filling the area above, and a drawer.
-- **Drawer:** two resting heights. Lowered, it shows the handle, "Your trips", the **Create a trip** button, the Upcoming / Planning / Past filter and the first trips. Raised, it covers most of the globe and scrolls. It follows the finger and settles with a spring. The existing `ui/bottom-sheet.tsx` is a modal and does not fit; this is a new non-modal drawer built on Reanimated and Gesture Handler, both already installed. *(My call: no new sheet library.)*
+- **Drawer:** two resting heights. Lowered, it shows the handle, "Your trips", the **Create a trip** button, the Upcoming / Planning / Past filter and the first trips. Raised, it covers most of the globe and scrolls. It follows the finger and eases to rest (the project allows no springs or bounces, Plan 32). The existing `ui/bottom-sheet.tsx` is a modal and does not fit; this is a new non-modal drawer built on Reanimated and Gesture Handler, both already installed. *(My call: no new sheet library.)*
 - The trip list keeps what it has today: the live-trip card, trip cards, filters, the empty state and its wording.
 - **Create a trip** lives in the drawer header. The centre "New trip" button in the tab bar starts the same flow. *(Changed from the mock, which dropped the centre button: keeping it costs nothing and people already know it. Owner to confirm.)*
 - The `/new-trip` route and its form stay in the code for now as the fallback: where the web view's native module is missing (the owner's current development build), **Create a trip** opens it as today. Where the module is present, both buttons start the globe flow. Removing the old route is a later, separate change once the new build is installed. `components/trip-form.tsx` also stays for editing a trip. *(My call.)*
@@ -146,9 +146,9 @@ Then the celebration (`useCelebrate`), the drawer shows the new trip, and the ap
 ### Motion *(owner asked for good animations and proper transitions; the specifics are my proposal, approved in outline)*
 - **Between steps:** the globe stays; the panel's content slides and cross-fades (about 250 ms); the panel height animates to fit.
 - **Globe:** flies to a picked country; tilts and zooms for cities; fits the route for days. Camera moves 600–900 ms, eased, interruptible by touch.
-- **Picks:** a pin pops (scale spring) with a light haptic; the route line draws from the previous stop (about 400 ms).
+- **Picks:** a pin pops (a short eased scale) with a light haptic; the route line draws from the previous stop (about 400 ms).
 - **Days:** the count rolls when changed (`CountUp`); going over shakes the total once as it turns red, with a warning haptic; reaching "All days placed" gives a success haptic.
-- **Drawer:** follows the finger, springs to rest; the globe scales down slightly as the drawer rises.
+- **Drawer:** follows the finger, eases to rest; the globe scales down slightly as the drawer rises.
 - **Create:** the route draws once more, then the existing celebration.
 - **Reduce motion:** slides, pops, shakes and draws become plain fades or instant changes; camera moves jump. Haptics stay.
 - Nothing blocks input; app-side transitions stay within about 200–350 ms.
