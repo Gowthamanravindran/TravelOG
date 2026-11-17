@@ -60,6 +60,28 @@ describe('themes', () => {
     expect(bad).toEqual([]);
   });
 
+  it('mono is black and white with one ink accent in every area', () => {
+    expect(THEME_NAMES).toContain('mono');
+    for (const mode of MODES) {
+      const l = themeFor('mono', mode, 'light');
+      const d = themeFor('mono', mode, 'dark');
+      expect([l.bg, l.ink, l.accent, l.onAccent]).toEqual([
+        '#FFFFFF',
+        '#000000',
+        '#000000',
+        '#FFFFFF',
+      ]);
+      expect([d.bg, d.ink, d.accent, d.onAccent]).toEqual([
+        '#000000',
+        '#FFFFFF',
+        '#FFFFFF',
+        '#000000',
+      ]);
+      expect(l.band).toBeNull();
+      expect(l.name).toBe('mono');
+    }
+  });
+
   it('color maths', () => {
     expect(contrast('#FFFFFF', '#000000')).toBeCloseTo(21, 5);
     expect(Math.abs(oklch('#5B5BD6').H - 278.3)).toBeLessThan(1);

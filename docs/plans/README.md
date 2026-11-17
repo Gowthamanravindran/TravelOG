@@ -68,3 +68,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 62 | [Must-do in Trip mode](62-must-do.md) | see git log |
 | 63 | [The dev server's web page: blank, now a notice](63-web-page-bundle.md) | see git log |
 | 64 | [Save from a link and Share to TravelOG removed, to the backlog](64-reel-import-removed.md) | see git log |
+| 65 | [A black and white theme, the default for new installs](65-black-and-white-theme.md) | see git log |

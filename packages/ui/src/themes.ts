@@ -1,10 +1,10 @@
 /**
- * The two app themes (Plan 26). Values come from
+ * The app themes (Plan 26; black and white added in Plan 65). Values come from
  * docs/superpowers/specs/2026-11-05-app-redesign-design.md §3; every pair is checked
  * for 4.5:1 contrast and the violet band in themes.test.ts.
  */
 
-export type ThemeName = 'sunset' | 'block';
+export type ThemeName = 'sunset' | 'block' | 'mono';
 export type TileFamily = 'sea' | 'clay' | 'mango' | 'leaf' | 'rose';
 type SchemeKey = 'light' | 'dark';
 type ModeKey = 'home' | 'plan' | 'trip';
@@ -42,6 +42,11 @@ const solid = (bg: string) => ({ light: { bg, fg: '#FFFFFF' }, dark: { bg, fg: '
 
 const SUNSET_LIGHT_BG = '#FFF4EC';
 const SUNSET_DARK_BG = '#17110E';
+
+const MONO_LIGHT: AccentSet = ['#000000', '#EBEBEB', '#FFFFFF'];
+const MONO_DARK: AccentSet = ['#FFFFFF', '#2A2A2A', '#000000'];
+// The dark icon is just off white so category colours take the icon, not the fill (see `strong` in tokens.ts).
+const MONO_TILE = tint(['#EBEBEB', '#000000'], ['#2A2A2A', '#F5F5F5']);
 
 export const THEMES: Record<ThemeName, ThemeData> = {
   sunset: {
@@ -119,5 +124,44 @@ export const THEMES: Record<ThemeName, ThemeData> = {
     band: false,
     inkTabBar: true,
     displaySize: 32,
+  },
+  /** Black and white (Plan 65): one ink accent in every area; red only through `danger`. */
+  mono: {
+    grounds: {
+      home: { light: '#FFFFFF', dark: '#000000' },
+      plan: { light: '#FFFFFF', dark: '#000000' },
+      trip: { light: '#FFFFFF', dark: '#000000' },
+    },
+    neutrals: {
+      light: {
+        surface: '#FFFFFF',
+        surface2: '#F2F2F2',
+        ink: '#000000',
+        ink2: '#595959',
+        line: '#E0E0E0',
+      },
+      dark: {
+        surface: '#141414',
+        surface2: '#1F1F1F',
+        ink: '#FFFFFF',
+        ink2: '#B3B3B3',
+        line: '#333333',
+      },
+    },
+    accents: {
+      home: { light: MONO_LIGHT, dark: MONO_DARK },
+      plan: { light: MONO_LIGHT, dark: MONO_DARK },
+      trip: { light: MONO_LIGHT, dark: MONO_DARK },
+    },
+    tiles: {
+      sea: MONO_TILE,
+      clay: MONO_TILE,
+      mango: MONO_TILE,
+      leaf: MONO_TILE,
+      rose: MONO_TILE,
+    },
+    band: false,
+    inkTabBar: false,
+    displaySize: 28,
   },
 };

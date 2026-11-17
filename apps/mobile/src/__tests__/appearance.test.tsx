@@ -38,7 +38,14 @@ describe('appearance setting', () => {
     setSetting(db, 'appearance.theme', 'neon');
     setSetting(db, 'appearance.mode', 'dim');
     expect(readAppearance(db)).toEqual(DEFAULT_APPEARANCE);
-    expect(DEFAULT_APPEARANCE).toEqual({ theme: 'sunset', mode: 'system' });
+    expect(DEFAULT_APPEARANCE).toEqual({ theme: 'mono', mode: 'system' });
+  });
+
+  it('new installs get black and white; a saved theme is kept', () => {
+    const db = makeDb();
+    expect(readAppearance(db).theme).toBe('mono');
+    setSetting(db, 'appearance.theme', 'sunset');
+    expect(readAppearance(db).theme).toBe('sunset');
   });
 
   it('saveAppearance round-trips', () => {
@@ -126,7 +133,7 @@ describe('Profile → Appearance', () => {
     saveLocalProfile(db, { displayName: 'Gowtham', homeCurrency: 'INR', upiId: null });
     await render(withData(db, <ProfileScreen />));
     expect(
-      screen.getByRole('radio', { name: 'Theme Sunset' }).props.accessibilityState,
+      screen.getByRole('radio', { name: 'Theme Black & white' }).props.accessibilityState,
     ).toMatchObject({
       selected: true,
     });

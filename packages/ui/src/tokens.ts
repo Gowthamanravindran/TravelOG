@@ -1,6 +1,6 @@
 /**
  * Design tokens (docs/02-design-system.md, Plan 26).
- * Two themes × light/dark × three modes; each mode re-themes the app through its accent.
+ * Three themes × light/dark × three modes; each mode re-themes the app through its accent.
  */
 
 export type Mode = 'home' | 'plan' | 'trip';
@@ -47,7 +47,7 @@ export interface Theme {
   displaySize: number;
 }
 
-export const THEME_NAMES: readonly ThemeName[] = ['sunset', 'block'];
+export const THEME_NAMES: readonly ThemeName[] = ['sunset', 'block', 'mono'];
 
 /** Status colours, the same in both themes (light values darkened for 4.5:1 in Plan 26). */
 const STATUS: Record<Scheme, { mango: string; success: string; danger: string }> = {

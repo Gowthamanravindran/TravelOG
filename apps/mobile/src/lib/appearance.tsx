@@ -11,7 +11,7 @@ export interface Appearance {
   mode: AppearanceMode;
 }
 
-export const DEFAULT_APPEARANCE: Appearance = { theme: 'sunset', mode: 'system' };
+export const DEFAULT_APPEARANCE: Appearance = { theme: 'mono', mode: 'system' };
 const MODES: readonly AppearanceMode[] = ['light', 'dark', 'system'];
 const KEY = { theme: 'appearance.theme', mode: 'appearance.mode' } as const;
 

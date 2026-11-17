@@ -6,6 +6,8 @@ See it live in [`/mockups/index.html`](../mockups/index.html).
 
 > **Plan 26 (current app look).** The phone app now uses two switchable themes, **Sunset** and **Colour block**, chosen in Profile → Appearance with Light / Dark / Match phone. Trip mode follows that switch; the collage editor stays dark. Sections 1–4 below describe the earlier design and are **superseded by Plan 26** for colours, type and shape; the rest still applies.
 >
+> **Plan 65.** A third theme, **Black & white** (`mono`), is the default for new installs: white or black grounds, one ink accent in every area, greys for tiles, and red only for errors. Sunset and Colour block stay switchable.
+>
 > - **Colours:** only from `themeFor(theme, mode, scheme)` / `useTheme()` in `packages/ui`. Every value is in the spec, [`superpowers/specs/2026-11-05-app-redesign-design.md`](superpowers/specs/2026-11-05-app-redesign-design.md) §3.
 > - **Rules, enforced by tests:**
 >   - no violet: OKLCH hue 270–330° (`packages/ui/src/themes.test.ts`);

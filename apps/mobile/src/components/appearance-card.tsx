@@ -8,6 +8,7 @@ import { useTheme } from '@/ui/theme';
 
 /** Theme specimens: a strip of each theme's own colours (exempt from the hex guard). */
 const THEME_CARDS: { name: ThemeName; label: string; strip: string[] }[] = [
+  { name: 'mono', label: 'Black & white', strip: ['#FFFFFF', '#000000', '#595959', '#E0E0E0'] },
   { name: 'sunset', label: 'Sunset', strip: ['#FFF4EC', '#B32F18', '#0B6584', '#FFB23F'] },
   { name: 'block', label: 'Colour block', strip: ['#C6D9FF', '#FFFFFF', '#1F4FD1', '#141414'] },
 ];

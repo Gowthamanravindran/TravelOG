@@ -18,13 +18,18 @@ describe('themeFor', () => {
     expect(themeFor('sunset', 'home', null).scheme).toBe('light');
   });
 
-  it('gives each mode its own accent in every theme', () => {
+  it('gives each mode its own accent in the colour themes; black and white has one', () => {
     for (const name of THEME_NAMES) {
       const accents = new Set(
         (['home', 'plan', 'trip'] as Mode[]).map((m) => themeFor(name, m, 'light').accent),
       );
-      expect(accents.size).toBe(3);
+      expect(accents.size).toBe(name === 'mono' ? 1 : 3);
     }
+  });
+
+  it('keeps black and white category colours readable on its cards', () => {
+    expect(themeFor('mono', 'home', 'dark').categories.stay).toBe('#F5F5F5');
+    expect(themeFor('mono', 'home', 'light').categories.stay).toBe('#000000');
   });
 
   it('draws Colour block’s tab bar in black', () => {
