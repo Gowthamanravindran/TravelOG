@@ -12,13 +12,8 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
 import { loadCountries } from './countries';
 import { FLAGS } from './flags';
-import {
-  buildGlobeHtml,
-  DEFAULT_IMAGERY_URL,
-  defaultTheme,
-  GlobeQuality,
-  GlobeTheme,
-} from './globeHtml';
+import { globePayload } from './payload';
+import { buildGlobeHtml, defaultTheme, GlobeQuality, GlobeTheme } from './globeHtml';
 
 export type Place = {
   id: string;
@@ -43,14 +38,26 @@ export type GlobeMapHandle = {
   focusCountry: (iso: string) => void;
   /** Remove the outline and label, and zoom back out. */
   clearFocus: () => void;
+  /** Frame every stop. */
+  fitStops: () => void;
+  /** Frame several countries at once (ISO alpha-3). */
+  fitCountries: (isos: string[]) => void;
 };
 
 export type GlobeMapProps = {
   /** ISO 3166-1 alpha-3 codes, e.g. ['IND', 'FRA'] */
   visitedCountries?: string[];
   places?: Place[];
-  /** Ordered stops; drawn as great-circle arcs. */
+  /** Ordered points; drawn as great-circle arcs. Ignored when `stops` has any. */
   route?: { lat: number; lng: number }[];
+  /** Cities that could be added: hollow, tappable dots. One that is also a stop is not drawn. */
+  candidates?: Place[];
+  /** Picked cities in visit order: numbered pins joined by the route; a new last stop draws its leg. */
+  stops?: Place[];
+  /** Whether tapping a country does anything. Default true. */
+  countryTapEnabled?: boolean;
+  /** Camera moves jump and the route appears whole. Default false. */
+  reduceMotion?: boolean;
   quality?: GlobeQuality;
   /** XYZ raster tiles. Pass '' to turn imagery off. */
   imageryUrl?: string;
@@ -67,7 +74,9 @@ export type GlobeMapProps = {
   /** Shown instead of the globe if the map cannot start on this device. */
   fallback?: React.ReactNode;
   onCountryPress?: (country: CountryTap) => void;
+  /** A pin or a numbered stop was tapped. */
   onPlacePress?: (place: Place) => void;
+  onCandidatePress?: (place: Place) => void;
   onReady?: (info: { ms: number; quality: 'high' | 'low'; pixelRatio: number }) => void;
   onPerf?: (sample: PerfSample) => void;
   onQualityChange?: (info: { quality: 'high' | 'low'; reason: string; fps: number | null }) => void;
@@ -80,10 +89,14 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     visitedCountries,
     places,
     route,
+    candidates,
+    stops,
+    countryTapEnabled = true,
+    reduceMotion = false,
     quality = 'auto',
-    imageryUrl = DEFAULT_IMAGERY_URL,
+    imageryUrl = '',
     imageryMaxZoom = 5,
-    imageryAttribution = 'NASA Blue Marble',
+    imageryAttribution = '',
     active = true,
     focusCountryOnPress = true,
     benchmark = false,
@@ -92,6 +105,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     fallback,
     onCountryPress,
     onPlacePress,
+    onCandidatePress,
     onReady,
     onPerf,
     onQualityChange,
@@ -131,20 +145,30 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     setReady(false);
   }, [html, reloadKey]);
 
+  // Sent before the data, so a first route never animates when it should not.
+  useEffect(() => {
+    if (ready) run('window.globe.setReduceMotion(' + (reduceMotion ? 'true' : 'false') + ')');
+  }, [ready, reduceMotion, run]);
+
   // Push data when its content changes. Comparing the serialised form means a parent that
   // re-creates arrays on every render does not cause extra work in the map.
   const payload = useMemo(
-    () =>
-      JSON.stringify({ visited: visitedCountries ?? [], places: places ?? [], route: route ?? [] }),
-    [visitedCountries, places, route],
+    () => globePayload({ visited: visitedCountries, places, route, candidates, stops }),
+    [visitedCountries, places, route, candidates, stops],
   );
+  const latestStops = useRef<Place[]>([]);
+  latestStops.current = stops ?? [];
   useEffect(() => {
     if (ready) run('window.globe.setData(' + payload + ')');
   }, [ready, payload, run]);
 
   useEffect(() => {
-    if (ready) run('window.globe.setSpin(' + (active ? 'true' : 'false') + ')');
-  }, [ready, active, run]);
+    if (ready) run('window.globe.setCountryTap(' + (countryTapEnabled ? 'true' : 'false') + ')');
+  }, [ready, countryTapEnabled, run]);
+
+  useEffect(() => {
+    if (ready) run('window.globe.setSpin(' + (active && !reduceMotion ? 'true' : 'false') + ')');
+  }, [ready, active, reduceMotion, run]);
 
   useEffect(() => {
     if (ready && quality !== initialQuality.current) {
@@ -160,6 +184,13 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
         run('window.globe.flyTo(' + [lng, lat, zoom ?? 3.5].join(',') + ')'),
       focusCountry: (iso) => run('window.globe.focusCountry(' + JSON.stringify(iso) + ')'),
       clearFocus: () => run('window.globe.clearSelection()'),
+      fitStops: () =>
+        run(
+          'window.globe.fitPoints(' +
+            JSON.stringify(latestStops.current.map((p) => ({ lat: p.lat, lng: p.lng }))) +
+            ')',
+        ),
+      fitCountries: (isos) => run('window.globe.fitCountries(' + JSON.stringify(isos) + ')'),
     }),
     [run],
   );
@@ -188,6 +219,9 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
         case 'place':
           onPlacePress?.({ id: msg.id, name: msg.name, lat: msg.lat, lng: msg.lng });
           break;
+        case 'candidate':
+          onCandidatePress?.({ id: msg.id, name: msg.name, lat: msg.lat, lng: msg.lng });
+          break;
         case 'perf':
           onPerf?.(msg);
           break;
@@ -206,7 +240,17 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
           break;
       }
     },
-    [onCountryPress, onPlacePress, onReady, onPerf, onQualityChange, onImagery, onError, reload],
+    [
+      onCountryPress,
+      onPlacePress,
+      onCandidatePress,
+      onReady,
+      onPerf,
+      onQualityChange,
+      onImagery,
+      onError,
+      reload,
+    ],
   );
 
   if (failed && fallback) {

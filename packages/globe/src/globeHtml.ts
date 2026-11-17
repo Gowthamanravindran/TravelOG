@@ -12,6 +12,10 @@ export type GlobeTheme = {
   pin: string;
   route: string;
   rim: string; // glowing outline around the globe, as 'r,g,b'
+  tag?: string; // name tags and the country popup; default navy
+  tagText?: string;
+  /** False draws every star white (for a black and white theme). Default true. */
+  starTints?: boolean;
 };
 
 export const defaultTheme: GlobeTheme = {
@@ -23,6 +27,9 @@ export const defaultTheme: GlobeTheme = {
   pin: '#ffd166',
   route: '#ffffff',
   rim: '56,152,255',
+  tag: '#0b2239',
+  tagText: '#ffffff',
+  starTints: true,
 };
 
 export type GlobeQuality = 'auto' | 'high' | 'low';
@@ -84,15 +91,19 @@ function pageCss(theme: GlobeTheme): string {
       rim(0.5) +
       '; }',
     '#rim.lite { box-shadow: 0 0 10px 2px ' + rim(0.7) + '; }',
-    '.country-pop .maplibregl-popup-content { background: #0b2239; color: #fff; padding: 7px 13px; border-radius: 14px;',
+    '.country-pop .maplibregl-popup-content { background: ' +
+      theme.tag +
+      '; color: ' +
+      theme.tagText +
+      '; padding: 7px 13px; border-radius: 14px;',
     '  font: 600 14px -apple-system, Roboto, "Segoe UI", sans-serif; box-shadow: 0 4px 14px rgba(0,0,0,0.45); white-space: nowrap; }',
-    '.country-pop .maplibregl-popup-tip { border-top-color: #0b2239 !important; }',
+    '.country-pop .maplibregl-popup-tip { border-top-color: ' + theme.tag + ' !important; }',
     '.maplibregl-ctrl-attrib { font-size: 9px; opacity: 0.55; }',
   ].join(String.fromCharCode(10));
 }
 
 // Plain ES5, no template strings, so it runs on old WebViews and embeds safely.
-const MAIN_JS = `
+export const globePageScript = `
 function post(msg) {
   var text = JSON.stringify(msg);
   if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
@@ -102,7 +113,7 @@ function post(msg) {
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
 window.globe = {};
-['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection'].forEach(function (name) {
+['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries'].forEach(function (name) {
   window.globe[name] = function () { pending.push([name, Array.prototype.slice.call(arguments)]); };
 });
 
@@ -126,6 +137,7 @@ function drawStars() {
     var size = k < 0.78 ? 0.5 + rnd() * 0.5 : (k < 0.96 ? 1 + rnd() * 0.6 : 1.7 + rnd() * 0.8);
     var alpha = 0.5 + rnd() * 0.5;
     var tint = rnd() < 0.25 ? '190,215,255' : (rnd() < 0.1 ? '255,235,205' : '255,255,255');
+    if (CFG.theme.starTints === false) tint = '255,255,255';
     // Draw wrapped copies so stars on a tile edge are not cut in half at the seam.
     for (var ox = -1; ox <= 1; ox++) {
       for (var oy = -1; oy <= 1; oy++) {
@@ -173,6 +185,9 @@ function start() {
     },
     places: { type: 'geojson', data: EMPTY, cluster: true, clusterRadius: 36, clusterMaxZoom: 5 },
     route: { type: 'geojson', data: EMPTY },
+    leg: { type: 'geojson', data: EMPTY },
+    candidates: { type: 'geojson', data: EMPTY },
+    stops: { type: 'geojson', data: EMPTY },
     labels: { type: 'geojson', data: EMPTY }
   };
   if (hasImagery) {
@@ -201,12 +216,16 @@ function start() {
   }
   layers.push(
     { id: 'visited', type: 'fill', source: 'countries',
-      paint: { 'fill-color': THEME.visited, 'fill-opacity': ['case', VISITED, 0.6, 0] } },
+      paint: { 'fill-color': THEME.visited, 'fill-opacity': ['case', VISITED, hasImagery && quality === 'high' ? 0.6 : 1, 0] } },
     { id: 'borders', type: 'line', source: 'countries',
-      paint: { 'line-color': 'rgba(255,255,255,0.35)', 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.4, 5, 1] } },
+      paint: { 'line-color': hasImagery && quality === 'high' ? 'rgba(255,255,255,0.35)' : THEME.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.4, 5, 1] } },
     { id: 'selected', type: 'line', source: 'countries',
       paint: { 'line-color': '#ffffff', 'line-width': ['case', SELECTED, 2.5, VISITED, 1.5, 0] } },
     { id: 'route', type: 'line', source: 'route',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': THEME.route, 'line-width': 2, 'line-opacity': 0.9, 'line-dasharray': [2, 1.5] } },
+    // The newest leg of the route while it draws itself from the previous stop.
+    { id: 'leg', type: 'line', source: 'leg',
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: { 'line-color': THEME.route, 'line-width': 2, 'line-opacity': 0.9, 'line-dasharray': [2, 1.5] } },
     // Countries too small to see as shapes: faint dots once zoomed in, solid dots when visited.
@@ -233,7 +252,18 @@ function start() {
       layout: { 'icon-image': ['get', 'img'], 'icon-anchor': 'bottom', 'icon-offset': [0, -3], 'icon-padding': 1 } },
     // Tags for place pins sit above country tags, so a city wins when the two would overlap.
     { id: 'place-labels', type: 'symbol', source: 'places', filter: ['all', NOT_CLUSTER, ['has', 'img']],
-      layout: { 'icon-image': ['get', 'img'], 'icon-anchor': 'bottom', 'icon-offset': [0, -8], 'icon-padding': 1 } }
+      layout: { 'icon-image': ['get', 'img'], 'icon-anchor': 'bottom', 'icon-offset': [0, -8], 'icon-padding': 1 } },
+    // Cities that could be added: hollow dots with a name tag where there is room.
+    { id: 'candidates-dot', type: 'circle', source: 'candidates',
+      paint: { 'circle-radius': 5.5, 'circle-color': THEME.space,
+               'circle-stroke-color': THEME.pin, 'circle-stroke-width': 2 } },
+    { id: 'candidate-labels', type: 'symbol', source: 'candidates', filter: ['has', 'img'],
+      layout: { 'icon-image': ['get', 'img'], 'icon-anchor': 'bottom', 'icon-offset': [0, -8], 'icon-padding': 1 } },
+    // Picked cities, in visit order: a filled pin carrying its number, always drawn.
+    { id: 'stops-dot', type: 'symbol', source: 'stops',
+      layout: { 'icon-image': ['get', 'num'], 'icon-allow-overlap': true, 'icon-ignore-placement': true } },
+    { id: 'stop-labels', type: 'symbol', source: 'stops', filter: ['has', 'img'],
+      layout: { 'icon-image': ['get', 'img'], 'icon-anchor': 'bottom', 'icon-offset': [0, -15], 'icon-padding': 1 } }
   );
 
   var map;
@@ -455,7 +485,7 @@ function start() {
     c.width = Math.ceil(w * pr); c.height = Math.ceil((h + tip) * pr);
     g = c.getContext('2d');
     g.scale(pr, pr);
-    g.fillStyle = '#0b2239';
+    g.fillStyle = THEME.tag;
     g.beginPath();
     g.moveTo(r, 0); g.lineTo(w - r, 0); g.arc(w - r, r, r, -Math.PI / 2, Math.PI / 2);
     g.lineTo(w / 2 + tip, h); g.lineTo(w / 2, h + tip); g.lineTo(w / 2 - tip, h);
@@ -471,7 +501,7 @@ function start() {
       g.drawImage(flag, fx, fy, fw, fh);
       g.restore();
     }
-    g.font = font; g.fillStyle = '#ffffff'; g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.font = font; g.fillStyle = THEME.tagText; g.textAlign = 'left'; g.textBaseline = 'middle';
     g.fillText(text, 11 + fw + gap, h / 2 + 0.5);
     return { image: g.getImageData(0, 0, c.width, c.height), pixelRatio: pr };
   }
@@ -529,14 +559,155 @@ function start() {
     if (selected) map.setFeatureState({ source: 'countries', id: selected }, { selected: true });
     placesData = d.places || [];
     refreshPlaces();
-    map.getSource('route').setData(routeLine(d.route));
+    candidatesData = d.candidates || [];
+    refreshCandidates();
+    var next = d.stops || [];
+    var grewByOne = next.length === stopsData.length + 1 && stopsData.length >= 1 &&
+      stopsData.every(function (p, i) { return p.id === next[i].id; });
+    var before = stopsData;
+    stopsData = next;
+    refreshStops();
+    // Country name tags would sit on top of city tags, so they step aside while cities are shown.
+    map.setLayoutProperty('labels', 'visibility', candidatesData.length || stopsData.length ? 'none' : 'visible');
+    cancelLeg();
+    if (!stopsData.length) {
+      map.getSource('route').setData(routeLine(d.route));
+    } else if (grewByOne && !still) {
+      map.getSource('route').setData(routeLine(before));
+      drawLeg(before[before.length - 1], next[next.length - 1]);
+    } else {
+      map.getSource('route').setData(routeLine(stopsData));
+    }
     refreshLabels();
+  }
+
+  // ---- candidate cities and picked stops --------------------------------
+  var candidatesData = [];
+  var stopsData = [];
+  var still = false; // Reduce motion: camera moves jump and the route appears whole
+  var countryTap = true;
+  function dur(ms) { return still ? 0 : ms; }
+  function tagFor(prefix, p) {
+    var flag = flagImage(p.countryCode);
+    var img = prefix + p.id + (flag ? '-f' : '');
+    if (!map.hasImage(img)) {
+      var made = labelImage(tagName(p.name), flag);
+      map.addImage(img, made.image, { pixelRatio: made.pixelRatio });
+    }
+    return img;
+  }
+  function numberImage(n) {
+    var id = 'stop-' + n;
+    if (map.hasImage(id)) return id;
+    var pr = Math.min(dpr, 2), size = 26;
+    var c = document.createElement('canvas');
+    c.width = c.height = Math.ceil(size * pr);
+    var g = c.getContext('2d');
+    g.scale(pr, pr);
+    g.beginPath(); g.arc(size / 2, size / 2, size / 2 - 1.5, 0, Math.PI * 2); g.closePath();
+    g.fillStyle = THEME.pin; g.fill();
+    g.lineWidth = 1.5; g.strokeStyle = THEME.space; g.stroke();
+    g.font = '700 13px -apple-system, Roboto, "Segoe UI", sans-serif';
+    g.fillStyle = THEME.space; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(String(n), size / 2, size / 2 + 0.5);
+    map.addImage(id, g.getImageData(0, 0, c.width, c.height), { pixelRatio: pr });
+    return id;
+  }
+  function refreshCandidates() {
+    map.getSource('candidates').setData({
+      type: 'FeatureCollection',
+      features: candidatesData.map(function (p) {
+        return { type: 'Feature', properties: { id: p.id, name: p.name, img: tagFor('ctag-', p) },
+                 geometry: { type: 'Point', coordinates: [p.lng, p.lat] } };
+      })
+    });
+  }
+  function refreshStops() {
+    map.getSource('stops').setData({
+      type: 'FeatureCollection',
+      features: stopsData.map(function (p, i) {
+        return { type: 'Feature', properties: { id: p.id, name: p.name, num: numberImage(i + 1), img: tagFor('stag-', p) },
+                 geometry: { type: 'Point', coordinates: [p.lng, p.lat] } };
+      })
+    });
+  }
+  // The newest leg draws itself from the previous stop, then joins the route.
+  var legFrame = null;
+  function cancelLeg() {
+    if (legFrame != null) { cancelAnimationFrame(legFrame); legFrame = null; }
+    map.getSource('leg').setData(EMPTY);
+  }
+  function drawLeg(from, to) {
+    var pts = arc([from.lng, from.lat], [to.lng, to.lat]);
+    // Enough points for a smooth draw even on a short hop.
+    if (pts.length < 24) {
+      var fine = [];
+      for (var k = 0; k < pts.length - 1; k++) {
+        var steps = Math.ceil(24 / (pts.length - 1));
+        for (var m = 0; m < steps; m++) {
+          fine.push([pts[k][0] + (pts[k + 1][0] - pts[k][0]) * m / steps, pts[k][1] + (pts[k + 1][1] - pts[k][1]) * m / steps]);
+        }
+      }
+      fine.push(pts[pts.length - 1]);
+      pts = fine;
+    }
+    var t0 = performance.now(), LEG_MS = 400;
+    function step(now) {
+      var f = Math.min(1, (now - t0) / LEG_MS);
+      var n = Math.max(2, Math.round(f * (pts.length - 1)) + 1);
+      map.getSource('leg').setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: pts.slice(0, n) } });
+      if (f < 1) { legFrame = requestAnimationFrame(step); return; }
+      legFrame = null;
+      map.getSource('route').setData(routeLine(stopsData));
+      map.getSource('leg').setData(EMPTY);
+    }
+    legFrame = requestAnimationFrame(step);
+  }
+  function setCountryTap(on) { countryTap = !!on; }
+  function setReduceMotion(on) { still = !!on; if (still) cancelLeg(); if (still && stopsData.length) map.getSource('route').setData(routeLine(stopsData)); }
+  // Frame a set of points: one point zooms to it, several fit them all.
+  function fitPoints(points) {
+    if (!points || !points.length) return;
+    pause(8000);
+    if (points.length === 1) {
+      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900) });
+      return;
+    }
+    var w = 180, s = 90, e = -180, n = -90;
+    points.forEach(function (p) {
+      if (p.lng < w) w = p.lng; if (p.lng > e) e = p.lng; if (p.lat < s) s = p.lat; if (p.lat > n) n = p.lat;
+    });
+    fitBox([w, s, e, n]);
+  }
+  function fitBox(box) {
+    if (box[2] - box[0] > 200) { // most of the way round the globe: pull right back
+      map.flyTo({ center: [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2], zoom: 1.2, duration: dur(900) });
+      return;
+    }
+    map.fitBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
+      { padding: { top: 90, bottom: 60, left: 48, right: 48 }, maxZoom: 4.6, duration: dur(900) });
+  }
+  // Frame several countries at once (by ISO alpha-3).
+  function fitCountries(isos) {
+    var w = 180, s = 90, e = -180, n = -90, any = false;
+    (isos || []).forEach(function (iso) {
+      var id = String(iso).toUpperCase();
+      var f = INDEX[id], tiny = TINY[id];
+      var box = f ? largestBox(f.geometry) : (tiny ? [tiny.lng, tiny.lat, tiny.lng, tiny.lat] : null);
+      if (!box) return;
+      any = true;
+      if (box[0] < w) w = box[0]; if (box[2] > e) e = box[2]; if (box[1] < s) s = box[1]; if (box[3] > n) n = box[3];
+    });
+    if (!any) return;
+    pause(8000);
+    if (e - w < 1 && n - s < 1) { map.flyTo({ center: [(w + e) / 2, (s + n) / 2], zoom: 4.5, duration: dur(900) }); return; }
+    fitBox([w, s, e, n]);
   }
   function flyTo(lng, lat, zoom) {
     if (selected) { map.setFeatureState({ source: 'countries', id: selected }, { selected: false }); selected = null; refreshLabels(); }
     label.remove();
     pause(8000);
-    map.flyTo({ center: [lng, lat], zoom: zoom == null ? 3.5 : zoom, duration: 1500 });
+    map.flyTo({ center: [lng, lat], zoom: zoom == null ? 3.5 : zoom, duration: dur(900) });
   }
   function setSpin(on) { spinEnabled = !!on; if (on) spin(); else map.stop(); }
   function setQuality(q) { auto = q === 'auto'; lowSamples = 0; applyQuality(q === 'low' ? 'low' : 'high', 'set'); }
@@ -584,12 +755,12 @@ function start() {
     var box = f ? largestBox(f.geometry) : null;
     var lngSpan = box ? box[2] - box[0] : 0, latSpan = box ? box[3] - box[1] : 0;
     if (tiny || !box || (lngSpan < 1 && latSpan < 1)) {
-      map.flyTo({ center: at, zoom: 4.5, duration: 1400 });
+      map.flyTo({ center: at, zoom: 4.5, duration: dur(900) });
     } else if (lngSpan > 200) { // wraps the globe (Antarctica)
-      map.flyTo({ center: at, zoom: 1.2, duration: 1400 });
+      map.flyTo({ center: at, zoom: 1.2, duration: dur(900) });
     } else {
       map.fitBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
-        { padding: { top: 80, bottom: 50, left: 36, right: 36 }, maxZoom: 4.2, duration: 1400 });
+        { padding: { top: 80, bottom: 50, left: 36, right: 36 }, maxZoom: 4.2, duration: dur(900) });
     }
   }
 
@@ -602,7 +773,7 @@ function start() {
     } else {
       label.remove();
       // Tapping empty space after a selection pulls back out and lets the spin resume.
-      if (had) { pause(1200); map.easeTo({ zoom: Math.min(map.getZoom(), HOME_ZOOM), duration: 900 }); }
+      if (had) { pause(1200); map.easeTo({ zoom: Math.min(map.getZoom(), HOME_ZOOM), duration: dur(900) }); }
     }
     refreshLabels();
   }
@@ -622,6 +793,20 @@ function start() {
     var r = 14; // finger-sized hit area for point features
     var box = [[e.point.x - r, e.point.y - r], [e.point.x + r, e.point.y + r]];
 
+    var stopHits = map.queryRenderedFeatures(box, { layers: ['stops-dot'] });
+    if (stopHits.length) {
+      var sp = stopHits[0];
+      post({ type: 'place', id: sp.properties.id, name: sp.properties.name,
+             lng: sp.geometry.coordinates[0], lat: sp.geometry.coordinates[1] });
+      return;
+    }
+    var candHits = map.queryRenderedFeatures(box, { layers: ['candidates-dot'] });
+    if (candHits.length) {
+      var cp = candHits[0];
+      post({ type: 'candidate', id: cp.properties.id, name: cp.properties.name,
+             lng: cp.geometry.coordinates[0], lat: cp.geometry.coordinates[1] });
+      return;
+    }
     var pins = map.queryRenderedFeatures(box, { layers: ['places-dot'] });
     if (pins.length) {
       var p = pins[0];
@@ -638,6 +823,7 @@ function start() {
       });
       return;
     }
+    if (!countryTap) return; // countries are not pickable on this step
     var tinyLayers = map.getZoom() >= 2.5 ? ['tiny-all', 'tiny-visited'] : ['tiny-visited'];
     var tiny = map.queryRenderedFeatures(box, { layers: tinyLayers }).filter(function (f) {
       return map.getZoom() >= 2.5 || (f.state && f.state.visited);
@@ -679,7 +865,8 @@ function start() {
     map.off('sourcedata', maybeReady);
     window.globe = {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
-      focusCountry: focusByIso, clearSelection: function () { select(null); }
+      focusCountry: focusByIso, clearSelection: function () { select(null); },
+      setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries
     };
     if (quality === 'low') applyQuality('low', 'config');
     pending.forEach(function (call) { window.globe[call[0]].apply(null, call[1]); });
@@ -706,7 +893,9 @@ if (typeof maplibregl === 'undefined') {
 }
 `;
 
-export function buildGlobeHtml(data: GlobeData, config: GlobeConfig): string {
+export function buildGlobeHtml(data: GlobeData, input: GlobeConfig): string {
+  // Fields a caller's theme leaves out (tag colours, star tints) take the defaults.
+  const config: GlobeConfig = { ...input, theme: { ...defaultTheme, ...input.theme } };
   return [
     '<!DOCTYPE html><html><head><meta charset="utf-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />',
@@ -726,7 +915,7 @@ export function buildGlobeHtml(data: GlobeData, config: GlobeConfig): string {
     MAPLIBRE_JS,
     '</script>',
     '<script>',
-    MAIN_JS,
+    globePageScript,
     '</script>',
     '</body></html>',
   ].join('');
