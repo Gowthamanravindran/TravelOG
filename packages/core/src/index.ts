@@ -21,3 +21,4 @@ export * from './charts';
 export * from './geo';
 export * from './readiness';
 export * from './checklist-templates';
+export * from './trip-draft';
