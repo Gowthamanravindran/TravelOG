@@ -1,11 +1,11 @@
-import type { WhereBooking, WherePlace, WhereStop, WhereTrip } from '@travelog/core';
+import type { Place, WhereBooking, WherePlace, WhereStop, WhereTrip } from '@travelog/core';
 import { eq } from 'drizzle-orm';
 
-import { deleteRow, getRow, insertRow, liveRows, updateRow, type Db } from '../db';
+import { deleteRow, getRow, insertRow, liveRows, tx, updateRow, type Db } from '../db';
 import { tripStops, type StopKind } from '../schema';
 import { listBookings } from './bookings';
-import { getPlace } from './places';
-import { getTrip } from './trips';
+import { getPlace, savePlaces } from './places';
+import { createTrip, getTrip, type Trip, type TripInput } from './trips';
 
 export type TripStop = typeof tripStops.$inferSelect;
 
@@ -38,6 +38,26 @@ export function addStop(db: Db, input: StopInput): TripStop {
     label: tidy(input.label)?.slice(0, 80) ?? null,
     address: tidy(input.address)?.slice(0, 200) ?? null,
     notes: tidy(input.notes),
+  });
+}
+
+/**
+ * A trip made on the globe (Plan 67): the trip, its owner, a stay for each city in visit
+ * order, and any city the phone has not seen before, all saved together. If any part is
+ * refused, nothing is saved.
+ */
+export function createTripWithStops(
+  db: Db,
+  input: TripInput,
+  me: { displayName: string; upiId?: string | null },
+  stops: readonly { placeId: string; startDate: string; endDate: string }[],
+  places: readonly Place[],
+): Trip {
+  return tx(db, (db) => {
+    savePlaces(db, places);
+    const trip = createTrip(db, input, me);
+    for (const s of stops) addStop(db, { tripId: trip.id, kind: 'stay', ...s });
+    return trip;
   });
 }
 
