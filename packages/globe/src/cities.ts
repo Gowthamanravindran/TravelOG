@@ -7,7 +7,7 @@
 import { distanceKm } from '@travelog/core';
 
 export type City = {
-  /** GeoNames id as text. */
+  /** GeoNames id as text; or a whole place id (`osm:…`) for a city that came from the server. */
   id: string;
   name: string;
   /** ISO 3166-1 alpha-2, e.g. 'IN'. */
@@ -113,7 +113,10 @@ export function cityById(id: string): City | undefined {
   return r ? toCity(r) : undefined;
 }
 
-/** The app's place id for a city (`gn:<geonameid>`). */
+/**
+ * The app's place id for a city. Cities from the bundled list carry a bare GeoNames id and
+ * become `gn:<id>`; a city found on the server keeps the place id it came with (`osm:…`).
+ */
 export function cityPlaceId(city: City): string {
-  return `gn:${city.id}`;
+  return city.id.includes(':') ? city.id : `gn:${city.id}`;
 }

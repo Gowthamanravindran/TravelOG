@@ -25,6 +25,7 @@ describe('the map page', () => {
       'setReduceMotion',
       'fitPoints',
       'fitCountries',
+      'setInset',
     ])
       expect(typeof sandbox.window.globe?.[name]).toBe('function');
   });

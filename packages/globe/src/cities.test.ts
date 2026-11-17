@@ -42,5 +42,6 @@ describe('city ids', () => {
     expect(cityPlaceId(tokyo)).toBe('gn:1850147');
     expect(cityById('1850147')?.name).toBe('Tokyo');
     expect(cityById('nope')).toBeUndefined();
+    expect(cityPlaceId({ ...tokyo, id: 'osm:n123' })).toBe('osm:n123');
   });
 });

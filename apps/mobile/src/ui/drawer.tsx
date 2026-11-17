@@ -95,6 +95,9 @@ export function Drawer({
     return { transform: [{ translateY: y }] };
   });
 
+  // The footer rides up as the drawer rides down, so it stays at the bottom of what shows.
+  const footerStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -offset.get() }] }));
+
   const raised = index >= top;
   return (
     <Animated.View
@@ -135,15 +138,16 @@ export function Drawer({
         {children}
       </ScrollView>
       {footer ? (
-        <View
+        <Animated.View
           onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
           style={[
             styles.footer,
-            { bottom: resting, paddingBottom: spacing.md + bottomPad, backgroundColor: t.surface },
+            { paddingBottom: spacing.md + bottomPad, backgroundColor: t.surface },
+            footerStyle,
           ]}
         >
           {footer}
-        </View>
+        </Animated.View>
       ) : null}
     </Animated.View>
   );
@@ -168,6 +172,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
+    bottom: 0,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
   },

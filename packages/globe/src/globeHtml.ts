@@ -87,7 +87,7 @@ function post(msg) {
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
 window.globe = {};
-['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries'].forEach(function (name) {
+['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset'].forEach(function (name) {
   window.globe[name] = function () { pending.push([name, Array.prototype.slice.call(arguments)]); };
 });
 
@@ -638,13 +638,16 @@ function start() {
     legFrame = requestAnimationFrame(step);
   }
   function setCountryTap(on) { countryTap = !!on; }
+  // How much of the bottom of the map is covered by the app's drawer, so fits stay in view.
+  var inset = 0;
+  function setInset(px) { inset = Math.max(0, Number(px) || 0); }
   function setReduceMotion(on) { still = !!on; if (still) cancelLeg(); if (still && stopsData.length) map.getSource('route').setData(routeLine(stopsData)); }
   // Frame a set of points: one point zooms to it, several fit them all.
   function fitPoints(points) {
     if (!points || !points.length) return;
     pause(8000);
     if (points.length === 1) {
-      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900) });
+      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900), offset: [0, -inset / 2] });
       return;
     }
     var w = 180, s = 90, e = -180, n = -90;
@@ -659,7 +662,7 @@ function start() {
       return;
     }
     map.fitBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
-      { padding: { top: 90, bottom: 60, left: 48, right: 48 }, maxZoom: 4.6, duration: dur(900) });
+      { padding: { top: 90, bottom: 60 + inset, left: 48, right: 48 }, maxZoom: 4.6, duration: dur(900) });
   }
   // Frame several countries at once (by ISO alpha-3).
   function fitCountries(isos) {
@@ -840,7 +843,8 @@ function start() {
     window.globe = {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
-      setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries
+      setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
+      setInset: setInset
     };
     if (quality === 'low') applyQuality('low', 'config');
     pending.forEach(function (call) { window.globe[call[0]].apply(null, call[1]); });

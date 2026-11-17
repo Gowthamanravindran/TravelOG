@@ -94,6 +94,14 @@ describe('dates, days and the name', () => {
   });
 });
 
+describe('starting again', () => {
+  it('reset forgets everything', () => {
+    expect(run({ type: 'addCity', city: tokyo }, { type: 'next' }, { type: 'reset' })).toEqual(
+      emptyDraft,
+    );
+  });
+});
+
 describe('moving between steps', () => {
   it('goes countries → dates → cities → days and back', () => {
     let s = draftReducer(withDates, { type: 'next' });

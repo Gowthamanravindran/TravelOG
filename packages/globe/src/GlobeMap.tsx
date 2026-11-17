@@ -62,6 +62,8 @@ export type GlobeMapProps = {
   stops?: Place[];
   /** Whether tapping a country does anything. Default true. */
   countryTapEnabled?: boolean;
+  /** Points at the bottom of the globe covered by something else; camera fits stay above it. */
+  bottomInset?: number;
   /** Camera moves jump and the route appears whole. Default false. */
   reduceMotion?: boolean;
   quality?: GlobeQuality;
@@ -99,6 +101,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     stops,
     countryTapEnabled = true,
     reduceMotion = false,
+    bottomInset = 0,
     quality = 'auto',
     imageryUrl = DEFAULT_IMAGERY_URL,
     imageryMaxZoom = 5,
@@ -150,6 +153,10 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
   useEffect(() => {
     setReady(false);
   }, [html, reloadKey]);
+
+  useEffect(() => {
+    if (ready) run('window.globe.setInset(' + Math.round(bottomInset) + ')');
+  }, [ready, bottomInset, run]);
 
   // Sent before the data, so a first route never animates when it should not.
   useEffect(() => {

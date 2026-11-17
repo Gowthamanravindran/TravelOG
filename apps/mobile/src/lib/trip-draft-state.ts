@@ -34,7 +34,9 @@ export type DraftAction =
   | { type: 'setDays'; cityId: string; days: number }
   | { type: 'setName'; name: string }
   | { type: 'next' }
-  | { type: 'back' };
+  | { type: 'back' }
+  /** Start again from nothing (the flow was opened afresh). */
+  | { type: 'reset' };
 
 export const emptyDraft: DraftState = {
   step: 'countries',
@@ -95,6 +97,8 @@ function removeCities(s: DraftState, gone: (city: City) => boolean): DraftState 
 
 export function draftReducer(s: DraftState, a: DraftAction): DraftState {
   switch (a.type) {
+    case 'reset':
+      return emptyDraft;
     case 'toggleCountry': {
       if (!s.countries.includes(a.code)) return { ...s, countries: [...s.countries, a.code] };
       return {
