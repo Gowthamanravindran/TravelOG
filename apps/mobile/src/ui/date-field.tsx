@@ -1,12 +1,7 @@
 import {
   localDateIn,
-  monthGrid,
   monthOf,
-  monthTitle,
-  rangeRole,
-  shiftMonth,
   tapRange,
-  WEEKDAYS,
   type DateRange,
   joinTime,
   roundTo5,
@@ -19,6 +14,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { shortDate } from '@/lib/format';
 
 import { BottomSheet } from './bottom-sheet';
+import { CalendarMonth, prettyDay as pretty } from './range-calendar';
 import { Icon } from './icon';
 import { Button } from './kit';
 import { useTheme } from './theme';
@@ -69,11 +65,6 @@ function FieldShell({
     </View>
   );
 }
-
-const pretty = (d: string) => {
-  const year = d.slice(0, 4);
-  return `${shortDate(d)} ${year}`;
-};
 
 /** One date, picked on a calendar. Value is 'YYYY-MM-DD' or '' when not set. */
 export function DateField({
@@ -358,87 +349,7 @@ export function CalendarSheet({
       <Text style={[type.caption, styles.fieldLabel, { color: t.ink2 }]}>{title}</Text>
       <Text style={[type.title, { color: t.ink }]}>{summary}</Text>
 
-      <View style={styles.monthRow}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Previous month"
-          onPress={() => setMonth(shiftMonth(month, -1))}
-          hitSlop={10}
-          style={[styles.navBtn, { backgroundColor: t.surface2 }]}
-        >
-          <Icon name="left" size={20} color={t.ink} />
-        </Pressable>
-        <Text style={[type.headline, { color: t.ink }]}>{monthTitle(month)}</Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Next month"
-          onPress={() => setMonth(shiftMonth(month, 1))}
-          hitSlop={10}
-          style={[styles.navBtn, { backgroundColor: t.surface2 }]}
-        >
-          <Icon name="right" size={20} color={t.ink} />
-        </Pressable>
-      </View>
-
-      <View style={styles.week}>
-        {WEEKDAYS.map((w) => (
-          <Text key={w} style={[type.caption, styles.weekday, { color: t.ink2 }]}>
-            {w.slice(0, 2)}
-          </Text>
-        ))}
-      </View>
-      {monthGrid(month).map((week) => (
-        <View key={week[0]!.date} style={styles.week}>
-          {week.map(({ date, inMonth }) => {
-            const role = rangeRole(picked, date);
-            const edge = role === 'start' || role === 'end' || role === 'single';
-            return (
-              <View
-                key={date}
-                style={[
-                  styles.cell,
-                  role === 'between' && { backgroundColor: t.accentSoft },
-                  role === 'start' && {
-                    backgroundColor: t.accentSoft,
-                    borderTopLeftRadius: 20,
-                    borderBottomLeftRadius: 20,
-                  },
-                  role === 'end' && {
-                    backgroundColor: t.accentSoft,
-                    borderTopRightRadius: 20,
-                    borderBottomRightRadius: 20,
-                  },
-                ]}
-              >
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={pretty(date)}
-                  accessibilityState={{ selected: !!role }}
-                  onPress={() => tap(date)}
-                  style={[
-                    styles.day,
-                    edge && { backgroundColor: t.accent },
-                    !edge && date === today && { borderWidth: 1.5, borderColor: t.accent },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      type.body,
-                      {
-                        color: edge ? t.onAccent : inMonth ? t.ink : t.ink2,
-                        opacity: inMonth || edge ? 1 : 0.45,
-                        ...font('text', edge ? 600 : 400),
-                      },
-                    ]}
-                  >
-                    {Number(date.slice(8))}
-                  </Text>
-                </Pressable>
-              </View>
-            );
-          })}
-        </View>
-      ))}
+      <CalendarMonth picked={picked} month={month} onMonthChange={setMonth} onTap={tap} />
 
       <View style={styles.actions}>
         <View style={{ flex: 1 }}>
@@ -477,10 +388,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  week: { flexDirection: 'row' },
-  weekday: { flex: 1, textAlign: 'center' },
-  cell: { flex: 1, alignItems: 'center', paddingVertical: 2 },
-  day: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 8 },
   timeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   timeCell: {
