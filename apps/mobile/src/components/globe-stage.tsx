@@ -32,6 +32,8 @@ export interface GlobeScene {
   visitedCountries?: string[];
   candidates?: Place[];
   stops?: Place[];
+  /** The country (ISO alpha-3) the tab is showing a page for; the globe turns to it and keeps it. */
+  focus?: string;
   /** 'focus': the page outlines and zooms to a tapped country. 'report': the app decides. */
   tapMode: 'focus' | 'report';
   countryTapEnabled?: boolean;
@@ -69,6 +71,14 @@ export function useStageScene(tab: StageTab, scene: GlobeScene): void {
   useEffect(() => () => setScene(tab, null), [tab, setScene]);
 }
 
+/**
+ * Whether a path is one of the tabs. Anything else is a screen pushed over them (a trip,
+ * Licences): the stage hides, and the tab underneath keeps its page as it was.
+ */
+export function isTabPath(pathname: string): boolean {
+  return ['', '/', '/feed', '/explore', '/profile', '/saved'].includes(pathname);
+}
+
 /** Which tab, if any, a path draws on the globe for. */
 export function stageTabFor(pathname: string): StageTab | null {
   if (pathname === '/' || pathname === '') return 'trips';
@@ -88,6 +98,7 @@ const sceneKey = (s: GlobeScene | null) =>
         (s.candidates ?? []).map((p) => p.id),
         (s.stops ?? []).map((p) => p.id),
         s.tapMode,
+        s.focus ?? null,
         s.countryTapEnabled ?? true,
         s.spin,
         Math.round(s.covered),
@@ -101,9 +112,12 @@ const sceneKey = (s: GlobeScene | null) =>
  */
 export function GlobeStage({
   tab,
+  hidden = false,
   bottom,
 }: {
   tab: StageTab | null;
+  /** A screen is pushed over the tabs: draw nothing, keep everything. */
+  hidden?: boolean;
   /** The tab bar's height: the stage stops above it. */
   bottom: number;
 }): ReactElement {
@@ -130,20 +144,26 @@ export function GlobeStage({
   const scene = (tab && scenes.current[tab]) || null;
   // Taps go to whichever scene is in front when they happen.
   const current = () => (tabRef.current ? scenes.current[tabRef.current] : null);
-  const covered = Math.min(scene?.covered ?? 0, height * (1 - MIN_BAND));
+  // Between one tab's scene going and the next arriving, the globe keeps the last cover it was
+  // told. Saying "nothing covers you" for a moment would send it off to re-centre.
+  const lastCovered = useRef(0);
+  if (scene) lastCovered.current = scene.covered;
+  const covered = Math.min(lastCovered.current, height * (1 - MIN_BAND));
+  const shown = !!tab && !hidden;
 
   return (
     <View
       testID="globe-stage"
-      pointerEvents={tab ? 'auto' : 'none'}
-      style={[styles.stage, { bottom, display: tab ? 'flex' : 'none' }]}
+      pointerEvents={shown ? 'auto' : 'none'}
+      style={[styles.stage, { bottom, display: shown ? 'flex' : 'none' }]}
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
     >
-      {tab ? <StatusBar style="light" /> : null}
+      {shown ? <StatusBar style="light" /> : null}
       <Globe
         ref={globe}
-        active={!!scene?.spin}
+        active={shown && !!scene?.spin}
         bottomInset={covered}
+        focus={scene?.focus}
         visitedCountries={scene?.visitedCountries}
         candidates={scene?.candidates}
         stops={scene?.stops}

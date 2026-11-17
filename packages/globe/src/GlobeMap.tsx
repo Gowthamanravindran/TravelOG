@@ -71,6 +71,12 @@ export type GlobeMapProps = {
   countryTapEnabled?: boolean;
   /** Points at the bottom of the globe covered by something else; camera fits stay above it. */
   bottomInset?: number;
+  /**
+   * The country (ISO alpha-3) the app is showing a page for: the globe turns to it, outlines and
+   * names it, and keeps it so through new data, city flights and a page reload. Clearing it
+   * pulls the globe back to the whole Earth.
+   */
+  focus?: string | null;
   /** Camera moves jump and the route appears whole. Default false. */
   reduceMotion?: boolean;
   quality?: GlobeQuality;
@@ -110,6 +116,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     tapMode = 'focus',
     reduceMotion = false,
     bottomInset = 0,
+    focus = null,
     quality = 'auto',
     imageryUrl = DEFAULT_IMAGERY_URL,
     imageryMaxZoom = 5,
@@ -165,6 +172,18 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
   useEffect(() => {
     if (ready) run('window.globe.setInset(' + Math.round(bottomInset) + ')');
   }, [ready, bottomInset, run]);
+
+  // Held as state, not sent once: a fresh page (a reload after a crash) is told again.
+  const focused = useRef(false);
+  useEffect(() => {
+    if (!ready) {
+      focused.current = false;
+      return;
+    }
+    if (focus) run('window.globe.setFocus(' + JSON.stringify(focus) + ')');
+    else if (focused.current) run('window.globe.setFocus(null)');
+    focused.current = !!focus;
+  }, [ready, focus, run]);
 
   // Sent before the data, so a first route never animates when it should not.
   useEffect(() => {

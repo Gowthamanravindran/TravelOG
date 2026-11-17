@@ -15,7 +15,7 @@ export default function ExploreScreen() {
   const router = useRouter();
   const { country: param } = useLocalSearchParams<{ country?: string }>();
   if (hasGlobe()) return null;
-  const country = param ? countryByIso(param.toUpperCase()) : undefined;
+  const country = typeof param === 'string' ? countryByIso(param.toUpperCase()) : undefined;
   if (!country) {
     return (
       <Screen>

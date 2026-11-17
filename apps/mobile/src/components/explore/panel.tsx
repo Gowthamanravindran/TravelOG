@@ -36,7 +36,8 @@ export function ExplorePanel() {
   const router = useRouter();
   const { globe, height, full } = useStage();
   const { country: param } = useGlobalSearchParams<{ country?: string }>();
-  const country = param ? countryByIso(param.toUpperCase()) : undefined;
+  // A link can repeat the key, which arrives as a list: that is no country.
+  const country = typeof param === 'string' ? countryByIso(param.toUpperCase()) : undefined;
   const iso = country?.iso;
 
   const [raised, setRaised] = useState(false);
@@ -45,19 +46,15 @@ export function ExplorePanel() {
   const heights = [Math.round(height * (country ? COUNTRY : GENERAL)), full];
   const index = raised || searching ? 1 : 0;
 
-  // The globe follows the country: it turns to one that is opened, and pulls back when the
+  // A newly opened country starts with its page lowered, and is said aloud. The globe follows
+  // through the scene's `focus` (Plan 75): it turns to the country, and pulls back when the
   // page is left, whether for all of Explore or for another tab.
   useEffect(() => {
     if (!iso) return;
     setRaised(false);
     setSearching(false);
-    globe.current?.focusCountry(iso);
     AccessibilityInfo.announceForAccessibility(`Exploring ${country?.name ?? ''}`);
-    return () => {
-      globe.current?.clearFocus();
-      globe.current?.goHome();
-    };
-    // Only a change of country moves the globe.
+    // Only a change of country.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [iso]);
 
@@ -70,6 +67,7 @@ export function ExplorePanel() {
   };
   const scene: GlobeScene = {
     tapMode: 'report',
+    focus: iso,
     spin: !country && index === 0,
     covered: heights[0]!,
     candidates: country ? exploreCities(country).map(pin) : [],

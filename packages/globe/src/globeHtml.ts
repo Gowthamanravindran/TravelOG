@@ -72,6 +72,7 @@ function pageCss(theme: GlobeTheme): string {
       '; padding: 7px 13px; border-radius: 14px;',
     '  font: 600 14px -apple-system, Roboto, "Segoe UI", sans-serif; box-shadow: 0 4px 14px rgba(0,0,0,0.45); white-space: nowrap; }',
     '.country-pop .maplibregl-popup-tip { border-top-color: ' + theme.tag + ' !important; }',
+    '.country-pop, .country-pop * { pointer-events: none !important; }',
     '.maplibregl-ctrl-attrib { font-size: 9px; opacity: 0.55; }',
   ].join(String.fromCharCode(10));
 }
@@ -87,7 +88,7 @@ function post(msg) {
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
 window.globe = {};
-['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome'].forEach(function (name) {
+['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome', 'setFocus'].forEach(function (name) {
   window.globe[name] = function () { pending.push([name, Array.prototype.slice.call(arguments)]); };
 });
 
@@ -350,7 +351,7 @@ function start() {
     clearTimeout(resumeTimer);
     resumeTimer = setTimeout(spin, ms + 50);
   }
-  function onDown() { touching = true; clearTimeout(resumeTimer); map.stop(); }
+  function onDown() { touching = true; clearTimeout(resumeTimer); dropCommand(); map.stop(); }
   function onUp() { touching = false; pause(3000); }
   map.on('touchstart', onDown);
   map.on('mousedown', onDown);
@@ -546,7 +547,7 @@ function start() {
     refreshStops();
     // Country name tags would sit on top of city tags, so they step aside while cities are shown,
     // and so does the tapped country's popup (it would also swallow taps on the dots under it).
-    if (candidatesData.length || stopsData.length) label.remove();
+    if ((candidatesData.length || stopsData.length) && !held) label.remove();
     map.setLayoutProperty('labels', 'visibility', candidatesData.length || stopsData.length ? 'none' : 'visible');
     cancelLeg();
     if (!stopsData.length) {
@@ -647,11 +648,43 @@ function start() {
   // bottom padding, so every move (fly, fit, focus, spin, the resting view) centres in the part
   // that shows. A resting globe is also re-sized to fit that part.
   var inset = 0;
+  function pad() { return { top: 0, left: 0, right: 0, bottom: inset }; }
+  // The move the app last asked for, kept while it is in flight. The app's drawer often changes
+  // height just after it asks for a move, so a new inset arrives mid-flight: the move is then
+  // aimed again at the new visible part, instead of being cut short by a padding change of its
+  // own (Plan 75). A finger on the globe drops it.
+  var command = null, commandMs = 0, commandTimer = null, quietUntil = 0;
+  function dropCommand() { command = null; clearTimeout(commandTimer); }
+  function move(ms, go) {
+    command = go; commandMs = ms;
+    clearTimeout(commandTimer);
+    commandTimer = setTimeout(function () { command = null; }, dur(ms) + 80);
+    quietUntil = Date.now() + dur(ms) + 80;
+    go();
+  }
+  // Every asked-for move carries the padding with it, so the two arrive together.
+  function flyCamera(center, zoom, ms) {
+    map.flyTo({ center: center, zoom: zoom, padding: pad(), duration: dur(ms) });
+  }
+  // Fit a box inside the visible part, leaving the extra margins clear around it. The camera is worked
+  // out against the padding it will end with, then flown to along with that padding.
+  function flyBounds(bounds, extra, maxZoom, ms) {
+    var was = map.getPadding(), cam = null;
+    try {
+      map.setPadding(pad());
+      cam = map.cameraForBounds(bounds, { padding: extra, maxZoom: maxZoom });
+    } catch (e) { cam = null; } // no room left to fit anything in
+    map.setPadding(was);
+    if (cam && isFinite(cam.zoom)) { flyCamera(cam.center, Math.min(cam.zoom, maxZoom), ms); return; }
+    flyCamera([(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2], 1.2, ms);
+  }
   function setInset(px) {
     inset = Math.max(0, Number(px) || 0);
-    var to = { padding: { top: 0, left: 0, right: 0, bottom: inset }, duration: dur(300) };
+    if (command) { pause(8000); move(commandMs, command); return; }
+    var to = { padding: pad(), duration: dur(300) };
     if (!selected && map.getZoom() < 3 && !stopsData.length && !candidatesData.length) to.zoom = homeZoom();
     pause(600);
+    quietUntil = Date.now() + dur(300) + 80;
     map.easeTo(to);
   }
   // The zoom at which the whole Earth fits the visible band. On a globe the drawn radius is
@@ -665,8 +698,11 @@ function start() {
   }
   // Pull back to the whole Earth, keeping the side that is facing.
   function goHome() {
+    var lng = map.getCenter().lng;
     pause(1200);
-    map.easeTo({ center: [map.getCenter().lng, HOME_LAT], zoom: homeZoom(), duration: dur(900) });
+    move(900, function () {
+      map.easeTo({ center: [lng, HOME_LAT], zoom: homeZoom(), padding: pad(), duration: dur(900) });
+    });
   }
   // 'focus': a tapped country is outlined, named and zoomed to, then reported (the default).
   // 'report': the app is only told which country was tapped, and decides what happens.
@@ -674,7 +710,8 @@ function start() {
   function setTapMode(mode) { tapMode = mode === 'report' ? 'report' : 'focus'; }
   function debugSize() { // for scripts/globe/page-check.py
     var z = map.getZoom(), lat = map.getCenter().lat;
-    return { diameter: 512 * Math.pow(2, z) / Math.PI / Math.cos(lat * Math.PI / 180), centerY: map.project(map.getCenter()).y, zoom: z };
+    return { diameter: 512 * Math.pow(2, z) / Math.PI / Math.cos(lat * Math.PI / 180), centerY: map.project(map.getCenter()).y, zoom: z,
+             lng: map.getCenter().lng, lat: lat, selected: selected };
   }
   function setReduceMotion(on) { still = !!on; if (still) cancelLeg(); if (still && stopsData.length) map.getSource('route').setData(routeLine(stopsData)); }
   // Frame a set of points: one point zooms to it, several fit them all.
@@ -682,7 +719,7 @@ function start() {
     if (!points || !points.length) return;
     pause(8000);
     if (points.length === 1) {
-      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900) });
+      move(900, function () { flyCamera([points[0].lng, points[0].lat], 4.2, 900); });
       return;
     }
     var s = 90, n = -90;
@@ -708,11 +745,13 @@ function start() {
   }
   function fitBox(box) {
     if (box[2] - box[0] > 200) { // most of the way round the globe: pull right back
-      map.flyTo({ center: [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2], zoom: 1.2, duration: dur(900) });
+      move(900, function () { flyCamera([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2], 1.2, 900); });
       return;
     }
-    map.fitBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
-      { padding: { top: 90, bottom: 60, left: 48, right: 48 }, maxZoom: 4.6, duration: dur(900) });
+    move(900, function () {
+      flyBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
+        { top: 90, bottom: 60, left: 48, right: 48 }, 4.6, 900);
+    });
   }
   // Frame several countries at once (by ISO alpha-3).
   function fitCountries(isos) {
@@ -728,16 +767,21 @@ function start() {
     if (!spans.length) return;
     var we = lngSpan(spans), w = we[0], e = we[1];
     pause(8000);
-    if (e - w < 1 && n - s < 1) { map.flyTo({ center: [(w + e) / 2, (s + n) / 2], zoom: 4.5, duration: dur(900) }); return; }
+    if (e - w < 1 && n - s < 1) { move(900, function () { flyCamera([(w + e) / 2, (s + n) / 2], 4.5, 900); }); return; }
     fitBox([w, s, e, n]);
   }
   function flyTo(lng, lat, zoom) {
-    if (selected) { map.setFeatureState({ source: 'countries', id: selected }, { selected: false }); selected = null; refreshLabels(); }
-    label.remove();
+    // A country the app is holding in focus keeps its outline and name while a city in it is flown to.
+    if (selected && selected !== held) { map.setFeatureState({ source: 'countries', id: selected }, { selected: false }); selected = null; refreshLabels(); }
+    if (!held) label.remove();
     pause(8000);
-    map.flyTo({ center: [lng, lat], zoom: zoom == null ? 3.5 : zoom, duration: dur(900) });
+    move(900, function () { flyCamera([lng, lat], zoom == null ? 3.5 : zoom, 900); });
   }
-  function setSpin(on) { spinEnabled = !!on; if (on) spin(); else map.stop(); }
+  // Switching the spin off stops the spin's own drift, never a move the app asked for.
+  function setSpin(on) {
+    spinEnabled = !!on;
+    if (on) spin(); else if (!command && Date.now() > quietUntil) map.stop();
+  }
   function setQuality(q) { auto = q === 'auto'; lowSamples = 0; applyQuality(q === 'low' ? 'low' : 'high', 'set'); }
 
   // ---- taps ---------------------------------------------------------------
@@ -781,14 +825,33 @@ function start() {
     label.setLngLat(at).setDOMContent(el).addTo(map);
     var box = f ? largestBox(f.geometry) : null;
     var lngSpan = box ? box[2] - box[0] : 0, latSpan = box ? box[3] - box[1] : 0;
-    if (tiny || !box || (lngSpan < 1 && latSpan < 1)) {
-      map.flyTo({ center: at, zoom: 4.5, duration: dur(900) });
-    } else if (lngSpan > 200) { // wraps the globe (Antarctica)
-      map.flyTo({ center: at, zoom: 1.2, duration: dur(900) });
-    } else {
-      map.fitBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
-        { padding: { top: 80, bottom: 50, left: 36, right: 36 }, maxZoom: 4.2, duration: dur(900) });
-    }
+    pause(8000);
+    move(900, function () {
+      if (tiny || !box || (lngSpan < 1 && latSpan < 1)) {
+        flyCamera(at, 4.5, 900);
+      } else if (lngSpan > 200) { // wraps the globe (Antarctica)
+        flyCamera(at, 1.2, 900);
+      } else {
+        flyBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
+          { top: 80, bottom: 50, left: 36, right: 36 }, 4.2, 900);
+      }
+    });
+  }
+  // The country the app is showing a page for (Explore). Unlike a tap's selection it is the
+  // app's to hold: it stays outlined and named through new data and city flights, and is given
+  // again whenever the page reloads. Null lets go of it and pulls back to the whole Earth.
+  var held = null;
+  function setFocus(iso) {
+    var id = iso ? String(iso).toUpperCase() : null;
+    if (id && !INDEX[id] && !TINY[id]) id = null;
+    var had = held;
+    held = id;
+    if (id) { focusByIso(id); return; }
+    if (!had) return;
+    if (selected) { map.setFeatureState({ source: 'countries', id: selected }, { selected: false }); selected = null; }
+    label.remove();
+    refreshLabels();
+    goHome();
   }
 
   function select(iso) {
@@ -897,7 +960,7 @@ function start() {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
       setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
-      setInset: setInset, setTapMode: setTapMode, goHome: goHome, debugSize: debugSize
+      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, debugSize: debugSize
     };
     if (quality === 'low') applyQuality('low', 'config');
     pending.forEach(function (call) { window.globe[call[0]].apply(null, call[1]); });

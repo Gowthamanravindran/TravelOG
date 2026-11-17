@@ -188,6 +188,28 @@ describe('Profile → Settings, behind the gear (Plan 74)', () => {
     expect(mockPush).toHaveBeenCalledWith('/licenses');
   });
 
+  it('coming back from Licences is still Settings → About', async () => {
+    const { again } = await profile();
+    await press('Settings');
+    await fireEvent.press(screen.getByRole('button', { name: /^About/ }));
+    mockPath = '/licenses';
+    await again();
+    mockPath = '/profile';
+    await again();
+    expect(screen.getByText('This app build')).toBeTruthy();
+  });
+
+  it('switching tabs never tells the globe that nothing covers it', async () => {
+    const { again } = await profile();
+    mockPath = '/explore';
+    await again();
+    mockPath = '/';
+    await again();
+    mockPath = '/profile';
+    await again();
+    expect(calls('setInset(0)')).toHaveLength(0);
+  });
+
   it('leaving the Profile tab closes Settings', async () => {
     const { again } = await profile();
     await press('Settings');

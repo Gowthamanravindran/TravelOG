@@ -97,7 +97,7 @@ describe('Exploring a country (Plan 73)', () => {
   it('turns the globe to the country and shows its page', async () => {
     await explore({ country: 'JPN' });
     expect(screen.getByText('Exploring Japan')).toBeTruthy();
-    expect(last('focusCountry').includes('focusCountry("JPN")')).toBe(true);
+    expect(last('setFocus').includes('setFocus("JPN")')).toBe(true);
     // The country is outlined by the page, not filled like a picked or visited one.
     expect(last('setData').includes('"visited":[]')).toBe(true);
     expect(last('setData').includes('"candidates":[{"id":"1850147","name":"Tokyo"')).toBe(true);
@@ -154,25 +154,23 @@ describe('Exploring a country (Plan 73)', () => {
     const { again } = await explore({ country: 'JPN' });
     await press('All of Explore');
     expect(mockSetParams).toHaveBeenLastCalledWith({ country: undefined });
-    const cleared = calls('clearSelection()').length;
-    const homes = calls('goHome()').length;
+    const cleared = calls('setFocus(null)').length;
     mockParams = {};
     await again();
     expect(screen.getByRole('header', { name: 'Explore' })).toBeTruthy();
-    expect(calls('clearSelection()').length).toBe(cleared + 1);
-    expect(calls('goHome()').length).toBe(homes + 1);
+    expect(calls('setFocus(null)').length).toBe(cleared + 1);
     expect(last('setData').includes('"candidates":[]')).toBe(true);
   });
 
   it('leaving for another tab takes the country’s dots and outline off the globe', async () => {
     const { again } = await explore({ country: 'JPN' });
-    const cleared = calls('clearSelection()').length;
+    const cleared = calls('setFocus(null)').length;
     mockPath = '/';
     mockParams = {};
     await again();
     expect(screen.getByText('Your trips')).toBeTruthy();
     expect(last('setData').includes('"candidates":[]')).toBe(true);
-    expect(calls('clearSelection()').length).toBeGreaterThan(cleared);
+    expect(calls('setFocus(null)').length).toBe(cleared + 1);
   });
 
   it('a place with no cities listed still gets its page', async () => {
@@ -184,6 +182,34 @@ describe('Exploring a country (Plan 73)', () => {
   it('an unknown country code is Explore with no country', async () => {
     await explore({ country: 'ZZZ' });
     expect(screen.getByRole('header', { name: 'Explore' })).toBeTruthy();
-    expect(calls('focusCountry(')).toHaveLength(0);
+    expect(calls('setFocus(')).toHaveLength(0);
+  });
+
+  it('a country given twice in a link does not take the tabs down', async () => {
+    await explore({ country: ['JPN', 'IND'] as unknown as string });
+    expect(screen.getByRole('header', { name: 'Explore' })).toBeTruthy();
+  });
+
+  it('the country is the globe’s to keep: it is sent again when the map page reloads', async () => {
+    await explore({ country: 'JPN' });
+    // The page reports a crash; the globe loads a fresh page, which starts with nothing.
+    await fromGlobe({ type: 'crash', reason: 'test' });
+    expect(calls('setFocus(')).toHaveLength(0);
+    await ready();
+    expect(calls('setFocus("JPN")')).toHaveLength(1);
+  });
+
+  it('a screen pushed over the tabs hides the stage and keeps the page as it was', async () => {
+    const { again } = await explore({ country: 'JPN' });
+    const sent = calls('setFocus(').length;
+    mockPath = '/trip/abc';
+    await again();
+    expect(screen.getByTestId('globe-stage', { includeHiddenElements: true }).props.style).toEqual(
+      expect.arrayContaining([expect.objectContaining({ display: 'none' })]),
+    );
+    mockPath = '/explore';
+    await again();
+    expect(screen.getByText('Exploring Japan')).toBeTruthy();
+    expect(calls('setFocus(').length).toBe(sent);
   });
 });

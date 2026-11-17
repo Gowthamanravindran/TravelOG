@@ -1,10 +1,10 @@
 import { getLocalProfile } from '@travelog/db';
 import { Redirect, usePathname, useRouter } from 'expo-router';
 import { Tabs } from 'expo-router/tabs';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 
-import { GlobeStage, stageTabFor } from '@/components/globe-stage';
+import { GlobeStage, isTabPath, stageTabFor } from '@/components/globe-stage';
 import { useQuery } from '@/data/provider';
 import { useCreateFlow } from '@/lib/create-flow';
 import { hasGlobe } from '@/lib/runtime';
@@ -23,6 +23,11 @@ export default function HomeLayout() {
   const profile = useQuery((db) => getLocalProfile(db));
   const flow = useCreateFlow();
   const pathname = usePathname();
+  // A screen pushed over the tabs (a trip, Licences) hides the stage but keeps the tab's page
+  // on it, so coming back finds it as it was (Plan 75).
+  const onTabs = isTabPath(pathname);
+  const stageTab = useRef(stageTabFor(pathname));
+  if (onTabs) stageTab.current = stageTabFor(pathname);
   const [barHeight, setBarHeight] = useState(0);
   if (!profile) return <Redirect href="/welcome" />;
   // On the globe, a trip is created on the Trips tab itself; without it, in the old form (Plan 66).
@@ -60,7 +65,7 @@ export default function HomeLayout() {
         </Tabs>
         {/* One globe for Trips, Explore and Profile, drawn over the tab scenes (Plan 72). */}
         {hasGlobe() ? (
-          <GlobeStage tab={stageTabFor(pathname)} bottom={flow.open ? 0 : barHeight} />
+          <GlobeStage tab={stageTab.current} hidden={!onTabs} bottom={flow.open ? 0 : barHeight} />
         ) : null}
       </View>
     </ModeProvider>
