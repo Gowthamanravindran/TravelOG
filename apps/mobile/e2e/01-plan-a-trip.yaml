@@ -114,3 +114,20 @@ name: First run, see the globe, create a trip on it, add a stop, a booking and a
 - scrollUntilVisible:
     element: 'Fish thali'
 - takeScreenshot: budget
+# Back out of the trip to the tabs (Android Back; the trip is one screen above them).
+- back
+# Profile on the globe (Plan 74): the visited section, and Settings behind the gear.
+- tapOn: 'Profile'
+- extendedWaitUntil:
+    visible: 'Countries you’ve visited.*'
+    timeout: 15000
+- assertVisible: '0 countries visited'
+- takeScreenshot: profile
+- tapOn: 'Settings'
+- assertVisible: 'About'
+- takeScreenshot: settings
+- tapOn: 'Back to Profile'
+# Explore on the globe (Plan 73): with no country it offers a country search.
+- tapOn: 'Explore'
+- assertVisible: 'Search a country'
+- takeScreenshot: explore

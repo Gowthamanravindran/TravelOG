@@ -77,3 +77,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 71 | [The globe did not show on a build that had it](71-globe-detection.md) | see git log |
 | 72 | [One globe, shared by Trips, Explore and Profile](72-one-globe-behind-the-tabs.md) | see git log |
 | 73 | [Explore on the globe: the plain globe, and a country's page](73-explore-on-the-globe.md) | see git log |
+| 74 | [Profile on the globe: countries visited, and Settings behind a gear](74-profile-on-the-globe.md) | see git log |

@@ -32,6 +32,8 @@ Owner steps refer to numbered sections in [14 · Owner setup](14-owner-setup.md)
 ---
 
 > **Plans 65–67** change the app's front door ahead of the phases: a black and white theme (the default for new installs), the Trips tab as a globe with the trip list in a drawer, and creating a trip on that globe in four steps. They add no server work. A new development build is needed for the globe.
+>
+> **Plans 72–74** put that one globe behind Trips, Explore and Profile: a tapped country opens its Explore page with the globe turned to it (placeholder cities and sample trips), and Profile marks the countries a person has visited, with settings behind a gear. No server work; nothing here has been seen on a phone yet.
 
 ## Phase 0 — Project setup
 **Claude builds**

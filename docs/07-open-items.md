@@ -17,6 +17,9 @@ Everything still undecided or not yet done before and during the build. Each ite
 ## Product
 | Item | Decision needed | Closes in |
 |---|---|---|
+| Explore: city tiles and curated trips (Plan 73) | What tapping a city tile or a curated trip opens (today a tile only flies the globe to the city; trips are samples). Photos for both | With the Explore content work |
+| Explore: where curated trips come from (Plan 73) | Travellers sharing their own itineraries ("Share your itinerary" says "Coming soon"), editorial picks, or both; and the moderation that needs | Phase 5 |
+| Profile: countries from past trips (Plan 74) | Whether to offer the countries of completed trips as visited, rather than marking each by hand | After the first phone test |
 | Moderation | Tooling and process defined in [16](16-admin-and-ops.md); rules for what gets removed still to write | Phase 5 |
 | Support channel | In-app "Help" → email first; WhatsApp support later | Phase 8 |
 | Analytics event list | Funnel defined in [15](15-go-to-market.md) §7; event names and properties to write | Phase 1, extended each phase |
