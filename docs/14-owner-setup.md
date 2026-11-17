@@ -101,8 +101,7 @@ Names in `UPPER_CASE` below are the exact secret names the code will read.
    pnpm dev
    ```
    then open the development build of TravelOG on the phone. After every `git pull`, start with `pnpm dev` again: it installs any packages a plan added (otherwise you'd see `Unable to resolve "<package>"`). When a plan adds phone features, also install a new development build; Profile → **This app build** says whether yours is up to date.
-8. iPhone: needs the Apple Developer account (§6) first, then `eas device:create` to register your iPhone. From Plan 60 the iPhone build also has a **share extension** (TravelOG in the share sheet), which needs an App Group: when `eas build` asks to set up capabilities and the extra target, say yes and let EAS manage them. Build Android first; iPhone when the Apple account is ready.
-   **Plan 60 needs a new development build** (Android: step 5 with profile `development`, or `preview` to try it without a computer). Then in Instagram, YouTube, Chrome or any app: **Share → TravelOG** opens Save from a link with that link. Profile → This app build says whether yours has it.
+8. iPhone: needs the Apple Developer account (§6) first, then `eas device:create` to register your iPhone.
 9. **End-to-end checks (Plan 49, optional):** GitHub runs them nightly. To start one yourself, go to **Actions → "E2E (Android emulator)" → Run workflow**. It builds a release app, runs it on an Android emulator and taps through a first run: welcome, plan a trip, add a stop, a booking and an expense. The run's **e2e-results** download has a screenshot of each step. To run the same flows on your own phone or emulator, install Maestro (`curl -Ls "https://get.maestro.mobile.dev" | bash`), install a preview build, and run `pnpm e2e`. The flows clear the app's data on that device first, so use a test phone or emulator.
 
 ## §6 Apple Developer Program — Phase 1 · $99/yr (individual)

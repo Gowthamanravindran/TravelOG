@@ -121,16 +121,7 @@ export default function SavedScreen() {
     <Screen>
       <Between>
         <H1>Saved</H1>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Button
-            label="From a link"
-            icon="share"
-            small
-            variant="secondary"
-            onPress={() => router.push('/save-link')}
-          />
-          <Button label="Add" icon="add" small onPress={() => router.push('/saved-place')} />
-        </View>
+        <Button label="Add" icon="add" small onPress={() => router.push('/saved-place')} />
       </Between>
       {saved.length === 0 ? (
         <Empty
@@ -139,16 +130,7 @@ export default function SavedScreen() {
           artFamily="sea"
           title="Places you want to go"
           body="Save cafés, sights and stays here, from your trips or by searching. When you plan a trip there, they’re waiting in its Ideas."
-          action={
-            <View style={{ gap: 8 }}>
-              <Button label="Save a place" onPress={() => router.push('/saved-place')} />
-              <Button
-                label="Save from a link"
-                variant="secondary"
-                onPress={() => router.push('/save-link')}
-              />
-            </View>
-          }
+          action={<Button label="Save a place" onPress={() => router.push('/saved-place')} />}
         />
       ) : (
         <>

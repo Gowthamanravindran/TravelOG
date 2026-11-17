@@ -485,14 +485,6 @@ export function ItineraryView({
             />
           ) : null}
           {editable && day === IDEAS_DAY ? (
-            <Button
-              label="Save from a link"
-              icon="share"
-              variant="secondary"
-              onPress={() => router.push(`/save-link?tripId=${tripId}`)}
-            />
-          ) : null}
-          {editable && day === IDEAS_DAY ? (
             <PlanIdeas tripId={tripId} days={days.filter((d) => d !== IDEAS_DAY)} ideas={items} />
           ) : null}
         </View>

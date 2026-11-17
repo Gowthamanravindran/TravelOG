@@ -2437,13 +2437,6 @@
    "author": null
   },
   {
-   "name": "expo-share-intent",
-   "version": "9.0.0",
-   "license": "MIT",
-   "homepage": "https://github.com/achorein/expo-share-intent/",
-   "author": "achorein"
-  },
-  {
    "name": "expo-sharing",
    "version": "58.0.22",
    "license": "MIT",

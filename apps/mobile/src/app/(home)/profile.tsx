@@ -7,7 +7,6 @@ import { AppearanceCard } from '@/components/appearance-card';
 import { useMutate, useQuery } from '@/data/provider';
 import { remindersEnabled, setRemindersEnabled } from '@/lib/reminders';
 import { isExpoGo } from '@/lib/runtime';
-import { loadShareIntent } from '@/lib/share-intent';
 import { sharingBuildLevel } from '@/lib/social-share';
 import { Between, Body, Button, Card, H1, Screen, Section, Strong } from '@/ui/kit';
 
@@ -18,8 +17,6 @@ export default function ProfileScreen() {
   const mutate = useMutate();
   const sharing = sharingBuildLevel();
   const expoGo = isExpoGo();
-  // Plan 60: saving from other apps' share sheet needs the build from Plan 60.
-  const shareIn = !!loadShareIntent();
   const reminders = useQuery((db) => remindersEnabled(db));
   const done = trips.filter((t) => t.state === 'completed' || t.state === 'archived').length;
 
@@ -73,13 +70,11 @@ export default function ProfileScreen() {
         <Body muted small>
           {expoGo
             ? "Running in Expo Go: test data is kept apart and isn't encrypted; Instagram posting uses the share sheet."
-            : sharing === 2 && shareIn
-              ? 'Up to date: posting to Instagram and Facebook, and saving places from other apps’ share sheet, are included.'
-              : sharing === 2
-                ? 'Install the latest build to save places from other apps’ share sheet (Share → TravelOG). Save from a link works meanwhile.'
-                : sharing === 1
-                  ? 'Older build: install the latest build to open Instagram with your slides.'
-                  : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}
+            : sharing === 2
+              ? 'Up to date: posting collages to Instagram and Facebook is included.'
+              : sharing === 1
+                ? 'Older build: install the latest build to open Instagram with your slides.'
+                : 'Older build without Instagram/Facebook posting. Install the latest build from GitHub Actions.'}
         </Body>
       </Card>
       <Card>

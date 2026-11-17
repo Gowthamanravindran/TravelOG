@@ -15,7 +15,6 @@ on:
       # Plan 60: native packages and their wiring always get a release build.
       - 'apps/mobile/native-packages.json'
       - 'apps/mobile/app.config.ts'
-      - 'apps/mobile/src/lib/share-intent.tsx'
 
 concurrency:
   group: e2e-${{ github.ref }}

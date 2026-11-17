@@ -1,6 +1,6 @@
 {
   "note": "Packages with native code that the installed app has (Plan 49 T1). Adding a native package means a new development build and a fallback in Expo Go; add it here only once that is planned. Checked by scripts/native/check.mjs in CI.",
-  "lastBuild": "Expo Go SDK 58 / development build from Plan 60 (needs a new build for expo-share-intent)",
+  "lastBuild": "Expo Go SDK 58 / development build from Plan 60 (its share target is unused since Plan 64)",
   "packages": {
     "@expo/ui": "Expo Go SDK 58 and the development build",
     "expo": "Expo Go SDK 58 and the development build",
@@ -21,7 +21,6 @@
     "expo-notifications": "Expo Go SDK 58 and the development build",
     "expo-router": "Expo Go SDK 58 and the development build",
     "expo-secure-store": "Expo Go SDK 58 and the development build",
-    "expo-share-intent": "Development build from Plan 60 (not in Expo Go; lib/share-intent.tsx skips it when missing)",
     "expo-sharing": "Expo Go SDK 58 and the development build",
     "expo-splash-screen": "Expo Go SDK 58 and the development build",
     "expo-sqlite": "Expo Go SDK 58 and the development build",

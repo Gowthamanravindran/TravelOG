@@ -9,7 +9,8 @@ import path from 'node:path';
 // react-native-svg: missing from the owner's installed app, crashed Expenses (Plan 48).
 const NOT_IN_EXPO_GO = ['@react-native-community/datetimepicker', 'react-native-svg'];
 // Development-build-only packages, allowed only in the file that checks for them first.
-const BUILD_ONLY: Record<string, string> = { 'expo-share-intent': 'lib/share-intent.tsx' };
+// (Plan 64 removed expo-share-intent, the only one so far.)
+const BUILD_ONLY: Record<string, string> = {};
 
 function files(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {

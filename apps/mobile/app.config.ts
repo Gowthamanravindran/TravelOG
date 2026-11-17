@@ -72,18 +72,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         microphonePermission: false,
       },
     ],
-    // Plan 60: TravelOG in other apps' share sheet (links and text). Android: a SEND text/plain
-    // filter; iOS: a share extension with an App Group, set up by EAS. Not in Expo Go.
-    [
-      'expo-share-intent',
-      {
-        iosActivationRules: {
-          NSExtensionActivationSupportsWebURLWithMaxCount: 1,
-          NSExtensionActivationSupportsText: true,
-        },
-        androidIntentFilters: ['text/*'],
-      },
-    ],
     [
       'expo-splash-screen',
       {

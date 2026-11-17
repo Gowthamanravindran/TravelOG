@@ -64,8 +64,8 @@ function setup() {
       destination: 'Goa',
       destinationPlaceId: 'gn:goa',
       timeZone: 'Asia/Kolkata',
-      startDate: '2026-11-14',
-      endDate: '2026-11-16',
+      startDate: '2030-11-14',
+      endDate: '2030-11-16',
     },
     { displayName: 'A' },
   );
@@ -130,7 +130,7 @@ describe('the Saved tab', () => {
 describe('saving from a trip', () => {
   it('a stop’s place can be saved from the stop editor', async () => {
     const { db, tripId } = setup();
-    const v = ensureMainVariant(db, tripId, '2026-11-15');
+    const v = ensureMainVariant(db, tripId, '2030-11-15');
     const item = addItem(db, v.id, {
       type: 'food',
       title: 'Breakfast',
@@ -178,7 +178,7 @@ describe('saving from a trip', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Add 2 to days' }));
     expect(listItems(db, ideas.id)).toHaveLength(0);
     // Artjuna and Chapora are minutes apart: the same day.
-    const first = ensureMainVariant(db, tripId, '2026-11-14');
+    const first = ensureMainVariant(db, tripId, '2030-11-14');
     expect(
       listItems(db, first.id)
         .map((i) => i.title)

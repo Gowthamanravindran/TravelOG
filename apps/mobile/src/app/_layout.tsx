@@ -23,7 +23,6 @@ import { usePlacesSeed } from '@/lib/places';
 import { CelebrationHost } from '@/ui/motion';
 import { useScheme, useTheme } from '@/ui/theme';
 import { useReminders } from '@/lib/reminders';
-import { ShareIntentHandler } from '@/lib/share-intent';
 
 // Gesture-handler's root view needs its native module to exist before it's drawn.
 // The library looks the module up when it loads, but tree shaking (release builds)
@@ -144,7 +143,6 @@ function AppRoot() {
             <Themed>
               <CelebrationHost>
                 <Background />
-                <ShareIntentHandler />
                 <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
                   <Stack.Screen
                     name="new-trip"
