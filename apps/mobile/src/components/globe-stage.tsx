@@ -187,5 +187,15 @@ export function GlobeStage({
 }
 
 const styles = StyleSheet.create({
-  stage: { position: 'absolute', top: 0, left: 0, right: 0, backgroundColor: GLOBE_SPACE },
+  stage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: GLOBE_SPACE,
+    // A drawer is as tall as its highest stop and slides down to rest, so part of it sits below
+    // the stage. Cut it off here, or it covers the tab bar (Plan 76). The tab screens used to
+    // do this clipping for the drawer when it lived inside them.
+    overflow: 'hidden',
+  },
 });

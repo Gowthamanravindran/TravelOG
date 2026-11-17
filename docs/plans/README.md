@@ -79,3 +79,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 73 | [Explore on the globe: the plain globe, and a country's page](73-explore-on-the-globe.md) | see git log |
 | 74 | [Profile on the globe: countries visited, and Settings behind a gear](74-profile-on-the-globe.md) | see git log |
 | 75 | [The globe's moves survive the drawer; a country is held, not sent once](75-moves-that-survive-the-drawer.md) | see git log |
+| 76 | [The tab bar was covered by the globe's drawer](76-tab-bar-covered-by-the-drawer.md) | see git log |

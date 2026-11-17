@@ -1,4 +1,5 @@
 import { saveLocalProfile } from '@travelog/db';
+import { StyleSheet } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import HomeLayout from '@/app/(home)/_layout';
@@ -86,6 +87,15 @@ describe('the globe stage', () => {
     expect(lastCall('setTapMode')!.includes('"report"')).toBe(true);
     await fromGlobe({ type: 'country', iso: 'JPN', name: 'Japan', visited: false });
     expect(mockNavigate).toHaveBeenCalledWith({ pathname: '/explore', params: { country: 'JPN' } });
+  });
+
+  it('clips what it draws, so a drawer below its resting height never covers the tab bar', async () => {
+    // A drawer is as tall as its highest stop and slides down to rest; the part pushed below the
+    // stage must be cut off there. Unclipped, it hung over the tab bar and hid it (Plan 76).
+    await render(withData(db(), <HomeLayout />));
+    expect(StyleSheet.flatten(screen.getByTestId('globe-stage').props.style).overflow).toBe(
+      'hidden',
+    );
   });
 
   it('on Feed the stage is hidden and does not take touches', async () => {
