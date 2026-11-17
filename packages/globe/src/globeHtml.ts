@@ -541,7 +541,9 @@ function start() {
     var before = stopsData;
     stopsData = next;
     refreshStops();
-    // Country name tags would sit on top of city tags, so they step aside while cities are shown.
+    // Country name tags would sit on top of city tags, so they step aside while cities are shown,
+    // and so does the tapped country's popup (it would also swallow taps on the dots under it).
+    if (candidatesData.length || stopsData.length) label.remove();
     map.setLayoutProperty('labels', 'visibility', candidatesData.length || stopsData.length ? 'none' : 'visible');
     cancelLeg();
     if (!stopsData.length) {
@@ -650,11 +652,26 @@ function start() {
       map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900), offset: [0, -inset / 2] });
       return;
     }
-    var w = 180, s = 90, e = -180, n = -90;
-    points.forEach(function (p) {
-      if (p.lng < w) w = p.lng; if (p.lng > e) e = p.lng; if (p.lat < s) s = p.lat; if (p.lat > n) n = p.lat;
-    });
-    fitBox([w, s, e, n]);
+    var s = 90, n = -90;
+    points.forEach(function (p) { if (p.lat < s) s = p.lat; if (p.lat > n) n = p.lat; });
+    var we = lngSpan(points.map(function (p) { return [p.lng, p.lng]; }));
+    fitBox([we[0], s, we[1], n]);
+  }
+  // The west and east edges that hold every [west, east] interval in the shorter way round the
+  // globe. Tokyo and Los Angeles are 102 degrees apart across the Pacific, not 258 the other way;
+  // the eastern edge then runs past 180, which the map accepts.
+  function lngSpan(intervals) {
+    function edges(shift) {
+      var w = 720, e = -720;
+      intervals.forEach(function (iv) {
+        var add = shift && (iv[0] + iv[1]) / 2 < 0 ? 360 : 0;
+        if (iv[0] + add < w) w = iv[0] + add;
+        if (iv[1] + add > e) e = iv[1] + add;
+      });
+      return [w, e];
+    }
+    var plain = edges(false), wrapped = edges(true);
+    return wrapped[1] - wrapped[0] < plain[1] - plain[0] ? wrapped : plain;
   }
   function fitBox(box) {
     if (box[2] - box[0] > 200) { // most of the way round the globe: pull right back
@@ -666,16 +683,17 @@ function start() {
   }
   // Frame several countries at once (by ISO alpha-3).
   function fitCountries(isos) {
-    var w = 180, s = 90, e = -180, n = -90, any = false;
+    var s = 90, n = -90, spans = [];
     (isos || []).forEach(function (iso) {
       var id = String(iso).toUpperCase();
       var f = INDEX[id], tiny = TINY[id];
       var box = f ? largestBox(f.geometry) : (tiny ? [tiny.lng, tiny.lat, tiny.lng, tiny.lat] : null);
       if (!box) return;
-      any = true;
-      if (box[0] < w) w = box[0]; if (box[2] > e) e = box[2]; if (box[1] < s) s = box[1]; if (box[3] > n) n = box[3];
+      spans.push([box[0], box[2]]);
+      if (box[1] < s) s = box[1]; if (box[3] > n) n = box[3];
     });
-    if (!any) return;
+    if (!spans.length) return;
+    var we = lngSpan(spans), w = we[0], e = we[1];
     pause(8000);
     if (e - w < 1 && n - s < 1) { map.flyTo({ center: [(w + e) / 2, (s + n) / 2], zoom: 4.5, duration: dur(900) }); return; }
     fitBox([w, s, e, n]);

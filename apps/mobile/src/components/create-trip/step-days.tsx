@@ -134,6 +134,12 @@ export function StepDays({
           );
         })}
       </View>
+      {/* Every stop needs a day, so with more stops than days the total can never match. */}
+      {stops.length > total ? (
+        <Body small style={{ color: t.danger }}>
+          More stops than days. Remove a stop, or go back and add days.
+        </Body>
+      ) : null}
       {draft.dropped.map((code) => (
         <Body key={code} small muted>
           No stops in {countryByCode(code)?.name ?? code}, so it’s left out

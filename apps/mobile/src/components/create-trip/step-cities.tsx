@@ -111,6 +111,12 @@ export function StepCities({
           {!results.length ? (
             <Body muted>{server.searching ? 'Searching…' : `No city matches “${q}”.`}</Body>
           ) : null}
+          {/* The credit the place data asks for, as the destination field shows it. */}
+          {more.length && server.attribution ? (
+            <Body small muted>
+              {server.attribution}
+            </Body>
+          ) : null}
         </View>
       ) : draft.cities.length ? (
         <Chips>

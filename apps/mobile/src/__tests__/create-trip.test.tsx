@@ -1,6 +1,7 @@
 import { monthOf, shiftMonth, localDateIn, type Place } from '@travelog/core';
 import { listStops, listTrips, saveLocalProfile, savePlaces } from '@travelog/db';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { DeviceEventEmitter } from 'react-native';
 
 import TripsScreen from '@/app/(home)/index';
 import { closeCreateFlow, createFlowOpen } from '@/lib/create-flow';
@@ -204,6 +205,59 @@ describe('creating a trip on the globe, by search and buttons alone (Plan 67)', 
     expect(screen.getByText('Your trips')).toBeTruthy();
     await press('Create a trip');
     expect(screen.queryByRole('button', { name: 'Remove Japan' })).toBeNull();
+  });
+});
+
+describe('search and the panel', () => {
+  it('stepping back while a search field has focus does not hide the next step’s button', async () => {
+    await render(withData(db(), <TripsScreen />));
+    await toCitiesStep();
+    await fireEvent(screen.getByLabelText('Search a city'), 'focus');
+    expect(screen.queryByRole('button', { name: 'Next →' })).toBeNull();
+    await press('Back');
+    expect(screen.getByText('When?')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Next →' })).toBeTruthy();
+  });
+
+  it('closing the keyboard brings the main button back', async () => {
+    await render(withData(db(), <TripsScreen />));
+    await toCitiesStep();
+    await fireEvent(screen.getByLabelText('Search a city'), 'focus');
+    expect(screen.queryByRole('button', { name: 'Next →' })).toBeNull();
+    await act(async () => {
+      DeviceEventEmitter.emit('keyboardDidHide', {});
+    });
+    expect(screen.getByRole('button', { name: 'Next →' })).toBeTruthy();
+  });
+
+  it('searching raises the panel even after it was dragged down', async () => {
+    await render(withData(db(), <TripsScreen />));
+    await press('Create a trip');
+    await press('Expand panel');
+    await press('Collapse panel');
+    await fireEvent(screen.getByLabelText('Search a country or city'), 'focus');
+    expect(screen.getByRole('button', { name: 'Collapse panel' })).toBeTruthy();
+  });
+
+  it('more stops than days says what to do, since the days can never match', async () => {
+    await render(withData(db(), <TripsScreen />));
+    await toDatesStep();
+    await press('Next month');
+    await press(prettyDay(day(12)));
+    await press(prettyDay(day(13)));
+    await press('Next →');
+    for (const [q, label] of [
+      ['kyo', 'Add Kyoto, Japan'],
+      ['osa', 'Add Osaka, Japan'],
+    ] as const) {
+      await search('Search a city', q);
+      await press(label);
+    }
+    await press('Next →');
+    expect(screen.getByText('1 day too many')).toBeTruthy();
+    expect(
+      screen.getByText('More stops than days. Remove a stop, or go back and add days.'),
+    ).toBeTruthy();
   });
 });
 

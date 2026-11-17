@@ -38,6 +38,7 @@ import { draftToSave } from '@/lib/trip-draft-save';
 import { draftReducer, emptyDraft } from '@/lib/trip-draft-state';
 import { tripHref } from '@/lib/trip-route';
 import { Drawer } from '@/ui/drawer';
+import { useKeyboardHidden } from '@/ui/keyboard';
 import { Between, Button, H1, H2, Screen } from '@/ui/kit';
 import { haptic, Swap, useCelebrate } from '@/ui/motion';
 import { ModeProvider, useTheme } from '@/ui/theme';
@@ -112,7 +113,11 @@ function GlobeHome() {
   // Where the person dragged the panel to; forgotten when the step changes.
   const [dragged, setDragged] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const index = flow.open ? (dragged ?? (searching ? 2 : STEP_HEIGHT[draft.step])) : homeIndex;
+  // Searching always raises the panel, so results show above the keyboard.
+  const index = flow.open ? (searching ? 2 : (dragged ?? STEP_HEIGHT[draft.step])) : homeIndex;
+  // Search ends when the keyboard closes, whether or not the field kept its focus (Android's
+  // back gesture closes the keyboard without a blur).
+  useKeyboardHidden(useCallback(() => setSearching(false), []));
 
   // Every opening of the flow starts from nothing; closing it discards the draft.
   useEffect(() => {
@@ -126,6 +131,8 @@ function GlobeHome() {
   const isos = draftIsos(draft).join(',');
   useEffect(() => {
     setDragged(null);
+    // A step's search field goes away with the step, without telling anyone it lost focus.
+    setSearching(false);
     if (!flow.open) return;
     if (draft.step === 'dates' || draft.step === 'cities')
       globe.current?.fitCountries(isos ? isos.split(',') : []);

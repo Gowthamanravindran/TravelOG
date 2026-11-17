@@ -12,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useKeyboardHeight } from './keyboard';
 import { MOTION, useMotionOk } from './motion';
 import { useTheme } from './theme';
 
@@ -65,6 +66,8 @@ export function Drawer({
   const start = useSharedValue(0);
   const [footerHeight, setFooterHeight] = useState(0);
   const bottomPad = padBottom ? insets.bottom : 0;
+  // Rows under an open keyboard can still be scrolled up into view.
+  const keyboard = useKeyboardHeight();
 
   useEffect(() => {
     offset.set(ok ? withTiming(resting, SETTLE) : resting);
@@ -132,7 +135,10 @@ export function Drawer({
         // The part below the resting height is off screen; pad so the last row can be reached.
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: spacing.lg + bottomPad + resting + (footer ? footerHeight : 0) },
+          {
+            paddingBottom:
+              spacing.lg + bottomPad + resting + (footer ? footerHeight : 0) + keyboard,
+          },
         ]}
       >
         {children}

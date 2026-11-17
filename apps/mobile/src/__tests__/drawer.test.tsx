@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { useState } from 'react';
-import { Text } from 'react-native';
+import { DeviceEventEmitter, StyleSheet, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -54,5 +54,21 @@ describe('Drawer (Plan 66)', () => {
     expect(screen.getByTestId('drawer-scroll').props.scrollEnabled).toBe(false);
     await fireEvent.press(screen.getByRole('button', { name: 'Expand trip list' }));
     expect(screen.getByTestId('drawer-scroll').props.scrollEnabled).toBe(true);
+  });
+
+  it('leaves room under its content for the keyboard, so the last rows can be scrolled into view', async () => {
+    await render(<Harness onChange={() => {}} />);
+    const pad = () =>
+      StyleSheet.flatten(screen.getByTestId('drawer-scroll').props.contentContainerStyle)
+        .paddingBottom as number;
+    const before = pad();
+    await act(async () => {
+      DeviceEventEmitter.emit('keyboardDidShow', { endCoordinates: { height: 300 } });
+    });
+    expect(pad()).toBe(before + 300);
+    await act(async () => {
+      DeviceEventEmitter.emit('keyboardDidHide', {});
+    });
+    expect(pad()).toBe(before);
   });
 });
