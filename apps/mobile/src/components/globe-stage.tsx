@@ -15,6 +15,7 @@ import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Globe, GLOBE_SPACE, type GlobeHandle } from '@/components/globe';
+import { ExplorePanel } from '@/components/explore/panel';
 import { TripsPanel } from '@/components/trips-panel';
 
 /** The tabs that draw on the shared globe. */
@@ -152,7 +153,7 @@ export function GlobeStage({
         onPlacePress={(p) => current()?.onPlacePress?.(p)}
       />
       <StageContext.Provider value={stage}>
-        {tab === 'trips' ? <TripsPanel /> : null}
+        {tab === 'trips' ? <TripsPanel /> : tab === 'explore' ? <ExplorePanel /> : null}
       </StageContext.Provider>
     </View>
   );

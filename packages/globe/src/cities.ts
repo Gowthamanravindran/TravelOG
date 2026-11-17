@@ -81,11 +81,8 @@ export function searchCities(query: string, limit = 30): City[] {
   return out.concat(later).slice(0, limit);
 }
 
-/**
- * The best-known cities of a country as drawn on the globe: its largest, skipping any that sit
- * within `minGapKm` of one already chosen so the dots do not pile up.
- */
-export function topCities(countryCode: string, limit = 8, minGapKm = 40): City[] {
+/** A country's rows, largest first; territories drawn inside a parent count as the parent. */
+function rowsIn(countryCode: string): Row[] {
   if (!byCountry) {
     byCountry = new Map();
     for (const r of load().rows) {
@@ -95,8 +92,40 @@ export function topCities(countryCode: string, limit = 8, minGapKm = 40): City[]
       else byCountry.set(code, [r]);
     }
   }
+  return byCountry.get(countryCode) ?? [];
+}
+
+/** Every city of a country as drawn on the globe, largest first. */
+export function citiesIn(countryCode: string): City[] {
+  return rowsIn(countryCode).map(toCity);
+}
+
+/**
+ * Cities of one country whose name starts with the query, largest first, then those with a
+ * later word that starts with it. Fewer than two letters finds nothing.
+ */
+export function searchCitiesIn(countryCode: string, query: string, limit = 12): City[] {
+  const q = foldText(query.trim());
+  if (q.length < 2) return [];
+  const starts: City[] = [];
+  const later: City[] = [];
+  const inner = ' ' + q;
+  for (const r of rowsIn(countryCode)) {
+    if (starts.length >= limit) break;
+    const name = foldText(r[1]);
+    if (name.startsWith(q)) starts.push(toCity(r));
+    else if (later.length < limit && name.includes(inner)) later.push(toCity(r));
+  }
+  return starts.concat(later).slice(0, limit);
+}
+
+/**
+ * The best-known cities of a country as drawn on the globe: its largest, skipping any that sit
+ * within `minGapKm` of one already chosen so the dots do not pile up.
+ */
+export function topCities(countryCode: string, limit = 8, minGapKm = 40): City[] {
   const out: City[] = [];
-  for (const r of byCountry.get(countryCode) ?? []) {
+  for (const r of rowsIn(countryCode)) {
     if (out.length >= limit) break;
     const c = toCity(r);
     if (out.every((o) => distanceKm(o, c) >= minGapKm)) out.push(c);

@@ -1,7 +1,15 @@
 import { distanceKm } from '@travelog/core';
 import { describe, expect, it } from 'vitest';
 
-import { cityById, cityPlaceId, countryCodeOnGlobe, searchCities, topCities } from './cities';
+import {
+  citiesIn,
+  cityById,
+  cityPlaceId,
+  countryCodeOnGlobe,
+  searchCities,
+  searchCitiesIn,
+  topCities,
+} from './cities';
 
 describe('city search', () => {
   it('finds cities by prefix, largest first, accents folded', () => {
@@ -43,5 +51,31 @@ describe('city ids', () => {
     expect(cityById('1850147')?.name).toBe('Tokyo');
     expect(cityById('nope')).toBeUndefined();
     expect(cityPlaceId({ ...tokyo, id: 'osm:n123' })).toBe('osm:n123');
+  });
+});
+
+describe('cities of one country', () => {
+  it('lists them all, largest first, with territories under their parent', () => {
+    const jp = citiesIn('JP');
+    expect(jp[0]?.name).toBe('Tokyo');
+    expect(jp.length).toBeGreaterThan(100);
+    expect(jp.every((c) => c.countryCode === 'JP')).toBe(true);
+    expect(citiesIn('FR').some((c) => c.countryCode === 'RE')).toBe(true);
+    expect(citiesIn('ZZ')).toEqual([]);
+  });
+
+  it('searches inside the country only', () => {
+    const names = searchCitiesIn('JP', 'kyo').map((c) => c.name);
+    expect(names).toContain('Kyoto');
+    expect(searchCitiesIn('JP', 'kyo').every((c) => c.countryCode === 'JP')).toBe(true);
+    expect(searchCitiesIn('JP', 'paris')).toEqual([]);
+    expect(searchCitiesIn('JP', 'k')).toEqual([]); // under 2 letters
+    expect(searchCitiesIn('JP', 'to', 3)).toHaveLength(3);
+  });
+
+  it('finds a later word, after the names that start with the query', () => {
+    const us = searchCitiesIn('US', 'york').map((c) => c.name);
+    expect(us).toContain('New York City');
+    expect(searchCitiesIn('FR', 'saint-denis').some((c) => c.countryCode === 'RE')).toBe(true);
   });
 });
