@@ -44,6 +44,8 @@ export type GlobeMapHandle = {
   focusCountry: (iso: string) => void;
   /** Remove the outline and label, and zoom back out. */
   clearFocus: () => void;
+  /** Pull back to the whole Earth, sized to the part that shows. */
+  goHome: () => void;
   /** Frame every stop. */
   fitStops: () => void;
   /** Frame several countries at once (ISO alpha-3). */
@@ -60,6 +62,11 @@ export type GlobeMapProps = {
   candidates?: Place[];
   /** Picked cities in visit order: numbered pins joined by the route; a new last stop draws its leg. */
   stops?: Place[];
+  /**
+   * 'focus' (default): a tapped country is outlined, named and zoomed to, then reported.
+   * 'report': it is only reported, and the app decides what happens. Switched without reloading.
+   */
+  tapMode?: 'focus' | 'report';
   /** Whether tapping a country does anything. Default true. */
   countryTapEnabled?: boolean;
   /** Points at the bottom of the globe covered by something else; camera fits stay above it. */
@@ -100,6 +107,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     candidates,
     stops,
     countryTapEnabled = true,
+    tapMode = 'focus',
     reduceMotion = false,
     bottomInset = 0,
     quality = 'auto',
@@ -176,6 +184,10 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
   }, [ready, payload, run]);
 
   useEffect(() => {
+    if (ready) run('window.globe.setTapMode(' + JSON.stringify(tapMode) + ')');
+  }, [ready, tapMode, run]);
+
+  useEffect(() => {
     if (ready) run('window.globe.setCountryTap(' + (countryTapEnabled ? 'true' : 'false') + ')');
   }, [ready, countryTapEnabled, run]);
 
@@ -197,6 +209,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
         run('window.globe.flyTo(' + [lng, lat, zoom ?? 3.5].join(',') + ')'),
       focusCountry: (iso) => run('window.globe.focusCountry(' + JSON.stringify(iso) + ')'),
       clearFocus: () => run('window.globe.clearSelection()'),
+      goHome: () => run('window.globe.goHome()'),
       fitStops: () =>
         run(
           'window.globe.fitPoints(' +

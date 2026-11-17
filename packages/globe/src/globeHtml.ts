@@ -87,7 +87,7 @@ function post(msg) {
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
 window.globe = {};
-['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset'].forEach(function (name) {
+['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome'].forEach(function (name) {
   window.globe[name] = function () { pending.push([name, Array.prototype.slice.call(arguments)]); };
 });
 
@@ -246,7 +246,7 @@ function start() {
       container: 'map',
       center: [78, 18],
       zoom: 1.4,
-      minZoom: 0.6,
+      minZoom: 0.2, // low enough for the whole Earth to fit a short visible band
       maxZoom: 7,
       attributionControl: false,
       dragRotate: false,
@@ -278,13 +278,16 @@ function start() {
     var D = focal + R;
     var r = focal * R / Math.sqrt(D * D - R * R);
     var show = r < Math.sqrt(w * w + h * h) / 2 + 60;
-    var key = show ? [Math.round(r * 2) / 2, w, h].join(',') : 'off';
+    // The globe is centred in the padded view (the part the app's drawer leaves showing).
+    var pad = map.getPadding ? map.getPadding() : null;
+    var cy = pad ? (h + (pad.top || 0) - (pad.bottom || 0)) / 2 : h / 2;
+    var key = show ? [Math.round(r * 2) / 2, w, h, Math.round(cy * 2) / 2].join(',') : 'off';
     if (key === rimKey) return;
     rimKey = key;
     if (!show) { rim.style.display = 'none'; return; }
     rim.style.display = 'block';
     rim.style.width = rim.style.height = (2 * r) + 'px';
-    rim.style.transform = 'translate(' + (w / 2 - r) + 'px,' + (h / 2 - r) + 'px)';
+    rim.style.transform = 'translate(' + (w / 2 - r) + 'px,' + (cy - r) + 'px)';
   }
   map.on('move', updateRim);
   map.on('resize', updateRim);
@@ -640,16 +643,46 @@ function start() {
     legFrame = requestAnimationFrame(step);
   }
   function setCountryTap(on) { countryTap = !!on; }
-  // How much of the bottom of the map is covered by the app's drawer, so fits stay in view.
+  // How much of the bottom of the map is covered by the app's drawer. It becomes the camera's
+  // bottom padding, so every move (fly, fit, focus, spin, the resting view) centres in the part
+  // that shows. A resting globe is also re-sized to fit that part.
   var inset = 0;
-  function setInset(px) { inset = Math.max(0, Number(px) || 0); }
+  function setInset(px) {
+    inset = Math.max(0, Number(px) || 0);
+    var to = { padding: { top: 0, left: 0, right: 0, bottom: inset }, duration: dur(300) };
+    if (!selected && map.getZoom() < 3 && !stopsData.length && !candidatesData.length) to.zoom = homeZoom();
+    pause(600);
+    map.easeTo(to);
+  }
+  // The zoom at which the whole Earth fits the visible band. On a globe the drawn radius is
+  // worldSize / (2 pi cos(latitude)), so the zoom depends on the resting latitude.
+  var HOME_LAT = 18;
+  function homeZoom() {
+    var el = map.getContainer();
+    var across = Math.min(el.clientWidth, el.clientHeight - inset) * 0.95;
+    var z = Math.log(Math.PI * across * Math.cos(HOME_LAT * Math.PI / 180) / 512) / Math.LN2;
+    return Math.max(0.2, z);
+  }
+  // Pull back to the whole Earth, keeping the side that is facing.
+  function goHome() {
+    pause(1200);
+    map.easeTo({ center: [map.getCenter().lng, HOME_LAT], zoom: homeZoom(), duration: dur(900) });
+  }
+  // 'focus': a tapped country is outlined, named and zoomed to, then reported (the default).
+  // 'report': the app is only told which country was tapped, and decides what happens.
+  var tapMode = 'focus';
+  function setTapMode(mode) { tapMode = mode === 'report' ? 'report' : 'focus'; }
+  function debugSize() { // for scripts/globe/page-check.py
+    var z = map.getZoom(), lat = map.getCenter().lat;
+    return { diameter: 512 * Math.pow(2, z) / Math.PI / Math.cos(lat * Math.PI / 180), centerY: map.project(map.getCenter()).y, zoom: z };
+  }
   function setReduceMotion(on) { still = !!on; if (still) cancelLeg(); if (still && stopsData.length) map.getSource('route').setData(routeLine(stopsData)); }
   // Frame a set of points: one point zooms to it, several fit them all.
   function fitPoints(points) {
     if (!points || !points.length) return;
     pause(8000);
     if (points.length === 1) {
-      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900), offset: [0, -inset / 2] });
+      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 4.2, duration: dur(900) });
       return;
     }
     var s = 90, n = -90;
@@ -679,7 +712,7 @@ function start() {
       return;
     }
     map.fitBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
-      { padding: { top: 90, bottom: 60 + inset, left: 48, right: 48 }, maxZoom: 4.6, duration: dur(900) });
+      { padding: { top: 90, bottom: 60, left: 48, right: 48 }, maxZoom: 4.6, duration: dur(900) });
   }
   // Frame several countries at once (by ISO alpha-3).
   function fitCountries(isos) {
@@ -712,7 +745,6 @@ function start() {
   DATA.countries.features.forEach(function (f) { INDEX[f.properties.iso] = f; });
   var TINY = {};
   DATA.tiny.forEach(function (t) { TINY[t.iso] = t; });
-  var HOME_ZOOM = 1.4;
   var label = new maplibregl.Popup({
     closeButton: false, closeOnClick: false, closeOnMove: false,
     anchor: 'bottom', offset: 6, className: 'country-pop', maxWidth: 'none'
@@ -768,7 +800,7 @@ function start() {
     } else {
       label.remove();
       // Tapping empty space after a selection pulls back out and lets the spin resume.
-      if (had) { pause(1200); map.easeTo({ zoom: Math.min(map.getZoom(), HOME_ZOOM), duration: dur(900) }); }
+      if (had) { pause(1200); map.easeTo({ zoom: Math.min(map.getZoom(), homeZoom()), duration: dur(900) }); }
     }
     refreshLabels();
   }
@@ -780,8 +812,10 @@ function start() {
     focusCountry(id, name);
   }
   function postCountry(f) {
-    select(f.properties.iso);
-    if (CFG.focusOnTap) focusCountry(f.properties.iso, f.properties.name);
+    if (tapMode === 'focus') {
+      select(f.properties.iso);
+      if (CFG.focusOnTap) focusCountry(f.properties.iso, f.properties.name);
+    }
     post({ type: 'country', iso: f.properties.iso, name: f.properties.name, visited: !!(f.state && f.state.visited) });
   }
   map.on('click', function (e) {
@@ -826,7 +860,8 @@ function start() {
     if (tiny.length) { postCountry(tiny[0]); return; }
 
     var hits = map.queryRenderedFeatures(e.point, { layers: ['land'] });
-    if (hits.length) postCountry(hits[0]); else select(null);
+    if (hits.length) postCountry(hits[0]);
+    else if (tapMode === 'focus') select(null); // in report mode the app owns the outline
   });
 
   // ---- imagery status and errors ----------------------------------------
@@ -862,7 +897,7 @@ function start() {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
       setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
-      setInset: setInset
+      setInset: setInset, setTapMode: setTapMode, goHome: goHome, debugSize: debugSize
     };
     if (quality === 'low') applyQuality('low', 'config');
     pending.forEach(function (call) { window.globe[call[0]].apply(null, call[1]); });
