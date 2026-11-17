@@ -10,3 +10,6 @@ apps/web/public/*.html
 apps/mobile/assets
 packages/db/drizzle
 apps/mobile/expo-env.d.ts
+packages/globe/src/maplibreAssets.ts
+packages/globe/src/flags.ts
+packages/globe/src/data

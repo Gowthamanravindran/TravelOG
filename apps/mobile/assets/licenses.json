@@ -2165,7 +2165,7 @@
   },
   {
    "name": "escape-string-regexp",
-   "version": "1.0.5, 2.0.0",
+   "version": "1.0.5, 2.0.0, 4.0.0",
    "license": "MIT",
    "homepage": "https://github.com/sindresorhus/escape-string-regexp#readme",
    "author": "Sindre Sorhus"
@@ -3877,6 +3877,13 @@
    "license": "MIT",
    "homepage": "https://github.com/necolas/react-native-web#readme",
    "author": "Nicolas Gallagher"
+  },
+  {
+   "name": "react-native-webview",
+   "version": "14.0.1",
+   "license": "MIT",
+   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+   "author": "Jamon Holmgren"
   },
   {
    "name": "react-native-worklets",

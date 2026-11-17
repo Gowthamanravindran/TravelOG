@@ -34,6 +34,7 @@
     "react-native-safe-area-context": "Expo Go SDK 58 and the development build",
     "react-native-screens": "Expo Go SDK 58 and the development build",
     "react-native-view-shot": "Expo Go SDK 58 and the development build",
+    "react-native-webview": "Expo Go SDK 58; the development build needs a rebuild (Plan 66)",
     "react-native-worklets": "Expo Go SDK 58 and the development build"
   }
 }
