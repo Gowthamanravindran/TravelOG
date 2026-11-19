@@ -31,6 +31,28 @@ describe('one layer of stars in the flight', () => {
 });
 
 describe('the whole flight', () => {
+  it('no streak is drawn near the middle, only once a star is out to the side (Plan 84)', () => {
+    const streaked = warpLayers().flatMap((l) => l.stars.filter((s) => s.streak === true));
+    expect(streaked.length).toBeGreaterThan(150);
+    const near: string[] = [];
+    for (let t = 0; t < 2; t += 0.01) {
+      for (const layer of warpLayers()) {
+        const at = layerAt(layer.depthAt(t), 0.5);
+        if (at.opacity * at.streaks < 0.01) continue;
+        for (const s of layer.stars.filter((x) => x.streak)) {
+          const out = Math.hypot(s.x * (W / 2) * at.scale, s.y * (H / 2) * at.scale);
+          if (out < 0.2 * Math.min(W, H)) near.push(`${t.toFixed(2)}: ${out.toFixed(0)} pt`);
+        }
+      }
+    }
+    expect(near).toEqual([]);
+  });
+
+  it('stars near the middle still show, as points', () => {
+    const middle = warpLayers().flatMap((l) => l.stars.filter((s) => s.streak === false));
+    expect(middle.length).toBeGreaterThan(10);
+  });
+
   it('fills the sky: every quarter has stars, and some are out near the edges', () => {
     const shown = warpLayers().flatMap((layer) => {
       const { scale, opacity } = layerAt(layer.depthAt(0.37), 0.5);

@@ -87,3 +87,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 81 | [A fuller night sky while the globe starts](81-a-fuller-night-sky.md) | see git log |
 | 82 | [A flight through the stars while the globe starts](82-a-flight-through-the-stars.md) | see git log |
 | 83 | [The star flight drawn in layers, so it runs smoothly](83-star-flight-in-layers.md) | see git log |
+| 84 | [No streaks from the middle](84-no-streaks-from-the-middle.md) | see git log |

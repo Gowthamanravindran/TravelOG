@@ -28,6 +28,14 @@ const SCALE_MAX = NEAR / Z_MIN;
 /** At the nearest: a star's size and its streak's length, in points. */
 const STAR_SIZE = 3.8;
 const STREAK = 72;
+/**
+ * No streaks near the middle (the owner's call, Plan 84): a star streaks only if it is at least
+ * this far off the line of flight, and a layer's streaks fade in only once it has spread out
+ * (its zoom from `STREAKS_FROM` to `STREAKS_FROM + STREAKS_RAMP`).
+ */
+const STREAK_FROM_MIDDLE = 0.75;
+const STREAKS_FROM = 0.55;
+const STREAKS_RAMP = 0.25;
 /** Depth travelled per second at speed 1. */
 const RATE = 0.6;
 /** Cruising at first, then up to warp, where the stars streak. */
@@ -80,6 +88,8 @@ export interface WarpStar {
   size: number;
   bright: number;
   tint: string;
+  /** False for stars near the line of flight: they stay points. */
+  streak: boolean;
 }
 export interface WarpLayer {
   phase: number;
@@ -99,13 +109,18 @@ export function warpLayers(): WarpLayer[] {
       phase,
       speed,
       depthAt: (travel: number) => depth(travel, phase, speed),
-      stars: Array.from({ length: PER_LAYER }, () => ({
-        x: (next() * 2 - 1) * SPREAD,
-        y: (next() * 2 - 1) * SPREAD,
-        size: 0.6 + next() * 0.4,
-        bright: 0.7 + next() * 0.3,
-        tint: tint(next()),
-      })),
+      stars: Array.from({ length: PER_LAYER }, () => {
+        const x = (next() * 2 - 1) * SPREAD;
+        const y = (next() * 2 - 1) * SPREAD;
+        return {
+          x,
+          y,
+          size: 0.6 + next() * 0.4,
+          bright: 0.7 + next() * 0.3,
+          tint: tint(next()),
+          streak: Math.hypot(x, y) >= STREAK_FROM_MIDDLE,
+        };
+      }),
     };
   });
 }
@@ -115,17 +130,20 @@ export function warpLayers(): WarpLayer[] {
  * perspective factor: a star's offset from the middle is its place times this, so far layers
  * sit near the middle and near ones spread past the edges, their stars growing as they come.
  * Far layers fade in, so stars never pop in, and the nearest fade as they pass. `streaks` is
- * how much the streaks show: fully at warp, not at all at a stop.
+ * how much the streaks show: fully at warp, not at all at a stop, and not while the layer is
+ * still gathered near the middle.
  */
 export function layerAt(z: number, speed: number) {
   'worklet';
   const bright = Math.pow(Math.min(1, Math.max(0, (1 - z) * 1.15)), 1.2);
   const fadeIn = z > 0.85 ? (1 - z) / 0.15 : 1;
   const fadeOut = Math.min(1, (z - Z_MIN) / 0.05);
+  const scale = NEAR / z;
+  const spread = Math.min(1, Math.max(0, (scale - STREAKS_FROM) / STREAKS_RAMP));
   return {
-    scale: NEAR / z,
+    scale,
     opacity: Math.max(0, bright * fadeIn * fadeOut),
-    streaks: Math.min(1, Math.max(0, speed / WARP)),
+    streaks: Math.min(1, Math.max(0, speed / WARP)) * spread,
   };
 }
 
@@ -169,6 +187,7 @@ function Layer({
     <>
       <Animated.View testID="star-layer" style={[StyleSheet.absoluteFill, streaks]}>
         {placed.map((s, i) => {
+          if (!s.streak) return null;
           const length = STREAK * s.size;
           const thick = STAR_SIZE * s.size;
           return (
