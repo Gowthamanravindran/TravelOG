@@ -118,6 +118,24 @@ beforeEach(() => {
 });
 
 describe('creating a trip on the globe, by search and buttons alone (Plan 67)', () => {
+  it('the dates step keeps the drawer at the height the countries step had (Plan 78)', async () => {
+    await render(withData(db(), <HomeLayout />));
+    await fromGlobe({ type: 'ready', ms: 1, quality: 'high', pixelRatio: 2 });
+    const inset = () =>
+      webview()
+        .injected.filter((js) => js.includes('setInset('))
+        .at(-1);
+    await press('Create a trip');
+    await search('Search a country or city', 'tok');
+    await press('Add Tokyo, Japan');
+    // The search raised the drawer; it comes back down when the keyboard closes.
+    await act(async () => DeviceEventEmitter.emit('keyboardDidHide', {}));
+    const countries = inset();
+    await press('Let’s go →');
+    expect(screen.getByText('When?')).toBeTruthy();
+    expect(inset()).toBe(countries);
+  });
+
   it('goes countries → dates → cities → days and saves the trip with its stops', async () => {
     const d = db();
     await render(withData(d, <HomeLayout />));

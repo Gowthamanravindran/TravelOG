@@ -11,8 +11,12 @@ import { useTheme } from '@/ui/theme';
 
 import { tripSummary } from './step-dates';
 
-/** Which of the drawer's three heights each step rests at: low, middle or high. */
-export const STEP_HEIGHT: Record<Step, 0 | 1 | 2> = { countries: 0, dates: 2, cities: 0, days: 1 };
+/**
+ * Which of the drawer's three heights each step rests at: low, middle or high. The dates step
+ * rests as low as the countries step, with the globe still in view; the calendar scrolls inside
+ * the drawer, and it can be dragged up (the owner's call, Plan 78).
+ */
+export const STEP_HEIGHT: Record<Step, 0 | 1 | 2> = { countries: 0, dates: 0, cities: 0, days: 1 };
 
 const TITLES: Record<Step, string> = {
   countries: 'Where to?',
