@@ -217,10 +217,23 @@ with sync_playwright() as p:
     out["tap_nearest_at"] = picks
     page.evaluate("window.globe.setData({})")
 
+    # ---- Quality comes back (Plan 87) ---------------------------------------------------------
+    # Put the automatic quality in the state of a drop long ago; while the globe is still, it
+    # tries the satellite look again within a couple of seconds.
+    page.evaluate("window.globe.setSpin(false)")
+    q = page.evaluate("window.globe.debugQuality()")
+    out["quality_ready_known"] = q["state"]["readyAt"] > 0
+    n0 = page.evaluate("window.__msgs.length")
+    page.evaluate("t => window.globe.debugQuality({ quality: 'low', slow: 0, since: t - 30000, wait: 20000, readyAt: 1 })", q["now"])
+    page.wait_for_timeout(2600)
+    back = page.evaluate("n => window.__msgs.slice(n).filter(m => m.type === 'quality')", n0)
+    out["quality_returns"] = any(m["quality"] == "high" and m["reason"] == "retry" for m in back)
+    out["quality_returns_at"] = back
+
     out["no_errors"] = not errors and not page.evaluate("window.__msgs.some(m=>m.type==='error')")
     out["errors"] = errors[:3]
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)

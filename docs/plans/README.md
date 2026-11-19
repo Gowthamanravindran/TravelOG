@@ -90,3 +90,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 84 | [No streaks from the middle](84-no-streaks-from-the-middle.md) | see git log |
 | 85 | [Picking stops: the countries fill the view, and a tap picks the city under it](85-picking-stops-framing-and-taps.md) | see git log |
 | 86 | [Put the stops in a new order by dragging](86-reorder-stops-by-dragging.md) | see git log |
+| 87 | [The globe's satellite look comes back after a drop](87-globe-quality-comes-back.md) | see git log |

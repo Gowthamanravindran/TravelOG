@@ -77,6 +77,37 @@ function pageCss(theme: GlobeTheme): string {
   ].join(String.fromCharCode(10));
 }
 
+/**
+ * When the globe drops to its plain look to stay smooth, and when it tries the satellite look
+ * again (Plan 87). Plain ES5, embedded in the page and tested on its own. Before, a drop lasted
+ * until the app restarted, and two slow readings at a busy moment (the start) were enough.
+ * - Readings in the first 4 s after ready are ignored: the globe is flying in.
+ * - Three slow readings in a row (under 28 fps while moving) drop it.
+ * - Once still for `wait` after a drop, it tries the satellite look again; each drop after a try
+ *   doubles the wait, up to 160 s, and a minute of smooth running resets it to 20 s.
+ */
+export const qualityPolicyScript = `
+var Q_SETTLE_MS = 4000, Q_SLOW_FPS = 28, Q_SLOW_RUN = 3, Q_WAIT = 20000, Q_WAIT_MAX = 160000, Q_GOOD_MS = 60000;
+function qualityStep(st, ev) {
+  var s = { quality: st.quality, slow: st.slow, since: st.since, wait: st.wait, readyAt: st.readyAt };
+  if (s.quality === 'high') {
+    if (s.wait !== Q_WAIT && ev.now - s.since >= Q_GOOD_MS) s.wait = Q_WAIT;
+    if (ev.kind !== 'sample' || ev.now - s.readyAt < Q_SETTLE_MS) return { state: s, set: null };
+    s.slow = ev.fps < Q_SLOW_FPS ? s.slow + 1 : 0;
+    if (s.slow < Q_SLOW_RUN) return { state: s, set: null };
+    // A drop soon after a try means the try failed: wait longer next time.
+    if (s.since > 0 && ev.now - s.since < Q_GOOD_MS) s.wait = Math.min(Q_WAIT_MAX, s.wait * 2);
+    s.quality = 'low'; s.slow = 0; s.since = ev.now;
+    return { state: s, set: 'low' };
+  }
+  if (ev.kind === 'idle' && ev.now - s.since >= s.wait) {
+    s.quality = 'high'; s.slow = 0; s.since = ev.now;
+    return { state: s, set: 'high' };
+  }
+  return { state: s, set: null };
+}
+`;
+
 // Plain ES5, no template strings, so it runs on old WebViews and embeds safely.
 export const globePageScript = `
 function post(msg) {
@@ -373,8 +404,19 @@ function start() {
   var lastFrame = 0;
   var sampleStart = 0;
   var sampleTouched = false;
-  var lowSamples = 0;
   var readyAt = 0;
+  // The automatic quality's state (qualityStep, Plan 87), on the frames' clock.
+  var qs = { quality: quality, slow: 0, since: 0, wait: Q_WAIT, readyAt: 0 };
+  function qualityEvent(ev, fps) {
+    var r = qualityStep(qs, ev);
+    qs = r.state;
+    if (r.set) applyQuality(r.set, r.set === 'low' ? 'fps' : 'retry', fps);
+  }
+  // While the globe is still, see whether it is time to try the satellite look again.
+  function qualityTick() {
+    if (!auto || touching || document.hidden || map.isMoving()) return;
+    qualityEvent({ kind: 'idle', now: performance.now() });
+  }
 
   function flush(now) {
     var n = gaps.length;
@@ -386,10 +428,7 @@ function start() {
         post({ type: 'perf', fps: fps, worstMs: Math.round(worst), slowFrames: slow, frames: n,
                during: sampleTouched ? 'touch' : 'spin', quality: quality });
       }
-      if (auto && quality === 'high' && now - readyAt > 1500) {
-        lowSamples = fps < 28 ? lowSamples + 1 : 0;
-        if (lowSamples >= 2) applyQuality('low', 'fps', fps);
-      }
+      if (auto) qualityEvent({ kind: 'sample', fps: fps, now: now }, fps);
     }
     gaps = []; sampleStart = now; sampleTouched = false;
   }
@@ -828,7 +867,13 @@ function start() {
     spinEnabled = !!on;
     if (on) spin(); else if (!command && Date.now() > quietUntil) map.stop();
   }
-  function setQuality(q) { auto = q === 'auto'; lowSamples = 0; applyQuality(q === 'low' ? 'low' : 'high', 'set'); }
+  function setQuality(q) {
+    auto = q === 'auto';
+    applyQuality(q === 'low' ? 'low' : 'high', 'set');
+    qs = { quality: quality, slow: 0, since: performance.now(), wait: Q_WAIT, readyAt: qs.readyAt };
+  }
+  // For the desktop check script: read or set the automatic quality's state.
+  function debugQuality(st) { if (st) qs = st; return { state: qs, now: performance.now() }; }
 
   // ---- taps ---------------------------------------------------------------
   var INDEX = {};
@@ -1016,13 +1061,15 @@ function start() {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
       setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
-      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, debugSize: debugSize, debugPoint: debugPoint, debugBox: debugBox
+      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, debugSize: debugSize, debugPoint: debugPoint, debugBox: debugBox, debugQuality: debugQuality
     };
     if (quality === 'low') applyQuality('low', 'config');
     setOff();
     pending.forEach(function (call) { window.globe[call[0]].apply(null, call[1]); });
     pending = [];
     readyAt = performance.now();
+    qs.readyAt = readyAt;
+    setInterval(qualityTick, 2000);
     post({ type: 'ready', ms: Math.round(readyAt - T0), quality: quality, pixelRatio: map.getPixelRatio() });
     requestAnimationFrame(frame);
     spin();
@@ -1072,6 +1119,7 @@ export function buildGlobeHtml(data: GlobeData, input: GlobeConfig): string {
     MAPLIBRE_JS,
     '</script>',
     '<script>',
+    qualityPolicyScript,
     globePageScript,
     '</script>',
     '</body></html>',
