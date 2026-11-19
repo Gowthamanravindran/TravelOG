@@ -84,3 +84,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 78 | [The dates step keeps the drawer low](78-dates-step-stays-low.md) | see git log |
 | 79 | [The globe's start: progress, not a fixed limit, and no silent dark area](79-globe-start-progress.md) | see git log |
 | 80 | [Arriving at the globe](80-arriving-at-the-globe.md) | see git log |
+| 81 | [A fuller night sky while the globe starts](81-a-fuller-night-sky.md) | see git log |

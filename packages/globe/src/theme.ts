@@ -13,6 +13,9 @@ export type GlobeTheme = {
   tagText?: string;
   /** False draws every star white (for a black and white theme). Default true. */
   starTints?: boolean;
+  /** The two star tints, as the page draws them (blue-white and warm white). */
+  starCool?: string;
+  starWarm?: string;
 };
 
 export const defaultTheme: GlobeTheme = {
@@ -27,4 +30,6 @@ export const defaultTheme: GlobeTheme = {
   tag: '#0b2239',
   tagText: '#ffffff',
   starTints: true,
+  starCool: 'rgb(190, 215, 255)',
+  starWarm: 'rgb(255, 235, 205)',
 };

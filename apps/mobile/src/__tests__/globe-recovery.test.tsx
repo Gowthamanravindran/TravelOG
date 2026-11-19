@@ -6,6 +6,13 @@ import { globeProblem } from '@/lib/runtime';
 // The map page can fail to start (no drawing context, the page going silent). The globe then
 // tries again by itself, and remembers what went wrong so Settings → About can say (Plan 77).
 
+// These tests run the clock forward by up to a minute; with motion on, every frame of the
+// streaming stars would be stepped through. The stars' own tests are in star-warp.test.tsx.
+jest.mock('@/ui/motion', () => ({
+  ...jest.requireActual('@/ui/motion'),
+  useMotionOk: () => false,
+}));
+
 type MockWebView = {
   injected: string[];
   props: { onMessage: (e: { nativeEvent: { data: string } }) => void };
