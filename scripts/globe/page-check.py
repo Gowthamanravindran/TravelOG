@@ -18,24 +18,10 @@ from playwright.sync_api import sync_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PKG = os.path.join(ROOT, "packages", "globe")
 HTML = "/tmp/travelog-globe.html"
-DUMP = os.path.join(PKG, "src", "zz-page-dump.test.ts")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from globe_page import build  # noqa: E402
 
-# Build the page with the package's own code (no imagery: the check must not need the network).
-with open(DUMP, "w") as f:
-    f.write(
-        "import { writeFileSync } from 'node:fs';\n"
-        "import { it } from 'vitest';\n"
-        "import { loadCountries } from './countries';\n"
-        "import { FLAGS } from './flags';\n"
-        "import { buildGlobeHtml, defaultTheme } from './globeHtml';\n"
-        "it('dump', () => {\n"
-        f"  writeFileSync('{HTML}', buildGlobeHtml(loadCountries(), {{ theme: defaultTheme, quality: 'auto', imageryUrl: '', imageryMaxZoom: 5, imageryAttribution: '', benchmark: false, focusOnTap: true, flags: FLAGS }}));\n"
-        "});\n"
-    )
-try:
-    subprocess.run(["npx", "vitest", "run", "src/zz-page-dump.test.ts"], cwd=PKG, check=True, capture_output=True)
-finally:
-    os.remove(DUMP)
+build(HTML)
 
 W, H, INSET = 390, 470, 200
 BAND_MID = (H - INSET) // 2  # the middle of the part of the globe that shows

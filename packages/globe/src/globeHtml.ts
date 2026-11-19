@@ -115,6 +115,14 @@ function post(msg) {
   if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
   else console.log('[globe] ' + text);
 }
+// An error nothing caught is reported (Plan 93): one stopped every cold start for 5 s, silently.
+// Before the globe is ready it means the start has failed, so the app can try again at once.
+var pageReady = false;
+if (window.addEventListener) {
+  window.addEventListener('error', function (e) {
+    post({ type: 'error', fatal: !pageReady, message: 'Page error: ' + (e && e.message ? e.message : 'unknown') });
+  });
+}
 // Say how far the start has got; postStep comes from the page's first script (Plan 79).
 // A step can carry details (Plan 92: the globe's size when the map is made).
 function startStep(name, extra) { if (typeof postStep === 'function') postStep(name, extra); }
@@ -134,6 +142,9 @@ function drawStars() {
   var c = document.getElementById('stars');
   var d = Math.min(window.devicePixelRatio || 1, 1.5);
   var w = window.innerWidth, h = window.innerHeight;
+  // No size yet (the page can start before the globe is laid out): draw on the first resize.
+  // Drawing a 0 x 0 canvas throws, and that stopped the whole page (Plan 93).
+  if (!w || !h) return;
   starTileW = w; starTileH = h;
   var tile = document.createElement('canvas');
   tile.width = Math.round(w * d); tile.height = Math.round(h * d);
@@ -169,9 +180,10 @@ function drawStars() {
   c.style.width = (2 * w) + 'px'; c.style.height = (2 * h) + 'px';
   var cg = c.getContext('2d');
   for (var tx = 0; tx < 2; tx++) for (var ty = 0; ty < 2; ty++) cg.drawImage(tile, tx * tile.width, ty * tile.height);
-  startStep('sky'); // the background stars are drawn (Plan 92)
 }
-drawStars();
+// The stars are a backdrop: whatever happens drawing them, the map is still made.
+try { drawStars(); } catch (e) { post({ type: 'error', fatal: false, message: 'Stars: ' + e.message }); }
+startStep('sky'); // past the background stars (Plan 92)
 
 function start() {
   var THEME = CFG.theme;
@@ -1088,6 +1100,7 @@ function start() {
     readyAt = performance.now();
     qs.readyAt = readyAt;
     setInterval(qualityTick, 2000);
+    pageReady = true;
     post({ type: 'ready', ms: Math.round(readyAt - T0), quality: quality, pixelRatio: map.getPixelRatio() });
     wake();
     spin();
