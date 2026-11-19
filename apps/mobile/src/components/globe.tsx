@@ -1,4 +1,9 @@
-import { defaultTheme, type GlobeMapHandle, type GlobeMapProps } from '@travelog/globe';
+import {
+  defaultTheme,
+  type GlobeMapHandle,
+  type GlobeMapProps,
+  type GlobeStep,
+} from '@travelog/globe';
 import type GlobeMapComponent from '@travelog/globe/src/GlobeMap';
 import { font, spacing, type } from '@travelog/ui';
 import { forwardRef } from 'react';
@@ -41,7 +46,7 @@ export const Globe = forwardRef<GlobeHandle, GlobeProps>(function Globe(props, r
         reduceMotion={!ok}
         onReady={(info) => {
           // How long starts take on real phones decides the stall limit (Plan 79).
-          if (__DEV__) console.log(`[globe] ready in ${info.ms} ms`);
+          if (__DEV__) console.log(readyLine(info.ms, info.steps));
           props.onReady?.(info);
         }}
         onError={(message, fatal) => {
@@ -70,3 +75,16 @@ const styles = StyleSheet.create({
   // The globe's own colours: it is dark in every app theme.
   noteText: { color: defaultTheme.tagText, textAlign: 'center', ...font('text', 500) },
 });
+
+/**
+ * The development log line for a start (Plan 92): the page's own time, how long after the
+ * globe was made the page started (the browser starting and the page arriving), and how long
+ * each step took after the one before.
+ */
+function readyLine(ms: number, steps: readonly GlobeStep[]): string {
+  const first = steps[0];
+  const parts = steps.slice(1).map((s, i) => `${s.step} +${s.ms - steps[i]!.ms}`);
+  if (steps.length) parts.push(`ready +${ms - steps.at(-1)!.ms}`);
+  const started = first ? `page started ${first.at} ms after the globe was made; ` : '';
+  return `[globe] ready in ${ms} ms (${started}${parts.join(', ')})`;
+}

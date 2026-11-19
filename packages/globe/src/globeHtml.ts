@@ -116,7 +116,8 @@ function post(msg) {
   else console.log('[globe] ' + text);
 }
 // Say how far the start has got; postStep comes from the page's first script (Plan 79).
-function startStep(name) { if (typeof postStep === 'function') postStep(name); }
+// A step can carry details (Plan 92: the globe's size when the map is made).
+function startStep(name, extra) { if (typeof postStep === 'function') postStep(name, extra); }
 startStep('library'); // the map library is in
 
 // Calls made before the map has loaded are queued and replayed.
@@ -168,6 +169,7 @@ function drawStars() {
   c.style.width = (2 * w) + 'px'; c.style.height = (2 * h) + 'px';
   var cg = c.getContext('2d');
   for (var tx = 0; tx < 2; tx++) for (var ty = 0; ty < 2; ty++) cg.drawImage(tile, tx * tile.width, ty * tile.height);
+  startStep('sky'); // the background stars are drawn (Plan 92)
 }
 drawStars();
 
@@ -277,6 +279,9 @@ function start() {
 
   var map;
   try {
+    // Making the map sets up the drawing context, the first time after launch with a cold
+    // graphics process: say so, with the size it is made at, so a stall here can be told apart.
+    startStep('creating', { w: window.innerWidth, h: window.innerHeight });
     map = new maplibregl.Map({
       container: 'map',
       center: [78, 18],
@@ -1113,7 +1118,8 @@ export function buildGlobeHtml(data: GlobeData, input: GlobeConfig): string {
     // First thing on the page: say it is running. Each later step of the start says so too, so
     // the app can tell a slow start from a stuck one (Plan 79).
     '<script>var T0 = performance.now();',
-    'function postStep(step) { var m = JSON.stringify({ type: "progress", step: step, ms: Math.round(performance.now() - T0) });',
+    'function postStep(step, extra) { var o = { type: "progress", step: step, ms: Math.round(performance.now() - T0) };',
+    ' if (extra) for (var k in extra) o[k] = extra[k]; var m = JSON.stringify(o);',
     ' if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(m); }',
     'postStep("page");</script>',
     '<style>',

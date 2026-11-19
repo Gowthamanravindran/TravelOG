@@ -111,7 +111,13 @@ export type GlobeMapProps = {
   /** A pin or a numbered stop was tapped. */
   onPlacePress?: (place: Place) => void;
   onCandidatePress?: (place: Place) => void;
-  onReady?: (info: { ms: number; quality: 'high' | 'low'; pixelRatio: number }) => void;
+  onReady?: (info: {
+    ms: number;
+    quality: 'high' | 'low';
+    pixelRatio: number;
+    /** Each step of the start: page time (`ms`) and time since the globe was made (`at`). */
+    steps: GlobeStep[];
+  }) => void;
   onPerf?: (sample: PerfSample) => void;
   onQualityChange?: (info: { quality: 'high' | 'low'; reason: string; fps: number | null }) => void;
   onImagery?: (info: { ok: boolean; ms?: number }) => void;
@@ -214,19 +220,18 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     },
     [],
   );
-  // A new page starts from the beginning.
+  // A new page starts from the beginning, timed from when it is made (Plan 92).
+  const timeline = useRef<{ start: number; steps: GlobeStep[] }>({ start: Date.now(), steps: [] });
   useEffect(() => {
     step.current = 'start';
+    timeline.current = { start: Date.now(), steps: [] };
   }, [html, reloadKey]);
   // A start that goes too long without any step is counted as failed. A slow start that keeps
   // reporting steps is left to finish: starting it again would only make it later (Plan 79).
   useEffect(() => {
     if (ready || failed || !visible) return;
     const timer = setTimeout(
-      () =>
-        startFailed(
-          `Map made no progress for ${SILENCE_LIMIT_MS / 1000} s after “${step.current}”`,
-        ),
+      () => startFailed(stallMessage(timeline.current.steps)),
       SILENCE_LIMIT_MS,
     );
     return () => clearTimeout(timer);
@@ -342,12 +347,23 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
       switch (msg.type) {
         case 'progress':
           step.current = String(msg.step);
+          timeline.current.steps.push({
+            step: String(msg.step),
+            ms: Number(msg.ms) || 0,
+            at: Date.now() - timeline.current.start,
+            ...(msg.w && msg.h ? { w: Number(msg.w), h: Number(msg.h) } : {}),
+          });
           setProgress((n) => n + 1);
           break;
         case 'ready':
           failures.current = 0;
           setReady(true);
-          onReady?.({ ms: msg.ms, quality: msg.quality, pixelRatio: msg.pixelRatio });
+          onReady?.({
+            ms: msg.ms,
+            quality: msg.quality,
+            pixelRatio: msg.pixelRatio,
+            steps: [...timeline.current.steps],
+          });
           break;
         case 'country':
           onCountryPress?.({ iso: msg.iso, name: msg.name, visited: msg.visited });
@@ -441,6 +457,27 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
 });
 
 export default GlobeMap;
+
+/** One step of the globe's start, as the page reports it (Plan 92). */
+export interface GlobeStep {
+  step: string;
+  /** Since the page started running. */
+  ms: number;
+  /** Since the globe was made in the app: includes the browser starting and the page arriving. */
+  at: number;
+  /** The globe's size, on the step where the map is made. */
+  w?: number;
+  h?: number;
+}
+
+/** What a stalled start says: the step it stalled after, and the globe's size if known. */
+function stallMessage(steps: readonly GlobeStep[]): string {
+  const last = steps.at(-1);
+  const limit = SILENCE_LIMIT_MS / 1000;
+  if (!last) return `Map page never started within ${limit} s`;
+  const size = last.w && last.h ? ` (${last.w}×${last.h})` : '';
+  return `Map made no progress for ${limit} s after “${last.step}”${size}`;
+}
 
 /** Starts tried in a row before the fallback is shown. */
 const START_TRIES = 3;

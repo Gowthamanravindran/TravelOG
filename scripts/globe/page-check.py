@@ -60,7 +60,10 @@ with sync_playwright() as p:
     page.wait_for_function("window.__msgs.some(m=>m.step==='loaded')", timeout=10000)
     steps = page.evaluate("window.__msgs.filter(m=>m.type==='progress'||m.type==='ready').map(m=>m.type==='ready'?'ready':m.step)")
     # "loaded" (the map's own load event) can come just before or after ready.
-    out["start_steps"] = steps[:4] == ["page", "data", "library", "map"] and "ready" in steps and "loaded" in steps
+    # Plan 92: two more steps between the library and the map, the second with the globe's size.
+    out["start_steps"] = steps[:6] == ["page", "data", "library", "sky", "creating", "map"] and "ready" in steps and "loaded" in steps
+    creating = page.evaluate("window.__msgs.find(m => m.step === 'creating') || null")
+    out["creating_has_size"] = bool(creating) and creating.get("w", 0) > 0 and creating.get("h", 0) > 0
     out["start_steps_seen"] = steps
     # ---- Arriving (Plan 80) ---------------------------------------------------------------------
     # The globe is ready far away, small; a height setting before it arrives is applied at once
@@ -261,5 +264,5 @@ with sync_playwright() as p:
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["idle_quiet", "hidden_no_crash", "shown_lost_crashes", "quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["creating_has_size", "idle_quiet", "hidden_no_crash", "shown_lost_crashes", "quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)

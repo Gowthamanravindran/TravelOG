@@ -82,7 +82,7 @@ describe('the globe recovers from a failed start (Plan 77)', () => {
     const first = page();
     await act(async () => jest.advanceTimersByTime(7_000));
     expect(page()).not.toBe(first);
-    expect(globeProblem()).toMatch(/no progress for 5 s after “start”/);
+    expect(globeProblem()).toMatch(/page never started within 5 s/);
   });
 
   it('while it loads, a starry sky shows; the words only if it takes a while (Plan 80)', async () => {
@@ -134,5 +134,44 @@ describe('the globe recovers from a failed start (Plan 77)', () => {
     await ready();
     await act(async () => jest.advanceTimersByTime(60_000));
     expect(page()).toBe(first);
+  });
+
+  describe('where a start’s time goes (Plan 92)', () => {
+    it('when ready, the log says how long each step took, from when the globe was made', async () => {
+      const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+      await render(<Globe />);
+      await act(async () => jest.advanceTimersByTime(800));
+      for (const [step, ms] of [
+        ['page', 5],
+        ['data', 120],
+        ['library', 400],
+        ['sky', 420],
+        ['creating', 430],
+        ['map', 900],
+      ] as const)
+        await send({ type: 'progress', step, ms });
+      await send({ type: 'ready', ms: 1295, quality: 'high', pixelRatio: 2 });
+      const line = log.mock.calls.map((c) => String(c[0])).find((c) => c.includes('ready in'));
+      expect(line).toMatch(/ready in 1295 ms/);
+      expect(line).toMatch(/page started 800 ms after the globe was made/);
+      expect(line).toMatch(
+        /data \+115, library \+280, sky \+20, creating \+10, map \+470, ready \+395/,
+      );
+      log.mockRestore();
+    });
+
+    it('a stall says which step and how big the globe was', async () => {
+      await render(<Globe />);
+      await send({ type: 'progress', step: 'library', ms: 400 });
+      await send({ type: 'progress', step: 'creating', ms: 430, w: 390, h: 260 });
+      await act(async () => jest.advanceTimersByTime(5_100));
+      expect(globeProblem()).toMatch(/no progress for 5 s after “creating” \(390×260\)/);
+    });
+
+    it('a page that never starts says so', async () => {
+      await render(<Globe />);
+      await act(async () => jest.advanceTimersByTime(5_100));
+      expect(globeProblem()).toMatch(/page never started/);
+    });
   });
 });
