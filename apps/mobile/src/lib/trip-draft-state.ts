@@ -32,6 +32,8 @@ export type DraftAction =
   | { type: 'toggleCity'; city: City }
   | { type: 'setDates'; start: string; end: string }
   | { type: 'setDays'; cityId: string; days: number }
+  /** Put a stop at a new place in the visit order (Plan 86); its days go with it. */
+  | { type: 'moveCity'; from: number; to: number }
   | { type: 'setName'; name: string }
   | { type: 'next' }
   | { type: 'back' }
@@ -116,6 +118,16 @@ export function draftReducer(s: DraftState, a: DraftAction): DraftState {
       return { ...s, startDate: a.start, endDate: a.end };
     case 'setDays':
       return { ...s, days: { ...s.days, [a.cityId]: Math.max(1, Math.round(a.days)) } };
+    case 'moveCity': {
+      const n = s.cities.length;
+      if (a.from < 0 || a.from >= n) return s;
+      const to = Math.min(n - 1, Math.max(0, a.to));
+      if (to === a.from) return s;
+      const cities = [...s.cities];
+      const [moved] = cities.splice(a.from, 1);
+      cities.splice(to, 0, moved!);
+      return { ...s, cities };
+    }
     case 'setName':
       return { ...s, name: a.name.trim() ? a.name : null };
     case 'next': {

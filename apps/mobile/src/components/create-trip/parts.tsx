@@ -85,6 +85,43 @@ export function PickChip({
   );
 }
 
+/** A stop's place in the visit order, as a filled circle. */
+export function StopNumber({ n }: { n: number }) {
+  const t = useTheme();
+  return (
+    <View style={[styles.stopNumber, { backgroundColor: t.accent }]}>
+      <Text style={[type.caption, { color: t.onAccent, ...font('text', 600) }]}>{n}</Text>
+    </View>
+  );
+}
+
+/** A round button with an icon alone: it gets a spoken name and a full 44 pt target. */
+export function IconButton({
+  label,
+  icon,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  icon: 'add' | 'remove' | 'close';
+  disabled?: boolean;
+  onPress: () => void;
+}) {
+  const t = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={[styles.iconButton, { borderColor: t.line, opacity: disabled ? 0.4 : 1 }]}
+    >
+      <Icon name={icon} size={20} color={t.ink} />
+    </Pressable>
+  );
+}
+
 export function Chips({ children }: { children: React.ReactNode }) {
   return <View style={styles.chips}>{children}</View>;
 }
@@ -115,6 +152,21 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stopNumber: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

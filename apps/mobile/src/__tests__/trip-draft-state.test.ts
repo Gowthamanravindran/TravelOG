@@ -75,6 +75,44 @@ describe('picking cities', () => {
   });
 });
 
+describe('reordering the stops (Plan 86)', () => {
+  const three = () =>
+    run(
+      { type: 'addCity', city: tokyo },
+      { type: 'addCity', city: kyoto },
+      { type: 'addCity', city: seoul },
+      { type: 'setDays', cityId: kyoto.id, days: 4 },
+    );
+
+  it('moves a stop to a new place in the visit order', () => {
+    expect(draftReducer(three(), { type: 'moveCity', from: 0, to: 2 }).cities).toEqual([
+      kyoto,
+      seoul,
+      tokyo,
+    ]);
+    expect(draftReducer(three(), { type: 'moveCity', from: 2, to: 0 }).cities).toEqual([
+      seoul,
+      tokyo,
+      kyoto,
+    ]);
+  });
+
+  it('a stop keeps its days when it moves', () => {
+    expect(draftReducer(three(), { type: 'moveCity', from: 1, to: 2 }).days[kyoto.id]).toBe(4);
+  });
+
+  it('a move to the same place or out of range changes nothing', () => {
+    const s = three();
+    expect(draftReducer(s, { type: 'moveCity', from: 1, to: 1 })).toBe(s);
+    expect(draftReducer(s, { type: 'moveCity', from: 0, to: 9 }).cities).toEqual([
+      kyoto,
+      seoul,
+      tokyo,
+    ]);
+    expect(draftReducer(s, { type: 'moveCity', from: -1, to: 0 })).toBe(s);
+  });
+});
+
 describe('dates, days and the name', () => {
   it('sets dates', () => {
     const s = run({ type: 'setDates', start: '2027-03-12', end: '' });

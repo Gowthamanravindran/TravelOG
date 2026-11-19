@@ -22,6 +22,7 @@ export const ICONS = {
   settings: { ios: 'gearshape', android: 'settings' },
   expand: { ios: 'chevron.down', android: 'expand_more' },
   collapse: { ios: 'chevron.up', android: 'expand_less' },
+  drag: { ios: 'line.3.horizontal', android: 'drag_indicator' },
   add: { ios: 'plus', android: 'add' },
   back: { ios: 'chevron.left', android: 'chevron_left' },
   more: { ios: 'ellipsis', android: 'more_horiz' },

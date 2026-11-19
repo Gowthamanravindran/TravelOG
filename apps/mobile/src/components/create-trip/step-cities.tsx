@@ -6,14 +6,17 @@ import {
   searchCities,
   type City,
 } from '@travelog/globe';
+import { font, type } from '@travelog/ui';
 import { useState, type Dispatch } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { usePlaceSearch } from '@/lib/places';
 import type { DraftAction, DraftState } from '@/lib/trip-draft-state';
 import { Body, Chip, ChipRow, Field } from '@/ui/kit';
+import { ReorderList } from '@/ui/reorder-list';
+import { useTheme } from '@/ui/theme';
 
-import { Chips, PickChip, ResultRow } from './parts';
+import { IconButton, ResultRow, StopNumber } from './parts';
 import { countryNameOf } from './step-countries';
 
 /**
@@ -50,6 +53,7 @@ export function StepCities({
   onShowCountry: (code: string) => void;
   onSearching: (searching: boolean) => void;
 }) {
+  const t = useTheme();
   const [query, setQuery] = useState('');
   const q = query.trim();
   const bundled = q ? searchCities(q, 8) : [];
@@ -119,16 +123,31 @@ export function StepCities({
           ) : null}
         </View>
       ) : draft.cities.length ? (
-        <Chips>
-          {draft.cities.map((city, i) => (
-            <PickChip
-              key={city.id}
-              label={city.name}
-              number={i + 1}
-              onRemove={() => dispatch({ type: 'toggleCity', city })}
+        // The visit order; drag a stop by its handle to change it (Plan 86).
+        <ReorderList
+          items={draft.cities.map((city) => ({ key: city.id, name: city.name, city }))}
+          onMove={(from, to) => dispatch({ type: 'moveCity', from, to })}
+          renderRow={({ city }, i) => (
+            <>
+              <StopNumber n={i + 1} />
+              <View style={{ flex: 1, gap: 1 }}>
+                <Text style={[type.body, { color: t.ink, ...font('text', 600) }]} numberOfLines={1}>
+                  {city.name}
+                </Text>
+                <Text style={[type.caption, { color: t.ink2 }]} numberOfLines={1}>
+                  {[city.region, countryNameOf(city)].filter(Boolean).join(', ')}
+                </Text>
+              </View>
+            </>
+          )}
+          renderEnd={({ city }) => (
+            <IconButton
+              label={`Remove ${city.name}`}
+              icon="close"
+              onPress={() => dispatch({ type: 'toggleCity', city })}
             />
-          ))}
-        </Chips>
+          )}
+        />
       ) : (
         <Body muted>Tap the cities on the map. Can’t see one? Search for it.</Body>
       )}

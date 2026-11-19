@@ -9,9 +9,11 @@ import { draftAutoName, draftStops } from '@/lib/trip-draft-save';
 import type { DraftAction, DraftState } from '@/lib/trip-draft-state';
 import { Icon } from '@/ui/icon';
 import { Body, Field } from '@/ui/kit';
+import { ReorderList } from '@/ui/reorder-list';
 import { haptic, Shake, Swap } from '@/ui/motion';
 import { useTheme } from '@/ui/theme';
 
+import { IconButton, StopNumber } from './parts';
 import { datesText } from './step-dates';
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -91,17 +93,15 @@ export function StepDays({
           </Text>
         </View>
       </Shake>
-      <View>
-        {draft.cities.map((city, i) => {
-          const n = stops[i]!.days;
+      {/* The visit order; drag a stop by its handle to change it (Plan 86). */}
+      <ReorderList
+        items={draft.cities.map((city) => ({ key: city.id, name: city.name, city }))}
+        onMove={(from, to) => dispatch({ type: 'moveCity', from, to })}
+        renderRow={({ city }, i) => {
           const late = !!draft.endDate && days[i]!.last > draft.endDate;
           return (
-            <View key={city.id} style={[styles.stop, { borderBottomColor: t.line }]}>
-              <View style={[styles.number, { backgroundColor: t.accent }]}>
-                <Text style={[type.caption, { color: t.onAccent, ...font('text', 600) }]}>
-                  {i + 1}
-                </Text>
-              </View>
+            <>
+              <StopNumber n={i + 1} />
               <View style={styles.stopText}>
                 <Text style={[type.body, { color: t.ink, ...font('text', 600) }]} numberOfLines={1}>
                   {city.name}
@@ -110,7 +110,15 @@ export function StepDays({
                   {datesText(days[i]!.first, days[i]!.last)}
                 </Text>
               </View>
-              <Stepper
+            </>
+          );
+        }}
+        renderEnd={({ city }, i) => {
+          const n = stops[i]!.days;
+          const late = !!draft.endDate && days[i]!.last > draft.endDate;
+          return (
+            <View style={styles.days}>
+              <IconButton
                 label={`One day less in ${city.name}`}
                 icon="remove"
                 disabled={n <= 1}
@@ -125,15 +133,15 @@ export function StepDays({
                   {n}
                 </Text>
               </Swap>
-              <Stepper
+              <IconButton
                 label={`One day more in ${city.name}`}
                 icon="add"
                 onPress={() => setDays(city.id, n + 1)}
               />
             </View>
           );
-        })}
-      </View>
+        }}
+      />
       {/* Every stop needs a day, so with more stops than days the total can never match. */}
       {stops.length > total ? (
         <Body small style={{ color: t.danger }}>
@@ -149,56 +157,9 @@ export function StepDays({
   );
 }
 
-function Stepper({
-  label,
-  icon,
-  disabled,
-  onPress,
-}: {
-  label: string;
-  icon: 'add' | 'remove';
-  disabled?: boolean;
-  onPress: () => void;
-}) {
-  const t = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={[styles.stepper, { borderColor: t.line, opacity: disabled ? 0.4 : 1 }]}
-    >
-      <Icon name={icon} size={20} color={t.ink} />
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   between: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  stop: {
-    minHeight: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
   stopText: { flex: 1, gap: 1 },
-  number: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  days: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   count: { minWidth: 24, textAlign: 'center' },
-  stepper: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });
