@@ -57,14 +57,16 @@ export default function ReadyScreen() {
     }
   };
 
+  // The budget and bookings are tabs of the trip already open under this sheet: go back to
+  // them, rather than open the trip a second time on top (Plan 91).
   const openAuto = (a: AutoItem) => {
-    if (a.key === 'budget') router.push(`/trip/${id}/plan/budget?edit=1`);
+    if (a.key === 'budget') router.dismissTo(`/trip/${id}/plan/budget?edit=1`);
     else if (a.key === 'plan') {
       const v = mutate((db) =>
         ensureMainVariant(db, id, trip.startDate ?? IDEAS_DAY, myMember(db, id)?.id),
       );
       router.push(`/trip/${id}/item?variantId=${v.id}`);
-    } else router.push(`/trip/${id}/plan/bookings`);
+    } else router.dismissTo(`/trip/${id}/plan/bookings`);
   };
 
   return (

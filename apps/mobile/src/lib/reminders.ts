@@ -96,8 +96,9 @@ export function useReminders(): void {
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
       const tripId = response.notification.request.content.data?.tripId;
       const trip = typeof tripId === 'string' ? getTrip(db, tripId) : undefined;
-      // Straight to the trip's own screen (Plan 36).
-      if (trip) router.push(tripHref(trip));
+      // Straight to the trip's own screen (Plan 36); back to it if it is already open, rather
+      // than a second copy on top (Plan 91).
+      if (trip) router.dismissTo(tripHref(trip));
     });
     return () => sub.remove();
   }, [router, db]);

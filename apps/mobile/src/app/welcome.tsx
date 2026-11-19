@@ -25,7 +25,10 @@ export default function Welcome() {
       mutate((db) =>
         saveLocalProfile(db, { displayName: name, homeCurrency: currency, upiId: upi || null }),
       );
-      router.replace('/');
+      // Editing (from Profile) goes back there. The first time there is no Trips screen yet, so
+      // this one becomes it; replacing it when editing opened a second one (Plan 91).
+      if (existing) router.back();
+      else router.replace('/');
     } catch (e) {
       setError(errorMessage(e));
     }

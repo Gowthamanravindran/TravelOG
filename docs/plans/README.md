@@ -94,3 +94,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 88 | ["A stay every night" means every night; an uploaded booking is not added twice](88-stays-every-night-and-no-double-bookings.md) | see git log |
 | 89 | [The globe rests while out of sight, and stops reloading behind trips](89-globe-rests-out-of-sight.md) | see git log |
 | 90 | [Back to Trips goes back, instead of opening another Trips screen](90-back-to-trips-goes-back.md) | see git log |
+| 91 | [No second copies of screens already open](91-no-duplicate-screens.md) | see git log |
