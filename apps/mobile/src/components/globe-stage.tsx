@@ -162,6 +162,7 @@ export function GlobeStage({
       <Globe
         ref={globe}
         active={shown && !!scene?.spin}
+        visible={shown}
         bottomInset={covered}
         focus={scene?.focus}
         visitedCountries={scene?.visitedCountries}

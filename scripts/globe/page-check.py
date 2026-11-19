@@ -48,6 +48,8 @@ with sync_playwright() as p:
     page = browser.new_page(viewport={"width": W, "height": H})
     page.add_init_script(
         "window.__msgs=[]; window.ReactNativeWebView={postMessage:function(m){window.__msgs.push(JSON.parse(m))}};"
+        # Count animation frames asked for, to see whether the page rests when nothing moves.
+        "window.__raf=0; var __r=window.requestAnimationFrame.bind(window); window.requestAnimationFrame=function(f){window.__raf++; return __r(f);};"
     )
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
@@ -230,10 +232,34 @@ with sync_playwright() as p:
     out["quality_returns"] = any(m["quality"] == "high" and m["reason"] == "retry" for m in back)
     out["quality_returns_at"] = back
 
+    # ---- Resting and hidden (Plan 89) ------------------------------------------------------
+    # With nothing moving, the page asks for (almost) no frames.
+    page.evaluate("window.globe.setSpin(false); window.globe.setVisible(true)")
+    page.wait_for_timeout(2500)
+    r0 = page.evaluate("window.__raf")
+    page.wait_for_timeout(1000)
+    out["idle_quiet"] = page.evaluate("window.__raf") - r0 <= 3
+    out["idle_quiet_at"] = page.evaluate("window.__raf") - r0
+    # Losing the drawing context while hidden is not a crash; it comes back when shown.
+    lose = "window.__lc = window.__lc || document.querySelector('canvas.maplibregl-canvas').getContext('webgl2').getExtension('WEBGL_lose_context');"
+    n0 = page.evaluate("window.__msgs.length")
+    page.evaluate("window.globe.setVisible(false); " + lose + " window.__lc.loseContext()")
+    page.wait_for_timeout(4000)
+    hidden_crash = page.evaluate("n => window.__msgs.slice(n).some(m => m.type === 'crash')", n0)
+    page.evaluate("window.globe.setVisible(true); window.__lc.restoreContext()")
+    page.wait_for_timeout(4000)
+    shown_crash = page.evaluate("n => window.__msgs.slice(n).some(m => m.type === 'crash')", n0)
+    out["hidden_no_crash"] = not hidden_crash and not shown_crash
+    # In sight, a context that does not come back is still a crash (the app reloads).
+    n1 = page.evaluate("window.__msgs.length")
+    page.evaluate(lose + " window.__lc.loseContext()")
+    page.wait_for_timeout(4000)
+    out["shown_lost_crashes"] = page.evaluate("n => window.__msgs.slice(n).some(m => m.type === 'crash')", n1)
+
     out["no_errors"] = not errors and not page.evaluate("window.__msgs.some(m=>m.type==='error')")
     out["errors"] = errors[:3]
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["idle_quiet", "hidden_no_crash", "shown_lost_crashes", "quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)

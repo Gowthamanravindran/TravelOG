@@ -1,6 +1,5 @@
 import { defaultTheme } from '@travelog/globe';
 import { font, spacing, type } from '@travelog/ui';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -50,15 +49,6 @@ const FADE_MS = 600;
 const WORDS_AFTER_MS = 3000;
 /** The glow's circles, as parts of the sky's shorter side. */
 const GLOW_RINGS = Array.from({ length: 18 }, (_, i) => 0.95 - i * 0.048);
-
-/** "#rrggbb" or "rgb(r, g, b)" with an alpha, for the fading end of a streak. */
-function withAlpha(color: string, alpha: number): string {
-  const hex = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(color);
-  const [r, g, b] = hex
-    ? hex.slice(1).map((h) => parseInt(h, 16))
-    : (color.match(/\d+/g) ?? ['255', '255', '255']).slice(0, 3).map(Number);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 const WHITE = defaultTheme.tagText ?? 'rgb(255, 255, 255)';
 const COOL = defaultTheme.starCool ?? WHITE;
@@ -207,13 +197,10 @@ function Layer({
                 },
               ]}
             >
-              <LinearGradient
-                colors={[withAlpha(s.tint, 0), withAlpha(s.tint, 0.5), s.tint]}
-                locations={[0, 0.7, 1]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={StyleSheet.absoluteFill}
-              />
+              {/* Faint along its length, brighter towards the star: two plain shapes, as a
+                  gradient view for each of 200 streaks cost too much to draw (Plan 89). */}
+              <View style={[styles.tail, { backgroundColor: s.tint }]} />
+              <View style={[styles.tailNear, { backgroundColor: s.tint }]} />
             </View>
           );
         })}
@@ -272,7 +259,14 @@ function deepField(w: number, h: number): Fixed[] {
  * in. A dim deep field behind keeps the edges from being empty, and a faint glow marks the point
  * the stars come from. With Reduce motion the stars stay still, as points.
  */
-export function StarWarp({ leaving }: { leaving: boolean }) {
+export function StarWarp({
+  leaving,
+  paused = false,
+}: {
+  leaving: boolean;
+  /** Out of sight: the flight stops, so it costs nothing behind another screen (Plan 89). */
+  paused?: boolean;
+}) {
   const ok = useMotionOk();
   const layers = useMemo(warpLayers, []);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -293,8 +287,8 @@ export function StarWarp({ leaving }: { leaving: boolean }) {
     travel.set(travel.get() + s * dt * RATE);
   }, false);
   useEffect(() => {
-    frames.setActive(ok && !gone);
-  }, [ok, gone, frames]);
+    frames.setActive(ok && !gone && !paused);
+  }, [ok, gone, paused, frames]);
 
   // Cruise, then warp; at the end, drop out of warp. Comes back if the globe loads again.
   useEffect(() => {
@@ -384,6 +378,8 @@ const styles = StyleSheet.create({
   dot: { position: 'absolute' },
   glow: { position: 'absolute', backgroundColor: COOL, opacity: 0.009 },
   streak: { position: 'absolute', overflow: 'hidden' },
+  tail: { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, opacity: 0.22 },
+  tailNear: { position: 'absolute', top: 0, bottom: 0, right: 0, width: '40%', opacity: 0.6 },
   words: { position: 'absolute', left: 0, right: 0, bottom: spacing.lg, alignItems: 'center' },
   // The globe's own colours: it is dark in every app theme.
   wordsText: { color: WHITE, ...font('text', 500) },

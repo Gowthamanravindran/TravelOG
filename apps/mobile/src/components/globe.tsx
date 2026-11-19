@@ -50,7 +50,7 @@ export const Globe = forwardRef<GlobeHandle, GlobeProps>(function Globe(props, r
         }}
         // While the map starts, a night sky flying towards the globe; it fades as the globe
         // travels in (Plans 79, 80).
-        loading={(ready) => <StarWarp leaving={ready} />}
+        loading={(ready) => <StarWarp leaving={ready} paused={props.visible === false} />}
         // After three failed starts in a row.
         fallback={(retry) => (
           <View style={styles.note}>

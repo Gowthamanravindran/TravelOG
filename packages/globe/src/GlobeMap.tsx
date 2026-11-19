@@ -100,6 +100,11 @@ export type GlobeMapProps = {
    * along and told whether the map is ready, so it can leave in its own time (Plan 80).
    */
   loading?: React.ReactNode | ((ready: boolean) => React.ReactNode);
+  /**
+   * False while the globe is out of sight (another screen over it). It then does not reload or
+   * count a slow start; anything that needs a reload waits until it is in sight (Plan 89).
+   */
+  visible?: boolean;
   /** The globe's name for screen readers. */
   label?: string;
   onCountryPress?: (country: CountryTap) => void;
@@ -137,6 +142,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     fallback,
     loading,
     label,
+    visible = true,
     onCountryPress,
     onPlacePress,
     onCandidatePress,
@@ -183,6 +189,9 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
   // loaded again, up to three starts in a row, before the fallback is shown (Plan 77).
   // The page reports each step of its start; the step it last reached names a stall (Plan 79).
   const failures = useRef(0);
+  const shown = useRef(visible);
+  shown.current = visible;
+  const reloadWhenShown = useRef(false);
   const step = useRef('start');
   const [progress, setProgress] = useState(0);
   const retry = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -212,7 +221,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
   // A start that goes too long without any step is counted as failed. A slow start that keeps
   // reporting steps is left to finish: starting it again would only make it later (Plan 79).
   useEffect(() => {
-    if (ready || failed) return;
+    if (ready || failed || !visible) return;
     const timer = setTimeout(
       () =>
         startFailed(
@@ -221,7 +230,7 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
       SILENCE_LIMIT_MS,
     );
     return () => clearTimeout(timer);
-  }, [ready, failed, html, reloadKey, progress, startFailed]);
+  }, [ready, failed, visible, html, reloadKey, progress, startFailed]);
 
   const retryNow = useCallback(() => {
     failures.current = 0;
@@ -281,6 +290,11 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     }
   }, [ready, quality, run]);
 
+  // In sight or not, the page is told (Plan 89).
+  useEffect(() => {
+    if (ready) run('window.globe.setVisible(' + (visible ? 'true' : 'false') + ')');
+  }, [ready, visible, run]);
+
   // Last of everything sent when the page is ready: the globe travels in from far away (Plan 80).
   useEffect(() => {
     if (ready) run('window.globe.arrive()');
@@ -309,6 +323,13 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
   const reload = useCallback(() => {
     setReloadKey((k) => k + 1);
   }, []);
+  // A reload put off while the globe was out of sight happens once it is back (Plan 89).
+  useEffect(() => {
+    if (visible && reloadWhenShown.current) {
+      reloadWhenShown.current = false;
+      reload();
+    }
+  }, [visible, reload]);
 
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
@@ -347,7 +368,10 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
           onImagery?.({ ok: msg.ok, ms: msg.ms });
           break;
         case 'crash':
-          reload();
+          // Out of sight, the reload waits: it would only start the globe again behind the
+          // screen in front, slowing that screen (Plan 89).
+          if (shown.current) reload();
+          else reloadWhenShown.current = true;
           break;
         case 'error':
           if (msg.fatal) startFailed(String(msg.message));

@@ -122,7 +122,7 @@ startStep('library'); // the map library is in
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
 window.globe = {};
-['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome', 'setFocus', 'arrive'].forEach(function (name) {
+['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome', 'setFocus', 'arrive', 'setVisible'].forEach(function (name) {
   window.globe[name] = function () { pending.push([name, Array.prototype.slice.call(arguments)]); };
 });
 
@@ -432,17 +432,19 @@ function start() {
     }
     gaps = []; sampleStart = now; sampleTouched = false;
   }
+  // Runs only while the globe moves: asking for a frame 60 times a second while nothing moved
+  // kept the page busy all the time (Plan 89). A move wakes it again.
+  var looping = false;
   function frame(now) {
-    if (map.isMoving()) {
-      if (lastFrame) gaps.push(now - lastFrame); else if (!gaps.length) sampleStart = now;
-      lastFrame = now;
-      if (touching) sampleTouched = true;
-      if (now - sampleStart >= 2000) flush(now);
-    } else {
-      lastFrame = 0;
-    }
+    if (!map.isMoving()) { lastFrame = 0; looping = false; return; }
+    if (lastFrame) gaps.push(now - lastFrame); else if (!gaps.length) sampleStart = now;
+    lastFrame = now;
+    if (touching) sampleTouched = true;
+    if (now - sampleStart >= 2000) flush(now);
     requestAnimationFrame(frame);
   }
+  function wake() { if (!looping) { looping = true; requestAnimationFrame(frame); } }
+  map.on('movestart', wake);
 
   // ---- data from React Native -------------------------------------------
   var selected = null;
@@ -1042,13 +1044,24 @@ function start() {
   });
 
   // If the GPU context is lost and does not come back, ask React Native to reload the page.
+  // The phone can take the drawing context away, often while the globe is out of sight behind
+  // another screen; the map library restores it when it can. Only a context still gone after
+  // 3 s in sight is a crash for the app to reload (Plan 89): reloading behind a trip made
+  // coming back slow and the globe start again every time.
   var canvas = map.getCanvas();
-  var lost = false;
-  canvas.addEventListener('webglcontextlost', function () {
-    lost = true;
-    setTimeout(function () { if (lost) post({ type: 'crash', reason: 'webglcontextlost' }); }, 3000);
-  });
-  canvas.addEventListener('webglcontextrestored', function () { lost = false; });
+  var lost = false, visible = true, lostTimer = null;
+  function checkLost() {
+    clearTimeout(lostTimer);
+    if (!lost || !visible) return;
+    lostTimer = setTimeout(function () { if (lost && visible) post({ type: 'crash', reason: 'webglcontextlost' }); }, 3000);
+  }
+  canvas.addEventListener('webglcontextlost', function () { lost = true; checkLost(); });
+  canvas.addEventListener('webglcontextrestored', function () { lost = false; clearTimeout(lostTimer); });
+  function setVisible(on) {
+    visible = !!on;
+    checkLost();
+    if (visible) map.triggerRepaint();
+  }
 
   // Ready as soon as the country shapes are in. Imagery is not waited for: on a slow or
   // offline connection the flat globe shows first and the imagery fades in when it arrives.
@@ -1061,7 +1074,7 @@ function start() {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
       setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
-      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, debugSize: debugSize, debugPoint: debugPoint, debugBox: debugBox, debugQuality: debugQuality
+      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, setVisible: setVisible, debugSize: debugSize, debugPoint: debugPoint, debugBox: debugBox, debugQuality: debugQuality
     };
     if (quality === 'low') applyQuality('low', 'config');
     setOff();
@@ -1071,7 +1084,7 @@ function start() {
     qs.readyAt = readyAt;
     setInterval(qualityTick, 2000);
     post({ type: 'ready', ms: Math.round(readyAt - T0), quality: quality, pixelRatio: map.getPixelRatio() });
-    requestAnimationFrame(frame);
+    wake();
     spin();
     // Tile failures are often silent (404s, hung requests), so report by deadline instead.
     if (hasImagery) {
