@@ -55,10 +55,28 @@ with sync_playwright() as p:
     page.wait_for_function("window.__msgs.some(m=>m.type==='ready'||m.fatal)", timeout=60000)
     # The page reports each step of its start, in order, before ready (Plan 79): the app reloads
     # a page only after 5 s with no step at all.
+    page.wait_for_function("window.__msgs.some(m=>m.step==='loaded')", timeout=10000)
     steps = page.evaluate("window.__msgs.filter(m=>m.type==='progress'||m.type==='ready').map(m=>m.type==='ready'?'ready':m.step)")
     # "loaded" (the map's own load event) can come just before or after ready.
     out["start_steps"] = steps[:4] == ["page", "data", "library", "map"] and "ready" in steps and "loaded" in steps
     out["start_steps_seen"] = steps
+    # ---- Arriving (Plan 80) ---------------------------------------------------------------------
+    # The globe is ready far away, small; a height setting before it arrives is applied at once
+    # (no slide up from the bottom); arriving brings it to its full size in the visible part.
+    def size0():
+        return page.evaluate("window.globe.debugSize()")
+    far = size0()
+    page.evaluate("window.globe.setInset(%d)" % INSET)
+    page.wait_for_timeout(120)
+    out["arrive_far"] = far["diameter"] < 0.35 * min(W, H - INSET) and abs(size0()["centerY"] - BAND_MID) <= 6
+    page.evaluate("window.globe.arrive()")
+    page.wait_for_timeout(700)
+    mid = size0()
+    page.wait_for_timeout(1800)
+    end = size0()
+    out["arrive_moves"] = far["diameter"] < mid["diameter"] < end["diameter"]
+    out["arrive_home"] = 0.8 * min(W, H - INSET) <= end["diameter"] <= min(W, H - INSET) + 2 and abs(end["centerY"] - BAND_MID) <= 6
+    out["arrive_at"] = [far, mid, end]
     page.evaluate("window.globe.setSpin(false); window.globe.setReduceMotion(true)")
 
     def tap(x, y):
@@ -174,5 +192,5 @@ with sync_playwright() as p:
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["start_steps", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)

@@ -2,8 +2,9 @@ import { defaultTheme, type GlobeMapHandle, type GlobeMapProps } from '@travelog
 import type GlobeMapComponent from '@travelog/globe/src/GlobeMap';
 import { font, spacing, type } from '@travelog/ui';
 import { forwardRef } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { StarWarp } from '@/components/star-warp';
 import { hasGlobe, noteGlobeProblem } from '@/lib/runtime';
 import { Button } from '@/ui/kit';
 import { useMotionOk } from '@/ui/motion';
@@ -47,13 +48,9 @@ export const Globe = forwardRef<GlobeHandle, GlobeProps>(function Globe(props, r
           if (fatal) noteGlobeProblem(message);
           props.onError?.(message, fatal);
         }}
-        // While the map starts: say so, rather than a silent dark area (Plan 79).
-        loading={
-          <View style={styles.note}>
-            <ActivityIndicator color={defaultTheme.tagText} />
-            <Text style={[type.caption, styles.noteText]}>Loading the globe…</Text>
-          </View>
-        }
+        // While the map starts, a night sky flying towards the globe; it fades as the globe
+        // travels in (Plans 79, 80).
+        loading={(ready) => <StarWarp leaving={ready} />}
         // After three failed starts in a row.
         fallback={(retry) => (
           <View style={styles.note}>

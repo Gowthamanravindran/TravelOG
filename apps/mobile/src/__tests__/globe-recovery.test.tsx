@@ -78,13 +78,33 @@ describe('the globe recovers from a failed start (Plan 77)', () => {
     expect(globeProblem()).toMatch(/no progress for 5 s after “start”/);
   });
 
-  it('says the globe is loading until it is ready, instead of a silent dark area', async () => {
+  it('while it loads, a starry sky shows; the words only if it takes a while (Plan 80)', async () => {
     await render(<Globe />);
-    expect(screen.getByText('Loading the globe…')).toBeTruthy();
-    await send({ type: 'progress', step: 'map', ms: 1 });
-    expect(screen.getByText('Loading the globe…')).toBeTruthy();
-    await ready();
+    expect(screen.getByTestId('star-warp')).toBeTruthy();
     expect(screen.queryByText('Loading the globe…')).toBeNull();
+    await send({ type: 'progress', step: 'map', ms: 1 });
+    await act(async () => jest.advanceTimersByTime(3_100));
+    expect(screen.getByText('Loading the globe…')).toBeTruthy();
+  });
+
+  it('when ready, the globe is told to arrive after everything else it is sent', async () => {
+    await render(<Globe bottomInset={300} />);
+    await ready();
+    const js = page().injected;
+    const arrive = js.findIndex((c) => c.includes('window.globe.arrive('));
+    expect(arrive).toBeGreaterThan(-1);
+    expect(arrive).toBeGreaterThan(js.findIndex((c) => c.includes('setInset(300)')));
+    expect(arrive).toBe(js.length - 1);
+  });
+
+  it('the sky fades away once the globe is there, and comes back if it has to load again', async () => {
+    await render(<Globe />);
+    await ready();
+    await act(async () => jest.advanceTimersByTime(800));
+    expect(screen.queryByTestId('star-warp')).toBeNull();
+    await fatal();
+    await act(async () => jest.advanceTimersByTime(1500));
+    expect(screen.getByTestId('star-warp')).toBeTruthy();
   });
 
   it('after giving up it says so and offers to try again', async () => {

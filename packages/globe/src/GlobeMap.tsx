@@ -95,8 +95,11 @@ export type GlobeMapProps = {
   /** Shown instead of the globe if the map cannot start on this device. */
   /** Shown in place of the globe after it has failed to start; given a way to try again. */
   fallback?: React.ReactNode | ((retry: () => void) => React.ReactNode);
-  /** Shown over the globe's visible part until the map is ready (Plan 79). */
-  loading?: React.ReactNode;
+  /**
+   * Drawn over the globe's visible part while it starts (Plan 79). As a function it is drawn all
+   * along and told whether the map is ready, so it can leave in its own time (Plan 80).
+   */
+  loading?: React.ReactNode | ((ready: boolean) => React.ReactNode);
   /** The globe's name for screen readers. */
   label?: string;
   onCountryPress?: (country: CountryTap) => void;
@@ -278,6 +281,11 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     }
   }, [ready, quality, run]);
 
+  // Last of everything sent when the page is ready: the globe travels in from far away (Plan 80).
+  useEffect(() => {
+    if (ready) run('window.globe.arrive()');
+  }, [ready, run]);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -395,7 +403,11 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
         nestedScrollEnabled
         style={[styles.webview, { backgroundColor: theme.space }]}
       />
-      {!ready && loading ? (
+      {typeof loading === 'function' ? (
+        <View pointerEvents="none" style={[styles.band, { bottom: bottomInset }]}>
+          {loading(ready)}
+        </View>
+      ) : !ready && loading ? (
         <View pointerEvents="none" style={[styles.band, { bottom: bottomInset }]}>
           {loading}
         </View>

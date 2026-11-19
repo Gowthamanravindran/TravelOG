@@ -91,7 +91,7 @@ startStep('library'); // the map library is in
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
 window.globe = {};
-['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome', 'setFocus'].forEach(function (name) {
+['setData', 'flyTo', 'setSpin', 'setQuality', 'focusCountry', 'clearSelection', 'setCountryTap', 'setReduceMotion', 'fitPoints', 'fitCountries', 'setInset', 'setTapMode', 'goHome', 'setFocus', 'arrive'].forEach(function (name) {
   window.globe[name] = function () { pending.push([name, Array.prototype.slice.call(arguments)]); };
 });
 
@@ -685,12 +685,39 @@ function start() {
   }
   function setInset(px) {
     inset = Math.max(0, Number(px) || 0);
+    // Before the globe has arrived, a new height is applied at once: easing it is what made the
+    // globe slide up from the bottom on every start (Plan 80).
+    if (!arrived) { map.setPadding(pad()); if (command) move(commandMs, command); return; }
     if (command) { pause(8000); move(commandMs, command); return; }
     var to = { padding: pad(), duration: dur(300) };
     if (!selected && map.getZoom() < 3 && !stopsData.length && !candidatesData.length) to.zoom = homeZoom();
     pause(600);
     quietUntil = Date.now() + dur(300) + 80;
     map.easeTo(to);
+  }
+  // Arriving (Plan 80): the globe is ready far away, small, and travels in to its full size,
+  // as if flown to. The app calls arrive() after everything else it sends on start; a move it
+  // asked for (a country's page, the whole Earth) is already flying in from far away, so only a
+  // globe left resting is brought in here. Without the call, the globe arrives by itself.
+  var arrived = false, arriveTimer = null;
+  var FAR_ZOOM = -1.6, ARRIVE_MS = 1800, ARRIVE_TURN = 30;
+  function setOff() { // called once the map is ready
+    map.setMinZoom(-2);
+    map.jumpTo({ zoom: FAR_ZOOM, center: [map.getCenter().lng + ARRIVE_TURN, HOME_LAT] });
+    arriveTimer = setTimeout(arrive, 1500);
+  }
+  function arrive() {
+    if (arrived) return;
+    arrived = true;
+    clearTimeout(arriveTimer);
+    setTimeout(function () { if (map.getZoom() >= 0.2) map.setMinZoom(0.2); }, dur(ARRIVE_MS) + 1200);
+    if (command) return;
+    var lng = map.getCenter().lng - ARRIVE_TURN;
+    pause(dur(ARRIVE_MS) + 600);
+    move(ARRIVE_MS, function () {
+      map.easeTo({ center: [lng, HOME_LAT], zoom: homeZoom(), padding: pad(), duration: dur(ARRIVE_MS),
+        easing: function (t) { return 1 - Math.pow(1 - t, 3); } });
+    });
   }
   // The zoom at which the whole Earth fits the visible band. On a globe the drawn radius is
   // worldSize / (2 pi cos(latitude)), so the zoom depends on the resting latitude.
@@ -965,9 +992,10 @@ function start() {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
       setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
-      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, debugSize: debugSize
+      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, debugSize: debugSize
     };
     if (quality === 'low') applyQuality('low', 'config');
+    setOff();
     pending.forEach(function (call) { window.globe[call[0]].apply(null, call[1]); });
     pending = [];
     readyAt = performance.now();
