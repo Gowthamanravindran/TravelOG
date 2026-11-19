@@ -14,16 +14,20 @@ import Animated, {
 
 import { useMotionOk } from '@/ui/motion';
 
-/** Stars in the flight. */
-const STARS = 180;
+/** The flight: layers of stars, each layer at one depth. */
+const LAYERS = 12;
+const PER_LAYER = 18;
 /** How wide the field is: larger spreads the stars further out, so the edges stay full. */
 const NEAR = 0.35;
-/** The depth at which a star is drawn at nearly full size and brightness. */
-const CLOSE = 0.15;
 /** How far off the line of flight stars can be. */
 const SPREAD = 1.6;
-/** How far back along its path a streak reaches, per unit of speed. */
-const TRAIL = 0.12;
+/** The nearest a layer comes before it has passed: its stars are then drawn full size. */
+const Z_MIN = 0.12;
+/** Stars are drawn at their nearest, and a layer is scaled down by its distance. */
+const SCALE_MAX = NEAR / Z_MIN;
+/** At the nearest: a star's size and its streak's length, in points. */
+const STAR_SIZE = 3.8;
+const STREAK = 72;
 /** Depth travelled per second at speed 1. */
 const RATE = 0.6;
 /** Cruising at first, then up to warp, where the stars streak. */
@@ -31,14 +35,11 @@ const CRUISE = 0.18;
 const WARP = 0.5;
 const WARP_AFTER_MS = 700;
 /** One dim deep-field star per this many square points, so the edges are never empty. */
-const FIELD_AREA_PER_STAR = 900;
-const FIELD_MAX = 300;
+const FIELD_AREA_PER_STAR = 1400;
+const FIELD_MAX = 200;
 const FADE_MS = 600;
 /** The words only show if the globe is slow to come. */
 const WORDS_AFTER_MS = 3000;
-/** Every streak is this view, stretched and turned. */
-const BASE_W = 100;
-const BASE_H = 2;
 /** The glow's circles, as parts of the sky's shorter side. */
 const GLOW_RINGS = Array.from({ length: 18 }, (_, i) => 0.95 - i * 0.048);
 
@@ -65,104 +66,163 @@ function random(seed: number) {
   };
 }
 
-export interface WarpStar {
-  /** Across and up, about −1 to 1: where the star is off the line of flight. */
-  x: number;
-  y: number;
-  /** Where in its journey it starts, 0–1. */
-  phase: number;
-  /** Its own speed, so near and far ones part (parallax). */
-  speed: number;
-  tint: string;
+/** A layer's depth (1 far, `Z_MIN` near) once the flight has gone `travel`. */
+function depth(travel: number, phase: number, speed: number): number {
+  'worklet';
+  return Z_MIN + (1 - Z_MIN) * (1 - ((travel * speed + phase) % 1));
 }
 
-/** The same flight every time: a fixed seed. */
-export function warpStars(): WarpStar[] {
-  const next = random(7);
-  return Array.from({ length: STARS }, () => ({
-    x: (next() * 2 - 1) * SPREAD,
-    y: (next() * 2 - 1) * SPREAD,
-    phase: next(),
-    speed: 0.7 + next() * 0.6,
-    tint: tint(next()),
-  }));
+export interface WarpStar {
+  /** Across and up, about −1.6 to 1.6: where the star is off the line of flight. */
+  x: number;
+  y: number;
+  /** Its size and brightness against the others, 0.6–1. */
+  size: number;
+  bright: number;
+  tint: string;
+}
+export interface WarpLayer {
+  phase: number;
+  /** Its own speed, so the layers part a little (parallax). */
+  speed: number;
+  stars: WarpStar[];
+  depthAt: (travel: number) => number;
+}
+
+/** The same flight every time: a fixed seed. Layers are spread evenly through the depth. */
+export function warpLayers(): WarpLayer[] {
+  const next = random(11);
+  return Array.from({ length: LAYERS }, (_, i) => {
+    const phase = i / LAYERS + next() * 0.05;
+    const speed = 0.85 + next() * 0.3;
+    return {
+      phase,
+      speed,
+      depthAt: (travel: number) => depth(travel, phase, speed),
+      stars: Array.from({ length: PER_LAYER }, () => ({
+        x: (next() * 2 - 1) * SPREAD,
+        y: (next() * 2 - 1) * SPREAD,
+        size: 0.6 + next() * 0.4,
+        bright: 0.7 + next() * 0.3,
+        tint: tint(next()),
+      })),
+    };
+  });
 }
 
 /**
- * Where a star is drawn at depth `z` (1 far, near 0 close) while flying at `speed`, in a
- * `w` × `h` sky (Plan 82). Perspective: the screen offset grows as 1/z, so far stars sit near
- * the middle and near ones rush out past the edges, growing and brightening. The streak runs
- * back to where the star was a moment ago, so it is long for near, fast stars and nothing at a
- * stop. Stars far away fade in, so a star coming round never pops in.
+ * How a layer of stars at depth `z` is drawn while flying at `speed` (Plan 83). `scale` is the
+ * perspective factor: a star's offset from the middle is its place times this, so far layers
+ * sit near the middle and near ones spread past the edges, their stars growing as they come.
+ * Far layers fade in, so stars never pop in, and the nearest fade as they pass. `streaks` is
+ * how much the streaks show: fully at warp, not at all at a stop.
  */
-export function starAt(star: WarpStar, z: number, speed: number, w: number, h: number) {
+export function layerAt(z: number, speed: number) {
   'worklet';
-  const cx = w / 2;
-  const cy = h / 2;
-  const hx = cx + (star.x * (w / 2) * NEAR) / z;
-  const hy = cy + (star.y * (h / 2) * NEAR) / z;
-  const back = z + speed * TRAIL;
-  const tx = cx + (star.x * (w / 2) * NEAR) / back;
-  const ty = cy + (star.y * (h / 2) * NEAR) / back;
-  const near = Math.pow(CLOSE / z, 0.8);
-  const size = Math.min(3.4, 0.6 + 2.4 * near);
   const bright = Math.pow(Math.min(1, Math.max(0, (1 - z) * 1.15)), 1.2);
   const fadeIn = z > 0.85 ? (1 - z) / 0.15 : 1;
+  const fadeOut = Math.min(1, (z - Z_MIN) / 0.05);
   return {
-    x: hx,
-    y: hy,
-    size,
-    opacity: bright * fadeIn,
-    length: Math.max(size, Math.hypot(hx - tx, hy - ty)),
-    angle: Math.atan2(hy - cy, hx - cx),
+    scale: NEAR / z,
+    opacity: Math.max(0, bright * fadeIn * fadeOut),
+    streaks: Math.min(1, Math.max(0, speed / WARP)),
   };
 }
 
-function MovingStar({
-  star,
+/**
+ * One layer: its points and its streaks, each one view moved as a whole. The stars inside are
+ * drawn once, at their nearest, and never move by themselves; only the layer's zoom and
+ * opacity change each frame, which the phone does cheaply.
+ */
+function Layer({
+  layer,
   travel,
   speed,
-  width,
-  height,
+  w,
+  h,
 }: {
-  star: WarpStar;
+  layer: WarpLayer;
   travel: SharedValue<number>;
   speed: SharedValue<number>;
-  width: SharedValue<number>;
-  height: SharedValue<number>;
+  w: number;
+  h: number;
 }) {
-  const style = useAnimatedStyle(() => {
-    const z = Math.max(0.03, 1 - ((travel.get() * star.speed + star.phase) % 1));
-    const p = starAt(star, z, speed.get(), width.get(), height.get());
-    // The streak's middle: half its length back from the star, towards the centre.
-    const mx = p.x - (Math.cos(p.angle) * p.length) / 2;
-    const my = p.y - (Math.sin(p.angle) * p.length) / 2;
-    return {
-      opacity: p.opacity,
-      transform: [
-        { translateX: mx - BASE_W / 2 },
-        { translateY: my - BASE_H / 2 },
-        { rotate: `${p.angle}rad` },
-        { scaleX: p.length / BASE_W },
-        { scaleY: p.size / BASE_H },
-      ],
-    };
+  const { phase, speed: own } = layer;
+  const points = useAnimatedStyle(() => {
+    const at = layerAt(depth(travel.get(), phase, own), speed.get());
+    return { opacity: at.opacity, transform: [{ scale: at.scale / SCALE_MAX }] };
   });
-  // Faint at the tail, the star itself at the head.
-  const colors = useMemo(
-    () => [withAlpha(star.tint, 0), withAlpha(star.tint, 0.55), star.tint] as const,
-    [star.tint],
+  const streaks = useAnimatedStyle(() => {
+    const at = layerAt(depth(travel.get(), phase, own), speed.get());
+    return { opacity: at.opacity * at.streaks, transform: [{ scale: at.scale / SCALE_MAX }] };
+  });
+  const placed = useMemo(
+    () =>
+      layer.stars.map((s) => {
+        const dx = s.x * (w / 2) * SCALE_MAX;
+        const dy = s.y * (h / 2) * SCALE_MAX;
+        return { ...s, x: w / 2 + dx, y: h / 2 + dy, angle: Math.atan2(dy, dx) };
+      }),
+    [layer, w, h],
   );
   return (
-    <Animated.View testID="moving-star" style={[styles.streak, style]}>
-      <LinearGradient
-        colors={colors}
-        locations={[0, 0.7, 1]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        style={StyleSheet.absoluteFill}
-      />
-    </Animated.View>
+    <>
+      <Animated.View testID="star-layer" style={[StyleSheet.absoluteFill, streaks]}>
+        {placed.map((s, i) => {
+          const length = STREAK * s.size;
+          const thick = STAR_SIZE * s.size;
+          return (
+            <View
+              key={i}
+              style={[
+                styles.streak,
+                {
+                  width: length,
+                  height: thick,
+                  borderRadius: thick / 2,
+                  opacity: s.bright,
+                  // Its head at the star, its tail back towards the middle.
+                  left: s.x - (Math.cos(s.angle) * length) / 2 - length / 2,
+                  top: s.y - (Math.sin(s.angle) * length) / 2 - thick / 2,
+                  transform: [{ rotate: `${s.angle}rad` }],
+                },
+              ]}
+            >
+              <LinearGradient
+                colors={[withAlpha(s.tint, 0), withAlpha(s.tint, 0.5), s.tint]}
+                locations={[0, 0.7, 1]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={StyleSheet.absoluteFill}
+              />
+            </View>
+          );
+        })}
+      </Animated.View>
+      <Animated.View testID="star-layer" style={[StyleSheet.absoluteFill, points]}>
+        {placed.map((s, i) => {
+          const size = STAR_SIZE * s.size;
+          return (
+            <View
+              key={i}
+              testID="moving-star"
+              style={[
+                styles.dot,
+                {
+                  left: s.x - size / 2,
+                  top: s.y - size / 2,
+                  width: size,
+                  height: size,
+                  borderRadius: size / 2,
+                  backgroundColor: s.tint,
+                  opacity: s.bright,
+                },
+              ]}
+            />
+          );
+        })}
+      </Animated.View>
+    </>
   );
 }
 
@@ -187,7 +247,7 @@ function deepField(w: number, h: number): Fixed[] {
 }
 
 /**
- * The night sky shown while the globe starts (Plans 80–82): a flight through a 3D starfield.
+ * The night sky shown while the globe starts (Plans 80–83): a flight through a 3D starfield.
  * It cruises, then speeds up until the near stars streak; when the globe is ready (`leaving`) it
  * drops out of warp, the streaks shrink back to points and the sky fades as the globe travels
  * in. A dim deep field behind keeps the edges from being empty, and a faint glow marks the point
@@ -195,15 +255,13 @@ function deepField(w: number, h: number): Fixed[] {
  */
 export function StarWarp({ leaving }: { leaving: boolean }) {
   const ok = useMotionOk();
-  const stars = useMemo(warpStars, []);
+  const layers = useMemo(warpLayers, []);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const field = useMemo(() => deepField(size.w, size.h), [size]);
   const travel = useSharedValue(0.37);
   const speed = useSharedValue(0);
   const target = useSharedValue(0);
   const ease = useSharedValue(2.2);
-  const width = useSharedValue(0);
-  const height = useSharedValue(0);
   const opacity = useSharedValue(1);
   const [gone, setGone] = useState(false);
   const [words, setWords] = useState(false);
@@ -250,8 +308,6 @@ export function StarWarp({ leaving }: { leaving: boolean }) {
       style={[StyleSheet.absoluteFill, styles.sky, fade]}
       onLayout={(e) => {
         const { width: w, height: h } = e.nativeEvent.layout;
-        width.set(w);
-        height.set(h);
         setSize({ w, h });
       }}
     >
@@ -290,16 +346,11 @@ export function StarWarp({ leaving }: { leaving: boolean }) {
           ]}
         />
       ))}
-      {stars.map((star, i) => (
-        <MovingStar
-          key={i}
-          star={star}
-          travel={travel}
-          speed={speed}
-          width={width}
-          height={height}
-        />
-      ))}
+      {size.w > 0
+        ? layers.map((layer, i) => (
+            <Layer key={i} layer={layer} travel={travel} speed={speed} w={size.w} h={size.h} />
+          ))
+        : null}
       {words ? (
         <View style={styles.words}>
           <Text style={[type.caption, styles.wordsText]}>Loading the globe…</Text>
@@ -313,15 +364,7 @@ const styles = StyleSheet.create({
   sky: { backgroundColor: defaultTheme.space, overflow: 'hidden' },
   dot: { position: 'absolute' },
   glow: { position: 'absolute', backgroundColor: COOL, opacity: 0.009 },
-  streak: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: BASE_W,
-    height: BASE_H,
-    borderRadius: BASE_H / 2,
-    overflow: 'hidden',
-  },
+  streak: { position: 'absolute', overflow: 'hidden' },
   words: { position: 'absolute', left: 0, right: 0, bottom: spacing.lg, alignItems: 'center' },
   // The globe's own colours: it is dark in every app theme.
   wordsText: { color: WHITE, ...font('text', 500) },
