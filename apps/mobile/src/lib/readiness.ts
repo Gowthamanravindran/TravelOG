@@ -2,6 +2,7 @@ import {
   autoReadiness,
   homeCountryFor,
   needsPermit,
+  nightsWithoutStay,
   readiness,
   suggestReadyList,
   type AutoItem,
@@ -37,11 +38,14 @@ export function tripReadiness(db: Db, tripId: string): TripReadiness | null {
   if (!trip) return null;
   const where = whereFor(db, tripId);
   const setup = tripSetupStatus(db, tripId);
+  const missing = where ? nightsWithoutStay(where.inputs, where.w) : [];
   const auto = autoReadiness({
     trip,
     journeys: where?.w.journeys ?? [],
-    checks: where?.checks ?? [],
-    hasStayBooking: !!where?.inputs.bookings.some((b) => b.type === 'stay'),
+    nightsWithoutStay: missing.length,
+    hasStay:
+      !!where?.inputs.bookings.some((b) => b.type === 'stay') ||
+      !!where?.inputs.stops.some((s) => s.kind === 'stay' && (s.label || s.address)),
     budget: setup.budget,
     plan: setup.plan,
   });

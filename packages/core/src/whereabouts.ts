@@ -39,6 +39,8 @@ export interface WhereStop {
   startDate: string;
   endDate: string;
   label: string | null;
+  /** Where exactly, if you said (Plan 35). */
+  address?: string | null;
 }
 
 export interface WhereTrip {
@@ -321,6 +323,32 @@ export function routeStops(w: Whereabouts): RouteItem[] {
     ]),
   ];
   return keyed.sort((a, b) => a[0].localeCompare(b[0])).map(([, item]) => item);
+}
+
+// ---------------------------------------------------------------- Nights with a stay sorted
+
+/**
+ * The nights (local dates) with nowhere sorted to sleep (Plan 88). A night is sorted by a
+ * booked stay, by an overnight journey, or by a stay you set yourself and named or gave an
+ * address ("Aunt's house"). A stay that only says which city you will be in (as a trip made on
+ * the globe has for every night) is a plan, not somewhere to sleep, so it does not count.
+ */
+export function nightsWithoutStay(inputs: Inputs, w: Whereabouts = whereabouts(inputs)): string[] {
+  const { stays } = spans(inputs);
+  const named = new Set(
+    inputs.stops
+      .filter((s) => s.kind === 'stay' && (s.label?.trim() || s.address?.trim()))
+      .map((s) => s.id),
+  );
+  return w.nights
+    .filter(
+      (n) =>
+        n.kind !== 'transit' &&
+        !stays.some(
+          (s) => (!s.set || named.has(s.sourceId)) && s.start <= n.date && n.date < s.end,
+        ),
+    )
+    .map((n) => n.date);
 }
 
 // ---------------------------------------------------------------- Check your plan

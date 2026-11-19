@@ -110,6 +110,7 @@ export function whereInputs(
     startDate: s.startDate,
     endDate: s.endDate,
     label: s.label,
+    address: s.address,
   }));
   const ids = new Set<string>();
   for (const b of bookings)

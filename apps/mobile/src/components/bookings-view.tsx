@@ -5,7 +5,13 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useDb, useQuery } from '@/data/provider';
-import { buildImport, readBookingDocument, stashImport, type FileRead } from '@/lib/booking-import';
+import {
+  buildImport,
+  knownInTrip,
+  readBookingDocument,
+  stashImport,
+  type FileRead,
+} from '@/lib/booking-import';
 import { resolveDraftPlaces } from '@/lib/booking-places';
 import { MAX_UPLOADS, pickAttachments } from '@/lib/files';
 import { dateTimeIn, errorMessage, money } from '@/lib/format';
@@ -40,11 +46,14 @@ export function BookingsView({ tripId }: { tripId: string }) {
   const [choosing, setChoosing] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Said when an upload held nothing new (Plan 88).
+  const [notice, setNotice] = useState<string | null>(null);
   if (!trip) return null;
 
   // Add booking: upload the ticket (read on the phone, Plan 31) or type it in.
   const add = () => {
     setError(null);
+    setNotice(null);
     setChoosing(true);
   };
   const upload = async () => {
@@ -68,7 +77,17 @@ export function BookingsView({ tripId }: { tripId: string }) {
         if (r.readable)
           r.drafts = await Promise.all(r.drafts.map((d) => resolveDraftPlaces(db, d)));
       setChoosing(false);
-      const id = stashImport(buildImport(reads, picked.truncated));
+      // Bookings already in the trip are left out; if nothing new is left, say so here.
+      const built = buildImport(reads, picked.truncated, knownInTrip(db, tripId, trip.timeZone));
+      if (!built.steps.length && built.already) {
+        setNotice(
+          built.already === 1
+            ? 'That booking is already in this trip.'
+            : 'Those bookings are already in this trip.',
+        );
+        return;
+      }
+      const id = stashImport(built);
       router.push(`/trip/${tripId}/booking?importId=${id}`);
     } catch (e) {
       setChoosing(false);
@@ -101,6 +120,13 @@ export function BookingsView({ tripId }: { tripId: string }) {
         </Row>
         <Button label="Add booking" icon="add" onPress={add} />
         <ErrorText>{error}</ErrorText>
+        {notice ? (
+          <View accessibilityLiveRegion="polite">
+            <Body small muted>
+              {notice}
+            </Body>
+          </View>
+        ) : null}
       </Card>
       <ChoiceSheet
         visible={choosing}

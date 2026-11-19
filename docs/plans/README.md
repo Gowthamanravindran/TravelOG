@@ -91,3 +91,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 85 | [Picking stops: the countries fill the view, and a tap picks the city under it](85-picking-stops-framing-and-taps.md) | see git log |
 | 86 | [Put the stops in a new order by dragging](86-reorder-stops-by-dragging.md) | see git log |
 | 87 | [The globe's satellite look comes back after a drop](87-globe-quality-comes-back.md) | see git log |
+| 88 | ["A stay every night" means every night; an uploaded booking is not added twice](88-stays-every-night-and-no-double-bookings.md) | see git log |

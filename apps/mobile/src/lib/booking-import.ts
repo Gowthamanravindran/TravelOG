@@ -1,4 +1,12 @@
-import { emptyDraft, extractPdfLayout, parseBookingPages, type BookingDraft } from '@travelog/core';
+import {
+  emptyDraft,
+  extractPdfLayout,
+  localDateIn,
+  localTimeIn,
+  parseBookingPages,
+  type BookingDraft,
+} from '@travelog/core';
+import { getPlace, listBookings, listTripAttachments, type Db } from '@travelog/db';
 import { File } from 'expo-file-system';
 
 import type { PickedFile } from './files';
@@ -31,37 +39,95 @@ export interface BookingImport {
   steps: ImportStep[];
   /** Bookings found twice (the same file saved twice, or two copies of a voucher). */
   skipped: number;
+  /** Bookings already saved in the trip, left out (Plan 88). */
+  already: number;
   /** More than the maximum number of files were picked; the rest were left out. */
   truncated: boolean;
 }
 
-const sameBooking = (a: BookingDraft, b: BookingDraft) =>
-  !!a.reference &&
-  a.reference === b.reference &&
+/** What a saved booking is known by: its type, reference, and start as printed (local). */
+export interface KnownBooking {
+  type: string;
+  reference: string | null;
+  startDate: string | null;
+  startTime: string | null;
+}
+/** What the trip already holds, so an upload does not add it twice (Plan 88). */
+export interface KnownInTrip {
+  saved?: KnownBooking[];
+  /** Files already attached in the trip, by name and size. */
+  files?: { name: string; sizeBytes: number | null }[];
+}
+
+const ref = (r: string | null) => r?.trim().toUpperCase() || null;
+/** One booking: the same type, reference and start (a return on one reference is two). */
+const sameBooking = (a: KnownBooking, b: KnownBooking) =>
+  !!ref(a.reference) &&
+  ref(a.reference) === ref(b.reference) &&
   a.type === b.type &&
   a.startDate === b.startDate &&
   a.startTime === b.startTime;
 
 /**
+ * The trip's saved bookings and files, as an upload compares them (Plan 88). A booking's start
+ * is taken in its own place's time zone (where a journey leaves from), as its ticket prints it.
+ */
+export function knownInTrip(db: Db, tripId: string, tripTimeZone: string): KnownInTrip {
+  const saved = listBookings(db, tripId)
+    .filter((b) => b.reference)
+    .map((b) => {
+      const where = b.fromPlaceId ?? b.placeId;
+      const tz = (where && getPlace(db, where)?.timeZone) || tripTimeZone;
+      const at = b.startsAt ? new Date(b.startsAt) : null;
+      return {
+        type: b.type,
+        reference: b.reference,
+        startDate: at ? localDateIn(tz, at) : null,
+        startTime: at ? localTimeIn(tz, at) : null,
+      };
+    });
+  const files = listTripAttachments(db, tripId).map((f) => ({
+    name: f.name,
+    sizeBytes: f.sizeBytes,
+  }));
+  return { saved, files };
+}
+
+/**
  * Turns what each file gave into steps: one per booking, duplicates dropped
  * (same type, reference and start), sorted by start, undated ones last.
  */
-export function buildImport(reads: FileRead[], truncated = false): BookingImport {
+export function buildImport(
+  reads: FileRead[],
+  truncated = false,
+  known: KnownInTrip = {},
+): BookingImport {
   const steps: ImportStep[] = [];
   let skipped = 0;
-  for (const r of reads)
+  let already = 0;
+  for (const r of reads) {
+    // The very same file is already in the trip: everything in it was added before.
+    if (known.files?.some((f) => f.name === r.file.name && f.sizeBytes === r.file.sizeBytes)) {
+      already += Math.max(1, r.drafts.length);
+      continue;
+    }
     for (const draft of r.drafts) {
+      if (r.readable && known.saved?.some((k) => sameBooking(k, draft))) {
+        already++;
+        continue;
+      }
       if (r.readable && steps.some((s) => s.readable && sameBooking(s.draft, draft))) {
         skipped++;
         continue;
       }
       steps.push({ file: r.file, draft, readable: r.readable });
     }
+  }
   const key = (s: ImportStep) =>
     s.draft.startDate ? `${s.draft.startDate} ${s.draft.startTime ?? ''}` : '\uffff';
   // A stable sort keeps a file's own order (its legs) for equal starts.
   steps.sort((a, b) => key(a).localeCompare(key(b)));
-  return { steps, skipped, truncated };
+  return { steps, skipped, already, truncated };
 }
 
 const looksLikePdf = (file: PickedFile) =>

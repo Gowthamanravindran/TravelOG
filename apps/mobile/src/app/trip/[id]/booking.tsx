@@ -80,6 +80,7 @@ export default function BookingEditor() {
           imported.skipped
             ? `${imported.skipped} ${imported.skipped === 1 ? 'duplicate' : 'duplicates'} skipped.`
             : '',
+          imported.already ? `${imported.already} already in this trip, left out.` : '',
           imported.truncated ? 'Only the first 10 files were added.' : '',
         ].filter(Boolean)
       : [];

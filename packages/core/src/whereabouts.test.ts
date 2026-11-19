@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  nightsWithoutStay,
   planChecks,
   routeStops,
   whereabouts,
@@ -254,6 +255,99 @@ describe('planChecks', () => {
         date: '2026-07-12',
         sourceIds: [hotel.id, 'dup'].sort(),
       },
+    ]);
+  });
+});
+
+describe('nightsWithoutStay (Plan 88): the nights with nowhere sorted to sleep', () => {
+  const long: WhereTrip = { ...trip, startDate: '2026-07-12', endDate: '2026-08-01' }; // 20 nights
+  const cityStop = (
+    id: string,
+    placeId: string,
+    startDate: string,
+    endDate: string,
+  ): WhereStop => ({
+    id,
+    kind: 'stay',
+    placeId,
+    toPlaceId: null,
+    startDate,
+    endDate,
+    label: null,
+  });
+  // A trip made on the globe: a stop for each city covering every night, with no name.
+  const globeStops = [
+    cityStop('s1', 'goa', '2026-07-12', '2026-07-22'),
+    cityStop('s2', 'gok', '2026-07-22', '2026-08-01'),
+  ];
+  const fourNights = booking({
+    type: 'stay',
+    startsAt: ist('2026-07-12', '14:00'),
+    endsAt: ist('2026-07-16', '11:00'),
+    placeId: 'goa',
+  });
+
+  it('one 4-night hotel on a 20-night trip leaves 16 nights, even with a city for every night', () => {
+    const missing = nightsWithoutStay({
+      ...base,
+      trip: long,
+      stops: globeStops,
+      bookings: [fourNights],
+    });
+    expect(missing).toHaveLength(16);
+    expect(missing[0]).toBe('2026-07-16');
+    expect(missing.at(-1)).toBe('2026-07-31');
+  });
+
+  it('a stay you named or gave an address counts, a city alone does not', () => {
+    const named = { ...cityStop('s3', 'gok', '2026-07-22', '2026-08-01'), label: 'Aunt’s house' };
+    const missing = nightsWithoutStay({
+      ...base,
+      trip: long,
+      stops: [globeStops[0]!, named],
+      bookings: [fourNights],
+    });
+    expect(missing).toEqual([
+      '2026-07-16',
+      '2026-07-17',
+      '2026-07-18',
+      '2026-07-19',
+      '2026-07-20',
+      '2026-07-21',
+    ]);
+    const address = { ...named, label: null, address: 'Near the temple' } as WhereStop;
+    expect(
+      nightsWithoutStay({
+        ...base,
+        trip: long,
+        stops: [globeStops[0]!, address],
+        bookings: [fourNights],
+      }),
+    ).toHaveLength(6);
+  });
+
+  it('a night on an overnight journey is not missing', () => {
+    const overnight = booking({
+      type: 'train',
+      startsAt: ist('2026-07-15', '21:00'),
+      endsAt: ist('2026-07-16', '07:00'),
+      fromPlaceId: 'goa',
+      toPlaceId: 'del',
+    });
+    const short = { ...trip, startDate: '2026-07-12', endDate: '2026-07-16' };
+    const hotel3 = booking({
+      type: 'stay',
+      startsAt: ist('2026-07-12', '14:00'),
+      endsAt: ist('2026-07-15', '11:00'),
+      placeId: 'goa',
+    });
+    expect(nightsWithoutStay({ ...base, trip: short, bookings: [hotel3, overnight] })).toEqual([]);
+  });
+
+  it('every night booked is none missing', () => {
+    expect(nightsWithoutStay({ ...base, bookings: [flightIn, hotel, bus, flightHome] })).toEqual([
+      '2026-07-15',
+      '2026-07-16',
     ]);
   });
 });

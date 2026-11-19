@@ -276,4 +276,96 @@ describe('adding a booking from a document (Plan 31)', () => {
     expect(screen.getByText('Booking 1 of 10')).toBeTruthy();
     expect(screen.getByText('Only the first 10 files were added.')).toBeTruthy();
   });
+
+  describe('a booking already in the trip is not added twice (Plan 88)', () => {
+    const pdf = (name: string, sizeBytes = TICKET.length) => ({
+      name,
+      mimeType: 'application/pdf',
+      sizeBytes,
+      localUri: `file:///docs/attachments/${name}`,
+    });
+    /** Uploads the ticket and saves it, as a first upload does. */
+    async function saveTicketOnce(db: ReturnType<typeof makeDb>, tripId: string) {
+      mockPick.mockResolvedValue(pdf('ticket.pdf'));
+      mockBytes.mockResolvedValue(new Uint8Array(TICKET));
+      const { importId } = await upload(db, tripId);
+      mockParams = { id: tripId, importId };
+      await render(withData(db, <BookingEditor />, 'plan'));
+      await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
+      expect(listBookings(db, tripId)).toHaveLength(1);
+      mockPush.mockReset();
+    }
+    /** Uploads again and waits for Bookings to finish reading. */
+    async function uploadAgain(db: ReturnType<typeof makeDb>, tripId: string) {
+      await render(withData(db, <BookingsView tripId={tripId} />, 'plan'));
+      await fireEvent.press(screen.getByRole('button', { name: 'Add booking' }));
+      await fireEvent.press(screen.getByRole('button', { name: 'Upload documents' }));
+    }
+
+    it('the same file again: nothing new, and Bookings says it is already there', async () => {
+      const { db, tripId } = setup();
+      await saveTicketOnce(db, tripId);
+      mockPick.mockResolvedValue(pdf('ticket.pdf'));
+      await uploadAgain(db, tripId);
+      await waitFor(() =>
+        expect(screen.getByText('That booking is already in this trip.')).toBeTruthy(),
+      );
+      expect(mockPush).not.toHaveBeenCalled();
+      expect(listBookings(db, tripId)).toHaveLength(1);
+    });
+
+    it('another copy of it (renamed, a different size) is known by its reference and start', async () => {
+      const { db, tripId } = setup();
+      await saveTicketOnce(db, tripId);
+      mockPick.mockResolvedValue(pdf('ticket (1).pdf', TICKET.length + 1));
+      await uploadAgain(db, tripId);
+      await waitFor(() =>
+        expect(screen.getByText('That booking is already in this trip.')).toBeTruthy(),
+      );
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    it('with something new alongside: only the new one is offered, and the form says why', async () => {
+      const { db, tripId } = setup();
+      await saveTicketOnce(db, tripId);
+      mockPick.mockResolvedValue([
+        pdf('ticket.pdf'),
+        { name: 'IMG_7.jpg', mimeType: 'image/jpeg', sizeBytes: 9, localUri: 'file:///p.jpg' },
+      ]);
+      await uploadAgain(db, tripId);
+      await waitFor(() => expect(mockPush).toHaveBeenCalled());
+      const importId = new URL(
+        mockPush.mock.calls.at(-1)![0] as string,
+        'https://x',
+      ).searchParams.get('importId')!;
+      mockParams = { id: tripId, importId };
+      await render(withData(db, <BookingEditor />, 'plan'));
+      expect(screen.getByText('IMG_7.jpg')).toBeTruthy();
+      expect(screen.getByText('1 already in this trip, left out.')).toBeTruthy();
+      expect(screen.queryByText(/Booking 1 of/)).toBeNull();
+    });
+
+    it('a different leg on the same reference is still new', () => {
+      const leg = (startTime: string): BookingDraft => ({
+        ...emptyDraft(),
+        type: 'flight',
+        title: 'Leg',
+        reference: 'x7k2qp ',
+        startDate: '2026-07-12',
+        startTime,
+      });
+      const file = pdf('return.pdf');
+      const built = buildImport(
+        [{ file, drafts: [leg('06:45'), leg('19:30')], readable: true }],
+        false,
+        {
+          saved: [
+            { type: 'flight', reference: 'X7K2QP', startDate: '2026-07-12', startTime: '06:45' },
+          ],
+        },
+      );
+      expect(built.steps.map((s) => s.draft.startTime)).toEqual(['19:30']);
+      expect(built.already).toBe(1);
+    });
+  });
 });

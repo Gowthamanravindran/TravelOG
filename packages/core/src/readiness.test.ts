@@ -7,21 +7,14 @@ import { planReminders } from './reminders';
 const trip = { startDate: '2026-12-12', endDate: '2026-12-18' };
 const leg = (type: string, departDate: string) =>
   ({ type, departDate, arriveDate: departDate }) as never;
-const noStay = {
-  key: 'n',
-  kind: 'noStay',
-  startDate: '2026-12-17',
-  endDate: '2026-12-18',
-  placeId: null,
-} as never;
 
 /** Plan 61: Get ready. */
 describe('items the app ticks itself', () => {
   const base = {
     trip,
     journeys: [],
-    checks: [],
-    hasStayBooking: false,
+    nightsWithoutStay: 6,
+    hasStay: false,
     budget: false,
     plan: false,
   };
@@ -36,11 +29,13 @@ describe('items the app ticks itself', () => {
     expect(both[0]!.done).toBe(true);
   });
 
-  it('a stay every night needs stays and no gaps', () => {
-    expect(autoReadiness(base)[1]!.detail).toBe('Add where you’ll stay');
-    const gap = autoReadiness({ ...base, hasStayBooking: true, checks: [noStay] });
-    expect(gap[1]).toMatchObject({ done: false, detail: '1 gap in your stays' });
-    expect(autoReadiness({ ...base, hasStayBooking: true })[1]!.done).toBe(true);
+  it('a stay every night needs a stay sorted for every night (Plan 88)', () => {
+    expect(autoReadiness(base)[1]).toMatchObject({ done: false, detail: 'Add where you’ll stay' });
+    const some = autoReadiness({ ...base, hasStay: true, nightsWithoutStay: 16 });
+    expect(some[1]).toMatchObject({ done: false, detail: '16 nights without a stay' });
+    const one = autoReadiness({ ...base, hasStay: true, nightsWithoutStay: 1 });
+    expect(one[1]).toMatchObject({ done: false, detail: '1 night without a stay' });
+    expect(autoReadiness({ ...base, hasStay: true, nightsWithoutStay: 0 })[1]!.done).toBe(true);
   });
 
   it('counts with your own items, next is the soonest due', () => {

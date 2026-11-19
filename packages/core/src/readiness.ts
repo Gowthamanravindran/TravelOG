@@ -1,7 +1,7 @@
 // Plan 61: how ready a trip is. Some items tick themselves from the trip (bookings, stays,
 // budget, a first stop); the rest are the person's own checklist items.
 
-import type { Journey, PlanCheck } from './whereabouts';
+import type { Journey } from './whereabouts';
 
 export type AutoKey = 'transport' | 'stays' | 'budget' | 'plan';
 
@@ -16,8 +16,10 @@ export interface AutoItem {
 export interface AutoInputs {
   trip: { startDate: string | null; endDate: string | null };
   journeys: readonly Pick<Journey, 'type' | 'departDate' | 'arriveDate'>[];
-  checks: readonly PlanCheck[];
-  hasStayBooking: boolean;
+  /** Nights with nowhere sorted to sleep (`nightsWithoutStay`, Plan 88). */
+  nightsWithoutStay: number;
+  /** Any stay at all: a booked one, or one you named. */
+  hasStay: boolean;
   budget: boolean;
   plan: boolean;
 }
@@ -33,8 +35,9 @@ export function autoReadiness(i: AutoInputs): AutoItem[] {
     : legs.length > 0;
   const back = end ? legs.some((j) => j.departDate >= end) : legs.length > 1;
   const transport = there && back;
-  const gaps = i.checks.filter((c) => c.kind === 'noStay');
-  const stays = i.hasStayBooking && gaps.length === 0;
+  // Every night, not just one stay: a 4-night hotel on a 20-night trip is not done (Plan 88).
+  const stays = i.hasStay && i.nightsWithoutStay === 0;
+  const left = i.nightsWithoutStay;
   return [
     {
       key: 'transport',
@@ -54,9 +57,9 @@ export function autoReadiness(i: AutoInputs): AutoItem[] {
       done: stays,
       detail: stays
         ? 'Booked'
-        : !i.hasStayBooking
+        : !i.hasStay
           ? 'Add where you’ll stay'
-          : `${gaps.length} ${gaps.length === 1 ? 'gap' : 'gaps'} in your stays`,
+          : `${left} ${left === 1 ? 'night' : 'nights'} without a stay`,
     },
     {
       key: 'budget',
