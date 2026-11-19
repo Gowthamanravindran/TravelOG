@@ -11,3 +11,6 @@ supabase/.temp/
 supabase/.branches/
 .places-cache/
 data/destinations/photos/
+
+# Python caches from the scripts
+__pycache__/
