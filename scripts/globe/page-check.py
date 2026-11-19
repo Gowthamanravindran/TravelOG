@@ -187,10 +187,40 @@ with sync_playwright() as p:
     page.evaluate("window.globe.setFocus(null); window.globe.setInset(342)")
     page.wait_for_timeout(1200)
 
+    # ---- Picking stops (Plan 85) -------------------------------------------------------------
+    page.set_viewport_size({"width": W, "height": H})  # an earlier section made the page taller
+    page.wait_for_timeout(300)
+    page.evaluate("window.globe.setReduceMotion(true); window.globe.setSpin(false); window.globe.setFocus(null); window.globe.setInset(%d)" % INSET)
+    # The picked countries fill most of the visible part, and still fit in it.
+    page.evaluate("window.globe.fitCountries(['ITA'])")
+    page.wait_for_timeout(400)
+    b = page.evaluate("window.globe.debugBox('ITA')")
+    band_h = H - INSET
+    fill = max((b["right"] - b["left"]) / W, (b["bottom"] - b["top"]) / band_h)
+    out["fit_fills"] = fill >= 0.7 and b["left"] >= 0 and b["right"] <= W and b["top"] >= 0 and b["bottom"] <= band_h
+    out["fit_fills_at"] = [round(fill, 2), b]
+    # A tap right on the middle city of a tight cluster picks that city, not a neighbour.
+    cluster = [
+        {"id": "mid", "name": "Middle", "lat": 35.68, "lng": 139.69},
+        {"id": "up", "name": "Above", "lat": 35.86, "lng": 139.66},
+        {"id": "down", "name": "Below", "lat": 35.50, "lng": 139.66},
+    ]
+    page.evaluate("c => window.globe.setData({ candidates: c })", cluster)
+    page.evaluate("window.globe.flyTo(139.68, 35.68, 5.5)")
+    page.wait_for_timeout(500)
+    picks = {}
+    for city in cluster:
+        p0 = page.evaluate("c => window.globe.debugPoint(c.lng, c.lat)", city)
+        hit = [m for m in tap(p0["x"], p0["y"]) if m.get("type") == "candidate"]
+        picks[city["id"]] = hit[0]["id"] if hit else None
+    out["tap_nearest"] = picks == {"mid": "mid", "up": "up", "down": "down"}
+    out["tap_nearest_at"] = picks
+    page.evaluate("window.globe.setData({})")
+
     out["no_errors"] = not errors and not page.evaluate("window.__msgs.some(m=>m.type==='error')")
     out["errors"] = errors[:3]
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)

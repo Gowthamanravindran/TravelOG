@@ -674,14 +674,19 @@ function start() {
   // Fit a box inside the visible part, leaving the extra margins clear around it. The camera is worked
   // out against the padding it will end with, then flown to along with that padding.
   function flyBounds(bounds, extra, maxZoom, ms) {
+    // The zoom is worked out for the visible part (the drawer's height added to the bottom
+    // margin), with no other padding in play; the camera then centres the box in that part.
+    // Passing the margins to the library as padding as well had it centre the box on the whole
+    // screen, so its lower part sat under the drawer (Plan 85).
     var was = map.getPadding(), cam = null;
+    var room = { top: extra.top, bottom: extra.bottom + inset, left: extra.left, right: extra.right };
     try {
-      map.setPadding(pad());
-      cam = map.cameraForBounds(bounds, { padding: extra, maxZoom: maxZoom });
+      map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
+      cam = map.cameraForBounds(bounds, { padding: room, maxZoom: maxZoom });
     } catch (e) { cam = null; } // no room left to fit anything in
     map.setPadding(was);
-    if (cam && isFinite(cam.zoom)) { flyCamera(cam.center, Math.min(cam.zoom, maxZoom), ms); return; }
-    flyCamera([(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2], 1.2, ms);
+    var mid = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
+    flyCamera(mid, cam && isFinite(cam.zoom) ? Math.min(cam.zoom, maxZoom) : 1.2, ms);
   }
   function setInset(px) {
     inset = Math.max(0, Number(px) || 0);
@@ -740,6 +745,14 @@ function start() {
   // 'report': the app is only told which country was tapped, and decides what happens.
   var tapMode = 'focus';
   function setTapMode(mode) { tapMode = mode === 'report' ? 'report' : 'focus'; }
+  // For the desktop check script: where a place is drawn, and what a country's box covers.
+  function debugPoint(lng, lat) { var p = map.project([lng, lat]); return { x: p.x, y: p.y }; }
+  function debugBox(iso) {
+    var f = INDEX[String(iso).toUpperCase()];
+    if (!f) return null;
+    var b = largestBox(f.geometry), a = map.project([b[0], b[3]]), c = map.project([b[2], b[1]]);
+    return { left: Math.min(a.x, c.x), right: Math.max(a.x, c.x), top: Math.min(a.y, c.y), bottom: Math.max(a.y, c.y) };
+  }
   function debugSize() { // for scripts/globe/page-check.py
     var z = map.getZoom(), lat = map.getCenter().lat;
     return { diameter: 512 * Math.pow(2, z) / Math.PI / Math.cos(lat * Math.PI / 180), centerY: map.project(map.getCenter()).y, zoom: z,
@@ -781,8 +794,9 @@ function start() {
       return;
     }
     move(900, function () {
+      // Close margins, so the picked countries fill the visible part (Plan 85).
       flyBounds([[box[0], Math.max(box[1], -80)], [box[2], Math.min(box[3], 84)]],
-        { top: 90, bottom: 60, left: 48, right: 48 }, 4.6, 900);
+        { top: 28, bottom: 20, left: 16, right: 16 }, 5, 900);
     });
   }
   // Frame several countries at once (by ISO alpha-3).
@@ -913,27 +927,37 @@ function start() {
     }
     post({ type: 'country', iso: f.properties.iso, name: f.properties.name, visited: !!(f.state && f.state.visited) });
   }
+  // Of the dots under a finger, the one nearest its middle: the library lists them in drawing
+  // order, so taking the first picked a neighbour in a tight cluster (Plan 85).
+  function nearest(hits, point) {
+    var best = null, bestD = Infinity;
+    hits.forEach(function (f) {
+      var p = map.project(f.geometry.coordinates), d = Math.pow(p.x - point.x, 2) + Math.pow(p.y - point.y, 2);
+      if (d < bestD) { bestD = d; best = f; }
+    });
+    return best;
+  }
   map.on('click', function (e) {
     var r = 14; // finger-sized hit area for point features
     var box = [[e.point.x - r, e.point.y - r], [e.point.x + r, e.point.y + r]];
 
     var stopHits = map.queryRenderedFeatures(box, { layers: ['stops-dot'] });
     if (stopHits.length) {
-      var sp = stopHits[0];
+      var sp = nearest(stopHits, e.point);
       post({ type: 'place', id: sp.properties.id, name: sp.properties.name,
              lng: sp.geometry.coordinates[0], lat: sp.geometry.coordinates[1] });
       return;
     }
     var candHits = map.queryRenderedFeatures(box, { layers: ['candidates-dot'] });
     if (candHits.length) {
-      var cp = candHits[0];
+      var cp = nearest(candHits, e.point);
       post({ type: 'candidate', id: cp.properties.id, name: cp.properties.name,
              lng: cp.geometry.coordinates[0], lat: cp.geometry.coordinates[1] });
       return;
     }
     var pins = map.queryRenderedFeatures(box, { layers: ['places-dot'] });
     if (pins.length) {
-      var p = pins[0];
+      var p = nearest(pins, e.point);
       post({ type: 'place', id: p.properties.id, name: p.properties.name,
              lng: p.geometry.coordinates[0], lat: p.geometry.coordinates[1] });
       return;
@@ -992,7 +1016,7 @@ function start() {
       setData: setData, flyTo: flyTo, setSpin: setSpin, setQuality: setQuality,
       focusCountry: focusByIso, clearSelection: function () { select(null); },
       setCountryTap: setCountryTap, setReduceMotion: setReduceMotion, fitPoints: fitPoints, fitCountries: fitCountries,
-      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, debugSize: debugSize
+      setInset: setInset, setTapMode: setTapMode, goHome: goHome, setFocus: setFocus, arrive: arrive, debugSize: debugSize, debugPoint: debugPoint, debugBox: debugBox
     };
     if (quality === 'low') applyQuality('low', 'config');
     setOff();
