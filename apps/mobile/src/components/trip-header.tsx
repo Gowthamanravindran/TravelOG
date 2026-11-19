@@ -119,8 +119,10 @@ export function TripHeader() {
         style={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: t.band ? 18 : 12, gap: 12 }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          {/* Back to the Trips screen already there: navigate would push a second one on top,
+              with a second globe (Plan 90). */}
           {roundButton('back', mode === 'trip' ? 'Exit trip mode' : 'Back to trips', () =>
-            router.navigate('/'),
+            router.dismissTo('/'),
           )}
           <View style={{ flex: 1 }} />
           {switchTo ? (

@@ -161,7 +161,8 @@ export default function EditTrip() {
                 onPress={() =>
                   run(() => {
                     mutate((db) => deleteTrip(db, id));
-                    router.navigate('/');
+                    // Back to the Trips screen already there, not a new one (Plan 90).
+                    router.dismissTo('/');
                   })
                 }
               />
