@@ -82,3 +82,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 76 | [The tab bar was covered by the globe's drawer](76-tab-bar-covered-by-the-drawer.md) | see git log |
 | 77 | [The globe tries again when it fails to start](77-globe-start-recovery.md) | see git log |
 | 78 | [The dates step keeps the drawer low](78-dates-step-stays-low.md) | see git log |
+| 79 | [The globe's start: progress, not a fixed limit, and no silent dark area](79-globe-start-progress.md) | see git log |

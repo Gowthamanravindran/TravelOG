@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { Globe } from '@/components/globe';
 import { globeProblem } from '@/lib/runtime';
@@ -46,12 +46,59 @@ describe('the globe recovers from a failed start (Plan 77)', () => {
     expect(globeProblem()).toMatch(/no WebGL/);
   });
 
-  it('a page that never says it is ready is loaded again', async () => {
+  it('a page that goes 5 s without any progress is loaded again, naming the step it stalled at', async () => {
     await render(<Globe />);
     const first = page();
-    await act(async () => jest.advanceTimersByTime(16_500));
+    await send({ type: 'progress', step: 'map', ms: 900 });
+    await act(async () => jest.advanceTimersByTime(4_900));
+    expect(page()).toBe(first);
+    await act(async () => jest.advanceTimersByTime(1_200)); // 5 s silent, then the 1 s retry wait
+    await act(async () => jest.advanceTimersByTime(1_000));
     expect(page()).not.toBe(first);
-    expect(globeProblem()).toMatch(/did not start within 15 s/);
+    expect(globeProblem()).toMatch(/no progress for 5 s after “map”/);
+  });
+
+  it('a slow start that keeps making progress is left to finish', async () => {
+    await render(<Globe />);
+    const first = page();
+    for (const step of ['page', 'data', 'library', 'map', 'loaded']) {
+      await act(async () => jest.advanceTimersByTime(4_000));
+      await send({ type: 'progress', step, ms: 1 });
+    }
+    await act(async () => jest.advanceTimersByTime(4_000));
+    await ready();
+    expect(page()).toBe(first);
+  });
+
+  it('a page that never sends anything is loaded again after 5 s', async () => {
+    await render(<Globe />);
+    const first = page();
+    await act(async () => jest.advanceTimersByTime(7_000));
+    expect(page()).not.toBe(first);
+    expect(globeProblem()).toMatch(/no progress for 5 s after “start”/);
+  });
+
+  it('says the globe is loading until it is ready, instead of a silent dark area', async () => {
+    await render(<Globe />);
+    expect(screen.getByText('Loading the globe…')).toBeTruthy();
+    await send({ type: 'progress', step: 'map', ms: 1 });
+    expect(screen.getByText('Loading the globe…')).toBeTruthy();
+    await ready();
+    expect(screen.queryByText('Loading the globe…')).toBeNull();
+  });
+
+  it('after giving up it says so and offers to try again', async () => {
+    await render(<Globe />);
+    for (let i = 0; i < 3; i++) {
+      await fatal();
+      await act(async () => jest.advanceTimersByTime(1500));
+    }
+    expect(views()).toHaveLength(0);
+    expect(screen.getByText('The globe couldn’t load.')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+    expect(views()).toHaveLength(1);
+    await ready();
+    expect(screen.queryByText('The globe couldn’t load.')).toBeNull();
   });
 
   it('once ready, a slow moment later does not reload it', async () => {

@@ -53,6 +53,12 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.goto("file://" + HTML)
     page.wait_for_function("window.__msgs.some(m=>m.type==='ready'||m.fatal)", timeout=60000)
+    # The page reports each step of its start, in order, before ready (Plan 79): the app reloads
+    # a page only after 5 s with no step at all.
+    steps = page.evaluate("window.__msgs.filter(m=>m.type==='progress'||m.type==='ready').map(m=>m.type==='ready'?'ready':m.step)")
+    # "loaded" (the map's own load event) can come just before or after ready.
+    out["start_steps"] = steps[:4] == ["page", "data", "library", "map"] and "ready" in steps and "loaded" in steps
+    out["start_steps_seen"] = steps
     page.evaluate("window.globe.setSpin(false); window.globe.setReduceMotion(true)")
 
     def tap(x, y):
@@ -168,5 +174,5 @@ with sync_playwright() as p:
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["start_steps", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)

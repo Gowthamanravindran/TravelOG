@@ -84,6 +84,9 @@ function post(msg) {
   if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
   else console.log('[globe] ' + text);
 }
+// Say how far the start has got; postStep comes from the page's first script (Plan 79).
+function startStep(name) { if (typeof postStep === 'function') postStep(name); }
+startStep('library'); // the map library is in
 
 // Calls made before the map has loaded are queued and replayed.
 var pending = [];
@@ -260,6 +263,8 @@ function start() {
     post({ type: 'error', fatal: true, message: 'Map could not start: ' + (err && err.message) });
     return;
   }
+  startStep('map');
+  map.once('load', function () { startStep('loaded'); });
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: 'Natural Earth' }), 'bottom-left');
 
@@ -993,6 +998,12 @@ export function buildGlobeHtml(data: GlobeData, input: GlobeConfig): string {
   return [
     '<!DOCTYPE html><html><head><meta charset="utf-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />',
+    // First thing on the page: say it is running. Each later step of the start says so too, so
+    // the app can tell a slow start from a stuck one (Plan 79).
+    '<script>var T0 = performance.now();',
+    'function postStep(step) { var m = JSON.stringify({ type: "progress", step: step, ms: Math.round(performance.now() - T0) });',
+    ' if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(m); }',
+    'postStep("page");</script>',
     '<style>',
     MAPLIBRE_CSS,
     '</style>',
@@ -1000,11 +1011,11 @@ export function buildGlobeHtml(data: GlobeData, input: GlobeConfig): string {
     pageCss(config.theme),
     '</style>',
     '</head><body><canvas id="stars"></canvas><div id="map"></div>',
-    '<script>var T0 = performance.now(); var CFG = ',
+    '<script>var CFG = ',
     safeJson(config),
     '; var DATA = ',
     safeJson(data),
-    ';</script>',
+    '; postStep("data");</script>',
     '<script>',
     MAPLIBRE_JS,
     '</script>',

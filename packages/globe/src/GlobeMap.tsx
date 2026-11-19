@@ -93,7 +93,12 @@ export type GlobeMapProps = {
   theme?: GlobeTheme;
   style?: StyleProp<ViewStyle>;
   /** Shown instead of the globe if the map cannot start on this device. */
-  fallback?: React.ReactNode;
+  /** Shown in place of the globe after it has failed to start; given a way to try again. */
+  fallback?: React.ReactNode | ((retry: () => void) => React.ReactNode);
+  /** Shown over the globe's visible part until the map is ready (Plan 79). */
+  loading?: React.ReactNode;
+  /** The globe's name for screen readers. */
+  label?: string;
   onCountryPress?: (country: CountryTap) => void;
   /** A pin or a numbered stop was tapped. */
   onPlacePress?: (place: Place) => void;
@@ -127,6 +132,8 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     theme = defaultTheme,
     style,
     fallback,
+    loading,
+    label,
     onCountryPress,
     onPlacePress,
     onCandidatePress,
@@ -171,7 +178,10 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
 
   // A start can fail: the drawing context is refused, or the page goes silent. The page is then
   // loaded again, up to three starts in a row, before the fallback is shown (Plan 77).
+  // The page reports each step of its start; the step it last reached names a stall (Plan 79).
   const failures = useRef(0);
+  const step = useRef('start');
+  const [progress, setProgress] = useState(0);
   const retry = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startFailed = useCallback(
     (message: string) => {
@@ -192,15 +202,29 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
     },
     [],
   );
-  // A page that has not said it is ready within the limit is counted as a failed start.
+  // A new page starts from the beginning.
+  useEffect(() => {
+    step.current = 'start';
+  }, [html, reloadKey]);
+  // A start that goes too long without any step is counted as failed. A slow start that keeps
+  // reporting steps is left to finish: starting it again would only make it later (Plan 79).
   useEffect(() => {
     if (ready || failed) return;
     const timer = setTimeout(
-      () => startFailed(`Map did not start within ${READY_LIMIT_MS / 1000} s`),
-      READY_LIMIT_MS,
+      () =>
+        startFailed(
+          `Map made no progress for ${SILENCE_LIMIT_MS / 1000} s after “${step.current}”`,
+        ),
+      SILENCE_LIMIT_MS,
     );
     return () => clearTimeout(timer);
-  }, [ready, failed, html, reloadKey, startFailed]);
+  }, [ready, failed, html, reloadKey, progress, startFailed]);
+
+  const retryNow = useCallback(() => {
+    failures.current = 0;
+    setFailed(false);
+    setReloadKey((k) => k + 1);
+  }, []);
 
   useEffect(() => {
     if (ready) run('window.globe.setInset(' + Math.round(bottomInset) + ')');
@@ -287,6 +311,10 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
         return;
       }
       switch (msg.type) {
+        case 'progress':
+          step.current = String(msg.step);
+          setProgress((n) => n + 1);
+          break;
         case 'ready':
           failures.current = 0;
           setReady(true);
@@ -335,12 +363,20 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
 
   if (failed && fallback) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.space }, style]}>{fallback}</View>
+      <View style={[styles.container, { backgroundColor: theme.space }, style]}>
+        <View style={[styles.band, { bottom: bottomInset }]}>
+          {typeof fallback === 'function' ? fallback(retryNow) : fallback}
+        </View>
+      </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.space }, style]}>
+    <View
+      accessible={!!label}
+      accessibilityLabel={label}
+      style={[styles.container, { backgroundColor: theme.space }, style]}
+    >
       <WebView
         key={reloadKey}
         ref={webview}
@@ -359,6 +395,11 @@ const GlobeMap = forwardRef<GlobeMapHandle, GlobeMapProps>(function GlobeMap(
         nestedScrollEnabled
         style={[styles.webview, { backgroundColor: theme.space }]}
       />
+      {!ready && loading ? (
+        <View pointerEvents="none" style={[styles.band, { bottom: bottomInset }]}>
+          {loading}
+        </View>
+      ) : null}
     </View>
   );
 });
@@ -369,10 +410,19 @@ export default GlobeMap;
 const START_TRIES = 3;
 /** Wait before loading the page again after a failed start. */
 const RETRY_MS = 1000;
-/** How long a page may take to say it is ready (country shapes in; imagery is not waited for). */
-const READY_LIMIT_MS = 15_000;
+/** How long a start may go without reporting any step before it counts as stuck (Plan 79). */
+const SILENCE_LIMIT_MS = 5_000;
 
 const styles = StyleSheet.create({
   container: { flex: 1, overflow: 'hidden' },
   webview: { flex: 1 },
+  // The part of the globe that shows above whatever covers its lower part.
+  band: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
