@@ -41,9 +41,13 @@ const RATE = 0.6;
 const CRUISE = 0.18;
 const WARP = 0.5;
 const WARP_AFTER_MS = 700;
-/** One dim deep-field star per this many square points, so the edges are never empty. */
-const FIELD_AREA_PER_STAR = 1400;
-const FIELD_MAX = 200;
+/** Dim deep-field stars, so the edges are never empty. */
+const FIELD_STARS = 170;
+/**
+ * The sky's shape until it has measured itself (a phone's globe area): only the streaks' angles
+ * depend on it, and they settle once it is measured (Plan 94).
+ */
+const ASSUMED = { w: 390, h: 430 };
 const FADE_MS = 600;
 /** The words only show if the globe is slow to come. */
 const WORDS_AFTER_MS = 3000;
@@ -166,11 +170,14 @@ function Layer({
   });
   const placed = useMemo(
     () =>
-      layer.stars.map((s) => {
-        const dx = s.x * (w / 2) * SCALE_MAX;
-        const dy = s.y * (h / 2) * SCALE_MAX;
-        return { ...s, x: w / 2 + dx, y: h / 2 + dy, angle: Math.atan2(dy, dx) };
-      }),
+      // Where each star is, as a part of the sky (it can be well outside it when drawn nearest),
+      // so it draws before the sky has measured itself; the angle needs its shape (Plan 94).
+      layer.stars.map((s) => ({
+        ...s,
+        fx: 0.5 + s.x * 0.5 * SCALE_MAX,
+        fy: 0.5 + s.y * 0.5 * SCALE_MAX,
+        angle: Math.atan2(s.y * h, s.x * w),
+      })),
     [layer, w, h],
   );
   return (
@@ -191,8 +198,10 @@ function Layer({
                   borderRadius: thick / 2,
                   opacity: s.bright,
                   // Its head at the star, its tail back towards the middle.
-                  left: s.x - (Math.cos(s.angle) * length) / 2 - length / 2,
-                  top: s.y - (Math.sin(s.angle) * length) / 2 - thick / 2,
+                  left: `${s.fx * 100}%`,
+                  top: `${s.fy * 100}%`,
+                  marginLeft: -(Math.cos(s.angle) * length) / 2 - length / 2,
+                  marginTop: -(Math.sin(s.angle) * length) / 2 - thick / 2,
                   transform: [{ rotate: `${s.angle}rad` }],
                 },
               ]}
@@ -215,8 +224,10 @@ function Layer({
               style={[
                 styles.dot,
                 {
-                  left: s.x - size / 2,
-                  top: s.y - size / 2,
+                  left: `${s.fx * 100}%`,
+                  top: `${s.fy * 100}%`,
+                  marginLeft: -size / 2,
+                  marginTop: -size / 2,
                   width: size,
                   height: size,
                   borderRadius: size / 2,
@@ -240,12 +251,12 @@ interface Fixed {
   color: string;
 }
 /** Distant stars that do not seem to move: dim, so the flight is what catches the eye. */
-function deepField(w: number, h: number): Fixed[] {
+/** Placed as parts of the sky (0–1), so they draw before the sky has measured itself (Plan 94). */
+function deepField(): Fixed[] {
   const next = random(20261119);
-  const n = Math.min(FIELD_MAX, Math.round((w * h) / FIELD_AREA_PER_STAR));
-  return Array.from({ length: n }, () => ({
-    x: next() * w,
-    y: next() * h,
+  return Array.from({ length: FIELD_STARS }, () => ({
+    x: next(),
+    y: next(),
     size: 0.8 + next() * 0.6,
     opacity: 0.12 + next() * 0.3,
     color: tint(next()),
@@ -269,8 +280,9 @@ export function StarWarp({
 }) {
   const ok = useMotionOk();
   const layers = useMemo(warpLayers, []);
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  const field = useMemo(() => deepField(size.w, size.h), [size]);
+  const [measured, setSize] = useState({ w: 0, h: 0 });
+  const size = measured.w > 0 && measured.h > 0 ? measured : ASSUMED;
+  const field = useMemo(deepField, []);
   const travel = useSharedValue(0.37);
   const speed = useSharedValue(0);
   const target = useSharedValue(0);
@@ -331,8 +343,8 @@ export function StarWarp({
           style={[
             styles.dot,
             {
-              left: s.x,
-              top: s.y,
+              left: `${s.x * 100}%`,
+              top: `${s.y * 100}%`,
               width: s.size,
               height: s.size,
               borderRadius: s.size / 2,
@@ -353,17 +365,17 @@ export function StarWarp({
               width: glow * part,
               height: glow * part,
               borderRadius: (glow * part) / 2,
-              left: size.w / 2 - (glow * part) / 2,
-              top: size.h / 2 - (glow * part) / 2,
+              left: '50%',
+              top: '50%',
+              marginLeft: -(glow * part) / 2,
+              marginTop: -(glow * part) / 2,
             },
           ]}
         />
       ))}
-      {size.w > 0
-        ? layers.map((layer, i) => (
-            <Layer key={i} layer={layer} travel={travel} speed={speed} w={size.w} h={size.h} />
-          ))
-        : null}
+      {layers.map((layer, i) => (
+        <Layer key={i} layer={layer} travel={travel} speed={speed} w={size.w} h={size.h} />
+      ))}
       {words ? (
         <View style={styles.words}>
           <Text style={[type.caption, styles.wordsText]}>Loading the globe…</Text>

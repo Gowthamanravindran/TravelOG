@@ -1,5 +1,5 @@
 import { saveLocalProfile } from '@travelog/db';
-import { act, render } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 
 import HomeLayout from '@/app/(home)/_layout';
 import { globeProblem } from '@/lib/runtime';
@@ -105,5 +105,17 @@ describe('the globe while a trip is open over it (Plan 89)', () => {
     await view.rerender(tree());
     await wait(7_000);
     expect(page()).not.toBe(first);
+  });
+
+  it('on Feed the Trips drawer stays as it was, hidden, so coming back does not rebuild it (Plan 94)', async () => {
+    const view = await render(tree());
+    await ready();
+    const drawer = screen.getByText('Your trips');
+    mockPath = '/feed';
+    await view.rerender(tree());
+    expect(screen.getByText('Your trips', { includeHiddenElements: true })).toBe(drawer);
+    mockPath = '/';
+    await view.rerender(tree());
+    expect(screen.getByText('Your trips')).toBe(drawer);
   });
 });

@@ -52,7 +52,8 @@ function pageCss(theme: GlobeTheme): string {
     'html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }',
     'body { background-color: ' + theme.space + '; -webkit-user-select: none; user-select: none;',
     '  -webkit-tap-highlight-color: transparent; touch-action: none; }',
-    '#map { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }',
+    // Hidden until the globe arrives (Plan 94).
+    '#map { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; }',
     '#stars { position: absolute; left: 0; top: 0; will-change: transform; }',
     '#map { background: transparent; }',
     '#rim { position: absolute; left: 0; top: 0; border-radius: 50%; pointer-events: none; box-sizing: border-box;',
@@ -296,9 +297,11 @@ function start() {
     startStep('creating', { w: window.innerWidth, h: window.innerHeight });
     map = new maplibregl.Map({
       container: 'map',
-      center: [78, 18],
-      zoom: 1.4,
-      minZoom: 0.2, // low enough for the whole Earth to fit a short visible band
+      // Made far away and small, where the arrival starts (Plan 80): set here, so no frame is
+      // drawn at a default place first (Plan 94). arrive() brings it in and back to minZoom 0.2.
+      center: [108, 18],
+      zoom: -1.6,
+      minZoom: -2,
       maxZoom: 7,
       attributionControl: false,
       dragRotate: false,
@@ -763,24 +766,40 @@ function start() {
   // asked for (a country's page, the whole Earth) is already flying in from far away, so only a
   // globe left resting is brought in here. Without the call, the globe arrives by itself.
   var arrived = false, arriveTimer = null;
-  var FAR_ZOOM = -1.6, ARRIVE_MS = 1800, ARRIVE_TURN = 30;
-  function setOff() { // called once the map is ready
+  var ARRIVE_MS = 1800, ARRIVE_TURN = 30; // made at zoom -1.6, 30° east of where it arrives
+  // Called once the map is ready. It was made far away, but the library can move it while it
+  // loads, so it is put there again; unseen, as the map is hidden until it arrives (Plan 94).
+  function setOff() {
     map.setMinZoom(-2);
-    map.jumpTo({ zoom: FAR_ZOOM, center: [map.getCenter().lng + ARRIVE_TURN, HOME_LAT] });
+    map.jumpTo({ zoom: -1.6, center: [map.getCenter().lng + ARRIVE_TURN, HOME_LAT] });
     arriveTimer = setTimeout(arrive, 1500);
   }
   function arrive() {
     if (arrived) return;
     arrived = true;
     clearTimeout(arriveTimer);
+    // Not seen until now, so nothing it drew before arriving shows (Plan 94). It appears at once:
+    // the app's night sky over it is what fades, as the globe flies in.
+    document.getElementById('map').style.opacity = '1';
     setTimeout(function () { if (map.getZoom() >= 0.2) map.setMinZoom(0.2); }, dur(ARRIVE_MS) + 1200);
-    if (command) return;
-    var lng = map.getCenter().lng - ARRIVE_TURN;
-    pause(dur(ARRIVE_MS) + 600);
-    move(ARRIVE_MS, function () {
-      map.easeTo({ center: [lng, HOME_LAT], zoom: homeZoom(), padding: pad(), duration: dur(ARRIVE_MS),
-        easing: function (t) { return 1 - Math.pow(1 - t, 3); } });
-    });
+    pause(dur(ARRIVE_MS) + 1200);
+    // The first frame it is seen in can be slow to draw; a flight timed from before it would
+    // jump ahead. So the flight starts once that frame is drawn (Plan 94). A move already asked
+    // for (a country's page) is started again then, from far away, for the same reason.
+    // Two frames on, the first frame it is seen in has been drawn, however slow it was.
+    var flight = command;
+    map.triggerRepaint();
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      // That frame can take seconds on a slow phone; the spin is held off from when the flight
+      // starts, or it would take over the camera half-way in.
+      pause(dur(ARRIVE_MS) + 1200);
+      if (flight) { if (command === flight) move(commandMs, flight); return; }
+      var lng = map.getCenter().lng - ARRIVE_TURN;
+      move(ARRIVE_MS, function () {
+        map.easeTo({ center: [lng, HOME_LAT], zoom: homeZoom(), padding: pad(), duration: dur(ARRIVE_MS),
+          easing: function (t) { return 1 - Math.pow(1 - t, 3); } });
+      });
+    }); });
   }
   // The zoom at which the whole Earth fits the visible band. On a globe the drawn radius is
   // worldSize / (2 pi cos(latitude)), so the zoom depends on the resting latitude.

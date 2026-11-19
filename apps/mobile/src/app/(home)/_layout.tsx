@@ -50,8 +50,11 @@ export default function HomeLayout() {
   // A screen pushed over the tabs (a trip, Licences) hides the stage but keeps the tab's page
   // on it, so coming back finds it as it was (Plan 75).
   const onTabs = isTabPath(pathname);
-  const stageTab = useRef(stageTabFor(pathname));
-  if (onTabs) stageTab.current = stageTabFor(pathname);
+  // The globe's tab now, or none (Feed). The last globe tab's page stays on the stage, hidden,
+  // while Feed or another screen is in front, so coming back does not rebuild it (Plan 94).
+  const here = onTabs ? stageTabFor(pathname) : null;
+  const stageTab = useRef(here);
+  if (here) stageTab.current = here;
   const [barHeight, setBarHeight] = useState(0);
   const [bar, setBar] = useState<BottomTabBarProps | null>(null);
   if (!profile) return <Redirect href="/welcome" />;
@@ -77,7 +80,7 @@ export default function HomeLayout() {
         </Tabs>
         {/* One globe for Trips, Explore and Profile, drawn over the tab scenes (Plan 72). */}
         {hasGlobe() ? (
-          <GlobeStage tab={stageTab.current} hidden={!onTabs} bottom={flow.open ? 0 : barHeight} />
+          <GlobeStage tab={stageTab.current} hidden={!here} bottom={flow.open ? 0 : barHeight} />
         ) : null}
         {/* The bar, drawn last so it is on top. The create flow uses the whole screen; the bar
             comes back when it closes. */}

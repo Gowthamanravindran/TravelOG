@@ -97,3 +97,4 @@ Each planning step in order. Earlier plans are never edited; new work is added a
 | 91 | [No second copies of screens already open](91-no-duplicate-screens.md) | see git log |
 | 92 | [Where the globe's start-up time goes](92-globe-start-timeline.md) | see git log |
 | 93 | [Every cold start stalled for 5 s: the stars were drawn before the globe had a size](93-globe-cold-start-stall.md) | see git log |
+| 94 | [No dark screen and no jump when the globe starts](94-smooth-globe-start.md) | see git log |

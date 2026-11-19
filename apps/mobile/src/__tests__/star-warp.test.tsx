@@ -82,6 +82,13 @@ async function sky() {
 }
 
 describe('the night sky while the globe starts', () => {
+  it('shows its stars from the first frame, before it has measured itself (Plan 94)', async () => {
+    // While the app starts the measuring comes late, and the sky was an empty dark area till then.
+    await render(<StarWarp leaving={false} />);
+    expect(screen.getAllByTestId('moving-star').length).toBeGreaterThanOrEqual(150);
+    expect(screen.getAllByTestId('sky-star').length).toBeGreaterThanOrEqual(100);
+  });
+
   it('flies through plenty of stars, but moves only a few layers each frame', async () => {
     await sky();
     expect(screen.getAllByTestId('moving-star').length).toBeGreaterThanOrEqual(150);
@@ -92,12 +99,14 @@ describe('the night sky while the globe starts', () => {
   it('has no fixed bright stars on top; the deep field behind is dim and reaches the edges', async () => {
     await sky();
     expect(screen.queryAllByTestId('bright-star')).toHaveLength(0);
+    // Placed as parts of the sky (Plan 94): "3.2%" is 0.032 of the way across.
     const field = screen
       .getAllByTestId('sky-star')
-      .map((v) => StyleSheet.flatten(v.props.style) as { left: number; opacity: number });
+      .map((v) => StyleSheet.flatten(v.props.style) as { left: string; opacity: number });
+    const across = field.map((s) => parseFloat(s.left) / 100);
     expect(field.length).toBeGreaterThanOrEqual(100);
     expect(Math.max(...field.map((s) => s.opacity))).toBeLessThanOrEqual(0.45);
-    expect(Math.min(...field.map((s) => s.left))).toBeLessThan(W * 0.05);
-    expect(Math.max(...field.map((s) => s.left))).toBeGreaterThan(W * 0.95);
+    expect(Math.min(...across)).toBeLessThan(0.05);
+    expect(Math.max(...across)).toBeGreaterThan(0.95);
   });
 });

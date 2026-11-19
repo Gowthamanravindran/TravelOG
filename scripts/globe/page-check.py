@@ -56,14 +56,20 @@ with sync_playwright() as p:
     # (no slide up from the bottom); arriving brings it to its full size in the visible part.
     def size0():
         return page.evaluate("window.globe.debugSize()")
+    # Plan 94: the map is not seen until it arrives, so no frame at its default place shows.
+    out["hidden_until_arrive"] = page.evaluate("getComputedStyle(document.getElementById('map')).opacity") == "0"
     far = size0()
     page.evaluate("window.globe.setInset(%d)" % INSET)
     page.wait_for_timeout(120)
     out["arrive_far"] = far["diameter"] < 0.35 * min(W, H - INSET) and abs(size0()["centerY"] - BAND_MID) <= 6
     page.evaluate("window.globe.arrive()")
-    page.wait_for_timeout(700)
+    out["shown_on_arrive"] = page.evaluate("getComputedStyle(document.getElementById('map')).opacity") != "0"
+    # The flight starts once the first frame it is seen in is drawn, which in this software
+    # renderer can take a second or more; caught part-way, it is between far and home.
+    page.wait_for_function("window.globe.debugSize().zoom > -1.5", timeout=8000, polling=50)
+    page.wait_for_timeout(150)
     mid = size0()
-    page.wait_for_timeout(1800)
+    page.wait_for_timeout(2600)
     end = size0()
     out["arrive_moves"] = far["diameter"] < mid["diameter"] < end["diameter"]
     out["arrive_home"] = 0.8 * min(W, H - INSET) <= end["diameter"] <= min(W, H - INSET) + 2 and abs(end["centerY"] - BAND_MID) <= 6
@@ -250,5 +256,5 @@ with sync_playwright() as p:
     browser.close()
 
 print(json.dumps(out, indent=1))
-checks = ["creating_has_size", "idle_quiet", "hidden_no_crash", "shown_lost_crashes", "quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
+checks = ["hidden_until_arrive", "shown_on_arrive", "creating_has_size", "idle_quiet", "hidden_no_crash", "shown_lost_crashes", "quality_ready_known", "quality_returns", "fit_fills", "tap_nearest", "start_steps", "arrive_far", "arrive_moves", "arrive_home", "inset_focus", "report_only", "focus_mode", "home_fits", "motion_focus", "focus_held", "motion_home", "motion_fit", "no_errors"]
 sys.exit(0 if all(out.get(c) for c in checks) else 1)
